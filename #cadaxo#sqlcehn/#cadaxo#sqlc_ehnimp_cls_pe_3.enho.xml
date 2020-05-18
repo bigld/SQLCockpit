@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_ENHO" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <TOOL>HOOK_IMPL</TOOL>
+   <SHORTTEXT>SQL Cockpit Update - Client Specified</SHORTTEXT>
+   <ORIGINAL_OBJECT>
+    <PGMID>R3TR</PGMID>
+    <ORG_OBJ_TYPE>CLAS</ORG_OBJ_TYPE>
+    <ORG_OBJ_NAME>/CADAXO/CL_SQLC_COCKPIT_PARSE</ORG_OBJ_NAME>
+    <ORG_MAIN_TYPE>CLAS</ORG_MAIN_TYPE>
+    <ORG_MAIN_NAME>/CADAXO/CL_SQLC_COCKPIT_PARSE</ORG_MAIN_NAME>
+    <PROGRAMNAME>/CADAXO/CL_SQLC_COCKPIT_PARSE=CP</PROGRAMNAME>
+   </ORIGINAL_OBJECT>
+   <ENHANCEMENTS>
+    <ENH_HOOK_IMPL>
+     <SPOTNAME>/CADAXO/SQLC_EHNSP_CLS_SE_001</SPOTNAME>
+     <PROGRAMNAME>/CADAXO/CL_SQLC_COCKPIT_PARSE=CP</PROGRAMNAME>
+     <ENHMODE>D</ENHMODE>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_001\EI</FULL_NAME>
+     <SOURCE>
+      <item>*...</item>
+      <item>* client specified - main select</item>
+      <item>FIND ALL OCCURRENCES OF &apos;SELECT&apos; IN lv_check_sql_string RESULTS lt_results.</item>
+      <item>READ TABLE lt_results INDEX 2 INTO ls_results.</item>
+      <item>IF sy-subrc EQ 0.</item>
+      <item>l_length2 = ls_results-offset.</item>
+      <item>ELSE.</item>
+      <item>l_length2 = strlen( sql_string ).</item>
+      <item>ENDIF.</item>
+      <item>FIND FIRST OCCURRENCE OF REGEX &apos;CLIENT\s+SPECIFIED&apos; IN SECTION OFFSET 0 LENGTH l_length2 OF lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.</item>
+      <item>IF sy-subrc EQ 0.</item>
+      <item>IF ls_adm_cust-allow_cls NE abap_true.</item>
+      <item>MESSAGE e013(/cadaxo/sqlc) INTO l_message.</item>
+      <item>RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error</item>
+      <item>EXPORTING message       = l_message</item>
+      <item>/cadaxo/msgid = &apos;/CADAXO/SQLC&apos;</item>
+      <item>/cadaxo/msgnr = &apos;013&apos;.</item>
+      <item>ELSE.</item>
+      <item/>
+      <item>l_cl_sql_parse-&gt;gs_client_handling-client_specified = abap_true.</item>
+      <item>lv_spacer_string = repeat( val = ` ` occ = l_length ).                                                         &quot;COCKPIT-222</item>
+      <item>lv_check_sql_string = replace( val = lv_check_sql_string off = l_moff len = l_length with = lv_spacer_string ).&quot;COCKPIT-222</item>
+      <item>sql_string          = replace( val = sql_string          off = l_moff len = l_length with = lv_spacer_string ).&quot;COCKPIT-222</item>
+      <item/>
+      <item>ENDIF.</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item>* client specified - sub selects</item>
+      <item>FIND FIRST OCCURRENCE OF REGEX &apos;\ASELECT(.*)SELECT(.*)(CLIENT\s+SPECIFIED)&apos; IN lv_check_sql_string.</item>
+      <item>IF sy-subrc EQ 0.</item>
+      <item>IF ls_adm_cust-allow_cls NE abap_true.</item>
+      <item>MESSAGE e013(/cadaxo/sqlc) INTO l_message.</item>
+      <item>RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error</item>
+      <item>EXPORTING message       = l_message</item>
+      <item>/cadaxo/msgid = &apos;/CADAXO/SQLC&apos;</item>
+      <item>/cadaxo/msgnr = &apos;013&apos;.</item>
+      <item>ENDIF.</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item/>
+      <item>FIND FIRST OCCURRENCE OF REGEX &apos;USING\s+CLIENT&apos;                                                      &quot;COCKPIT-225</item>
+      <item>IN SECTION OFFSET 0 LENGTH l_length2 OF lv_check_sql_string                                     &quot;COCKPIT-225</item>
+      <item>MATCH OFFSET l_moff MATCH LENGTH l_length.                                                      &quot;COCKPIT-225</item>
+      <item>IF sy-subrc EQ 0.                                                                                    &quot;COCKPIT-225</item>
+      <item>IF ls_adm_cust-allow_cls NE abap_true.                                                             &quot;COCKPIT-225</item>
+      <item>MESSAGE e121(/cadaxo/sqlc) INTO l_message.                                                       &quot;COCKPIT-225</item>
+      <item>RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                                                &quot;COCKPIT-225</item>
+      <item>EXPORTING message       = l_message                                                        &quot;COCKPIT-225</item>
+      <item>/cadaxo/msgid = &apos;/CADAXO/SQLC&apos;                                                   &quot;COCKPIT-225</item>
+      <item>/cadaxo/msgnr = &apos;121&apos;.                                                           &quot;COCKPIT-225</item>
+      <item>ELSE.                                                                                              &quot;COCKPIT-225</item>
+      <item>&quot;COCKPIT-225</item>
+      <item>l_cl_sql_parse-&gt;gs_client_handling-using_client = abap_true.                                     &quot;COCKPIT-225</item>
+      <item>&quot;COCKPIT-225</item>
+      <item>ENDIF.                                                                                             &quot;COCKPIT-225</item>
+      <item>ENDIF.                                                                                               &quot;COCKPIT-225</item>
+      <item>&quot;COCKPIT-225</item>
+      <item>* client specified - sub selects                                                                         &quot;COCKPIT-225</item>
+      <item>FIND FIRST OCCURRENCE OF REGEX &apos;\ASELECT(.*)SELECT(.*)(USING\s+CLIENT)&apos; IN lv_check_sql_string.      &quot;COCKPIT-225</item>
+      <item>IF sy-subrc EQ 0.                                                                                    &quot;COCKPIT-225</item>
+      <item>IF ls_adm_cust-allow_cls NE abap_true.                                                             &quot;COCKPIT-225</item>
+      <item>MESSAGE e121(/cadaxo/sqlc) INTO l_message.                                                       &quot;COCKPIT-225</item>
+      <item>RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                                                &quot;COCKPIT-225</item>
+      <item>EXPORTING message       = l_message                                                        &quot;COCKPIT-225</item>
+      <item>/cadaxo/msgid = &apos;/CADAXO/SQLC&apos;                                                   &quot;COCKPIT-225</item>
+      <item>/cadaxo/msgnr = &apos;121&apos;.                                                           &quot;COCKPIT-225</item>
+      <item>ENDIF.                                                                                             &quot;COCKPIT-225</item>
+      <item>ENDIF.                                                                                               &quot;COCKPIT-225</item>
+      <item/>
+     </SOURCE>
+    </ENH_HOOK_IMPL>
+    <ENH_HOOK_IMPL>
+     <SPOTNAME>/CADAXO/SQLC_EHNSP_CLS_SE_001</SPOTNAME>
+     <PROGRAMNAME>/CADAXO/CL_SQLC_COCKPIT_PARSE=CP</PROGRAMNAME>
+     <ENHMODE>D</ENHMODE>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_002\EI</FULL_NAME>
+     <SOURCE>
+      <item>*...</item>
+      <item/>
+      <item>CASE abap_true.</item>
+      <item>WHEN i_cl_cockpit_parse-&gt;gs_client_handling-client_specified.</item>
+      <item>CONCATENATE l_line &apos;CLIENT SPECIFIED&apos; INTO l_line SEPARATED BY space.</item>
+      <item>*    WHEN i_cl_cockpit_parse-&gt;gs_client_handling-using_client.</item>
+      <item>*      CONCATENATE l_line &apos;USING CLIENT&apos; INTO l_line SEPARATED BY space.</item>
+      <item>ENDCASE.</item>
+      <item/>
+     </SOURCE>
+    </ENH_HOOK_IMPL>
+    <ENH_HOOK_IMPL>
+     <SPOTNAME>/CADAXO/SQLC_EHNSP_CLS_SE_001</SPOTNAME>
+     <PROGRAMNAME>/CADAXO/CL_SQLC_COCKPIT_PARSE=CP</PROGRAMNAME>
+     <ENHMODE>S</ENHMODE>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_003\EI</FULL_NAME>
+     <SOURCE>
+      <item>*...</item>
+      <item/>
+      <item>DEFINE cls_cdss.</item>
+      <item>* add &quot;client specified&quot;</item>
+      <item>CASE abap_true.</item>
+      <item>WHEN me-&gt;gs_client_handling-client_specified.</item>
+      <item>APPEND &apos;CLIENT SPECIFIED&apos; TO lt_abap_code.</item>
+      <item>*    WHEN me-&gt;gs_client_handling-using_client.</item>
+      <item>*      APPEND &apos;USING CLIENT&apos; TO lt_abap_code.</item>
+      <item>ENDCASE.</item>
+      <item/>
+      <item>END-OF-DEFINITION.</item>
+      <item/>
+     </SOURCE>
+    </ENH_HOOK_IMPL>
+    <ENH_HOOK_IMPL>
+     <SPOTNAME>/CADAXO/SQLC_EHNSP_CLS_SE_001</SPOTNAME>
+     <PROGRAMNAME>/CADAXO/CL_SQLC_COCKPIT_PARSE=CP</PROGRAMNAME>
+     <ENHMODE>S</ENHMODE>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_004\EI</FULL_NAME>
+     <SOURCE>
+      <item>*...</item>
+      <item>CONSTANTS: lc_cs_active TYPE flag VALUE abap_true.</item>
+     </SOURCE>
+    </ENH_HOOK_IMPL>
+    <ENH_HOOK_IMPL>
+     <SPOTNAME>/CADAXO/SQLC_EHNSP_CLS_SE_001</SPOTNAME>
+     <PROGRAMNAME>/CADAXO/CL_SQLC_COCKPIT_PARSE=CP</PROGRAMNAME>
+     <ENHMODE>S</ENHMODE>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_005\EI</FULL_NAME>
+     <SOURCE>
+      <item>*...</item>
+      <item>CONSTANTS: lc_cs_active TYPE flag VALUE abap_true.</item>
+     </SOURCE>
+    </ENH_HOOK_IMPL>
+   </ENHANCEMENTS>
+   <SPACES>
+    <item>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_001\EI</FULL_NAME>
+     <SPACES>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>6</item>
+      <item>4</item>
+      <item>6</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>14</item>
+      <item>24</item>
+      <item>24</item>
+      <item>6</item>
+      <item>0</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>6</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>14</item>
+      <item>24</item>
+      <item>24</item>
+      <item>6</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>9</item>
+      <item>9</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>14</item>
+      <item>24</item>
+      <item>24</item>
+      <item>6</item>
+      <item>105</item>
+      <item>8</item>
+      <item>105</item>
+      <item>6</item>
+      <item>4</item>
+      <item>105</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>14</item>
+      <item>24</item>
+      <item>24</item>
+      <item>6</item>
+      <item>4</item>
+      <item>0</item>
+     </SPACES>
+    </item>
+    <item>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_002\EI</FULL_NAME>
+     <SPACES>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+     </SPACES>
+    </item>
+    <item>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_003\EI</FULL_NAME>
+     <SPACES>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+     </SPACES>
+    </item>
+    <item>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_004\EI</FULL_NAME>
+     <SPACES>
+      <item>0</item>
+      <item>2</item>
+     </SPACES>
+    </item>
+    <item>
+     <FULL_NAME>\PR:/CADAXO/CL_SQLC_COCKPIT_PARSE=CP\EX:/CADAXO/SQLC_EHN_S_CLS_SE_005\EI</FULL_NAME>
+     <SPACES>
+      <item>0</item>
+      <item>2</item>
+     </SPACES>
+    </item>
+   </SPACES>
+  </asx:values>
+ </asx:abap>
+</abapGit>

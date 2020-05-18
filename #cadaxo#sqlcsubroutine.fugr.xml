@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_FUGR" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <AREAT>SQL Cockpit - SUBROUTINE Pool</AREAT>
+   <INCLUDES>
+    <SOBJ_NAME>/CADAXO/LSQLCSUBROUTINEF01</SOBJ_NAME>
+    <SOBJ_NAME>/CADAXO/LSQLCSUBROUTINEM01</SOBJ_NAME>
+    <SOBJ_NAME>/CADAXO/LSQLCSUBROUTINETOP</SOBJ_NAME>
+    <SOBJ_NAME>/CADAXO/SAPLSQLCSUBROUTINE</SOBJ_NAME>
+   </INCLUDES>
+   <FUNCTIONS>
+    <item>
+     <FUNCNAME>/CADAXO/SQLCSUBROUTINEPOOL</FUNCNAME>
+     <REMOTE_CALL>R</REMOTE_CALL>
+     <SHORT_TEXT>SQL Cockpit - Subroutine Pool</SHORT_TEXT>
+     <IMPORT>
+      <RSIMP>
+       <PARAMETER>I_VERSION</PARAMETER>
+       <TYP>/CADAXO/SQLC_SELECT_VERSION</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>I_TRACE</PARAMETER>
+       <TYP>BOOLEAN</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>I_USER_SETT_SQL_TRACE</PARAMETER>
+       <TYP>/CADAXO/SQLCSQLTRACE</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>I_USER_SETT_TABB_TRACE</PARAMETER>
+       <TYP>/CADAXO/SQLCTABLEBUFFERTRACE</TYP>
+      </RSIMP>
+     </IMPORT>
+     <CHANGING>
+      <RSCHA>
+       <PARAMETER>IC_DATA</PARAMETER>
+       <TYP>XSTRING</TYP>
+      </RSCHA>
+     </CHANGING>
+     <EXPORT>
+      <RSEXP>
+       <PARAMETER>E_ERROR_MESSAGE</PARAMETER>
+       <TYP>STRING</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>E_RUNTIME</PARAMETER>
+       <TYP>INT4</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>E_RESULT_LINES</PARAMETER>
+       <TYP>INT4</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>ET_RESULT</PARAMETER>
+       <TYP>XSTRING</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>ET_DFIES_ALL</PARAMETER>
+       <TYP>/CADAXO/SQLCDFIES_T</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>ET_DFIES</PARAMETER>
+       <TYP>/CADAXO/SQLCDFIES_T</TYP>
+      </RSEXP>
+     </EXPORT>
+     <DOCUMENTATION>
+      <RSFDO>
+       <PARAMETER>I_VERSION</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>SQL Cockpit - Select version</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>I_TRACE</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Boolean Variable (X=True, -=False, Space=Unknown)</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>I_USER_SETT_SQL_TRACE</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>SQL Cockpit - SQL Trace</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>I_USER_SETT_TABB_TRACE</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>SQL Cockpit - Tablebuffer Trace</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>E_ERROR_MESSAGE</PARAMETER>
+       <KIND>P</KIND>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>E_RUNTIME</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Natural number</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>E_RESULT_LINES</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Natural number</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>ET_RESULT</PARAMETER>
+       <KIND>P</KIND>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>ET_DFIES_ALL</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>SQL Cockpit - Table of /CADAXO/SQLCDFIES</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>ET_DFIES</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>SQL Cockpit - Table of /CADAXO/SQLCDFIES</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>IC_DATA</PARAMETER>
+       <KIND>P</KIND>
+      </RSFDO>
+     </DOCUMENTATION>
+    </item>
+   </FUNCTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

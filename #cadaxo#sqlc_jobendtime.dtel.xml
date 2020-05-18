@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/CADAXO/SQLC_JOBENDTIME</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <HEADLEN>12</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>15</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>SQL Cockpit - Job end time</DDTEXT>
+    <REPTEXT>End time</REPTEXT>
+    <SCRTEXT_S>EndTime</SCRTEXT_S>
+    <SCRTEXT_M>End time</SCRTEXT_M>
+    <SCRTEXT_L>End time</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <DATATYPE>TIMS</DATATYPE>
+    <LENG>000006</LENG>
+    <OUTPUTLEN>000008</OUTPUTLEN>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>SQL Cockpit - Job Endezeit</DDTEXT>
+     <REPTEXT>Endezeit</REPTEXT>
+     <SCRTEXT_S>Endezeit</SCRTEXT_S>
+     <SCRTEXT_M>Endezeit</SCRTEXT_M>
+     <SCRTEXT_L>Endezeit</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

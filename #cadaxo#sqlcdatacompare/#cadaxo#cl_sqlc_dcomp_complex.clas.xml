@@ -1,0 +1,770 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>Cadaxo SQL Cockpit - Complex Data Compare</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <TPOOL>
+    <item>
+     <ID>I</ID>
+     <KEY>001</KEY>
+     <ENTRY>Field Name</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>002</KEY>
+     <ENTRY>Short Description</ENTRY>
+     <LENGTH>27</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>003</KEY>
+     <ENTRY>Data Type</ENTRY>
+     <LENGTH>19</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>004</KEY>
+     <ENTRY>Delete Mapping</ENTRY>
+     <LENGTH>24</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>005</KEY>
+     <ENTRY>Set Key Mapping</ENTRY>
+     <LENGTH>25</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>006</KEY>
+     <ENTRY>Remove Key Mapping</ENTRY>
+     <LENGTH>28</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>I01</KEY>
+     <ENTRY>Fields can be connected with drag and drop.</ENTRY>
+     <LENGTH>60</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>I02</KEY>
+     <ENTRY>A double-click on a link connection creates a key connection.</ENTRY>
+     <LENGTH>80</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>I03</KEY>
+     <ENTRY>At least one field- and a unique key-mapping for both tables is required.</ENTRY>
+     <LENGTH>132</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>PI1</KEY>
+     <ENTRY>Comparing Data:</ENTRY>
+     <LENGTH>25</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>PI2</KEY>
+     <ENTRY>of</ENTRY>
+     <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q01</KEY>
+     <ENTRY>Show equal rows</ENTRY>
+     <LENGTH>40</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q02</KEY>
+     <ENTRY>Show different rows</ENTRY>
+     <LENGTH>48</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q03</KEY>
+     <ENTRY>Show missing rows</ENTRY>
+     <LENGTH>44</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q04</KEY>
+     <ENTRY>All columns</ENTRY>
+     <LENGTH>72</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q06</KEY>
+     <ENTRY>Show next difference</ENTRY>
+     <LENGTH>72</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q07</KEY>
+     <ENTRY>Show previous difference</ENTRY>
+     <LENGTH>48</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q11</KEY>
+     <ENTRY>Hide equal rows</ENTRY>
+     <LENGTH>40</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q12</KEY>
+     <ENTRY>Hide different rows</ENTRY>
+     <LENGTH>48</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q13</KEY>
+     <ENTRY>Hide missing rows</ENTRY>
+     <LENGTH>44</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q14</KEY>
+     <ENTRY>Only Columns with differences</ENTRY>
+     <LENGTH>72</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>STN</KEY>
+     <ENTRY>Left Table</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>TTN</KEY>
+     <ENTRY>Right Table</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+   </TPOOL>
+   <I18N_TPOOL>
+    <item>
+     <LANGUAGE>D</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>I</ID>
+       <KEY>001</KEY>
+       <ENTRY>Feldname</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>002</KEY>
+       <ENTRY>Kurzbeschreibung</ENTRY>
+       <LENGTH>27</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>003</KEY>
+       <ENTRY>Datentyp</ENTRY>
+       <LENGTH>19</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>004</KEY>
+       <ENTRY>Mapping löschen</ENTRY>
+       <LENGTH>24</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>005</KEY>
+       <ENTRY>Schlüsselmapping setzten</ENTRY>
+       <LENGTH>25</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>006</KEY>
+       <ENTRY>Schlüsselmapping entfernen</ENTRY>
+       <LENGTH>28</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>I01</KEY>
+       <ENTRY>Felder können mittels Drag and Drop verbunden werden</ENTRY>
+       <LENGTH>60</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>I02</KEY>
+       <ENTRY>Ein Doppelklick auf einen Link setzt/entfernt das Schlüsselmapping</ENTRY>
+       <LENGTH>80</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>I03</KEY>
+       <ENTRY>Zumindest ein Feldmapping und in beiden Tabellen eindeutiges Schlüsselmapping muss vorhanden sein</ENTRY>
+       <LENGTH>132</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>PI1</KEY>
+       <ENTRY>Datenvergleich</ENTRY>
+       <LENGTH>25</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>PI2</KEY>
+       <ENTRY>von</ENTRY>
+       <LENGTH>12</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q01</KEY>
+       <ENTRY>Zeilen ohne Unterschied anzeigen</ENTRY>
+       <LENGTH>40</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q02</KEY>
+       <ENTRY>Zeilen mit Unterschied anzeigen</ENTRY>
+       <LENGTH>48</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q03</KEY>
+       <ENTRY>Fehlende Zeilen anzeigen</ENTRY>
+       <LENGTH>44</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q04</KEY>
+       <ENTRY>Alle Spalten</ENTRY>
+       <LENGTH>72</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q06</KEY>
+       <ENTRY>Zum nächten Unterschied</ENTRY>
+       <LENGTH>72</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q07</KEY>
+       <ENTRY>Zum vorherigen Unterschied</ENTRY>
+       <LENGTH>48</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q11</KEY>
+       <ENTRY>Zeilen ohne Unterschied ausblenden</ENTRY>
+       <LENGTH>40</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q12</KEY>
+       <ENTRY>Zeilen mit Unterschied ausblenden</ENTRY>
+       <LENGTH>48</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q13</KEY>
+       <ENTRY>Fehlende Zeilen ausblenden</ENTRY>
+       <LENGTH>44</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q14</KEY>
+       <ENTRY>Nur Spalten mir Unterschieden</ENTRY>
+       <LENGTH>72</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>STN</KEY>
+       <ENTRY>linke Tabelle</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>TTN</KEY>
+       <ENTRY>rechten Tabelle</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+     </TEXTPOOL>
+    </item>
+   </I18N_TPOOL>
+   <I18N_LINES>
+    <item>
+     <LANGUAGE>D</LANGUAGE>
+    </item>
+   </I18N_LINES>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>BREAKUP_COMPONENTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>breakup components</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>BUILD_MAPPING_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>build mapping table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>BUILD_RESULT_FCAT_LINE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>build result fcat line</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>BUILD_SORT_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>build sort table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>CHECK_FIELD_MAPPING_TYPES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check field mapping types</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>CHECK_KEYS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check keys</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>CHECK_KEYS_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check keys table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>CLEAR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>clear</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>COMPARE_COLUMN_NAME_DIFF</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>compare column name diff</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>COMPARE_SET_COL_COLOR_DIFF</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>compare set col color diff</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>COMPARE_SET_COL_COLOR_EQUAL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>compare set col color equal</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>COMPARE_SET_COL_COLOR_KEY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>compare set col color key</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>COMPARE_SET_COL_COLOR_MISSING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>compare set col color missing</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>COMPARE_SET_LINE_MISSING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>compare set line missing</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Constructor</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>CREATE_COMPARE_RESULT_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>create compare result table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>CREATE_RESULT_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>create result table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>CREATE_RESULT_TABLES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>create result table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>DO_CHECK</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>do check</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>DYNAMIC_KEY_ATTRIBUTES_CLEAR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>dynamic key attributes clear</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>DYNAMIC_KEY_ATTRIBUTES_CREATE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>dynamic key attributes create</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>FIELDMAPPING_DELETE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>fieldmapping delete</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>FIELDMAPPING_SET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>fieldmapping set</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>FREE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>free data</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>FREE_NETPLAN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>free netplan</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>FREE_RESULTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>free results</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GET_CUSROR_FIELD</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>get cursor field</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GET_FIELDNAME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>get fieldname</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GET_FIELD_META</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>get field meta</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GET_FIELD_VALUE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>get vield value</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_COMPARE_RESULTS_GRID</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ALV List Viewer</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_CONTAINER_INFO_0200</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Container for Custom Controls in the Screen Area</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_CONTAINER_INFO_0300</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Container for Custom Controls in the Screen Area</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_CONTAINER_LEGEND</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Container for Custom Controls in the Screen Area</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_CONTAINER_MAPPING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Container for Custom Controls in the Screen Area</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_CONTAINER_RESULTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Container for Custom Controls in the Screen Area</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_LEGEND_GRID</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ALV List Viewer</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_NETPLAN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>General Network Control Methods</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_TEXT_INFO_0200</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SAP TextEdit Control</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GR_TEXT_INFO_0300</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SAP TextEdit Control</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>GT_RESULT_DETAILS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of /CADAXO/SQLCRESULT_DETAILS</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>G_USER_SETTINGS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Usersettings Dynpro</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>IS_FIELD_MAPPING_ALLOWED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>is field mapping allowed</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>LEGENT_BUILD_LINE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>legent build line</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>LINK_CREATE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>link create</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>LINK_DELETE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>link delete</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>LINK_KEY_REMOVE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>link key remote</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>LINK_KEY_SET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>link key set</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>LINK_MOVE_ALLOWED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>link move allowed</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>NAVIGATE_DIFFERENCE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>navigat difference</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>NAVIGATE_DIFFERENCE_NEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>navigate difference next</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>NAVIGATE_DIFFERENCE_PREVIOUS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>navigate difference prev</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>ON_HANDLE_CTXMNUREQ</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>context menue request</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>ON_HANDLE_CTXMNUSEL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>context menue select</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>ON_HANDLE_DOUBLE_CLICK</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>left button double click</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>ON_HANDLE_LINK_CREATED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>new link created</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>ON_HANDLE_LINK_PRED_CHANGED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>link pred changed</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>ON_HANDLE_LINK_SUCC_CHANGED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>link succ changed</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>ON_HANDLE_RESULT_TOOLBAR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>result toolbar</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>ON_HANDLE_RESULT_USER_COMMAND</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>result user command</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>PAI_0100</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>PAI 0100</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>PBO_0100</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>PBO 0100</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>PBO_0200</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>PBO 0200</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>PBO_0300</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>PBO 0300</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>PREPARE_DFIES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>prepare dfies</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SET_COLUMN_COLOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set column color</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SET_DIFFERENT_CELL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set different cell</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SET_INITIAL_STATUS_ICONS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set initial status icons</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SET_LINK_STATUS_ICONS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set link status icons</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SET_NETPLAN_TAB</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set netplan tab</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SET_NETPLAN_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set netplan table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SHOW_PROGRESS_INDICATOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>show progress indicator</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SORT_ORIGINAL_DATA</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>sort original data</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>TOGGLE_BUTTON</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>toggle button</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>TOGGLE_SHOW_ALL_COLUMNS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>toggle show all columns</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>UPDATE_FILTER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>refresh filter</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>UPDATE_STATUS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>update status</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_ENHS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <TOOL>BADI_DEF</TOOL>
+   <SHORTTEXT>SQL Cockpit - Enhancement Spot - Result List Conext Menu</SHORTTEXT>
+   <BADI_DATA>
+    <ENH_BADI_DATA>
+     <BADI_NAME>/CADAXO/SQLC_BADI_RES_CTXM</BADI_NAME>
+     <INTERFACE_NAME>/CADAXO/IF_SQLC_BADI_RES_CTXM</INTERFACE_NAME>
+     <CONTEXT_MODE>N</CONTEXT_MODE>
+     <BADI_SHORTTEXT>SQL Cockpit - BADI Result Context Menu</BADI_SHORTTEXT>
+     <BADI_SHORTTEXT_ID>E2693A043646F6F18E1A00155D160106</BADI_SHORTTEXT_ID>
+    </ENH_BADI_DATA>
+   </BADI_DATA>
+  </asx:values>
+ </asx:abap>
+</abapGit>
