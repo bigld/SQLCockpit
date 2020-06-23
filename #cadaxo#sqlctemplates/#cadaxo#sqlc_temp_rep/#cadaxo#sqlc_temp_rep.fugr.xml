@@ -184,7 +184,7 @@
       <item>
        <ID>I</ID>
        <KEY>P01</KEY>
-       <ENTRY>Überschreiben</ENTRY>
+       <ENTRY>Überschr.</ENTRY>
        <LENGTH>15</LENGTH>
       </item>
       <item>
@@ -202,7 +202,7 @@
       <item>
        <ID>I</ID>
        <KEY>P04</KEY>
-       <ENTRY>ist bereits vorhanden und wird überschreiben</ENTRY>
+       <ENTRY>ist bereits vorhanden und wird überschrieben</ENTRY>
        <LENGTH>60</LENGTH>
       </item>
       <item>

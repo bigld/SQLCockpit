@@ -452,7 +452,7 @@ FORM check_report USING VALUE(u_obj).
           text_button_2         = text-p02
           icon_button_2         = 'ICON_INCOMPLETE'
           default_button        = '1'
-          display_cancel_button = ''
+          display_cancel_button = abap_false
           popup_type            = 'ICON_MESSAGE_ERROR'
         IMPORTING
           answer                = l_answer.
@@ -680,11 +680,6 @@ ENDFORM.                    " SHOW_HELP
 *&---------------------------------------------------------------------*
 *&      Form  LOAD_REPORT_SETTINGS
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
-*  -->  p1        text
-*  <--  p2        text
-*----------------------------------------------------------------------*
 FORM load_report_settings .
   DATA: ls_sqlctemr        TYPE /cadaxo/sqlctemr,
         l_xml              TYPE string,
@@ -700,11 +695,8 @@ FORM load_report_settings .
 
   CHECK sy-subrc = 0.
 
-  cl_abap_gzip=>decompress_text(
-    EXPORTING
-      gzip_in  = ls_sqlctemr-reportsettings
-    IMPORTING
-      text_out = l_xml ).
+  cl_abap_gzip=>decompress_text( EXPORTING gzip_in  = ls_sqlctemr-reportsettings
+                                 IMPORTING text_out = l_xml ).
 
   CALL TRANSFORMATION id
     SOURCE XML l_xml

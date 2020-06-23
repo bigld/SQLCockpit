@@ -26,6 +26,8 @@ INCLUDE &GS_REPORT_ATTR-ENH_INCLUDE& IF FOUND.$}
 DATA: gr_dref              TYPE REF TO data.
 DATA: gr_table             TYPE REF TO cl_salv_table.
 DATA: gv_dbcnt             TYPE cua_tit_tx.
+DATA g_layout TYPE REF TO cl_salv_layout.
+DATA g_key TYPE salv_s_layout_key.
 {C$GS_EVT$
 CLASS lcl_handle_events    DEFINITION DEFERRED.
 DATA: gr_event_handler     TYPE REF TO lcl_handle_events.
@@ -249,6 +251,22 @@ FORM set_layout.
 
 DATA: lr_cols TYPE REF TO cl_salv_columns.
 DATA: lr_col  TYPE REF TO cl_salv_column.
+
+{C$GS_REPORT_ATTR-LAYOUT <> ''$
+g_layout = gr_table->get_layout( ).
+g_key-report = sy-repid.
+g_layout->set_key( g_key ).$}
+{C$GS_REPORT_ATTR-LAYOUT = 1$
+g_layout->set_save_restriction( \
+if_salv_c_layout=>RESTRICT_USER_INDEPENDANT ).$}
+{C$GS_REPORT_ATTR-LAYOUT = 2$
+g_layout->set_save_restriction( \
+if_salv_c_layout=>RESTRICT_USER_DEPENDANT ).$}
+{C$GS_REPORT_ATTR-LAYOUT = 3$
+g_layout->set_save_restriction( \
+if_salv_c_layout=>RESTRICT_NONE ).$}
+{C$GS_REPORT_ATTR-LAYOUT <> ''$
+g_layout->set_default( value = abap_true ).$}
 
 gr_table->set_screen_status( report        = \
 'SAPLSALV_METADATA_STATUS'
