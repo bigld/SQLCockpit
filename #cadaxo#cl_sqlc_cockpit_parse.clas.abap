@@ -1819,15 +1819,700 @@ ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_004 SPOTS /cadaxo/sqlc_ehnsp_cls_s
   CONSTANTS: lc_cs_active TYPE flag VALUE abap_false.
 END-ENHANCEMENT-SECTION.
 
+* Marco m_execute_select
 m_execute_select.
 
+  DATA: l_from    TYPE i,
+        l_to      TYPE i,
+        l_case(3) TYPE c,
+        l_maxsel  TYPE i.
 
-m_execute_select_v_2.
+  DATA: l_total_rows   TYPE i,
+        l_package_size TYPE i,
+        l_percentage   TYPE i,
+        lr_exception   TYPE REF TO cx_sy_open_sql_db,
+        lr_exception2  TYPE REF TO cx_sy_conversion_error. "CDX130-018
+
+  DATA l_result_details         TYPE /cadaxo/sqlcresult_details.
+  DATA l_sql_trace_activated    TYPE c LENGTH 1.
+
+  FIELD-SYMBOLS:  <l_result_table>  TYPE STANDARD TABLE,
+                  <l_result_struct> TYPE any.
+  CLEAR: l_maxsel.
+
+  IF i_user_settings IS SUPPLIED.
+    g_user_settings = i_user_settings.
+  ENDIF.
+
+  IF NOT me->g_up_to_x_rows IS INITIAL.
+    MOVE me->g_up_to_x_rows TO l_maxsel.
+  ELSEIF NOT g_user_settings-maxsel IS INITIAL.
+    MOVE g_user_settings-maxsel TO l_maxsel.
+  ENDIF.
+
+* log data
+  LOG-POINT ID /cadaxo/sqlc FIELDS me->column_syntax
+                                   me->source_syntax
+                                   me->where_syntax
+                                   me->group_syntax
+                                   me->having_syntax
+                                   me->order_syntax
+                                   me->g_select_distinct
+                                   me->g_bypassing_buffer
+                                   me->gs_client_handling
+                                   g_user_settings.
+
+* assign result table and result structure to local field symbols
+  ASSIGN me->result_table->*     TO <l_result_table>.
+  ASSIGN me->result_structure->* TO <l_result_struct>.
+
+* clear result tables
+  CLEAR <l_result_table>.
+
+* bei dynamischer Eingabe keine '
+  TRANSLATE me->dbhint_syntax USING `' `.
+
+  TRY.
+***    IF me->column_syntax EQ 'COUNT( * )' OR                       "bigld COCKPIT-100
+***       me->column_syntax EQ 'COUNT(*)'   AND                      "bigld COCKPIT-100
+        IF is_count_star_only( me->column_syntax ) AND                "bigld COCKPIT-100
+           me->group_syntax  IS INITIAL AND
+           me->subquery  IS INITIAL.
+
+        IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
+          /cadaxo/cl_sqlc_cockpit_assist=>sql_trace_on(
+          EXPORTING
+           i_sql_trace = me->g_main_ref->g_user_settings-sql_trace
+           i_tablebuffer_trace = me->g_main_ref->g_user_settings-tablebuffer_trace
+           IMPORTING
+             e_date_from = l_result_details-date_from
+             e_time_from = l_result_details-time_from
+             e_success   = l_sql_trace_activated ).
+          COMMIT WORK.
+        ENDIF.
+
+        IF me->gs_client_handling-client_specified IS INITIAL.
+          GET RUN TIME FIELD l_from.
+          SELECT (me->column_syntax)
+                  FROM (me->source_syntax)
+                  CONNECTION (me->connection_syntax)
+                  INTO <l_result_struct>
+                  WHERE (me->where_syntax)
+                  %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+
+            APPEND <l_result_struct> TO <l_result_table>.
+          ENDSELECT.
+          GET RUN TIME FIELD l_to.
+        ELSE.
+          ASSERT lc_cs_active = abap_true.
+          GET RUN TIME FIELD l_from.
+          SELECT (me->column_syntax)
+                  FROM (me->source_syntax)
+                  CLIENT SPECIFIED
+                  CONNECTION (me->connection_syntax)
+                  INTO <l_result_struct>
+                  WHERE (me->where_syntax)
+                  %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011   "#EC CI_HINTS
+                          DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+            APPEND <l_result_struct> TO <l_result_table>.
+          ENDSELECT.
+          GET RUN TIME FIELD l_to.
+        ENDIF.
+
+        e_result_details-runtime = l_to - l_from.
+        MOVE sy-dbcnt TO e_result_details-lines. "l_LINES.
+
+        IF l_sql_trace_activated IS NOT INITIAL.
+          /cadaxo/cl_sqlc_cockpit_assist=>sql_trace_off(
+            EXPORTING
+             i_sql_trace = me->g_main_ref->g_user_settings-sql_trace
+             i_tablebuffer_trace = me->g_main_ref->g_user_settings-tablebuffer_trace
+           IMPORTING
+             e_date_to = l_result_details-date_to
+             e_time_to = l_result_details-time_to ).
+          CLEAR l_sql_trace_activated.
+        ENDIF.
+
+      ELSE.
+
+* do we need to use the subquery
+        IF NOT me->subquery IS INITIAL.
+
+          me->execute_select_via_subpool(
+            EXPORTING
+              i_progress_indicator = i_progress_indicator
+            IMPORTING
+              e_result_details = e_result_details ).
+
+          IF sy-dbcnt EQ l_maxsel.
+            MESSAGE s044(/cadaxo/sqlc) WITH l_maxsel.
+            MOVE abap_true TO e_result_details-restricted_lines."CDX130-017
+            MOVE l_maxsel  TO e_result_details-maxsel.      "CDX130-017
+          ENDIF.
+
+        ELSE.
+
+          IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
+            /cadaxo/cl_sqlc_cockpit_assist=>sql_trace_on(
+              EXPORTING
+               i_sql_trace = me->g_main_ref->g_user_settings-sql_trace
+               i_tablebuffer_trace = me->g_main_ref->g_user_settings-tablebuffer_trace
+               IMPORTING
+                 e_date_from = l_result_details-date_from
+                 e_time_from = l_result_details-time_from
+                 e_success   = l_sql_trace_activated ).
+            COMMIT WORK.
+          ENDIF.
+
+          IF NOT me->g_select_single IS INITIAL.
+
+            IF me->gs_client_handling-client_specified IS INITIAL.
+              GET RUN TIME FIELD l_from.
+              SELECT SINGLE (me->column_syntax)
+                 FROM (me->source_syntax)
+                 CONNECTION (me->connection_syntax)
+                 INTO <l_result_struct>
+                 WHERE (me->where_syntax)
+                 GROUP BY (me->group_syntax)
+                 HAVING (me->having_syntax)
+                 %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011   "#EC CI_HINTS
+                         DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+              GET RUN TIME FIELD l_to.
+            ELSE.
+              ASSERT lc_cs_active = abap_true.
+              GET RUN TIME FIELD l_from.
+              SELECT SINGLE (me->column_syntax)
+                 FROM (me->source_syntax)
+                 CLIENT SPECIFIED
+                 CONNECTION (me->connection_syntax)
+                 INTO <l_result_struct>
+                 WHERE (me->where_syntax)
+                 GROUP BY (me->group_syntax)
+                 HAVING (me->having_syntax)
+                 %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+              GET RUN TIME FIELD l_to.
+            ENDIF.
+
+            e_result_details-runtime = l_to - l_from.
+            MOVE sy-dbcnt TO e_result_details-lines.
+
+            APPEND <l_result_struct> TO <l_result_table>.
+
+          ELSE.
+
+            MOVE: me->g_select_distinct  TO l_case(1),
+                  me->gs_client_handling-client_specified TO l_case+1(1),
+                  me->g_bypassing_buffer TO l_case+2(1).
+
+            GET RUN TIME FIELD l_from.
+
+            IF i_progress_indicator NE space.
+
+              SELECT COUNT( * )
+                      FROM (me->source_syntax)
+                      CONNECTION (me->connection_syntax)
+                      INTO l_total_rows
+                      UP TO l_maxsel ROWS
+                      WHERE (me->where_syntax)
+                      %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                              DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                              DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                              AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                              informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                              ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                              ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+              l_package_size = l_total_rows / 100 * 5.
+
+            ENDIF.
+
+
+            CASE l_case.
+              WHEN space.
+
+                IF i_progress_indicator NE space.
+
+                  SELECT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CONNECTION (me->connection_syntax)
+                          UP TO l_maxsel ROWS
+                          PACKAGE SIZE l_package_size
+                          APPENDING TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+
+                    l_percentage = l_percentage + 5.
+
+                    CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+                      EXPORTING
+                        percentage = l_percentage.
+
+                  ENDSELECT.
+
+                ELSE.
+
+                  SELECT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CONNECTION (me->connection_syntax)
+                          UP TO l_maxsel ROWS
+                          INTO TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                ENDIF.
+
+              WHEN 'X  '.
+                IF i_progress_indicator NE space.
+
+                  SELECT DISTINCT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CONNECTION (me->connection_syntax)
+                          UP TO l_maxsel ROWS
+                          PACKAGE SIZE l_package_size
+                          APPENDING TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+
+                    l_percentage = l_percentage + 5.
+
+                    CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+                      EXPORTING
+                        percentage = l_percentage.
+
+                  ENDSELECT.
+
+                ELSE.
+                  SELECT DISTINCT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CONNECTION (me->connection_syntax)
+                          UP TO l_maxsel ROWS
+                          INTO TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                ENDIF.
+              WHEN ' X '.
+                ASSERT lc_cs_active = abap_true.
+                IF i_progress_indicator NE space.
+
+                  SELECT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CLIENT SPECIFIED
+                          CONNECTION (me->connection_syntax)
+                          UP TO l_maxsel ROWS
+                          PACKAGE SIZE l_package_size
+                          APPENDING TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+
+                    l_percentage = l_percentage + 5.
+
+                    CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+                      EXPORTING
+                        percentage = l_percentage.
+
+                  ENDSELECT.
+
+                ELSE.
+                  SELECT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CLIENT SPECIFIED
+                          CONNECTION (me->connection_syntax)
+                          UP TO l_maxsel ROWS
+                          INTO TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                ENDIF.
+              WHEN '  X'.
+                IF i_progress_indicator NE space.
+
+                  SELECT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CONNECTION (me->connection_syntax)
+                          BYPASSING BUFFER
+                          UP TO l_maxsel ROWS
+                            PACKAGE SIZE l_package_size
+                            APPENDING TABLE <l_result_table>
+                            WHERE (me->where_syntax)
+                            GROUP BY (me->group_syntax)
+                            HAVING (me->having_syntax)
+                            ORDER BY (me->order_syntax)
+                            %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                    DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                    DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                    AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                    informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                    ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                    ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+
+                    l_percentage = l_percentage + 5.
+
+                    CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+                      EXPORTING
+                        percentage = l_percentage.
+
+                  ENDSELECT.
+
+                ELSE.
+                  SELECT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CONNECTION (me->connection_syntax)
+                          BYPASSING BUFFER
+                          UP TO l_maxsel ROWS
+                          INTO TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                ENDIF.
+              WHEN 'XX '.
+                ASSERT lc_cs_active = abap_true.
+                IF i_progress_indicator NE space.
+
+                  SELECT DISTINCT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CLIENT SPECIFIED
+                          CONNECTION (me->connection_syntax)
+                          UP TO l_maxsel ROWS
+                          PACKAGE SIZE l_package_size
+                          APPENDING TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+
+                    l_percentage = l_percentage + 5.
+
+                    CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+                      EXPORTING
+                        percentage = l_percentage.
+
+                  ENDSELECT.
+
+                ELSE.
+                  SELECT DISTINCT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CLIENT SPECIFIED
+                          CONNECTION (me->connection_syntax)
+                          UP TO l_maxsel ROWS
+                          INTO TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                ENDIF.
+              WHEN 'X X'.
+                IF i_progress_indicator NE space.
+
+                  SELECT DISTINCT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CONNECTION (me->connection_syntax)
+                          BYPASSING BUFFER
+                          UP TO l_maxsel ROWS
+                          PACKAGE SIZE l_package_size
+                          APPENDING TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+
+                    l_percentage = l_percentage + 5.
+
+                    CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+                      EXPORTING
+                        percentage = l_percentage.
+
+                  ENDSELECT.
+
+                ELSE.
+                  SELECT DISTINCT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CONNECTION (me->connection_syntax)
+                          BYPASSING BUFFER
+                          UP TO l_maxsel ROWS
+                          INTO TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                ENDIF.
+              WHEN ' XX'.
+                ASSERT lc_cs_active = abap_true.
+                IF i_progress_indicator NE space.
+
+                  SELECT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CLIENT SPECIFIED
+                          CONNECTION (me->connection_syntax)
+                          BYPASSING BUFFER
+                          UP TO l_maxsel ROWS
+                          PACKAGE SIZE l_package_size
+                          APPENDING TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+
+                    l_percentage = l_percentage + 5.
+
+                    CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+                      EXPORTING
+                        percentage = l_percentage.
+
+                  ENDSELECT.
+
+                ELSE.
+                  SELECT (me->column_syntax)
+                          FROM (me->source_syntax)
+                          CLIENT SPECIFIED
+                          CONNECTION (me->connection_syntax)
+                          BYPASSING BUFFER
+                          UP TO l_maxsel ROWS
+                          INTO TABLE <l_result_table>
+                          WHERE (me->where_syntax)
+                          GROUP BY (me->group_syntax)
+                          HAVING (me->having_syntax)
+                          ORDER BY (me->order_syntax)
+                          %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+
+                ENDIF.
+              WHEN 'XXX'.
+                ASSERT lc_cs_active = abap_true.
+                IF i_progress_indicator NE space.
+
+                  SELECT DISTINCT (me->column_syntax)
+                                  FROM (me->source_syntax)
+                                  CLIENT SPECIFIED
+                                  CONNECTION (me->connection_syntax)
+                                  BYPASSING BUFFER
+                                  UP TO l_maxsel ROWS
+                                  PACKAGE SIZE l_package_size
+                                  APPENDING TABLE <l_result_table>
+                                  WHERE (me->where_syntax)
+                                  GROUP BY (me->group_syntax)
+                                  HAVING (me->having_syntax)
+                                  ORDER BY (me->order_syntax)
+                                  %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+
+                    l_percentage = l_percentage + 5.
+
+                    CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+                      EXPORTING
+                        percentage = l_percentage.
+
+                  ENDSELECT.
+
+                ELSE.
+                  SELECT DISTINCT (me->column_syntax)
+                                  FROM (me->source_syntax)
+                                  CLIENT SPECIFIED
+                                  CONNECTION (me->connection_syntax)
+                                  BYPASSING BUFFER
+                                  UP TO l_maxsel ROWS
+                                  INTO TABLE <l_result_table>
+                                  WHERE (me->where_syntax)
+                                  GROUP BY (me->group_syntax)
+                                  HAVING (me->having_syntax)
+                                  ORDER BY (me->order_syntax)
+                                  %_HINTS MSSQLNT  me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                ENDIF.
+            ENDCASE.
+
+            GET RUN TIME FIELD l_to.
+            e_result_details-runtime = l_to - l_from.
+            MOVE sy-dbcnt TO e_result_details-lines. "l_LINES.
+
+            IF sy-dbcnt EQ l_maxsel.
+              MESSAGE s044(/cadaxo/sqlc) WITH l_maxsel.
+              MOVE abap_true TO e_result_details-restricted_lines."CDX130-017
+              MOVE l_maxsel  TO e_result_details-maxsel.    "CDX130-017
+            ENDIF.
+
+          ENDIF.
+          IF l_sql_trace_activated IS NOT INITIAL.
+            /cadaxo/cl_sqlc_cockpit_assist=>sql_trace_off(
+              EXPORTING
+               i_sql_trace = me->g_main_ref->g_user_settings-sql_trace
+               i_tablebuffer_trace = me->g_main_ref->g_user_settings-tablebuffer_trace
+             IMPORTING
+               e_date_to = l_result_details-date_to
+               e_time_to = l_result_details-time_to ).
+            CLEAR l_sql_trace_activated.
+            COMMIT WORK.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+
+      me->result_lines = e_result_details-lines.
+      me->result_runtime = e_result_details-runtime.
+
+      e_result_details-syst    = sy-sysid.
+      e_result_details-uname   = sy-uname.
+      e_result_details-mandant = sy-mandt.
+      GET TIME STAMP FIELD e_result_details-create_timestamp.
+
+    CATCH cx_sy_open_sql_db INTO lr_exception.
+      LOG-POINT ID /cadaxo/sqlc FIELDS me->column_syntax me->source_syntax l_maxsel
+                                 <l_result_table> me->where_syntax me->group_syntax
+                                 me->having_syntax me->order_syntax.
+      RAISE EXCEPTION lr_exception.
+    CATCH /cadaxo/cx_sqlc_syntax_error.
+      LOG-POINT ID /cadaxo/sqlc FIELDS me->column_syntax me->source_syntax l_maxsel
+                                       <l_result_table> me->where_syntax me->group_syntax
+                                       me->having_syntax me->order_syntax.
+      RAISE EXCEPTION TYPE cx_sy_open_sql_db.
+    CATCH cx_sy_conversion_error INTO lr_exception2.        "CDX130-018
+      LOG-POINT ID /cadaxo/sqlc FIELDS me->column_syntax me->source_syntax l_maxsel"CDX130-018
+                                 <l_result_table> me->where_syntax me->group_syntax"CDX130-018
+                                 me->having_syntax me->order_syntax."CDX130-018
+      RAISE EXCEPTION lr_exception2. "CDX130-018
+
+  ENDTRY.
+
+ ENDMETHOD.
+
+
 METHOD execute_select_v_2.
   DATA l_maxsel           TYPE i.
   DATA lr_exception       TYPE REF TO cx_sy_open_sql_db.
   DATA lr_exception2      TYPE REF TO cx_sy_conversion_error.
   DATA lr_root_exception  TYPE REF TO /cadaxo/cx_sqlc_syntax_error.
+
+* Macro m_execute_select_v_2
+m_execute_select_v_2.
 
   CLEAR l_maxsel.
 
