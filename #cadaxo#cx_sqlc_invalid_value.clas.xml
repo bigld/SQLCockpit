@@ -15,53 +15,6 @@
    <SOTR>
     <item>
      <HEADER>
-      <CONCEPT>E29D030E4A2BAEF19FB300155D160106</CONCEPT>
-      <CREA_LAN>E</CREA_LAN>
-      <TRALA_TYPE>1</TRALA_TYPE>
-      <OBJID_VEC>CA==</OBJID_VEC>
-     </HEADER>
-     <ENTRIES>
-      <SOTR_TEXT>
-       <CONCEPT>E29D030E4A2BAEF19FB300155D160106</CONCEPT>
-       <LANGU>E</LANGU>
-       <LFD_NUM>0001</LFD_NUM>
-       <FLAG_CNTXT>X</FLAG_CNTXT>
-       <STATUS>R</STATUS>
-       <LENGTH>255</LENGTH>
-       <TEXT>Invalid value &amp;VALUE&amp; for field &amp;field&amp;</TEXT>
-      </SOTR_TEXT>
-     </ENTRIES>
-    </item>
-    <item>
-     <HEADER>
-      <CONCEPT>E3D7BEACD1DDF8F1994B00155D160106</CONCEPT>
-      <CREA_LAN>E</CREA_LAN>
-      <TRALA_TYPE>1</TRALA_TYPE>
-      <OBJID_VEC>CA==</OBJID_VEC>
-     </HEADER>
-     <ENTRIES>
-      <SOTR_TEXT>
-       <CONCEPT>E3D7BEACD1DDF8F1994B00155D160106</CONCEPT>
-       <LANGU>D</LANGU>
-       <LFD_NUM>0001</LFD_NUM>
-       <FLAG_CNTXT>X</FLAG_CNTXT>
-       <STATUS>R</STATUS>
-       <LENGTH>255</LENGTH>
-       <TEXT>Zeilenüberschreitende Literale sind nicht erlaubt.</TEXT>
-      </SOTR_TEXT>
-      <SOTR_TEXT>
-       <CONCEPT>E3D7BEACD1DDF8F1994B00155D160106</CONCEPT>
-       <LANGU>E</LANGU>
-       <LFD_NUM>0001</LFD_NUM>
-       <FLAG_CNTXT>X</FLAG_CNTXT>
-       <STATUS>R</STATUS>
-       <LENGTH>255</LENGTH>
-       <TEXT>Literals that take up more than one line not permitted.</TEXT>
-      </SOTR_TEXT>
-     </ENTRIES>
-    </item>
-    <item>
-     <HEADER>
       <CONCEPT>00155D16011C1EE79EB758DB9AAF56F6</CONCEPT>
       <CREA_LAN>E</CREA_LAN>
       <TRALA_TYPE>1</TRALA_TYPE>
