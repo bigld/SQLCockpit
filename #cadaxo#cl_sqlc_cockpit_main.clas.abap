@@ -200,598 +200,597 @@ public section.
       !IT_SYMBOL_CREATE type T_SYMBOL_DB
     returning
       value(RV_SUCCESS) type BOOLEAN .
-PROTECTED SECTION.
+protected section.
 
-  CLASS-DATA gcont_splitter_top_toolbar TYPE REF TO cl_gui_container .
-  CLASS-DATA:
+  class-data GCONT_SPLITTER_TOP_TOOLBAR type ref to CL_GUI_CONTAINER .
+  class-data:
     gt_item_vari               TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY .
-  CLASS-DATA gt_node_vari TYPE treev_ntab .
-  DATA dragdrop_behaviour_alv TYPE REF TO cl_dragdrop .
-  DATA dragdrop_behaviour_clipboard TYPE REF TO cl_dragdrop .
-  DATA dragdrop_behaviour_editor TYPE REF TO cl_dragdrop .
-  DATA dragdrop_behaviour_elementinfo TYPE REF TO cl_dragdrop .
-  DATA dragdrop_behaviour_log TYPE REF TO cl_dragdrop .
-  DATA dragdrop_behaviour_symbol TYPE REF TO cl_dragdrop .
-  DATA dragdrop_handle_elementinfo TYPE i .
-  DATA dragdrop_handle_log TYPE i .
-  DATA dragdrop_handle_symbol TYPE i .
-  DATA gcont_abap_editor TYPE REF TO cl_gui_container .
-  DATA gcont_abap_error TYPE REF TO cl_gui_container .
-  DATA gcont_abap_splitter TYPE REF TO cl_gui_container .
-  DATA gcont_alv_queue TYPE REF TO cl_gui_custom_container .
-  DATA gcont_alv_template TYPE REF TO cl_gui_custom_container .
-  DATA gcont_clipboard TYPE REF TO cl_gui_container .
-  DATA gcont_clipboard_textedit TYPE REF TO cl_gui_container .
-  DATA gcont_clipboard_toolbar TYPE REF TO cl_gui_container .
-  DATA gcont_clipboard_toolbar_btns TYPE REF TO cl_gui_container .
-  DATA gcont_clipboard_toolbar_img TYPE REF TO cl_gui_container .
-  DATA gcont_elementinfo TYPE REF TO cl_gui_container .
-  DATA gcont_grid_elementinfo_t TYPE /cadaxo/sqlcclguicontainer_t .
-  DATA gcont_grid_results TYPE REF TO cl_gui_container .
-  DATA gcont_grid_result_t TYPE /cadaxo/sqlcclguicontainer_t .
-  DATA gcont_grid_symbol_t TYPE /cadaxo/sqlcclguicontainer_t .
-  DATA gcont_result_bottom TYPE REF TO cl_gui_container .
-  DATA gcont_result_toolbar TYPE REF TO cl_gui_container .
-  DATA gcont_splitter_bottom TYPE REF TO cl_gui_container .
-  DATA gcont_splitter_top TYPE REF TO cl_gui_container .
-  DATA gcont_symbol TYPE REF TO cl_gui_container .
-  DATA gcont_symbol_toolbar TYPE REF TO cl_gui_container .
-  DATA gcont_symbol_toolbar_btns TYPE REF TO cl_gui_container .
-  DATA gcont_symbol_toolbar_img TYPE REF TO cl_gui_container .
-  DATA gcont_toolbar_elementinfo TYPE REF TO cl_gui_container .
-  DATA gc_abap_editor TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit .
-  DATA gc_abap_editor_text TYPE REF TO cl_gui_textedit .
-  DATA gc_abap_error TYPE REF TO cl_gui_alv_grid .
-  DATA gc_alv_queue_3000 TYPE REF TO cl_gui_alv_grid .
-  DATA gc_alv_template_2000 TYPE REF TO cl_gui_alv_grid .
-  DATA gc_clipboard_textedit TYPE REF TO cl_gui_textedit .
-  DATA gc_clipboard_toolbar TYPE REF TO cl_gui_toolbar .
-  DATA gc_clipboard_toolbar_img TYPE REF TO cl_gui_picture .
-  DATA gc_docking TYPE REF TO cl_gui_docking_container .
-  DATA gc_elementinfo_alv TYPE REF TO cl_gui_alv_grid .
-  DATA gc_html_viewer TYPE REF TO cl_gui_html_viewer .
-  DATA gc_result_toolbar TYPE REF TO cl_gui_toolbar .
-  DATA gc_splitter TYPE REF TO cl_gui_splitter_container .
-  DATA gc_symbol_alv TYPE REF TO cl_gui_alv_grid .
-  DATA gc_symbol_toolbar TYPE REF TO cl_gui_toolbar .
-  DATA gc_symbol_toolbar_img TYPE REF TO cl_gui_picture .
-  DATA gs_splitter_bottom TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_clipboard TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_editor TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_lvl0 TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_results TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_res_button TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_symbol TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_symbol_toolbar TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_toolbar TYPE REF TO cl_gui_splitter_container .
-  DATA gs_splitter_top TYPE REF TO cl_gui_splitter_container .
-  DATA gt_clipboard TYPE /cadaxo/sqlcclipboard_t .
-  DATA gt_queue TYPE /cadaxo/sqlcapi_queue_t .
-  DATA gt_source_runtime_before TYPE /cadaxo/sqlccodeline_t .
-  DATA gt_sql_hist TYPE /cadaxo/sqlchistline_t .
-  DATA:
+  class-data GT_NODE_VARI type TREEV_NTAB .
+  data DRAGDROP_BEHAVIOUR_ALV type ref to CL_DRAGDROP .
+  data DRAGDROP_BEHAVIOUR_CLIPBOARD type ref to CL_DRAGDROP .
+  data DRAGDROP_BEHAVIOUR_EDITOR type ref to CL_DRAGDROP .
+  data DRAGDROP_BEHAVIOUR_ELEMENTINFO type ref to CL_DRAGDROP .
+  data DRAGDROP_BEHAVIOUR_LOG type ref to CL_DRAGDROP .
+  data DRAGDROP_BEHAVIOUR_SYMBOL type ref to CL_DRAGDROP .
+  data DRAGDROP_HANDLE_ELEMENTINFO type I .
+  data DRAGDROP_HANDLE_LOG type I .
+  data DRAGDROP_HANDLE_SYMBOL type I .
+  data GCONT_ABAP_EDITOR type ref to CL_GUI_CONTAINER .
+  data GCONT_ABAP_ERROR type ref to CL_GUI_CONTAINER .
+  data GCONT_ABAP_SPLITTER type ref to CL_GUI_CONTAINER .
+  data GCONT_ALV_QUEUE type ref to CL_GUI_CUSTOM_CONTAINER .
+  data GCONT_ALV_TEMPLATE type ref to CL_GUI_CUSTOM_CONTAINER .
+  data GCONT_CLIPBOARD type ref to CL_GUI_CONTAINER .
+  data GCONT_CLIPBOARD_TEXTEDIT type ref to CL_GUI_CONTAINER .
+  data GCONT_CLIPBOARD_TOOLBAR type ref to CL_GUI_CONTAINER .
+  data GCONT_CLIPBOARD_TOOLBAR_BTNS type ref to CL_GUI_CONTAINER .
+  data GCONT_CLIPBOARD_TOOLBAR_IMG type ref to CL_GUI_CONTAINER .
+  data GCONT_ELEMENTINFO type ref to CL_GUI_CONTAINER .
+  data GCONT_GRID_ELEMENTINFO_T type /CADAXO/SQLCCLGUICONTAINER_T .
+  data GCONT_GRID_RESULTS type ref to CL_GUI_CONTAINER .
+  data GCONT_GRID_RESULT_T type /CADAXO/SQLCCLGUICONTAINER_T .
+  data GCONT_GRID_SYMBOL_T type /CADAXO/SQLCCLGUICONTAINER_T .
+  data GCONT_RESULT_BOTTOM type ref to CL_GUI_CONTAINER .
+  data GCONT_RESULT_TOOLBAR type ref to CL_GUI_CONTAINER .
+  data GCONT_SPLITTER_BOTTOM type ref to CL_GUI_CONTAINER .
+  data GCONT_SPLITTER_TOP type ref to CL_GUI_CONTAINER .
+  data GCONT_SYMBOL type ref to CL_GUI_CONTAINER .
+  data GCONT_SYMBOL_TOOLBAR type ref to CL_GUI_CONTAINER .
+  data GCONT_SYMBOL_TOOLBAR_BTNS type ref to CL_GUI_CONTAINER .
+  data GCONT_SYMBOL_TOOLBAR_IMG type ref to CL_GUI_CONTAINER .
+  data GCONT_TOOLBAR_ELEMENTINFO type ref to CL_GUI_CONTAINER .
+  data GC_ABAP_EDITOR type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT .
+  data GC_ABAP_EDITOR_TEXT type ref to CL_GUI_TEXTEDIT .
+  data GC_ABAP_ERROR type ref to CL_GUI_ALV_GRID .
+  data GC_ALV_QUEUE_3000 type ref to CL_GUI_ALV_GRID .
+  data GC_ALV_TEMPLATE_2000 type ref to CL_GUI_ALV_GRID .
+  data GC_CLIPBOARD_TEXTEDIT type ref to CL_GUI_TEXTEDIT .
+  data GC_CLIPBOARD_TOOLBAR type ref to CL_GUI_TOOLBAR .
+  data GC_CLIPBOARD_TOOLBAR_IMG type ref to CL_GUI_PICTURE .
+  data GC_ELEMENTINFO_ALV type ref to CL_GUI_ALV_GRID .
+  data GC_HTML_VIEWER type ref to CL_GUI_HTML_VIEWER .
+  data GC_RESULT_TOOLBAR type ref to CL_GUI_TOOLBAR .
+  data GC_SPLITTER type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GC_SYMBOL_ALV type ref to CL_GUI_ALV_GRID .
+  data GC_SYMBOL_TOOLBAR type ref to CL_GUI_TOOLBAR .
+  data GC_SYMBOL_TOOLBAR_IMG type ref to CL_GUI_PICTURE .
+  data GS_SPLITTER_BOTTOM type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_CLIPBOARD type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_EDITOR type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_LVL0 type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_RESULTS type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_RES_BUTTON type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_SYMBOL type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_SYMBOL_TOOLBAR type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_TOOLBAR type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_TOP type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GT_CLIPBOARD type /CADAXO/SQLCCLIPBOARD_T .
+  data GT_QUEUE type /CADAXO/SQLCAPI_QUEUE_T .
+  data GT_SOURCE_RUNTIME_BEFORE type /CADAXO/SQLCCODELINE_T .
+  data GT_SQL_HIST type /CADAXO/SQLCHISTLINE_T .
+  data:
     gt_sql_log TYPE TABLE OF /cadaxo/sqlclog .
-  DATA gt_templates TYPE /cadaxo/sqlctemp_alv_t .
-  DATA gt_toolbuttons_top TYPE ttb_button .
-  DATA gt_variant TYPE /cadaxo/sqlcvari_alv_t .
-  DATA gv_export_type TYPE /cadaxo/sqlcapi_position_typ .
-  DATA g_client_category TYPE cccategory .
-  DATA g_client_logsys TYPE logsys .
-  DATA g_cont_pers_preferences TYPE char1 .
-  DATA g_height TYPE i .
-  DATA g_history_toolbar_excluding TYPE ui_functions .
-  DATA g_jobmonitor_toolbar_ex TYPE ui_functions .
-  DATA g_result_layout TYPE lvc_s_layo .
-  DATA g_result_toolbar_excluding TYPE ui_functions .
-  DATA g_show_clipboard TYPE boolean .
-  DATA:
+  data GT_TEMPLATES type /CADAXO/SQLCTEMP_ALV_T .
+  data GT_TOOLBUTTONS_TOP type TTB_BUTTON .
+  data GT_VARIANT type /CADAXO/SQLCVARI_ALV_T .
+  data GV_EXPORT_TYPE type /CADAXO/SQLCAPI_POSITION_TYP .
+  data G_CLIENT_CATEGORY type CCCATEGORY .
+  data G_CLIENT_LOGSYS type LOGSYS .
+  data G_CONT_PERS_PREFERENCES type CHAR1 .
+  data G_HEIGHT type I .
+  data G_HISTORY_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
+  data G_JOBMONITOR_TOOLBAR_EX type UI_FUNCTIONS .
+  data G_RESULT_LAYOUT type LVC_S_LAYO .
+  data G_RESULT_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
+  data G_SHOW_CLIPBOARD type BOOLEAN .
+  data:
     BEGIN OF ms_additional_functions,                 "COCKPIT-48
       uptomenu TYPE REF TO /cadaxo/cl_sqlc_uptomenu,  "COCKPIT-48
     END OF ms_additional_functions .
-  DATA gt_saved_list_fieldcat TYPE lvc_t_fcat .
-  DATA g_saved_list_gui_container TYPE REF TO cl_gui_custom_container .
+  data GT_SAVED_LIST_FIELDCAT type LVC_T_FCAT .
+  data G_SAVED_LIST_GUI_CONTAINER type ref to CL_GUI_CUSTOM_CONTAINER .
 
-  METHODS create_symbol_multival_tab_dyn
-    IMPORTING
-      !i_symbol_datatype TYPE /cadaxo/sqlcsymbol_datatype
-    EXPORTING
-      !e_data            TYPE data
-      !e_data_struct     TYPE data .
-  METHODS get_symbol_datatype_desc
-    IMPORTING
-      !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
-    RETURNING
-      VALUE(r_desc) TYPE as4text .
-  METHODS get_symbol_datatype_info
-    IMPORTING
-      !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
-    RETURNING
-      VALUE(r_info) TYPE /cadaxo/sqlcsymbol_datainfo .
-  METHODS check_symbol_datatype
-    IMPORTING
-      !i_value TYPE lvc_value
-    RAISING
-      /cadaxo/cx_sqlc_symb_not_found .
-  METHODS show_symbolmulti_dialog
-    IMPORTING
-      !i_symbol_multivalue  TYPE /cadaxo/sqlcsymbol_multivalue
-      !i_symbol_datatype    TYPE /cadaxo/sqlcsymbol_datatype
-    RETURNING
-      VALUE(r_symbol_value) TYPE rseloption
-    RAISING
-      /cadaxo/cx_sqlc_symb_not_found .
-  METHODS on_symbol_button_click
-        FOR EVENT button_click OF cl_gui_alv_grid
-    IMPORTING
-        !es_col_id
-        !es_row_no .
-  METHODS get_user_symbol_count
-    IMPORTING
-      !i_symbol_multivalue TYPE /cadaxo/sqlcsymbol_multivalue
-    RETURNING
-      VALUE(r_count)       TYPE i .
-  METHODS error_calc_height
-    IMPORTING
-      !iv_errors       TYPE i
-    RETURNING
-      VALUE(ev_height) TYPE i .
-  CLASS-METHODS build_result_grid_footer
-    IMPORTING
-      !iv_syst             TYPE sysysid
-      !iv_mandant          TYPE /cadaxo/sqlc_mandt
-      !iv_uname            TYPE uname
-      !iv_create_timestamp TYPE timestampl
-    RETURNING
-      VALUE(r_grid_footer) TYPE /cadaxo/sqlcresult_footer .
-  CLASS-METHODS build_result_grid_title
-    IMPORTING
-      !i_runtime          TYPE i
-      !i_lines            TYPE i
-      !i_message          TYPE string OPTIONAL
-    RETURNING
-      VALUE(r_grid_title) TYPE lvc_title .
-  METHODS insert_saved_list
-    IMPORTING
-      !it_saved_list      TYPE /cadaxo/sqlc_list_exp_sqlx_t
-    RETURNING
-      VALUE(ev_update_ok) TYPE abap_bool .
-  METHODS calc_result_rows_and_cols
-    IMPORTING
-      !i_lines TYPE i
-    EXPORTING
-      !e_rows  TYPE i
-      !e_cols  TYPE i .
-  METHODS confirm_symbol_overwrite .
-  METHODS create_clipboard_ui_control .
-  METHODS create_controls .
-  METHODS create_dyn_document
-    IMPORTING
-      !i_parent      TYPE REF TO cl_gui_container
-      VALUE(i_sql)   TYPE string
-      !i_header_text TYPE char255 OPTIONAL
-    CHANGING
-      !ic_document   TYPE REF TO cl_dd_document .
-  METHODS create_editor_ui_control .
-  METHODS create_primary_ui_controls .
-  METHODS create_result_ui_controls .
-  METHODS create_elementinfo_ui_control .
-  METHODS create_symbol_ui_control .
-  METHODS create_variant .
-  METHODS delete_log .
-  METHODS delete_symbols
-    EXPORTING
-      !e_success TYPE boolean .
-  METHODS execute_sql
-    IMPORTING
-      !i_progress_indicator TYPE char1 OPTIONAL
-        PREFERRED PARAMETER i_progress_indicator
-    RAISING
-      /cadaxo/cx_sqlc_to_much_resrow
-      /cadaxo/cx_sqlc_invalid_value
-      /cadaxo/cx_sqlc_syntax_error .
-  METHODS execute_sql_background_wiz .
-  METHODS focus_symbol_alv_cell
-    IMPORTING
-      !i_row_id     TYPE lvc_index
-      !i_field_name TYPE lvc_fname .
-  METHODS free_result_controls .
-  METHODS get_link
-    IMPORTING
-      !i_html_id TYPE /cadaxo/sqlcparameter_id
-    EXPORTING
-      !e_url     TYPE c
-    CHANGING
-      !ct_cache  TYPE gtt_char255 .
-  METHODS get_saved_results
-    IMPORTING
-      !i_ress_guid      TYPE /cadaxo/sqlc_ress_guid_t OPTIONAL
-      !i_clear_old_alvs TYPE flag OPTIONAL
-        PREFERRED PARAMETER i_ress_guid .
-  METHODS get_symbols_selected
-    EXPORTING
-      VALUE(e_success) TYPE boolean .
-  METHODS get_symbols .
-  METHODS get_user_symbol_from_sql
-    IMPORTING
-      !i_varguid TYPE /cadaxo/sqlc_variant_guid OPTIONAL
-      !i_sql     TYPE /cadaxo/sqlccodeline_t
-      !i_type    TYPE char1
-    EXPORTING
-      !e_symbols TYPE /cadaxo/sqlc_symbol_t .
-  METHODS get_variant .
-  METHODS handle_result_command_exp_csv
-    IMPORTING
-      !i_grid_i TYPE i .
-  METHODS handle_command_show_full_value
-    IMPORTING
-      !i_grid_i TYPE i OPTIONAL
-      !i_log    TYPE abap_bool OPTIONAL .
-  METHODS handle_command_show_html_brow
-    IMPORTING
-      !i_grid_i TYPE i OPTIONAL
-      !i_log    TYPE abap_bool OPTIONAL .
-  METHODS handle_command_show_xml_brow
-    IMPORTING
-      !i_grid_i TYPE i OPTIONAL
-      !i_log    TYPE abap_bool OPTIONAL .
-  METHODS handle_result_command_cdxexp
-    IMPORTING
-      !i_grid_i TYPE i .
-  METHODS handle_result_command_close
-    IMPORTING
-      !i_grid_i TYPE i .
-  METHODS handle_result_command_compare
-    IMPORTING
-      !i_source TYPE i
-      !i_target TYPE i .
-  METHODS handle_result_command_hold
-    IMPORTING
-      !i_grid_i TYPE i .
-  METHODS handle_result_command_keyfix
-    IMPORTING
-      !i_grid_i TYPE i .
-  METHODS handle_result_command_refrlst
-    IMPORTING
-      !i_grid_i TYPE i .
-  METHODS handle_result_command_fulldisp
-    IMPORTING
-      !i_grid_i TYPE i .
-  METHODS insert_codeblock_at_position
-    IMPORTING
-      !iv_line      TYPE i
-      !iv_pos       TYPE i
-      !iv_sqlstring TYPE /cadaxo/sqlcstring
-      !i_set_focus  TYPE abap_bool DEFAULT abap_false .
-  METHODS insert_table_to_editor
-    IMPORTING
-      !i_string TYPE string .
-  METHODS load_home_html .
-  METHODS move_back_to_sql .
-  METHODS move_forw_to_sql .
-  METHODS on_abap_error_hotspot_click
-        FOR EVENT hotspot_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row_id
-        !e_column_id
-        !es_row_no .
-  METHODS on_alv_drag
-        FOR EVENT ondrag OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no
-        !e_dragdropobj .
-  METHODS on_alv_result_double_click
-        FOR EVENT double_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-  METHODS on_alv_queue_double_click_3000
-        FOR EVENT double_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-  METHODS on_alv_templ_double_click_2000
-        FOR EVENT double_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-  METHODS on_clipboard_drop
-        FOR EVENT on_drop OF cl_gui_textedit
-    IMPORTING
-        !index
-        !line
-        !dragdrop_object .
-  METHODS on_editor_context_menu
-        FOR EVENT context_menu OF cl_gui_abapedit
-    IMPORTING
-        !menu
-        !menu_type .
-  METHODS on_editor_context_menu_sel
-        FOR EVENT context_menu_selected OF cl_gui_abapedit
-    IMPORTING
-        !fcode .
-  METHODS on_editor_dblclick
-       FOR EVENT dblclick OF cl_gui_abapedit .
-  METHODS on_editor_drop
-        FOR EVENT on_drop OF cl_gui_abapedit
-    IMPORTING
-        !index
-        !line
-        !pos
-        !dragdrop_object .
-  METHODS on_editor_text_drop
-        FOR EVENT on_drop OF cl_gui_textedit
-    IMPORTING
-        !index
-        !line
-        !pos
-        !dragdrop_object .
-  METHODS on_handle_job_toolbar
-        FOR EVENT toolbar OF cl_gui_alv_grid
-    IMPORTING
-        !e_object
-        !e_interactive .
-  METHODS on_handle_job_user_command
-        FOR EVENT user_command OF cl_gui_alv_grid
-    IMPORTING
-        !e_ucomm .
-  METHODS on_log_alv_context_menu
-        FOR EVENT context_menu_request OF cl_gui_alv_grid
-    IMPORTING
-        !e_object .
-  METHODS on_handle_result_context_menu
-        FOR EVENT context_menu_request OF cl_gui_alv_grid
-    IMPORTING
-        !e_object .
-  METHODS on_handle_result_end_of_page
-       FOR EVENT print_end_of_page OF cl_gui_alv_grid .
-  METHODS on_handle_result_menu_button
-        FOR EVENT menu_button OF cl_gui_alv_grid
-    IMPORTING
-        !e_object
-        !e_ucomm .
-  METHODS on_handle_result_toolbar
-        FOR EVENT toolbar OF cl_gui_alv_grid
-    IMPORTING
-        !e_object
-        !e_interactive .
-  METHODS on_handle_result_user_command
-        FOR EVENT user_command OF cl_gui_alv_grid
-    IMPORTING
-        !e_ucomm .
-  METHODS on_handle_savedlists_toolbar
-        FOR EVENT toolbar OF cl_gui_alv_grid
-    IMPORTING
-        !e_object
-        !e_interactive .
-  METHODS on_handle_savedlists_usrcommnd
-        FOR EVENT user_command OF cl_gui_alv_grid
-    IMPORTING
-        !e_ucomm .
-  METHODS on_handle_varsym_click
-        FOR EVENT hotspot_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row_id
-        !e_column_id
-        !es_row_no .
-  METHODS on_home_sapevent
-        FOR EVENT sapevent OF cl_gui_html_viewer
-    IMPORTING
-        !action
-        !frame
-        !getdata
-        !postdata
-        !query_table .
-  METHODS on_job_alv_click
-        FOR EVENT button_click OF cl_gui_alv_grid
-    IMPORTING
-        !es_col_id
-        !es_row_no .
-  METHODS on_job_alv_hotspot_click
-        FOR EVENT hotspot_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row_id
-        !e_column_id
-        !es_row_no .
-  METHODS on_log_alv_double_click
-        FOR EVENT double_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-  METHODS on_log_alv_drag
-        FOR EVENT ondrag OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no
-        !e_dragdropobj .
-  METHODS on_log_alv_toolbar
-        FOR EVENT toolbar OF cl_gui_alv_grid
-    IMPORTING
-        !e_object
-        !e_interactive .
-  METHODS on_log_alv_user_command
-        FOR EVENT user_command OF cl_gui_alv_grid
-    IMPORTING
-        !e_ucomm .
-  METHODS on_result_toolbar_dropdown
-        FOR EVENT dropdown_clicked OF cl_gui_toolbar
-    IMPORTING
-        !fcode
-        !posx
-        !posy .
-  METHODS on_result_toolbar_funcsel
-        FOR EVENT function_selected OF cl_gui_toolbar
-    IMPORTING
-        !fcode .
-  METHODS on_saved_list_select_line
-        FOR EVENT double_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-  METHODS on_symbol_alv_data_change
-        FOR EVENT data_changed OF cl_gui_alv_grid
-    IMPORTING
-        !er_data_changed
-        !e_onf4
-        !e_onf4_before
-        !e_onf4_after
-        !e_ucomm .
-  METHODS on_symbol_alv_data_changed_fin
-        FOR EVENT data_changed_finished OF cl_gui_alv_grid
-    IMPORTING
-        !e_modified
-        !et_good_cells .
-  METHODS on_symbol_alv_toolbar
-        FOR EVENT toolbar OF cl_gui_alv_grid
-    IMPORTING
-        !e_object
-        !e_interactive .
-  METHODS on_symbol_alv_user_command
-        FOR EVENT user_command OF cl_gui_alv_grid
-    IMPORTING
-        !e_ucomm .
-  METHODS on_elementinfo_double_click
-        FOR EVENT double_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-  METHODS on_symbol_double_click
-        FOR EVENT double_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-  METHODS on_elementinfo_hotspot_de
-        FOR EVENT hotspot_click OF cl_gui_alv_grid
-    IMPORTING
-        !e_row_id
-        !e_column_id
-        !es_row_no .
-  METHODS on_elementinfo_drag
-        FOR EVENT ondrag OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no
-        !e_dragdropobj .
-  METHODS on_symbol_drag
-        FOR EVENT ondrag OF cl_gui_alv_grid
-    IMPORTING
-        !e_row
-        !e_column
-        !es_row_no
-        !e_dragdropobj .
-  METHODS on_toolbar_function_selected
-        FOR EVENT function_selected OF cl_gui_toolbar
-    IMPORTING
-        !fcode .
-  METHODS on_top_toolbar_dropdown
-        FOR EVENT dropdown_clicked OF cl_gui_toolbar
-    IMPORTING
-        !fcode
-        !posx
-        !posy .
-  METHODS on_top_toolbar_funcsel
-        FOR EVENT function_selected OF cl_gui_toolbar
-    IMPORTING
-        !fcode
-        !sender .
-  METHODS save_symbols
-    EXPORTING
-      !e_success TYPE boolean .
-  METHODS select_jobdata .
-  METHODS send_sql_via_mail .
-  METHODS set_initial_date_history .
-  METHODS set_initial_date_jobmonitor .
-  METHODS set_result_toolbar_active
-    IMPORTING
-      !i_fcode TYPE ui_func .
-  METHODS set_sql_area
-    IMPORTING
-      !i_codelines_t TYPE /cadaxo/sqlccodeline_t .
-  METHODS show_admhelp .
-  METHODS show_html
-    IMPORTING
-      !i_html_id TYPE /cadaxo/sqlcparameter_id DEFAULT 'HTML_STARTUP' .
-  METHODS show_jobmonitor .
-  METHODS show_log .
-  METHODS show_result .
-  METHODS show_saved_lists .
-  METHODS store_sql_to_hist
-    IMPORTING
-      !i_codelines_t TYPE /cadaxo/sqlccodeline_t OPTIONAL .
-  METHODS update_field_catalog_alv .
-  METHODS usr_action_clear_sql_area .
-  METHODS usr_action_leave_sql_cockpit .
-  METHODS usr_action_pretty_printer .
-  METHODS usr_action_show_abap_docu .
-  METHODS usr_action_sql_trace_onoff .
-  METHODS on_editor_quick_info
-        FOR EVENT quick_info OF cl_gui_abapedit
-    IMPORTING
-        !contextstring
-        !datatype
-        !xpos
-        !ypos
-        !sender .
-  METHODS get_current_grid_number
-    RETURNING
-      VALUE(r_grid_number) TYPE i .
-  METHODS save_hold_lists .
-  METHODS add_hold_lists .
-  METHODS delete_symbol_db
-    RETURNING
-      VALUE(rv_success) TYPE boolean .
-  METHODS update_symbol_db
-    IMPORTING
-      VALUE(it_symbol_update) TYPE t_symbol_db
-    RETURNING
-      VALUE(rv_success)       TYPE boolean .
-  METHODS check_symbol_value_valid
-    IMPORTING
-      !is_symbol_line TYPE /cadaxo/sqlc_symbol
-    RAISING
-      /cadaxo/cx_sqlc_invalid_value .
-  METHODS on_symbol_button_variant
-        FOR EVENT button_click OF cl_gui_alv_grid
-    IMPORTING
-        !es_col_id
-        !es_row_no .
-  METHODS sql_search .
-  METHODS sql_search_next .
-  METHODS log_alv_line_selection .
-  METHODS handle_command_create_symbol
-    IMPORTING
-      !i_grid_i TYPE i OPTIONAL .
-  METHODS api_saved_list_import
-    IMPORTING
-      !ir_api   TYPE REF TO /cadaxo/cl_sqlc_cockpit_api
-      !is_items TYPE /cadaxo/sqlcapip .
-  METHODS share_saved_list .
-  METHODS populate_saved_list
-    IMPORTING
-      !iv_list_guid         TYPE /cadaxo/sqlc_list_exp_sqlx-list_guid
-      !iv_saved_list_shared TYPE /cadaxo/sqlc_list_exp_sqlx-type
-    RETURNING
-      VALUE(rs_saved_list)  TYPE /cadaxo/sqlc_list_exp_sqlx .
-  METHODS get_selected_elem_inf_flds
-    IMPORTING
-      !i_index        TYPE lvc_index
-    RETURNING
-      VALUE(r_fields) TYPE string .
-  METHODS get_saved_list_fieldcat
-    RETURNING
-      VALUE(r_saved_list_fieldcat) TYPE lvc_t_fcat .
-  METHODS handle_delete_saved_lists .
-  METHODS handle_export_saved_list .
+  methods CREATE_SYMBOL_MULTIVAL_TAB_DYN
+    importing
+      !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
+    exporting
+      !E_DATA type DATA
+      !E_DATA_STRUCT type DATA .
+  methods GET_SYMBOL_DATATYPE_DESC
+    importing
+      !I_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
+    returning
+      value(R_DESC) type AS4TEXT .
+  methods GET_SYMBOL_DATATYPE_INFO
+    importing
+      !I_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
+    returning
+      value(R_INFO) type /CADAXO/SQLCSYMBOL_DATAINFO .
+  methods CHECK_SYMBOL_DATATYPE
+    importing
+      !I_VALUE type LVC_VALUE
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  methods SHOW_SYMBOLMULTI_DIALOG
+    importing
+      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
+      !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
+    returning
+      value(R_SYMBOL_VALUE) type RSELOPTION
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  methods ON_SYMBOL_BUTTON_CLICK
+    for event BUTTON_CLICK of CL_GUI_ALV_GRID
+    importing
+      !ES_COL_ID
+      !ES_ROW_NO .
+  methods GET_USER_SYMBOL_COUNT
+    importing
+      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
+    returning
+      value(R_COUNT) type I .
+  methods ERROR_CALC_HEIGHT
+    importing
+      !IV_ERRORS type I
+    returning
+      value(EV_HEIGHT) type I .
+  class-methods BUILD_RESULT_GRID_FOOTER
+    importing
+      !IV_SYST type SYSYSID
+      !IV_MANDANT type /CADAXO/SQLC_MANDT
+      !IV_UNAME type UNAME
+      !IV_CREATE_TIMESTAMP type TIMESTAMPL
+    returning
+      value(R_GRID_FOOTER) type /CADAXO/SQLCRESULT_FOOTER .
+  class-methods BUILD_RESULT_GRID_TITLE
+    importing
+      !I_RUNTIME type I
+      !I_LINES type I
+      !I_MESSAGE type STRING optional
+    returning
+      value(R_GRID_TITLE) type LVC_TITLE .
+  methods INSERT_SAVED_LIST
+    importing
+      !IT_SAVED_LIST type /CADAXO/SQLC_LIST_EXP_SQLX_T
+    returning
+      value(EV_UPDATE_OK) type ABAP_BOOL .
+  methods CALC_RESULT_ROWS_AND_COLS
+    importing
+      !I_LINES type I
+    exporting
+      !E_ROWS type I
+      !E_COLS type I .
+  methods CONFIRM_SYMBOL_OVERWRITE .
+  methods CREATE_CLIPBOARD_UI_CONTROL .
+  methods CREATE_CONTROLS .
+  methods CREATE_DYN_DOCUMENT
+    importing
+      !I_PARENT type ref to CL_GUI_CONTAINER
+      value(I_SQL) type STRING
+      !I_HEADER_TEXT type CHAR255 optional
+    changing
+      !IC_DOCUMENT type ref to CL_DD_DOCUMENT .
+  methods CREATE_EDITOR_UI_CONTROL .
+  methods CREATE_PRIMARY_UI_CONTROLS .
+  methods CREATE_RESULT_UI_CONTROLS .
+  methods CREATE_ELEMENTINFO_UI_CONTROL .
+  methods CREATE_SYMBOL_UI_CONTROL .
+  methods CREATE_VARIANT .
+  methods DELETE_LOG .
+  methods DELETE_SYMBOLS
+    exporting
+      !E_SUCCESS type BOOLEAN .
+  methods EXECUTE_SQL
+    importing
+      !I_PROGRESS_INDICATOR type CHAR1 optional
+    preferred parameter I_PROGRESS_INDICATOR
+    raising
+      /CADAXO/CX_SQLC_TO_MUCH_RESROW
+      /CADAXO/CX_SQLC_INVALID_VALUE
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods EXECUTE_SQL_BACKGROUND_WIZ .
+  methods FOCUS_SYMBOL_ALV_CELL
+    importing
+      !I_ROW_ID type LVC_INDEX
+      !I_FIELD_NAME type LVC_FNAME .
+  methods FREE_RESULT_CONTROLS .
+  methods GET_LINK
+    importing
+      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID
+    exporting
+      !E_URL type C
+    changing
+      !CT_CACHE type GTT_CHAR255 .
+  methods GET_SAVED_RESULTS
+    importing
+      !I_RESS_GUID type /CADAXO/SQLC_RESS_GUID_T optional
+      !I_CLEAR_OLD_ALVS type FLAG optional
+    preferred parameter I_RESS_GUID .
+  methods GET_SYMBOLS_SELECTED
+    exporting
+      value(E_SUCCESS) type BOOLEAN .
+  methods GET_SYMBOLS .
+  methods GET_USER_SYMBOL_FROM_SQL
+    importing
+      !I_VARGUID type /CADAXO/SQLC_VARIANT_GUID optional
+      !I_SQL type /CADAXO/SQLCCODELINE_T
+      !I_TYPE type CHAR1
+    exporting
+      !E_SYMBOLS type /CADAXO/SQLC_SYMBOL_T .
+  methods GET_VARIANT .
+  methods HANDLE_RESULT_COMMAND_EXP_CSV
+    importing
+      !I_GRID_I type I .
+  methods HANDLE_COMMAND_SHOW_FULL_VALUE
+    importing
+      !I_GRID_I type I optional
+      !I_LOG type ABAP_BOOL optional .
+  methods HANDLE_COMMAND_SHOW_HTML_BROW
+    importing
+      !I_GRID_I type I optional
+      !I_LOG type ABAP_BOOL optional .
+  methods HANDLE_COMMAND_SHOW_XML_BROW
+    importing
+      !I_GRID_I type I optional
+      !I_LOG type ABAP_BOOL optional .
+  methods HANDLE_RESULT_COMMAND_CDXEXP
+    importing
+      !I_GRID_I type I .
+  methods HANDLE_RESULT_COMMAND_CLOSE
+    importing
+      !I_GRID_I type I .
+  methods HANDLE_RESULT_COMMAND_COMPARE
+    importing
+      !I_SOURCE type I
+      !I_TARGET type I .
+  methods HANDLE_RESULT_COMMAND_HOLD
+    importing
+      !I_GRID_I type I .
+  methods HANDLE_RESULT_COMMAND_KEYFIX
+    importing
+      !I_GRID_I type I .
+  methods HANDLE_RESULT_COMMAND_REFRLST
+    importing
+      !I_GRID_I type I .
+  methods HANDLE_RESULT_COMMAND_FULLDISP
+    importing
+      !I_GRID_I type I .
+  methods INSERT_CODEBLOCK_AT_POSITION
+    importing
+      !IV_LINE type I
+      !IV_POS type I
+      !IV_SQLSTRING type /CADAXO/SQLCSTRING
+      !I_SET_FOCUS type ABAP_BOOL default ABAP_FALSE .
+  methods INSERT_TABLE_TO_EDITOR
+    importing
+      !I_STRING type STRING .
+  methods LOAD_HOME_HTML .
+  methods MOVE_BACK_TO_SQL .
+  methods MOVE_FORW_TO_SQL .
+  methods ON_ABAP_ERROR_HOTSPOT_CLICK
+    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW_ID
+      !E_COLUMN_ID
+      !ES_ROW_NO .
+  methods ON_ALV_DRAG
+    for event ONDRAG of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO
+      !E_DRAGDROPOBJ .
+  methods ON_ALV_RESULT_DOUBLE_CLICK
+    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO .
+  methods ON_ALV_QUEUE_DOUBLE_CLICK_3000
+    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO .
+  methods ON_ALV_TEMPL_DOUBLE_CLICK_2000
+    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO .
+  methods ON_CLIPBOARD_DROP
+    for event ON_DROP of CL_GUI_TEXTEDIT
+    importing
+      !INDEX
+      !LINE
+      !DRAGDROP_OBJECT .
+  methods ON_EDITOR_CONTEXT_MENU
+    for event CONTEXT_MENU of CL_GUI_ABAPEDIT
+    importing
+      !MENU
+      !MENU_TYPE .
+  methods ON_EDITOR_CONTEXT_MENU_SEL
+    for event CONTEXT_MENU_SELECTED of CL_GUI_ABAPEDIT
+    importing
+      !FCODE .
+  methods ON_EDITOR_DBLCLICK
+    for event DBLCLICK of CL_GUI_ABAPEDIT .
+  methods ON_EDITOR_DROP
+    for event ON_DROP of CL_GUI_ABAPEDIT
+    importing
+      !INDEX
+      !LINE
+      !POS
+      !DRAGDROP_OBJECT .
+  methods ON_EDITOR_TEXT_DROP
+    for event ON_DROP of CL_GUI_TEXTEDIT
+    importing
+      !INDEX
+      !LINE
+      !POS
+      !DRAGDROP_OBJECT .
+  methods ON_HANDLE_JOB_TOOLBAR
+    for event TOOLBAR of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT
+      !E_INTERACTIVE .
+  methods ON_HANDLE_JOB_USER_COMMAND
+    for event USER_COMMAND of CL_GUI_ALV_GRID
+    importing
+      !E_UCOMM .
+  methods ON_LOG_ALV_CONTEXT_MENU
+    for event CONTEXT_MENU_REQUEST of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT .
+  methods ON_HANDLE_RESULT_CONTEXT_MENU
+    for event CONTEXT_MENU_REQUEST of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT .
+  methods ON_HANDLE_RESULT_END_OF_PAGE
+    for event PRINT_END_OF_PAGE of CL_GUI_ALV_GRID .
+  methods ON_HANDLE_RESULT_MENU_BUTTON
+    for event MENU_BUTTON of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT
+      !E_UCOMM .
+  methods ON_HANDLE_RESULT_TOOLBAR
+    for event TOOLBAR of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT
+      !E_INTERACTIVE .
+  methods ON_HANDLE_RESULT_USER_COMMAND
+    for event USER_COMMAND of CL_GUI_ALV_GRID
+    importing
+      !E_UCOMM .
+  methods ON_HANDLE_SAVEDLISTS_TOOLBAR
+    for event TOOLBAR of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT
+      !E_INTERACTIVE .
+  methods ON_HANDLE_SAVEDLISTS_USRCOMMND
+    for event USER_COMMAND of CL_GUI_ALV_GRID
+    importing
+      !E_UCOMM .
+  methods ON_HANDLE_VARSYM_CLICK
+    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW_ID
+      !E_COLUMN_ID
+      !ES_ROW_NO .
+  methods ON_HOME_SAPEVENT
+    for event SAPEVENT of CL_GUI_HTML_VIEWER
+    importing
+      !ACTION
+      !FRAME
+      !GETDATA
+      !POSTDATA
+      !QUERY_TABLE .
+  methods ON_JOB_ALV_CLICK
+    for event BUTTON_CLICK of CL_GUI_ALV_GRID
+    importing
+      !ES_COL_ID
+      !ES_ROW_NO .
+  methods ON_JOB_ALV_HOTSPOT_CLICK
+    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW_ID
+      !E_COLUMN_ID
+      !ES_ROW_NO .
+  methods ON_LOG_ALV_DOUBLE_CLICK
+    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO .
+  methods ON_LOG_ALV_DRAG
+    for event ONDRAG of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO
+      !E_DRAGDROPOBJ .
+  methods ON_LOG_ALV_TOOLBAR
+    for event TOOLBAR of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT
+      !E_INTERACTIVE .
+  methods ON_LOG_ALV_USER_COMMAND
+    for event USER_COMMAND of CL_GUI_ALV_GRID
+    importing
+      !E_UCOMM .
+  methods ON_RESULT_TOOLBAR_DROPDOWN
+    for event DROPDOWN_CLICKED of CL_GUI_TOOLBAR
+    importing
+      !FCODE
+      !POSX
+      !POSY .
+  methods ON_RESULT_TOOLBAR_FUNCSEL
+    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
+    importing
+      !FCODE .
+  methods ON_SAVED_LIST_SELECT_LINE
+    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO .
+  methods ON_SYMBOL_ALV_DATA_CHANGE
+    for event DATA_CHANGED of CL_GUI_ALV_GRID
+    importing
+      !ER_DATA_CHANGED
+      !E_ONF4
+      !E_ONF4_BEFORE
+      !E_ONF4_AFTER
+      !E_UCOMM .
+  methods ON_SYMBOL_ALV_DATA_CHANGED_FIN
+    for event DATA_CHANGED_FINISHED of CL_GUI_ALV_GRID
+    importing
+      !E_MODIFIED
+      !ET_GOOD_CELLS .
+  methods ON_SYMBOL_ALV_TOOLBAR
+    for event TOOLBAR of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT
+      !E_INTERACTIVE .
+  methods ON_SYMBOL_ALV_USER_COMMAND
+    for event USER_COMMAND of CL_GUI_ALV_GRID
+    importing
+      !E_UCOMM .
+  methods ON_ELEMENTINFO_DOUBLE_CLICK
+    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO .
+  methods ON_SYMBOL_DOUBLE_CLICK
+    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO .
+  methods ON_ELEMENTINFO_HOTSPOT_DE
+    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW_ID
+      !E_COLUMN_ID
+      !ES_ROW_NO .
+  methods ON_ELEMENTINFO_DRAG
+    for event ONDRAG of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO
+      !E_DRAGDROPOBJ .
+  methods ON_SYMBOL_DRAG
+    for event ONDRAG of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO
+      !E_DRAGDROPOBJ .
+  methods ON_TOOLBAR_FUNCTION_SELECTED
+    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
+    importing
+      !FCODE .
+  methods ON_TOP_TOOLBAR_DROPDOWN
+    for event DROPDOWN_CLICKED of CL_GUI_TOOLBAR
+    importing
+      !FCODE
+      !POSX
+      !POSY .
+  methods ON_TOP_TOOLBAR_FUNCSEL
+    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
+    importing
+      !FCODE
+      !SENDER .
+  methods SAVE_SYMBOLS
+    exporting
+      !E_SUCCESS type BOOLEAN .
+  methods SELECT_JOBDATA .
+  methods SEND_SQL_VIA_MAIL .
+  methods SET_INITIAL_DATE_HISTORY .
+  methods SET_INITIAL_DATE_JOBMONITOR .
+  methods SET_RESULT_TOOLBAR_ACTIVE
+    importing
+      !I_FCODE type UI_FUNC .
+  methods SET_SQL_AREA
+    importing
+      !I_CODELINES_T type /CADAXO/SQLCCODELINE_T .
+  methods SHOW_ADMHELP .
+  methods SHOW_HTML
+    importing
+      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID default 'HTML_STARTUP' .
+  methods SHOW_JOBMONITOR .
+  methods SHOW_LOG .
+  methods SHOW_RESULT .
+  methods SHOW_SAVED_LISTS .
+  methods STORE_SQL_TO_HIST
+    importing
+      !I_CODELINES_T type /CADAXO/SQLCCODELINE_T optional .
+  methods UPDATE_FIELD_CATALOG_ALV .
+  methods USR_ACTION_CLEAR_SQL_AREA .
+  methods USR_ACTION_LEAVE_SQL_COCKPIT .
+  methods USR_ACTION_PRETTY_PRINTER .
+  methods USR_ACTION_SHOW_ABAP_DOCU .
+  methods USR_ACTION_SQL_TRACE_ONOFF .
+  methods ON_EDITOR_QUICK_INFO
+    for event QUICK_INFO of CL_GUI_ABAPEDIT
+    importing
+      !CONTEXTSTRING
+      !DATATYPE
+      !XPOS
+      !YPOS
+      !SENDER .
+  methods GET_CURRENT_GRID_NUMBER
+    returning
+      value(R_GRID_NUMBER) type I .
+  methods SAVE_HOLD_LISTS .
+  methods ADD_HOLD_LISTS .
+  methods DELETE_SYMBOL_DB
+    returning
+      value(RV_SUCCESS) type BOOLEAN .
+  methods UPDATE_SYMBOL_DB
+    importing
+      value(IT_SYMBOL_UPDATE) type T_SYMBOL_DB
+    returning
+      value(RV_SUCCESS) type BOOLEAN .
+  methods CHECK_SYMBOL_VALUE_VALID
+    importing
+      !IS_SYMBOL_LINE type /CADAXO/SQLC_SYMBOL
+    raising
+      /CADAXO/CX_SQLC_INVALID_VALUE .
+  methods ON_SYMBOL_BUTTON_VARIANT
+    for event BUTTON_CLICK of CL_GUI_ALV_GRID
+    importing
+      !ES_COL_ID
+      !ES_ROW_NO .
+  methods SQL_SEARCH .
+  methods SQL_SEARCH_NEXT .
+  methods LOG_ALV_LINE_SELECTION .
+  methods HANDLE_COMMAND_CREATE_SYMBOL
+    importing
+      !I_GRID_I type I optional .
+  methods API_SAVED_LIST_IMPORT
+    importing
+      !IR_API type ref to /CADAXO/CL_SQLC_COCKPIT_API
+      !IS_ITEMS type /CADAXO/SQLCAPIP .
+  methods SHARE_SAVED_LIST .
+  methods POPULATE_SAVED_LIST
+    importing
+      !IV_LIST_GUID type /CADAXO/SQLC_LIST_EXP_SQLX-LIST_GUID
+      !IV_SAVED_LIST_SHARED type /CADAXO/SQLC_LIST_EXP_SQLX-TYPE
+    returning
+      value(RS_SAVED_LIST) type /CADAXO/SQLC_LIST_EXP_SQLX .
+  methods GET_SELECTED_ELEM_INF_FLDS
+    importing
+      !I_INDEX type LVC_INDEX
+    returning
+      value(R_FIELDS) type STRING .
+  methods GET_SAVED_LIST_FIELDCAT
+    returning
+      value(R_SAVED_LIST_FIELDCAT) type LVC_T_FCAT .
+  methods HANDLE_DELETE_SAVED_LISTS .
+  methods HANDLE_EXPORT_SAVED_LIST .
 PRIVATE SECTION.
 
     CONSTANTS:
@@ -2163,7 +2162,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-    IF gc_docking IS INITIAL.
+    IF gc_splitter IS INITIAL.
 
       CALL FUNCTION 'GUI_IS_ITS'
         IMPORTING
@@ -2695,15 +2694,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     DATA: ls_stb_button TYPE stb_button.
     DATA: lt_events     TYPE cntl_simple_events.
+*
+*    gc_docking = NEW #( repid     = '/CADAXO/SQLC_MAIN'
+*                        dynnr     = '0100'
+*                        side      = cl_gui_docking_container=>dock_at_bottom
+*                        extension = 1000 ).
+*
+*    gc_docking->set_name( 'GC_DOCKING' ).
 
-    gc_docking = NEW #( repid     = '/CADAXO/SQLC_MAIN'
-                        dynnr     = '0100'
-                        side      = cl_gui_docking_container=>dock_at_bottom
-                        extension = 1000 ).
-
-    gc_docking->set_name( 'GC_DOCKING' ).
-
-    gc_splitter = NEW #(  parent     = gc_docking "cl_gui_container=>screen0 "gc_docking
+    gc_splitter = NEW #(  parent     = cl_gui_container=>screen0 "gc_docking
                           rows       = 3
                           columns    = 1
                           shellstyle = cl_gui_container=>ws_visible + cl_gui_container=>ws_child ).
