@@ -1,4 +1,4 @@
-class /CADAXO/CL_SQLC_API_OT_SAVED definition
+class /CADAXO/CL_SQLC_API_OT_SAVEDLI definition
   public
   final
   create public .
@@ -12,7 +12,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_API_OT_SAVED IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_API_OT_SAVEDLI IMPLEMENTATION.
 
 
   method /CADAXO/IF_API_OBJECTTYPE~GET_VERSION.
@@ -60,4 +60,21 @@ CLASS /CADAXO/CL_SQLC_API_OT_SAVED IMPLEMENTATION.
                                    IMPORTING gzip_out = ev_data ).
 
   endmethod.
+
+  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
+
+    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name   = 'ICON_TABLE_SETTINGS'
+        info   = 'Saved List'
+      IMPORTING
+        result = e_icon_quickinfo
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+      CLEAR e_icon_quickinfo.
+    ENDIF.
+
+  ENDMETHOD.
+
 ENDCLASS.

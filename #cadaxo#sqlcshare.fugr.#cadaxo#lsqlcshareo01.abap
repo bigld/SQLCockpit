@@ -15,7 +15,7 @@ MODULE pbo_3001 OUTPUT.
       SET TITLEBAR '3001_3'.
     WHEN /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-variant.
       SET TITLEBAR '3001_5'.
-    WHEN /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-saved.
+    WHEN /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-savedList.
       SET TITLEBAR '3001_6'.
     WHEN OTHERS.
       SET TITLEBAR '3001'.
