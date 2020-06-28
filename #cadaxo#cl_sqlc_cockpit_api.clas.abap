@@ -18,10 +18,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_api DEFINITION
                END OF status.
     CONSTANTS:
       BEGIN OF cs_api_types,
-        sql     TYPE /cadaxo/sqlcapi_position_typ VALUE 1,
-        symbols TYPE /cadaxo/sqlcapi_position_typ VALUE 3,
-        variant TYPE /cadaxo/sqlcapi_position_typ VALUE 5,
-        saved   TYPE /cadaxo/sqlcapi_position_typ VALUE 6,
+        sql       TYPE /cadaxo/sqlcapi_position_typ VALUE 1,
+        symbols   TYPE /cadaxo/sqlcapi_position_typ VALUE 3,
+        variant   TYPE /cadaxo/sqlcapi_position_typ VALUE 5,
+        savedlist TYPE /cadaxo/sqlcapi_position_typ VALUE 6,
       END OF cs_api_types .
 
     CLASS-METHODS create_share_factory
@@ -55,7 +55,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_api DEFINITION
     METHODS delete_header_and_positions .
     CLASS-METHODS get_own_queue
       RETURNING
-        VALUE(rt_queue) TYPE /cadaxo/sqlcapi_queue_t .
+        VALUE(rt_queue) TYPE /cadaxo/sqlcapi_queue_t
+      RAISING
+        /cadaxo/cx_sqlc_syntax_error .
     CLASS-METHODS get_share_factory
       IMPORTING
         VALUE(iv_id)       TYPE /cadaxo/sqlcapi_id
@@ -89,12 +91,16 @@ CLASS /cadaxo/cl_sqlc_cockpit_api DEFINITION
         VALUE(ev_value) TYPE any .
     METHODS set_header_id
       IMPORTING
-        !iv_id TYPE /cadaxo/sqlcapi_id .
+        iv_id TYPE /cadaxo/sqlcapi_id .
+    METHODS get_objecttype_handler IMPORTING iv_typ                  TYPE /cadaxo/sqlcapi_position_typ
+                                   RETURNING VALUE(e_objecttype_api) TYPE REF TO /cadaxo/if_api_objecttype
+                                   RAISING
+                                             /cadaxo/cx_sqlc_syntax_error.
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
 
 
   METHOD add_item.
@@ -130,34 +136,37 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
     ls_pos-id_hdr = gv_header_id.
     ls_pos-typ    = iv_typ.
 
+    TRY.
+        DATA(objecttype_api) = me->get_objecttype_handler( iv_typ ).
+
+        ls_pos-version = objecttype_api->get_version( ).
+        objecttype_api->prepare_import( EXPORTING iv_data = iv_data
+                                        IMPORTING ev_data = ls_pos-data ).
+
+        INSERT INTO /cadaxo/sqlcapip VALUES ls_pos.
+      CATCH  /cadaxo/cx_sqlc_syntax_error ##NO_HANDLER.
+    ENDTRY.
+
+  ENDMETHOD.
+
+  METHOD get_objecttype_handler.
+
     CASE iv_typ.
       WHEN cs_api_types-sql.
-
-        ls_pos-version = /cadaxo/cl_sqlc_api_ot_sql=>/cadaxo/if_api_objecttype~get_version( ).
-        /cadaxo/cl_sqlc_api_ot_sql=>/cadaxo/if_api_objecttype~prepare_import( EXPORTING iv_data = iv_data
-                                                                              IMPORTING ev_data = DATA(lv_data) ).
+        e_objecttype_api  = NEW /cadaxo/cl_sqlc_api_ot_sql( ).
 
       WHEN cs_api_types-symbols.
-
-        ls_pos-version = /cadaxo/cl_sqlc_api_ot_symbol=>/cadaxo/if_api_objecttype~get_version( ).                           "COCKPIT-294
-        /cadaxo/cl_sqlc_api_ot_symbol=>/cadaxo/if_api_objecttype~prepare_import( EXPORTING iv_data = iv_data                "COCKPIT-294
-                                                                                 IMPORTING ev_data = lv_data ).             "COCKPIT-294
+        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_symbol( ).
 
       WHEN cs_api_types-variant.
-        ls_pos-version = /cadaxo/cl_sqlc_api_ot_sql=>/cadaxo/if_api_objecttype~get_version( ).
-        /cadaxo/cl_sqlc_api_ot_variant=>/cadaxo/if_api_objecttype~prepare_import( EXPORTING iv_data = iv_data
-                                                                                  IMPORTING ev_data = lv_data ).
+        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_variant( ).
 
-      WHEN cs_api_types-saved.
-        ls_pos-version = /cadaxo/cl_sqlc_api_ot_saved=>/cadaxo/if_api_objecttype~get_version( ).
-        /cadaxo/cl_sqlc_api_ot_saved=>/cadaxo/if_api_objecttype~prepare_import( EXPORTING iv_data = iv_data
-                                                                                IMPORTING ev_data = lv_data ).
+      WHEN cs_api_types-savedlist.
+        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_savedli( ).
+
       WHEN OTHERS.
-        RETURN.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
     ENDCASE.
-
-    ls_pos-data = lv_data.
-    INSERT INTO /cadaxo/sqlcapip VALUES ls_pos.
 
   ENDMETHOD.
 
@@ -317,6 +326,32 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD get_share_factory.
+****************************************************************************************************
+* Description             : Create Share Factory                                                   *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+* Creates and returns an instance for new API call                                                 *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Harald Wiesinger         Company    : CADAXO GesmbH                    *
+* Date                    : 01.08.2017               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
+* Date                    : xx.xx.2010                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+****************************************************************************************************
+    CREATE OBJECT ro_instance.
+
+    ro_instance->set_header_id( EXPORTING iv_id = iv_id ).
+
+  ENDMETHOD.
+
   METHOD create_share_factory.
 ****************************************************************************************************
 * Description             : Create Share Factory                                                   *
@@ -339,21 +374,16 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
 ****************************************************************************************************
     ro_instance = NEW #( ).
 
-    ro_instance->create_header_db(
-        EXPORTING
-            iv_sender = iv_sender
-            iv_sender_typ = iv_sender_typ
-            iv_receiver = iv_receiver
-            iv_receiver_typ = iv_receiver_typ
-            iv_expiration = iv_expiration
-            iv_rfcdest  = iv_rfcdest "+cockpit-295
-    ).
+    ro_instance->create_header_db( iv_sender       = iv_sender
+                                   iv_sender_typ   = iv_sender_typ
+                                   iv_receiver     = iv_receiver
+                                   iv_receiver_typ = iv_receiver_typ
+                                   iv_expiration   = iv_expiration
+                                   iv_rfcdest      = iv_rfcdest "+cockpit-295
+                                 ).
 
     IF iv_description IS NOT INITIAL.
-      ro_instance->create_description_db(
-          EXPORTING
-              iv_description = iv_description
-      ).
+      ro_instance->create_description_db( iv_description = iv_description ).
     ENDIF.
 
   ENDMETHOD.
@@ -394,25 +424,14 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
 * 08.10.2019 |Pat                   |export results                              | COCKPIT-401    *
 ****************************************************************************************************
 
-    CASE iv_pos_line-typ.
-      WHEN cs_api_types-sql.
-* begin of change COCKPIT-294
-*     rt_item = /cadaxo/cl_sqlc_api_ot_sql=>/cadaxo/if_api_objecttype~prepare_export(  ).
-        /cadaxo/cl_sqlc_api_ot_sql=>/cadaxo/if_api_objecttype~prepare_export( EXPORTING iv_data = iv_pos_line-data
-                                                                              IMPORTING rt_sql  = rt_item ).
+    TRY.
+        DATA(objecttype_api) = me->get_objecttype_handler( iv_pos_line-typ ).
 
-      WHEN cs_api_types-symbols.
-        /cadaxo/cl_sqlc_api_ot_symbol=>/cadaxo/if_api_objecttype~prepare_export( EXPORTING iv_data = iv_pos_line-data
-                                                                                 IMPORTING rt_sql  = rt_item ).
+        objecttype_api->prepare_export( EXPORTING iv_data = iv_pos_line-data
+                                        IMPORTING rt_sql  = rt_item ).
 
-      WHEN cs_api_types-variant.
-        /cadaxo/cl_sqlc_api_ot_variant=>/cadaxo/if_api_objecttype~prepare_export( EXPORTING iv_data = iv_pos_line-data
-                                                                                  IMPORTING rt_sql  = rt_item ).
-* end   of change COCKPIT-294
-      WHEN cs_api_types-saved.
-        /cadaxo/cl_sqlc_api_ot_saved=>/cadaxo/if_api_objecttype~prepare_export( EXPORTING iv_data = iv_pos_line-data
-                                                                                IMPORTING rt_sql  = rt_item ).
-    ENDCASE.
+      CATCH  /cadaxo/cx_sqlc_syntax_error ##NO_HANDLER.
+    ENDTRY.
 
   ENDMETHOD.
 
@@ -441,7 +460,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
     SELECT *
        FROM /cadaxo/sqlcapip
        INTO TABLE rt_items
-         WHERE id_hdr = gv_header_id.
+         WHERE id_hdr = me->gv_header_id.
     IF sy-subrc = 0.
 *      me->set_status( 'R' ). "-cockpit-294
     ENDIF.
@@ -472,14 +491,14 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
     DATA(lv_user)  = cl_abap_syst=>get_user_name( ).
     DATA(lv_langu) = cl_abap_syst=>get_language( ).
 
-    DATA: lt_ddo7 TYPE STANDARD TABLE OF dd07v WITH DEFAULT KEY.
+    DATA: position_type_sylangu_texts TYPE STANDARD TABLE OF dd07v WITH DEFAULT KEY.
 
     CALL FUNCTION 'DD_DOMVALUES_GET'
       EXPORTING
         domname   = '/CADAXO/SQLCAPI_POSITION_TYP'
         text      = abap_true
       TABLES
-        dd07v_tab = lt_ddo7
+        dd07v_tab = position_type_sylangu_texts
       EXCEPTIONS
         OTHERS    = 1.
 
@@ -505,65 +524,49 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
       ENDIF.
 
       " Convert timestamp
-      CONVERT TIME STAMP <ls_queue>-created TIME ZONE 'UTC' INTO DATE <ls_queue>-dat TIME <ls_queue>-tim.
+      CONVERT TIME STAMP <ls_queue>-created TIME ZONE 'UTC' INTO DATE <ls_queue>-date TIME <ls_queue>-time.
 
     ENDLOOP.
 
     LOOP AT rt_queue ASSIGNING <ls_queue>.
-*      Logic to populate item type                                                                        "COCKPIT-294
-      IF <ls_queue>-position_typ IS INITIAL.                                                              "COCKPIT-294
-        DATA(lr_api_position_type) = /cadaxo/cl_sqlc_cockpit_api=>get_share_factory( <ls_queue>-id ).     "COCKPIT-294
 
-        IF lr_api_position_type IS BOUND.                                                                 "COCKPIT-294
-          DATA(lt_items) = lr_api_position_type->get_items( <ls_queue>-id ).                              "COCKPIT-294
-          LOOP AT lt_items ASSIGNING FIELD-SYMBOL(<ls_item>).                                             "COCKPIT-294
-            IF sy-tabix = 1.                                                                              "COCKPIT-294
-              <ls_queue>-position_typ = <ls_item>-typ.                                                    "COCKPIT-294
-            ELSEIF sy-tabix > 1.                                                                          "COCKPIT-294
-              APPEND <ls_queue> TO rt_queue.                                                              "COCKPIT-294
-              <ls_queue>-position_typ = <ls_item>-typ.                                                    "COCKPIT-294
-            ENDIF.                                                                                        "COCKPIT-294
-          ENDLOOP.                                                                                        "COCKPIT-294
-        ENDIF.                                                                                            "COCKPIT-294
+      DATA(share_api) = /cadaxo/cl_sqlc_cockpit_api=>get_share_factory( <ls_queue>-id ).
 
-      ENDIF.
+      IF share_api IS BOUND.
 
-      IF <ls_queue>-position_typ IS NOT INITIAL.
-        TRY.
-            <ls_queue>-position_typ_text = lt_ddo7[ valpos = <ls_queue>-position_typ ]-ddtext.
-          CATCH cx_sy_itab_line_not_found.
-            <ls_queue>-position_typ_text = <ls_queue>-position_typ.
-        ENDTRY.
+        DATA(lt_items) = share_api->get_items( <ls_queue>-id ).
+
+        LOOP AT lt_items ASSIGNING FIELD-SYMBOL(<ls_item>).
+
+          IF line_exists( position_type_sylangu_texts[ valpos = <ls_item>-typ ] ).
+            DATA(type_text) = position_type_sylangu_texts[ valpos = <ls_item>-typ ]-ddtext.
+          ELSE.
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
+          ENDIF.
+          FIELD-SYMBOLS <type_field> TYPE /cadaxo/sqlcapi_queue_postype.
+          ASSIGN COMPONENT |{ condense( val = type_text from = | | to = || ) }| OF STRUCTURE <ls_queue> TO <type_field>.
+          IF sy-subrc <> 0.
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
+          ENDIF.
+          <type_field>-position_typ = <ls_item>-typ.
+
+          TRY.
+              DATA(objecttype_api) = share_api->get_objecttype_handler( <ls_item>-typ ).
+              <type_field>-position_typ_icon = objecttype_api->get_ui_icon( ).
+            CATCH /cadaxo/cx_sqlc_syntax_error.
+          ENDTRY.
+
+          IF line_exists( position_type_sylangu_texts[ valpos = <ls_item>-typ ] ).
+            <type_field>-position_typ_text = position_type_sylangu_texts[ valpos = <ls_item>-typ ]-ddtext.
+          ELSE.
+            <type_field>-position_typ_text = <ls_item>-typ.
+
+          ENDIF.
+
+        ENDLOOP.
       ENDIF.
 
     ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD get_share_factory.
-****************************************************************************************************
-* Description             : Create Share Factory                                                   *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-* Creates and returns an instance for new API call                                                 *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Harald Wiesinger         Company    : CADAXO GesmbH                    *
-* Date                    : 01.08.2017               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-    CREATE OBJECT ro_instance.
-
-    ro_instance->set_header_id( EXPORTING iv_id = iv_id ).
 
   ENDMETHOD.
 

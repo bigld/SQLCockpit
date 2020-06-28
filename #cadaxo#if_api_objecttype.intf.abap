@@ -1,18 +1,11 @@
-interface /CADAXO/IF_API_OBJECTTYPE
-  public .
+INTERFACE /cadaxo/if_api_objecttype
+  PUBLIC .
 
+  METHODS prepare_import IMPORTING VALUE(iv_data) TYPE any
+                         EXPORTING VALUE(ev_data) TYPE xsequence.
+  METHODS get_version RETURNING VALUE(rv_version) TYPE /cadaxo/sqlcapi_version.
+  METHODS prepare_export IMPORTING VALUE(iv_data) TYPE xstring
+                         EXPORTING VALUE(rt_sql)  TYPE ANY TABLE.
+  METHODS get_ui_icon RETURNING VALUE(e_icon_quickinfo) TYPE /cadaxo/sqlcapi_position_typic.
 
-  class-methods PREPARE_IMPORT
-    importing
-      value(IV_DATA) type ANY
-    exporting
-      value(EV_DATA) type XSEQUENCE .
-  class-methods GET_VERSION
-    returning
-      value(RV_VERSION) type /CADAXO/SQLCAPI_VERSION .
-  class-methods PREPARE_EXPORT
-    importing
-      value(IV_DATA) type XSTRING
-    exporting
-      value(RT_SQL) type ANY TABLE .
-endinterface.
+ENDINTERFACE.

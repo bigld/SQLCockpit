@@ -52,4 +52,21 @@ CLASS /CADAXO/CL_SQLC_API_OT_SYMBOL IMPLEMENTATION.
                                    IMPORTING gzip_out = ev_data ).
 
   ENDMETHOD.
+
+  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
+
+    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name   = 'ICON_CONVERT'
+        info   = 'Symbols'
+      IMPORTING
+        result = e_icon_quickinfo
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+      CLEAR e_icon_quickinfo.
+    ENDIF.
+
+  ENDMETHOD.
+
 ENDCLASS.

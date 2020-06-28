@@ -1,4 +1,4 @@
-FUNCTION /cadaxo/sqlc_share_insert.
+FUNCTION /CADAXO/SQLC_SHARE_INSERT.
 *"----------------------------------------------------------------------
 *"*"Local Interface:
 *"  IMPORTING
@@ -37,9 +37,9 @@ FUNCTION /cadaxo/sqlc_share_insert.
   ELSEIF iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-variant.
     ro_api->add_item( EXPORTING iv_typ = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-variant iv_data = is_variant ).
 
-  ELSEIF iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-saved."#Cockpit-401
+  ELSEIF iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-savedList."#Cockpit-401
     is_saved_list-uname = iv_receiver.
-    ro_api->add_item( EXPORTING iv_typ = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-saved iv_data = is_saved_list ).
+    ro_api->add_item( EXPORTING iv_typ = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-savedList iv_data = is_saved_list ).
 
   ENDIF.
 

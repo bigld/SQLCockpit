@@ -1,25 +1,25 @@
-class /CADAXO/CL_SQLC_API_OT_SQL definition
-  public
-  final
-  create public .
+CLASS /cadaxo/cl_sqlc_api_ot_sql DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces /CADAXO/IF_API_OBJECTTYPE .
-protected section.
-private section.
+    INTERFACES /cadaxo/if_api_objecttype .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_API_OT_SQL IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_api_ot_sql IMPLEMENTATION.
 
 
-  method /CADAXO/IF_API_OBJECTTYPE~GET_VERSION.
+  METHOD /cadaxo/if_api_objecttype~get_version.
 
-    RV_VERSION = '1.0'.
+    rv_version = '1.0'.
 
-  endmethod.
+  ENDMETHOD.
 
 
   METHOD /cadaxo/if_api_objecttype~prepare_export.
@@ -38,13 +38,13 @@ CLASS /CADAXO/CL_SQLC_API_OT_SQL IMPLEMENTATION.
         rt_sql = lt_data.
 
       CATCH cx_xslt_format_error.
-      "TODO - Errorhandling - technical error - queue record could not be read ...
+        "TODO - Errorhandling - technical error - queue record could not be read ...
     ENDTRY.
 
   ENDMETHOD.
 
 
-  method /CADAXO/IF_API_OBJECTTYPE~PREPARE_IMPORT.
+  METHOD /cadaxo/if_api_objecttype~prepare_import.
 
     DATA(json_writer) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
     CALL TRANSFORMATION id SOURCE data = iv_data RESULT XML json_writer.
@@ -53,5 +53,22 @@ CLASS /CADAXO/CL_SQLC_API_OT_SQL IMPLEMENTATION.
     cl_abap_gzip=>compress_binary( EXPORTING raw_in   = lv_json
                                    IMPORTING gzip_out = ev_data ).
 
-  endmethod.
+  ENDMETHOD.
+
+  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
+
+    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name   = 'ICON_SPOOL_REQUEST'
+        info   = 'SQL'
+      IMPORTING
+        result = e_icon_quickinfo
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+      CLEAR e_icon_quickinfo.
+    ENDIF.
+
+  ENDMETHOD.
+
 ENDCLASS.
