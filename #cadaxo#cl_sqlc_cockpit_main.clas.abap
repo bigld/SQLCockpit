@@ -865,7 +865,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -8786,14 +8786,12 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       l_xpos = xpos.
       WHILE l_xpos > 1.
         IF contextstring+l_xpos(1) = ` `.
-          l_xpos = l_xpos + 1.  "+cockpit433
           EXIT.
         ENDIF.
         l_xpos = l_xpos - 1.
       ENDWHILE.
 
-*     l_from = l_xpos + 1.      "-cockpit433
-      l_from = l_xpos - 1.      "+cockpit433
+      l_from = l_xpos + 1.
       l_xpos = xpos.
 
       WHILE l_xpos < l_to.
