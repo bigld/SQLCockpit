@@ -865,7 +865,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -8730,7 +8730,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *------------+----------------------+---------------------------------------------+----------------*
 * 16.05.2017 | Harald Wiesinger     | DATA LOSS Dump with periodic Jobs           | COCKPIT-206    *
 *------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
+* 27.07.2020 |Pat                   | quickinfo fix                               | Cockpit-433    *
 ****************************************************************************************************
 
     DATA l_xpos       TYPE i.
@@ -8786,12 +8786,14 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       l_xpos = xpos.
       WHILE l_xpos > 1.
         IF contextstring+l_xpos(1) = ` `.
+          l_xpos = l_xpos + 1.  "+cockpit433
           EXIT.
         ENDIF.
         l_xpos = l_xpos - 1.
       ENDWHILE.
 
-      l_from = l_xpos + 1.
+*     l_from = l_xpos + 1.      "-cockpit433
+      l_from = l_xpos - 1.      "+cockpit433
       l_xpos = xpos.
 
       WHILE l_xpos < l_to.
