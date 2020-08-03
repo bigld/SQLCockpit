@@ -1,205 +1,212 @@
-CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
-  PUBLIC
-  CREATE PUBLIC .
+class /CADAXO/CL_SQLC_COCKPIT_MAIN definition
+  public
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
-    TYPES:
-      t_symbol_db TYPE TABLE OF /cadaxo/sqlcusym .
-    TYPES:
-      gtt_char255 TYPE TABLE OF char255 .
-    TYPES:
-      t_string    TYPE TABLE OF string .
+  types:
+    t_symbol_db TYPE TABLE OF /cadaxo/sqlcusym .
+  types:
+    gtt_char255 TYPE TABLE OF char255 .
+  types:
+    t_string    TYPE TABLE OF string .
 
-    CONSTANTS c_cmd_create_symbol TYPE ui_func VALUE 'CREATE_SYMBOL' ##NO_TEXT.
-    CONSTANTS c_cmd_home TYPE ui_func VALUE 'HOME' ##NO_TEXT.
-    CONSTANTS c_cmd_insert_cds_entity TYPE ui_func VALUE 'INSERT_CDS_ENTITY' ##NO_TEXT.
-    CONSTANTS c_cmd_insert_sy_field TYPE ui_func VALUE 'INSERT_SY_FIELD' ##NO_TEXT.
-    CONSTANTS c_cmd_insert_table TYPE ui_func VALUE 'INSERT_TABLE' ##NO_TEXT.
-    CONSTANTS c_cmd_jobmonitor TYPE ui_func VALUE 'JOBMONITOR' ##NO_TEXT.
-    CONSTANTS c_cmd_pp TYPE ui_func VALUE 'PP' ##NO_TEXT.
-    CONSTANTS c_cmd_result_footer_hide TYPE ui_func VALUE 'HIDE_FOOTER' ##NO_TEXT.
-    CONSTANTS c_cmd_result_footer_show TYPE ui_func VALUE 'SHOW_FOOTER' ##NO_TEXT.
-    CONSTANTS c_cmd_result_toolbar_hide TYPE ui_func VALUE 'HIDE_RESULT_TOOLBAR' ##NO_TEXT.
-    CONSTANTS c_cmd_result_toolbar_show TYPE ui_func VALUE 'SHOW_RESULT_TOOLBAR' ##NO_TEXT.
-    CONSTANTS c_cmd_show_full_value TYPE ui_func VALUE 'SHOW_FULL_VALUE' ##NO_TEXT.
-    CONSTANTS c_cmd_show_result_table TYPE ui_func VALUE 'SHOW_RESULT_TABLE' ##NO_TEXT.
-    CONSTANTS c_cmd_show_saved_lists TYPE ui_func VALUE 'SHOW_SAVED_LISTS' ##NO_TEXT.
-    CONSTANTS c_cmd_show_value_as TYPE ui_func VALUE 'SHOW_VALUE_AS' ##NO_TEXT.
-    CONSTANTS c_cmd_show_value_as_html_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_HTML_BROW' ##NO_TEXT.
-    CONSTANTS c_cmd_show_value_as_xml_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_XML_BROW' ##NO_TEXT.
-    CONSTANTS c_okcode_clipboard TYPE syucomm VALUE 'CLIPBOARD' ##NO_TEXT.
-    CONSTANTS c_okcode_symbols TYPE syucomm VALUE 'SYMBOL' ##NO_TEXT.
-    CONSTANTS c_saved_list_share TYPE stb_button-function VALUE 'SAVED_LIST_SHARE' ##NO_TEXT.
-    CONSTANTS c_sqleditor_name TYPE string VALUE 'CADAXO_SQL_EDITOR' ##NO_TEXT.
-    CONSTANTS gc_saved_list_shared TYPE /cadaxo/sqlc_list_type VALUE 'SHR' ##NO_TEXT.
-    CONSTANTS gc_saved_list_job TYPE /cadaxo/sqlc_list_type VALUE 'JOB' ##NO_TEXT.
-    CONSTANTS gc_saved_list_manually TYPE /cadaxo/sqlc_list_type VALUE 'MAN' ##NO_TEXT.
-    CONSTANTS gc_symbol_separator TYPE char3 VALUE '###' ##NO_TEXT.
-    CLASS-DATA gt_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
-    CLASS-DATA toolbar_col_width TYPE int4 READ-ONLY .
-    CLASS-DATA toolbar_row_height TYPE int4 READ-ONLY .
-    DATA dragdrop_handle TYPE i .
-    DATA dref_result_tab_t TYPE /cadaxo/sqlc_dref_result_tab_t .
-    DATA gc_abap_parser TYPE REF TO cl_abap_parser .
-    DATA gc_splitter_top_toolbar TYPE REF TO cl_gui_toolbar .
-    DATA gr_user_log TYPE REF TO /cadaxo/cl_sqlc_user_log .
-    DATA gt_cl_sql_parse TYPE /cadaxo/sqlc_cl_cockpit_parset .
-    DATA gt_cl_sql_parse_hold TYPE /cadaxo/sqlc_cl_cockpit_parset .
-    DATA gt_errors TYPE /cadaxo/sqlcsyntaxerror_t .
-    DATA gt_lvc_t_fcat TYPE fieldcat1 .
-    DATA gt_lvc_t_fcat_hold LIKE gt_lvc_t_fcat .
-    DATA gt_result_details TYPE /cadaxo/sqlcresult_details_t .
-    DATA gt_result_details_hold LIKE gt_result_details .
-    DATA gt_result_tab_hold LIKE dref_result_tab_t .
-    DATA g_auth TYPE /cadaxo/sqlcrole_auth_xml .
-    DATA g_my_main_id TYPE i READ-ONLY .
-    DATA g_sql_pos TYPE i .
-    DATA g_sql_progress_on TYPE boolean .
-    DATA g_sql_trace_on TYPE boolean .
-    DATA g_user_settings TYPE /cadaxo/sqlcusrp_dyn .
-    DATA ms_user_settings_xml TYPE /cadaxo/sqlcusrp_xml READ-ONLY .
-    DATA mv_toolbar_result_active TYPE ui_func READ-ONLY VALUE c_cmd_home ##NO_TEXT.
+  constants C_CMD_CREATE_SYMBOL type UI_FUNC value 'CREATE_SYMBOL' ##NO_TEXT.
+  constants C_CMD_HOME type UI_FUNC value 'HOME' ##NO_TEXT.
+  constants C_CMD_INSERT_CDS_ENTITY type UI_FUNC value 'INSERT_CDS_ENTITY' ##NO_TEXT.
+  constants C_CMD_INSERT_SY_FIELD type UI_FUNC value 'INSERT_SY_FIELD' ##NO_TEXT.
+  constants C_CMD_INSERT_TABLE type UI_FUNC value 'INSERT_TABLE' ##NO_TEXT.
+  constants C_CMD_JOBMONITOR type UI_FUNC value 'JOBMONITOR' ##NO_TEXT.
+  constants C_CMD_PP type UI_FUNC value 'PP' ##NO_TEXT.
+  constants C_CMD_RESULT_FOOTER_HIDE type UI_FUNC value 'HIDE_FOOTER' ##NO_TEXT.
+  constants C_CMD_RESULT_FOOTER_SHOW type UI_FUNC value 'SHOW_FOOTER' ##NO_TEXT.
+  constants C_CMD_RESULT_TOOLBAR_HIDE type UI_FUNC value 'HIDE_RESULT_TOOLBAR' ##NO_TEXT.
+  constants C_CMD_RESULT_TOOLBAR_SHOW type UI_FUNC value 'SHOW_RESULT_TOOLBAR' ##NO_TEXT.
+  constants C_CMD_SHOW_FULL_VALUE type UI_FUNC value 'SHOW_FULL_VALUE' ##NO_TEXT.
+  constants C_CMD_SHOW_RESULT_TABLE type UI_FUNC value 'SHOW_RESULT_TABLE' ##NO_TEXT.
+  constants C_CMD_SHOW_SAVED_LISTS type UI_FUNC value 'SHOW_SAVED_LISTS' ##NO_TEXT.
+  constants C_CMD_SHOW_VALUE_AS type UI_FUNC value 'SHOW_VALUE_AS' ##NO_TEXT.
+  constants C_CMD_SHOW_VALUE_AS_HTML_BROW type UI_FUNC value 'SHOW_VALUE_AS_HTML_BROW' ##NO_TEXT.
+  constants C_CMD_SHOW_VALUE_AS_XML_BROW type UI_FUNC value 'SHOW_VALUE_AS_XML_BROW' ##NO_TEXT.
+  constants C_OKCODE_CLIPBOARD type SYUCOMM value 'CLIPBOARD' ##NO_TEXT.
+  constants C_OKCODE_SYMBOLS type SYUCOMM value 'SYMBOL' ##NO_TEXT.
+  constants C_SAVED_LIST_SHARE type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE' ##NO_TEXT.
+  constants C_SQLEDITOR_NAME type STRING value 'CADAXO_SQL_EDITOR' ##NO_TEXT.
+  constants GC_SAVED_LIST_SHARED type /CADAXO/SQLC_LIST_TYPE value 'SHR' ##NO_TEXT.
+  constants GC_SAVED_LIST_JOB type /CADAXO/SQLC_LIST_TYPE value 'JOB' ##NO_TEXT.
+  constants GC_SAVED_LIST_MANUALLY type /CADAXO/SQLC_LIST_TYPE value 'MAN' ##NO_TEXT.
+  constants GC_SYMBOL_SEPARATOR type CHAR3 value '###' ##NO_TEXT.
+  class-data GT_USED_SYMBOLS type /CADAXO/SQLCUSEDSYMBOLS_T .
+  class-data TOOLBAR_COL_WIDTH type INT4 read-only .
+  class-data TOOLBAR_ROW_HEIGHT type INT4 read-only .
+  data DRAGDROP_HANDLE type I .
+  data DREF_RESULT_TAB_T type /CADAXO/SQLC_DREF_RESULT_TAB_T .
+  data GC_ABAP_PARSER type ref to CL_ABAP_PARSER .
+  data GC_SPLITTER_TOP_TOOLBAR type ref to CL_GUI_TOOLBAR .
+  data GR_USER_LOG type ref to /CADAXO/CL_SQLC_USER_LOG .
+  data GT_CL_SQL_PARSE type /CADAXO/SQLC_CL_COCKPIT_PARSET .
+  data GT_CL_SQL_PARSE_HOLD type /CADAXO/SQLC_CL_COCKPIT_PARSET .
+  data GT_ERRORS type /CADAXO/SQLCSYNTAXERROR_T .
+  data GT_LVC_T_FCAT type FIELDCAT1 .
+  data GT_LVC_T_FCAT_HOLD like GT_LVC_T_FCAT .
+  data GT_RESULT_DETAILS type /CADAXO/SQLCRESULT_DETAILS_T .
+  data GT_RESULT_DETAILS_HOLD like GT_RESULT_DETAILS .
+  data GT_RESULT_TAB_HOLD like DREF_RESULT_TAB_T .
+  data G_AUTH type /CADAXO/SQLCROLE_AUTH_XML .
+  data G_MY_MAIN_ID type I read-only .
+  data G_SQL_POS type I .
+  data G_SQL_PROGRESS_ON type BOOLEAN .
+  data G_SQL_TRACE_ON type BOOLEAN .
+  data G_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN .
+  data MS_USER_SETTINGS_XML type /CADAXO/SQLCUSRP_XML read-only .
+  data MV_TOOLBAR_RESULT_ACTIVE type UI_FUNC read-only value C_CMD_HOME ##NO_TEXT.
 
-    EVENTS settings_changed_upto
-      EXPORTING
-        VALUE(i_new_upto) TYPE /cadaxo/sqlcmaxsel .
+  events SETTINGS_CHANGED_UPTO
+    exporting
+      value(I_NEW_UPTO) type /CADAXO/SQLCMAXSEL .
 
-    CLASS-METHODS calculate_height_for_button
-      RETURNING
-        VALUE(e_height) TYPE int4 .
-    CLASS-METHODS calculate_width_for_button
-      RETURNING
-        VALUE(e_width) TYPE int4 .
-    CLASS-METHODS api_execute_sql
-      IMPORTING
-        !i_sql_string TYPE /cadaxo/sqlcsql_string
-      EXPORTING
-        !et_table_ref TYPE /cadaxo/sqlcresult_ref_t .
-    CLASS-METHODS check_admin_auth
-      RETURNING
-        VALUE(r_true) TYPE char1 .
-    CLASS-METHODS class_constructor .
-    CLASS-METHODS execute_sql_background
-      IMPORTING
-        !i_list_guid TYPE /cadaxo/sqlc_listguid .
-    CLASS-METHODS match_saved_fieldcat_orig
-      IMPORTING
-        !it_fcat         TYPE lvc_t_fcat
-        !i_tabname       TYPE tabname
-        !it_result_table TYPE any
-      RETURNING
-        VALUE(rt_fcat)   TYPE lvc_t_fcat .
-    CLASS-METHODS match_saved_filter
-      IMPORTING
-        !it_filter       TYPE lvc_t_filt
-        !i_tabname       TYPE tabname
-        !it_result_table TYPE any
-      RETURNING
-        VALUE(rt_filter) TYPE lvc_t_filt .
-    CLASS-METHODS match_saved_sort
-      IMPORTING
-        !it_sort         TYPE lvc_t_sort
-        !i_tabname       TYPE tabname
-        !it_result_table TYPE any
-      RETURNING
-        VALUE(rt_sort)   TYPE lvc_t_sort .
-    CLASS-METHODS set_gt_used_symbols
-      IMPORTING
-        !i_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
-    CLASS-METHODS trigger_html
-      IMPORTING
-        !i_html_id     TYPE /cadaxo/sqlcparameter_id DEFAULT 'HTML_STARTUP'
-        !i_main_ref_id TYPE i .
-    METHODS check_sql_syntax
-      IMPORTING
-        !i_use_local_parser TYPE char1 OPTIONAL
-      RAISING
-        /cadaxo/cx_sqlc_syntax_error
-        /cadaxo/cx_sqlc_invalid_value .
-    METHODS constructor .
-    METHODS get_content
-      IMPORTING
-        !i_html_id      TYPE /cadaxo/sqlcparameter_id DEFAULT 'HTML_STARTUP'
-        !i_viewer       TYPE REF TO cl_gui_html_viewer OPTIONAL
-        !i_mime         TYPE flag DEFAULT space
-      EXPORTING
-        !et_content     TYPE gtt_char255
-        !e_size         TYPE int4
-        !e_assigend_url TYPE c
-        !e_html_string  TYPE string .
-    METHODS get_sql_area
-      EXPORTING
-        !e_code_string    TYPE string
-        !e_code_string_cr TYPE string
-      RAISING
-        /cadaxo/cx_sqlc_syntax_error .
-    METHODS get_sql_hist_lines
-      RETURNING
-        VALUE(r_sql_hist_lines) TYPE i .
-    METHODS is_result_filled
-      RETURNING
-        VALUE(r_filled) TYPE abap_bool .
-    METHODS pai_0100
-      IMPORTING
-        !i_ok_code TYPE sy-ucomm .
-    METHODS pai_0700
-      IMPORTING
-        !i_ok_code TYPE sy-ucomm .
-    METHODS pai_0800
-      IMPORTING
-        !i_ok_code  TYPE sy-ucomm
-        !i_sqlcsres TYPE /cadaxo/sqlcsres .
-    METHODS pai_3000
-      IMPORTING
-        !i_ok_code TYPE sy-ucomm .
-    METHODS pai_2000
-      IMPORTING
-        !i_ok_code TYPE sy-ucomm .
-    METHODS param_replace_tags
-      CHANGING
-        !data TYPE string .
-    METHODS pbo_0100 .
-    METHODS pbo_0700 .
-    METHODS pbo_0800 .
-    METHODS pbo_3000 .
+  class-methods CALCULATE_HEIGHT_FOR_BUTTON
+    returning
+      value(E_HEIGHT) type INT4 .
+  class-methods CALCULATE_WIDTH_FOR_BUTTON
+    returning
+      value(E_WIDTH) type INT4 .
+  class-methods API_EXECUTE_SQL
+    importing
+      !I_SQL_STRING type /CADAXO/SQLCSQL_STRING
+    exporting
+      !ET_TABLE_REF type /CADAXO/SQLCRESULT_REF_T .
+  class-methods CHECK_ADMIN_AUTH
+    returning
+      value(R_TRUE) type CHAR1 .
+  class-methods CLASS_CONSTRUCTOR .
+  class-methods EXECUTE_SQL_BACKGROUND
+    importing
+      !I_LIST_GUID type /CADAXO/SQLC_LISTGUID .
+  class-methods MATCH_SAVED_FIELDCAT_ORIG
+    importing
+      !IT_FCAT type LVC_T_FCAT
+      !I_TABNAME type TABNAME
+      !IT_RESULT_TABLE type ANY
+    returning
+      value(RT_FCAT) type LVC_T_FCAT .
+  class-methods MATCH_SAVED_FILTER
+    importing
+      !IT_FILTER type LVC_T_FILT
+      !I_TABNAME type TABNAME
+      !IT_RESULT_TABLE type ANY
+    returning
+      value(RT_FILTER) type LVC_T_FILT .
+  class-methods MATCH_SAVED_SORT
+    importing
+      !IT_SORT type LVC_T_SORT
+      !I_TABNAME type TABNAME
+      !IT_RESULT_TABLE type ANY
+    returning
+      value(RT_SORT) type LVC_T_SORT .
+  class-methods SET_GT_USED_SYMBOLS
+    importing
+      !I_USED_SYMBOLS type /CADAXO/SQLCUSEDSYMBOLS_T .
+  class-methods TRIGGER_HTML
+    importing
+      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID default 'HTML_STARTUP'
+      !I_MAIN_REF_ID type I .
+  methods CHECK_SQL_SYNTAX
+    importing
+      !I_USE_LOCAL_PARSER type CHAR1 optional
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR
+      /CADAXO/CX_SQLC_INVALID_VALUE .
+  methods CONSTRUCTOR .
+  methods GET_CONTENT
+    importing
+      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID default 'HTML_STARTUP'
+      !I_VIEWER type ref to CL_GUI_HTML_VIEWER optional
+      !I_MIME type FLAG default SPACE
+    exporting
+      !ET_CONTENT type GTT_CHAR255
+      !E_SIZE type INT4
+      !E_ASSIGEND_URL type C
+      !E_HTML_STRING type STRING .
+  methods GET_SQL_AREA
+    exporting
+      !E_CODE_STRING type STRING
+      !E_CODE_STRING_CR type STRING
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods GET_SQL_HIST_LINES
+    returning
+      value(R_SQL_HIST_LINES) type I .
+  methods IS_RESULT_FILLED
+    returning
+      value(R_FILLED) type ABAP_BOOL .
+  methods PAI_0100
+    importing
+      !I_OK_CODE type SY-UCOMM .
+  methods PAI_0700
+    importing
+      !I_OK_CODE type SY-UCOMM .
+  methods PAI_0800
+    importing
+      !I_OK_CODE type SY-UCOMM
+      !I_SQLCSRES type /CADAXO/SQLCSRES .
+  methods PAI_3000
+    importing
+      !I_OK_CODE type SY-UCOMM .
+  methods PAI_2000
+    importing
+      !I_OK_CODE type SY-UCOMM .
+  methods PARAM_REPLACE_TAGS
+    changing
+      !DATA type STRING .
+  methods PBO_0100 .
+  methods PBO_0700 .
+  methods PBO_0800 .
+  methods PBO_3000 .
     "! PBO for Dynpro 2000
-    METHODS pbo_2000 .
-    METHODS save_clipboard .
-    METHODS set_clipboard_alv .
+  methods PBO_2000 .
+  methods SAVE_CLIPBOARD .
+  methods SET_CLIPBOARD_ALV .
     "! get sql area
     "! @parameter planetype | Type of plane
-    METHODS get_sql_area_lt_code
-      RETURNING
-        VALUE(r_lt_code) TYPE /cadaxo/sqlccodeline_t .
-    METHODS set_symbol_alv .
-    METHODS set_user_settings
-      IMPORTING
-        !i_settings TYPE /cadaxo/sqlcusrp_dyn .
-    METHODS handle_msg_exception
-      IMPORTING
-        !i_msg       TYPE string
-        !i_exception TYPE REF TO cx_root .
-    METHODS prepare_result_table
-      IMPORTING
-        !is_sqlcsres TYPE /cadaxo/sqlcsres
-        !is_sqlcress TYPE /cadaxo/sqlcress .
-    METHODS get_csv_from_int_tab
-      IMPORTING
-        !it_table      TYPE ANY TABLE
-        !i_grid_i      TYPE i
-      EXPORTING
-        !ev_output_csv TYPE t_string .
-    METHODS get_csv_line_from_tab
-      IMPORTING
-        !it_csv_tab        TYPE t_string
-      RETURNING
-        VALUE(rv_csv_line) TYPE string .
-    METHODS create_symbol_db
-      IMPORTING
-        !it_symbol_create TYPE t_symbol_db
-      RETURNING
-        VALUE(rv_success) TYPE boolean .
+  methods GET_SQL_AREA_LT_CODE
+    returning
+      value(R_LT_CODE) type /CADAXO/SQLCCODELINE_T .
+  methods SET_SYMBOL_ALV .
+  methods SET_USER_SETTINGS
+    importing
+      !I_SETTINGS type /CADAXO/SQLCUSRP_DYN .
+  methods HANDLE_MSG_EXCEPTION
+    importing
+      !I_MSG type STRING
+      !I_EXCEPTION type ref to CX_ROOT .
+  methods PREPARE_RESULT_TABLE
+    importing
+      !IS_SQLCSRES type /CADAXO/SQLCSRES
+      !IS_SQLCRESS type /CADAXO/SQLCRESS .
+  methods GET_CSV_FROM_INT_TAB
+    importing
+      !IT_TABLE type ANY TABLE
+      !I_GRID_I type I
+    exporting
+      !EV_OUTPUT_CSV type T_STRING .
+  methods GET_CSV_LINE_FROM_TAB
+    importing
+      !IT_CSV_TAB type T_STRING
+    returning
+      value(RV_CSV_LINE) type STRING .
+  methods CREATE_SYMBOL_DB
+    importing
+      !IT_SYMBOL_CREATE type T_SYMBOL_DB
+    returning
+      value(RV_SUCCESS) type BOOLEAN .
+  methods GET_CSV_FROM_INT_TAB_CUST
+    importing
+      !IT_TABLE type ANY TABLE
+      !I_GRID_I type I
+    exporting
+      !EV_OUTPUT_CSV type T_STRING
+      !EV_CANCEL type ABAP_BOOL .
   PROTECTED SECTION.
 
     CLASS-DATA gcont_splitter_top_toolbar TYPE REF TO cl_gui_container .
@@ -4772,6 +4779,77 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD get_csv_from_int_tab_cust.
+
+    DATA lv_output_line  TYPE string.
+    DATA lv_tmp_dats     TYPE char30.
+    DATA lv_tmp_out      TYPE string.
+    DATA ls_csv_attr TYPE /cadaxo/sqlc_csv_cust.
+
+    DATA lv_cancel TYPE abap_bool.
+    CALL FUNCTION '/CADAXO/SQLC_CUSTOM_CSV_POPUP'
+      IMPORTING
+        ev_cancel   = lv_cancel
+      CHANGING
+        cs_csv_attr = ls_csv_attr.
+
+    IF lv_cancel = abap_true.
+      ev_cancel = abap_true.
+      RETURN.
+    ENDIF.
+
+    DATA(lv_separator) =   /cadaxo/cl_sqlc_csv_cust_util=>get_separator( EXPORTING i_separator_setting =  ls_csv_attr-field_separator
+                                                                                   i_separator_others  =  ls_csv_attr-field_separator_other ).
+
+    ASSIGN gt_lvc_t_fcat[ i_grid_i ] TO FIELD-SYMBOL(<lt_fields>).
+
+    IF ls_csv_attr-add_header = abap_true.
+      LOOP AT <lt_fields> ASSIGNING FIELD-SYMBOL(<ls_field>).
+        lv_output_line = lv_output_line && lv_separator && <ls_field>-fieldname.
+      ENDLOOP.
+
+      SHIFT lv_output_line BY 1 PLACES.
+      APPEND lv_output_line TO ev_output_csv.
+    ENDIF.
+
+    LOOP AT it_table ASSIGNING FIELD-SYMBOL(<ls_result>).
+      CLEAR lv_output_line.
+
+      LOOP AT <lt_fields> ASSIGNING <ls_field>.
+        ASSIGN COMPONENT <ls_field>-fieldname OF STRUCTURE <ls_result> TO FIELD-SYMBOL(<ls_line>).
+
+        IF  <ls_field>-inttype = 'T'.
+          " Export Date and Time in user format
+          lv_tmp_dats = /cadaxo/cl_sqlc_csv_cust_util=>convert_time(
+                            EXPORTING
+                              i_time_type       = ls_csv_attr-time_format
+                              i_time_int        = <ls_line> ).
+          lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
+        ELSEIF <ls_field>-inttype = 'D'.
+          lv_tmp_dats = /cadaxo/cl_sqlc_csv_cust_util=>convert_date(
+                            EXPORTING
+                              i_date_type       = ls_csv_attr-date_format
+                              i_date            = <ls_line> ).
+          lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
+        ELSEIF <ls_field>-inttype = 'C' AND ( <ls_line> CP |*{ lv_separator }*| OR <ls_line> CP '*"*' ).
+          " If Separator or Single Quotes are in Field Then Do same behavior as Excel -> CSV
+          lv_tmp_out = <ls_line>.
+          REPLACE ALL OCCURRENCES OF '"' IN lv_tmp_out WITH '""'.
+          lv_tmp_out = '"' && lv_tmp_out && '"'.
+          lv_output_line = lv_output_line && lv_separator && lv_tmp_out.
+        ELSE.
+          lv_output_line = lv_output_line && lv_separator && <ls_line>.
+        ENDIF.
+      ENDLOOP.
+
+      SHIFT lv_output_line BY 1 PLACES.
+      APPEND lv_output_line TO ev_output_csv.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
   METHOD get_csv_line_from_tab.
 
     LOOP AT it_csv_tab INTO DATA(ls_tab_line).
@@ -6539,12 +6617,27 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     IF <lt_result> IS NOT INITIAL.
 
-      CALL METHOD me->get_csv_from_int_tab
+*Begin of Insert Cockpit-398
+      CALL METHOD me->get_csv_from_int_tab_cust
         EXPORTING
           it_table      = <lt_result>
           i_grid_i      = i_grid_i
         IMPORTING
-          ev_output_csv = iv_output_table.
+          ev_output_csv = iv_output_table
+          ev_cancel     = DATA(lv_cancel).
+      IF lv_cancel = abap_true.
+        RETURN.
+      ENDIF.
+*End   of Insert Cockpit-398
+
+*Begin of Comments Cockpit-398
+*      CALL METHOD me->get_csv_from_int_tab
+*        EXPORTING
+*          it_table      = <lt_result>
+*          i_grid_i      = i_grid_i
+*        IMPORTING
+*          ev_output_csv = iv_output_table.
+*End   of Comments Cockpit-398
 
       cl_gui_frontend_services=>file_save_dialog(
         EXPORTING
