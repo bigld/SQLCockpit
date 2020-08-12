@@ -2241,8 +2241,10 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
             /cadaxo/cl_sqlc_variant=>rename_variant( i_varguid = <ls_variant>-varguid
                                                      i_varname = CONV #( fields[ 1 ]-value ) ).
 
-            READ TABLE me->gt_il_vnhd WITH KEY varguid = <ls_variant>-varguid ASSIGNING FIELD-SYMBOL(<vnhd>).
-            IF sy-subrc EQ 0.
+*            READ TABLE me->gt_il_vnhd WITH KEY varguid = <ls_variant>-varguid ASSIGNING FIELD-SYMBOL(<vnhd>)."-Cockpit-443
+*            IF sy-subrc EQ 0."-Cockpit-443
+             LOOP AT me->gt_il_vnhd ASSIGNING FIELD-SYMBOL(<vnhd>) WHERE varguid = <ls_variant>-varguid. "+Cockpit-443 "also select from favourite
+
               <vnhd>-varname = CONV #( fields[ 1 ]-value ).
 
               g_column_tree->item_set_text(
@@ -2259,8 +2261,8 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
               ).
 
               me->gs_il_variants-varname = <vnhd>-varname.
-
-            ENDIF.
+             ENDLOOP.  "+Cockpit-443
+*            ENDIF.
 
           CATCH /cadaxo/cx_sqlc_variant INTO lr_cx_sql_variant.
             l_error_message = lr_cx_sql_variant->get_text( ).

@@ -74,7 +74,7 @@
       <DESCRIPT>SQL Cockpit - User Preferences</DESCRIPT>
       <TYPE>M</TYPE>
       <NEXTSCREEN>0500</NEXTSCREEN>
-      <LINES>023</LINES>
+      <LINES>024</LINES>
       <COLUMNS>108</COLUMNS>
      </HEADER>
      <CONTAINERS>
@@ -214,7 +214,7 @@
        <COLUMN>002</COLUMN>
        <LENGTH>053</LENGTH>
        <VISLENGTH>053</VISLENGTH>
-       <HEIGHT>006</HEIGHT>
+       <HEIGHT>007</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -354,6 +354,36 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT002</NAME>
+       <TEXT>Maximum_no._of_hits_</TEXT>
+       <LINE>015</LINE>
+       <COLUMN>004</COLUMN>
+       <LENGTH>020</LENGTH>
+       <VISLENGTH>020</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>/CADAXO/SQLCUSRP_DYN-MAXSEL</NAME>
+       <TEXT>_______.___</TEXT>
+       <LINE>015</LINE>
+       <COLUMN>025</COLUMN>
+       <LENGTH>011</LENGTH>
+       <VISLENGTH>011</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>INT4</FORMAT>
+       <FROM_DICT>X</FROM_DICT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>%#AUTOTEXT008</NAME>
        <TEXT>Initial_date_selection______________________________</TEXT>
@@ -364,42 +394,6 @@
        <HEIGHT>004</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEXT</TYPE>
-       <NAME>/CADAXO/SQLCUSRP_DYN-EDITOR_TYPE</NAME>
-       <TEXT>Editor</TEXT>
-       <LINE>016</LINE>
-       <COLUMN>003</COLUMN>
-       <LENGTH>006</LENGTH>
-       <VISLENGTH>006</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <FROM_DICT>X</FROM_DICT>
-       <MODIFIC>F</MODIFIC>
-       <REQU_ENTRY>N</REQU_ENTRY>
-       <LABELLEFT>X</LABELLEFT>
-       <DICT_I_VAL>X</DICT_I_VAL>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEMPLATE</TYPE>
-       <NAME>/CADAXO/SQLCUSRP_DYN-EDITOR_TYPE</NAME>
-       <TEXT>__</TEXT>
-       <DROPDOWN>L</DROPDOWN>
-       <LINE>016</LINE>
-       <COLUMN>010</COLUMN>
-       <LENGTH>002</LENGTH>
-       <VISLENGTH>045</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <FROM_DICT>X</FROM_DICT>
-       <INPUT_FLD>X</INPUT_FLD>
-       <OUTPUT_FLD>X</OUTPUT_FLD>
-       <DICT_I_VAL>X</DICT_I_VAL>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
@@ -447,32 +441,16 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEXT</TYPE>
-       <NAME>%#AUTOTEXT002</NAME>
-       <TEXT>Maximum_no._of_hits_</TEXT>
+       <TYPE>FRAME</TYPE>
+       <NAME>EDITOR</NAME>
+       <TEXT>Editor_Settings_____________________________________</TEXT>
        <LINE>017</LINE>
-       <COLUMN>003</COLUMN>
-       <LENGTH>020</LENGTH>
-       <VISLENGTH>020</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
+       <COLUMN>002</COLUMN>
+       <LENGTH>053</LENGTH>
+       <VISLENGTH>053</VISLENGTH>
+       <HEIGHT>003</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEMPLATE</TYPE>
-       <NAME>/CADAXO/SQLCUSRP_DYN-MAXSEL</NAME>
-       <TEXT>_______.___</TEXT>
-       <LINE>017</LINE>
-       <COLUMN>043</COLUMN>
-       <LENGTH>011</LENGTH>
-       <VISLENGTH>011</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>INT4</FORMAT>
-       <FROM_DICT>X</FROM_DICT>
-       <INPUT_FLD>X</INPUT_FLD>
-       <OUTPUT_FLD>X</OUTPUT_FLD>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
@@ -521,10 +499,46 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>/CADAXO/SQLCUSRP_DYN-EDITOR_TYPE</NAME>
+       <TEXT>Editor</TEXT>
+       <LINE>018</LINE>
+       <COLUMN>003</COLUMN>
+       <LENGTH>006</LENGTH>
+       <VISLENGTH>006</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <FROM_DICT>X</FROM_DICT>
+       <MODIFIC>F</MODIFIC>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <LABELLEFT>X</LABELLEFT>
+       <DICT_I_VAL>X</DICT_I_VAL>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>/CADAXO/SQLCUSRP_DYN-EDITOR_TYPE</NAME>
+       <TEXT>__</TEXT>
+       <DROPDOWN>L</DROPDOWN>
+       <LINE>018</LINE>
+       <COLUMN>010</COLUMN>
+       <LENGTH>002</LENGTH>
+       <VISLENGTH>044</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <FROM_DICT>X</FROM_DICT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <DICT_I_VAL>X</DICT_I_VAL>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>ADT_FRAME</NAME>
        <TEXT>ABAP_Development_Tool_for_SAP_NetWeaver___________________________________________________________________</TEXT>
-       <LINE>019</LINE>
+       <LINE>020</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>107</LENGTH>
        <VISLENGTH>107</VISLENGTH>
@@ -538,7 +552,7 @@
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-FORWNAVDDLECLIPSE</NAME>
        <TEXT>Use_ADT_for_DDL_View_Foreward_Navigation____</TEXT>
-       <LINE>020</LINE>
+       <LINE>021</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>046</LENGTH>
        <VISLENGTH>046</VISLENGTH>
@@ -556,7 +570,7 @@
        <NAME>GD_ADT_INFO_I</NAME>
        <TEXT>____________________________</TEXT>
        <WITH_ICON>X</WITH_ICON>
-       <LINE>020</LINE>
+       <LINE>021</LINE>
        <COLUMN>051</COLUMN>
        <LENGTH>033</LENGTH>
        <VISLENGTH>002</VISLENGTH>
@@ -572,7 +586,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>GD_ADT_INFO</NAME>
        <TEXT>ADT_must_be_started_and</TEXT>
-       <LINE>020</LINE>
+       <LINE>021</LINE>
        <COLUMN>055</COLUMN>
        <LENGTH>023</LENGTH>
        <VISLENGTH>023</VISLENGTH>
@@ -586,7 +600,7 @@
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-FORWNAVDICTECLIPSE</NAME>
        <TEXT>Use_ADT_for_Dictionary_Foreward_Navigation____</TEXT>
-       <LINE>021</LINE>
+       <LINE>022</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>048</LENGTH>
        <VISLENGTH>048</VISLENGTH>
@@ -603,7 +617,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>GD_ADT_INFO1</NAME>
        <TEXT>ADT_Link_Handling_must_be_enabled____________</TEXT>
-       <LINE>021</LINE>
+       <LINE>022</LINE>
        <COLUMN>055</COLUMN>
        <LENGTH>045</LENGTH>
        <VISLENGTH>034</VISLENGTH>

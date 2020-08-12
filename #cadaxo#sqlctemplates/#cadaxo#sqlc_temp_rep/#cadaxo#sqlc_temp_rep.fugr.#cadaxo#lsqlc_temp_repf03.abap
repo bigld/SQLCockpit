@@ -22,5 +22,7 @@ FORM clear_globals .
   FREE  g_select_single.
   CLEAR gst_auth_tabnames.
   FREE  gst_auth_tabnames.
+  CLEAR gst_ranges.
+  FREE gst_ranges.
 
 ENDFORM.

@@ -35,9 +35,9 @@ $}
 {C$G_SELECT_SINGLE = 'X'$
 FIELD-SYMBOLS: <gt_table>  TYPE STANDARD TABLE.
 $}
-{T$GST_INIT where GENERATE_OPTION = '03'$$$
-RANGES: &GST_INIT-PARAMNAME& FOR &GST_INIT-TABLENAME&-\
-&GST_INIT-FIELDNAME&.$$}
+{T$GST_RANGES$$$
+RANGES: &GST_RANGES-PARAMNAME& FOR &GST_RANGES-TABLENAME&-\
+&GST_RANGES-FIELDNAME&.$$}
 {C$GS_EVT$
 **--------------------------------------------------------------------
 **       CLASS lcl_handle_events DEFINITION

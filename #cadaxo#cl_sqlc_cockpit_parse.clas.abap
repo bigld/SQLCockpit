@@ -5265,6 +5265,39 @@ METHOD parse_sql_where_columns.
               ENDIF.
             ENDIF.
 ********** CDX3301 End
+*         begin of insert-429
+          ELSEIF l_string = 'IN'.
+            l_where_col-operator = 'IN'.
+
+          /cadaxo/cl_sqlc_cockpit_assist=>get_where_value_match_offset(
+            EXPORTING
+              i_from         = l_from
+              i_total_length = l_total_len
+            CHANGING
+              c_where_syntax = me->where_syntax
+              c_offset       = l_match ).
+
+            l_offset = l_match - l_from.
+
+            l_where_col-value = me->where_syntax+l_from(l_offset).
+
+            l_wc_nr = l_wc_nr + 1.
+            CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
+            CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
+
+            MOVE: l_wildcard_operator  TO l_where_col-wildcard_operator,
+                  l_wildcard_condition TO l_where_col-wildcard_condition.
+            CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
+
+            APPEND l_where_col TO me->gt_sql_where_col_tab_t.
+            CLEAR l_where_col.
+
+          IF l_match GT l_from.
+            l_from = l_match + 1.
+          ENDIF.
+            CONTINUE.
+*         end   of insert-429
+
           ENDIF.
 
           MOVE l_string TO l_where_col-operator.

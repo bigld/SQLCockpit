@@ -27,9 +27,9 @@ DATA: gr_col               TYPE REF TO cl_salv_column.
 
 FIELD-SYMBOLS <gt_table> type table.
 
-{T$GST_INIT where generate_option = '03'$$$
-RANGES: &GST_INIT-PARAMNAME& FOR &GST_INIT-TABLENAME&-\
-&GST_INIT-FIELDNAME&.$$}
+{T$GST_RANGES$$$
+RANGES: &GST_RANGES-PARAMNAME& FOR &GST_RANGES-TABLENAME&-\
+&GST_RANGES-FIELDNAME&.$$}
 
 **********************************************************************
 * Selection Screen
