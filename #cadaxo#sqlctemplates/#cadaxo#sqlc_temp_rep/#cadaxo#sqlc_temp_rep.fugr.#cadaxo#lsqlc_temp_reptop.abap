@@ -50,6 +50,14 @@ INCLUDE         TYPE /cadaxo/sqlcwherecol_str.
 DATA: paramname TYPE fieldname,
       highvalue TYPE string,
       END OF gss_where.
+*begin of insert 445
+DATA: BEGIN OF gss_ranges.
+DATA: paramname TYPE fieldname,
+      TABLENAME Type  TABNAME16,
+      FIELDNAME Type  /CADAXO/SQLCFIELDNAME,
+      END OF gss_ranges.
+DATA: gst_ranges LIKE TABLE OF gss_ranges WITH HEADER LINE.
+*end   of insert 445
 DATA: gst_where              LIKE TABLE OF gss_where  WITH HEADER LINE.
 DATA: gst_init               LIKE TABLE OF gss_where  WITH HEADER LINE.
 DATA: gst_fcat               TYPE lvc_t_fcat          WITH HEADER LINE.

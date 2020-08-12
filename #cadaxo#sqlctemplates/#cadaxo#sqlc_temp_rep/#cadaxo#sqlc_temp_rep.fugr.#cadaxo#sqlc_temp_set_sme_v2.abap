@@ -144,8 +144,17 @@ FUNCTION /cadaxo/sqlc_temp_set_sme_v2.
             IMPORTING
               e_symbol_multivalue =   lt_selopt2
           ).
+* begin of 429
+          DATA(lv_paramname) = gss_where-value.
+          IF gss_where-generate_option = '03'.
+            gss_ranges-paramname = lv_paramname.
+            gss_ranges-fieldname = gss_where-fieldname.
+            gss_ranges-tablename = gss_where-tablename.
+            APPEND gss_ranges TO gst_ranges.
+          ENDIF.
+* end of 429
           LOOP AT lt_selopt2 INTO DATA(ls_selopt2).
-            gss_where-paramname = gss_where-value.
+            gss_where-paramname = lv_paramname.
             gss_where-value = |'{ ls_selopt2-low }'|.
             gss_where-highvalue = |'{ ls_selopt2-high }'|.
             gss_where-operator = ls_selopt2-option.
