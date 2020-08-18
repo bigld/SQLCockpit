@@ -192,6 +192,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
+
     IF iv_value IS NOT INITIAL.
       ev_value      = iv_value.
     ELSE.
