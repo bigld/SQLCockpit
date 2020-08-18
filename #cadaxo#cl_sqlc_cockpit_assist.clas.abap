@@ -1658,6 +1658,24 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
         ENDIF.
       ENDIF.
 
+*begin OF INSERT 444
+      IF c_where_syntax+c_offset(1) EQ '('.
+       DATA(lv_close_bracket)  = 0.
+       DATA(lv_open_bracket) = 0.
+       lv_open_bracket   = lv_open_bracket + 1.
+
+       WHILE lv_open_bracket > lv_close_bracket.
+           c_offset = c_offset + 1.
+           IF c_where_syntax+c_offset(1) EQ ')'.
+              lv_close_bracket = lv_close_bracket + 1.
+           ELSEIF c_where_syntax+c_offset(1) EQ '('.
+              lv_open_bracket = lv_open_bracket + 1.
+           ENDIF.
+       ENDWHILE.
+       EXIT.
+      ENDIF.
+*end OF INSERT 444
+
       c_offset = c_offset + 1.
 
     ENDDO.
