@@ -84,7 +84,9 @@ FUNCTION /cadaxo/sqlc_temp_set_sme_v2.
   LOOP AT it_where ASSIGNING <wa_where>.
     gss_where = CORRESPONDING #( <wa_where> ).
 *COCKPIT-435 INSERT
+    IF gss_where-generate_option NE '03'. "Cockpit-444 (default where option)
     gss_where-value = shift_left( val = gss_where-value sub = '@' ).
+    ENDIF.
 *COCKPIT-435 INSERT
     gss_where-paramname = <wa_where>-wildcard_operator+2(3).
     APPEND gss_where TO gst_where.
