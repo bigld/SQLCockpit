@@ -1642,6 +1642,26 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
     c_offset = i_from.
 
+*begin OF INSERT 444
+      IF c_where_syntax+c_offset(1) EQ '(' OR c_where_syntax+c_offset(2) = '@('.
+       DATA(lv_open_bracket) = 1.
+       DATA(lv_close_bracket)  = 0.
+       IF c_where_syntax+c_offset(1) = '@'.
+           c_offset = c_offset + 1.
+       ENDIF.
+       WHILE lv_open_bracket > lv_close_bracket.
+           c_offset = c_offset + 1.
+           IF c_where_syntax+c_offset(1) EQ ')'.
+              lv_close_bracket = lv_close_bracket + 1.
+           ELSEIF c_where_syntax+c_offset(1) EQ '('.
+              lv_open_bracket = lv_open_bracket + 1.
+           ENDIF.
+       ENDWHILE.
+           c_offset = c_offset + 1.
+       EXIT.
+      ENDIF.
+*end OF INSERT 444
+
     l_do_times = i_total_length - c_offset.
 
     DO l_do_times TIMES.
@@ -1657,24 +1677,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
           EXIT.
         ENDIF.
       ENDIF.
-
-*begin OF INSERT 444
-      IF c_where_syntax+c_offset(1) EQ '('.
-       DATA(lv_close_bracket)  = 0.
-       DATA(lv_open_bracket) = 0.
-       lv_open_bracket   = lv_open_bracket + 1.
-
-       WHILE lv_open_bracket > lv_close_bracket.
-           c_offset = c_offset + 1.
-           IF c_where_syntax+c_offset(1) EQ ')'.
-              lv_close_bracket = lv_close_bracket + 1.
-           ELSEIF c_where_syntax+c_offset(1) EQ '('.
-              lv_open_bracket = lv_open_bracket + 1.
-           ENDIF.
-       ENDWHILE.
-       EXIT.
-      ENDIF.
-*end OF INSERT 444
 
       c_offset = c_offset + 1.
 
