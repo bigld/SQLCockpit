@@ -529,13 +529,13 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE status_0100.</LINE>
+       <LINE>  MODULE status_0100.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0100.</LINE>
+       <LINE>  MODULE pbo_0100.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE modify_screen_0100.</LINE>
+       <LINE>  MODULE modify_screen_0100.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>*</LINE>
@@ -545,30 +545,16 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>FIELD gcl_controller-&gt;g_description</LINE>
+       <LINE>  FIELD gcl_controller-&gt;g_description</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE description_changed ON REQUEST.</LINE>
+       <LINE>     MODULE description_changed ON REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE user_command_0100.</LINE>
+       <LINE>  MODULE user_command_0100.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>2</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>5</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -738,10 +724,10 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE status_0200.</LINE>
+       <LINE>  MODULE status_0200.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0200.</LINE>
+       <LINE>  MODULE pbo_0200.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
@@ -749,60 +735,38 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE user_command_0200_at_exit AT EXIT-COMMAND.</LINE>
+       <LINE>  MODULE user_command_0200_at_exit AT EXIT-COMMAND.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>FIELD gcl_controller-&gt;gs_il_variants-varname</LINE>
+       <LINE>  FIELD gcl_controller-&gt;gs_il_variants-varname</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE varname ON REQUEST.</LINE>
+       <LINE>        MODULE varname ON REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>CHAIN.</LINE>
+       <LINE>  CHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>FIELD: gcl_controller-&gt;gs_il_variants-varname,</LINE>
+       <LINE>    FIELD: gcl_controller-&gt;gs_il_variants-varname,</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>gcl_controller-&gt;gs_il_variants-vargroup,</LINE>
+       <LINE>           gcl_controller-&gt;gs_il_variants-vargroup,</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>gcl_controller-&gt;gs_il_variants-vardescription,</LINE>
+       <LINE>           gcl_controller-&gt;gs_il_variants-vardescription,</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>gcl_controller-&gt;gs_il_variants-flag_public.</LINE>
+       <LINE>           gcl_controller-&gt;gs_il_variants-flag_public.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE user_command_0200.</LINE>
+       <LINE>    MODULE user_command_0200.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>ENDCHAIN.</LINE>
+       <LINE>  ENDCHAIN.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>8</item>
-      <item>0</item>
-      <item>2</item>
-      <item>4</item>
-      <item>11</item>
-      <item>11</item>
-      <item>11</item>
-      <item>4</item>
-      <item>2</item>
-     </SPACES>
     </item>
    </DYNPROS>
    <CUA>
