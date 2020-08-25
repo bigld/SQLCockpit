@@ -9665,6 +9665,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       CATCH cx_sy_move_cast_error ##no_handler.
     ENDTRY.
 
+    IF ls_col-fieldname IS NOT INITIAL. "cockpit-454
+
     l_grid_name_i = l_grid_name+15.
 
     READ TABLE dref_result_tab_t INDEX l_grid_name_i ASSIGNING <lr_dref>.
@@ -9729,6 +9731,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         it_lvc_t_row = lt_lvc_t_row
         i_row        = ls_row
         i_col        = ls_col.
+
+  ENDIF. "+ cockpit-454
 
   ENDMETHOD.
 
