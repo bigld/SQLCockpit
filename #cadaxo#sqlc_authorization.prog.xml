@@ -165,23 +165,23 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE init_tree_control.</LINE>
+       <LINE>  MODULE init_tree_control.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE tabs_active_tab_set.</LINE>
+       <LINE>  MODULE tabs_active_tab_set.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>CALL SUBSCREEN tabs_sca INCLUDING gwa_tabs-prog gwa_tabs-subscreen.</LINE>
+       <LINE>  CALL SUBSCREEN tabs_sca INCLUDING gwa_tabs-prog gwa_tabs-subscreen.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE modify_screen.</LINE>
+       <LINE>  MODULE modify_screen.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE status_0100.</LINE>
+       <LINE>  MODULE status_0100.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
@@ -189,55 +189,28 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE user_command_0100 AT EXIT-COMMAND.</LINE>
+       <LINE>  MODULE user_command_0100 AT EXIT-COMMAND.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>FIELD wa_sqlcrole-role MODULE check_role ON REQUEST.</LINE>
+       <LINE>  FIELD wa_sqlcrole-role MODULE check_role ON REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>FIELD wa_sqlcrole-role_description MODULE check_roledes ON REQUEST.</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW/>
-      <RPY_DYFLOW>
-       <LINE>CALL SUBSCREEN tabs_sca.</LINE>
+       <LINE>  FIELD wa_sqlcrole-role_description MODULE check_roledes ON REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE tabs_active_tab_get.</LINE>
+       <LINE>  CALL SUBSCREEN tabs_sca.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE user_command_0100.</LINE>
+       <LINE>  MODULE tabs_active_tab_get.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>  MODULE user_command_0100.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -289,27 +262,17 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE init_controls.</LINE>
+       <LINE>  MODULE init_controls.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>MODULE modify_screen.</LINE>
+       <LINE>  MODULE modify_screen.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-     </SPACES>
     </item>
    </DYNPROS>
    <CUA>

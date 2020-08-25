@@ -129,7 +129,10 @@ FORM process_version_2 CHANGING e_error_message TYPE string
                                                     l_user_settings-tablebuffer_trace "$001
                                                     lt_symbol_ranges
                                            CHANGING lrx_root.
-
+    IF lrx_root IS NOT INITIAL. "begin of +431
+        e_error_message = lrx_root->get_text( ).
+        RETURN.
+    ENDIF.  "end of +431
     GET RUN TIME FIELD l_to.
 
     e_runtime = l_to - l_from.
@@ -142,20 +145,8 @@ FORM process_version_2 CHANGING e_error_message TYPE string
   IF e_error_message IS INITIAL.
 
     lr_parser->result_table = lr_result.
-    TRY .
-        lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( EXPORTING p_data_ref = lr_result ).
-      CATCH  cx_root INTO DATA(ls_error).
-        DATA(lv_message) = |Database Message: { ls_error->get_text( ) } |.
-        ls_syn_msg-l1 = lv_message(72).
-        IF strlen( lv_message ) > 72.
-          ls_syn_msg-l2 = lv_message+72.
-          IF strlen( lv_message ) > 144.
-            ls_syn_msg-l3 = lv_message+144.
-          ENDIF.
-        ENDIF.
-        e_error_message = ls_syn_msg.
-        RETURN.
-    ENDTRY.
+
+    lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( EXPORTING p_data_ref = lr_result ).
     lr_typedescr ?= lr_tabledescr->get_table_line_type( ).
 
     CASE lr_typedescr->kind.

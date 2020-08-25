@@ -152,14 +152,14 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE status_0100.</LINE>
+       <LINE>  MODULE status_0100.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0100.</LINE>
+       <LINE>  MODULE pbo_0100.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>call subscreen EXPORT_SUBSCREEN including sy-repid g_sub_dynpro.</LINE>
+       <LINE>  call subscreen EXPORT_SUBSCREEN including sy-repid g_sub_dynpro.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW/>
@@ -167,7 +167,7 @@
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0100.</LINE>
+       <LINE>  MODULE pai_0100.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>*  FIELD g_csv_attr-field_separator_other</LINE>
@@ -176,28 +176,12 @@
        <LINE>*     MODULE pau_field_sep_changed ON REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>call subscreen export_subscreen.</LINE>
+       <LINE>  call subscreen export_subscreen.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE user_command_0100.</LINE>
+       <LINE>  MODULE user_command_0100.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -596,23 +580,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>module pbo_0110.</LINE>
+       <LINE>   module pbo_0110.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>module pai_0110.</LINE>
+       <LINE>   module pai_0110.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>3</item>
-      <item>0</item>
-      <item>0</item>
-      <item>3</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -661,13 +638,6 @@
        <LINE>* MODULE USER_COMMAND_0120.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-      <item>0</item>
-     </SPACES>
     </item>
    </DYNPROS>
    <CUA>

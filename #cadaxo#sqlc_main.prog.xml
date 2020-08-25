@@ -48,23 +48,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>module pbo_0100.</LINE>
+       <LINE>  module pbo_0100.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>module pai_0100.</LINE>
+       <LINE>  module pai_0100.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -802,7 +795,7 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE PBO_0500.</LINE>
+       <LINE>  MODULE PBO_0500.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>*</LINE>
@@ -811,16 +804,9 @@
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE PAI_0500.</LINE>
+       <LINE>  MODULE PAI_0500.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -885,24 +871,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0700.</LINE>
+       <LINE>  MODULE pbo_0700.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0700.</LINE>
+       <LINE>  MODULE pai_0700.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -936,7 +914,6 @@
        <FORMAT>CHAR</FORMAT>
        <FROM_DICT>X</FROM_DICT>
        <MODIFIC>2</MODIFIC>
-       <UP_LOWER>X</UP_LOWER>
        <REQU_ENTRY>N</REQU_ENTRY>
        <LABELLEFT>X</LABELLEFT>
       </RPY_DYFATC>
@@ -975,7 +952,7 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>module pbo_0800.</LINE>
+       <LINE>   module pbo_0800.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>*</LINE>
@@ -984,20 +961,12 @@
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>module pai_0800 at exit-command.</LINE>
+       <LINE>   module pai_0800 at exit-command.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>module pai_0800.</LINE>
+       <LINE>   module pai_0800.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>3</item>
-      <item>0</item>
-      <item>0</item>
-      <item>3</item>
-      <item>3</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -1194,40 +1163,28 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0900.</LINE>
+       <LINE>  MODULE pbo_0900.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE hide_tab.</LINE>
+       <LINE>  MODULE hide_tab.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>CALL SUBSCREEN sub_admin INCLUDING g_report g_subscreen.</LINE>
+       <LINE>  CALL SUBSCREEN sub_admin INCLUDING g_report g_subscreen.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0900 AT EXIT-COMMAND.</LINE>
+       <LINE>  MODULE pai_0900 AT EXIT-COMMAND.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>CALL SUBSCREEN sub_admin.</LINE>
+       <LINE>  CALL SUBSCREEN sub_admin.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0900.</LINE>
+       <LINE>  MODULE pai_0900.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>2</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>2</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -1666,24 +1623,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0910.</LINE>
+       <LINE>  MODULE pbo_0910.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0910.</LINE>
+       <LINE>  MODULE pai_0910.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -1752,24 +1701,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0920.</LINE>
+       <LINE>  MODULE pbo_0920.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0920.</LINE>
+       <LINE>  MODULE pai_0920.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -1870,24 +1811,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0930.</LINE>
+       <LINE>  MODULE pbo_0930.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0930.</LINE>
+       <LINE>  MODULE pai_0930.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -1925,24 +1858,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0940.</LINE>
+       <LINE>  MODULE pbo_0940.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0940.</LINE>
+       <LINE>  MODULE pai_0940.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -1980,24 +1905,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0950.</LINE>
+       <LINE>  MODULE pbo_0950.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0950.</LINE>
+       <LINE>  MODULE pai_0950.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -2035,24 +1952,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0960.</LINE>
+       <LINE>  MODULE pbo_0960.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0960.</LINE>
+       <LINE>  MODULE pai_0960.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -2090,24 +1999,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0970.</LINE>
+       <LINE>  MODULE pbo_0970.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0970.</LINE>
+       <LINE>  MODULE pai_0970.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -2145,24 +2046,16 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_0980.</LINE>
+       <LINE>  MODULE pbo_0980.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_0980.</LINE>
+       <LINE>  MODULE pai_0980.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -2209,7 +2102,7 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE PBO_2000.</LINE>
+       <LINE>  MODULE PBO_2000.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>*</LINE>
@@ -2218,16 +2111,9 @@
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE PAI_2000.</LINE>
+       <LINE>  MODULE PAI_2000.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
     <item>
      <HEADER>
@@ -2274,7 +2160,7 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE PBO_3000.</LINE>
+       <LINE>  MODULE PBO_3000.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>*</LINE>
@@ -2283,16 +2169,9 @@
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE PAI_3000.</LINE>
+       <LINE>  MODULE PAI_3000.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
    </DYNPROS>
    <CUA>

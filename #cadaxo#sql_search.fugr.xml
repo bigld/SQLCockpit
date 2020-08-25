@@ -97,21 +97,15 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pbo_3001.</LINE>
+       <LINE>  MODULE pbo_3001.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>MODULE pai_3001.</LINE>
+       <LINE>  MODULE pai_3001.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
-     <SPACES>
-      <item>0</item>
-      <item>2</item>
-      <item>0</item>
-      <item>2</item>
-     </SPACES>
     </item>
    </DYNPROS>
    <CUA>
