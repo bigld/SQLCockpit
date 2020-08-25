@@ -2592,6 +2592,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
         LOOP AT lt_included_view ASSIGNING FIELD-SYMBOL(<ls_component>).
 
+
           TRY.
               ls_dfies = lt_dfies[ fieldname = <ls_component>-name ].
             CATCH cx_sy_itab_line_not_found.

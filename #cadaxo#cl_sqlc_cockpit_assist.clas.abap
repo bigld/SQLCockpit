@@ -2308,6 +2308,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
     MODIFY /cadaxo/sqlcparv FROM ls_sqlcparv.
 
+
   ENDMETHOD.
 
 
