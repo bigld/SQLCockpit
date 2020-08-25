@@ -2566,10 +2566,13 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
     DATA ls_sdfies TYPE /cadaxo/sqlcdfies.
     DATA ls_dfies TYPE dfies.
+    DATA lt_dfies TYPE STANDARD TABLE OF dfies.
     DATA lr_structdescr TYPE REF TO cl_abap_structdescr.
     DATA lr_element TYPE REF TO cl_abap_elemdescr.
 
     LOOP AT it_dfies ASSIGNING FIELD-SYMBOL(<ls_sdfies>).
+
+      clear lt_dfies.
 
       IF <ls_sdfies>-stru_name IS NOT INITIAL.
 
@@ -2577,11 +2580,27 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
         DATA(lt_included_view) = lr_structdescr->get_included_view( ).
 
+        CALL FUNCTION 'DDIF_FIELDINFO_GET'
+          EXPORTING
+            tabname        = CONV ddobjname( <ls_sdfies>-stru_name )
+          TABLES
+            dfies_tab      = lt_dfies
+*           FIXED_VALUES   =
+          EXCEPTIONS
+            not_found      = 1
+            internal_error = 2
+            OTHERS         = 3.
+
         LOOP AT lt_included_view ASSIGNING FIELD-SYMBOL(<ls_component>).
 
-          lr_element ?= <ls_component>-type.
-          ls_dfies = lr_element->get_ddic_field( ).
+          TRY.
+              ls_dfies = lt_dfies[ fieldname = <ls_component>-name ].
+            CATCH cx_sy_itab_line_not_found. "fallback
+              lr_element ?= <ls_component>-type.
+              ls_dfies = lr_element->get_ddic_field( ).
+          ENDTRY.
           ls_sdfies = CORRESPONDING #( ls_dfies ).
+
           ls_sdfies-fieldname = <ls_component>-name.
           ls_sdfies-tabname = <ls_sdfies>-stru_name.
           ls_sdfies-/cadaxo/alias = <ls_sdfies>-fieldname.
