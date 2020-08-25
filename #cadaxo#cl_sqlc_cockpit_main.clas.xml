@@ -27,6 +27,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>003</KEY>
+     <ENTRY>Missing number range for Cockpit Updates. Please contact admin!</ENTRY>
+     <LENGTH>112</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>004</KEY>
      <ENTRY>Variant list</ENTRY>
      <LENGTH>30</LENGTH>
@@ -1157,6 +1163,12 @@
        <KEY>002</KEY>
        <ENTRY>Symbole erstellen</ENTRY>
        <LENGTH>24</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>003</KEY>
+       <ENTRY>Fehlender Nummernkreis für Cockpit-Updates. Bitte kontakt Admin!</ENTRY>
+       <LENGTH>112</LENGTH>
       </item>
       <item>
        <ID>I</ID>
