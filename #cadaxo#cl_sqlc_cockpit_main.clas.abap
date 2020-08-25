@@ -10260,6 +10260,14 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 *     field-symbols: <ls_result_line> type any.
 
+          IF e_ucomm = 'EDIT'.
+            SELECT SINGLE @abap_true FROM nriv INTO @DATA(lv_nr_exists) WHERE object = '/CADAXO/01'.
+              IF sy-subrc NE 0.
+               MESSAGE text-003 TYPE 'I'.
+               RETURN.
+              ENDIF.
+          ENDIF.
+
           READ TABLE dref_result_tab_t INTO l_dref_result_tab INDEX l_grid_name_i.
           IF sy-subrc = 0.
             l_index = sy-tabix.
