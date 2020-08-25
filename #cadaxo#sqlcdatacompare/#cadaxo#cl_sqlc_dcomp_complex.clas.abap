@@ -2572,7 +2572,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
     LOOP AT it_dfies ASSIGNING FIELD-SYMBOL(<ls_sdfies>).
 
-      clear lt_dfies.
+      CLEAR lt_dfies.
 
       IF <ls_sdfies>-stru_name IS NOT INITIAL.
 
@@ -2585,7 +2585,6 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
             tabname        = CONV ddobjname( <ls_sdfies>-stru_name )
           TABLES
             dfies_tab      = lt_dfies
-*           FIXED_VALUES   =
           EXCEPTIONS
             not_found      = 1
             internal_error = 2
@@ -2595,7 +2594,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
           TRY.
               ls_dfies = lt_dfies[ fieldname = <ls_component>-name ].
-            CATCH cx_sy_itab_line_not_found. "fallback
+            CATCH cx_sy_itab_line_not_found.
               lr_element ?= <ls_component>-type.
               ls_dfies = lr_element->get_ddic_field( ).
           ENDTRY.
