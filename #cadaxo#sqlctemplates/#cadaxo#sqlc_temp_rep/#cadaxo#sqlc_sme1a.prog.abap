@@ -233,7 +233,21 @@ g_layout->set_save_restriction(
    if_salv_c_layout=>RESTRICT_NONE ).$}
 {C$GS_REPORT_ATTR-LAYOUT <> 0$
 g_layout->set_default( value = abap_true ).$}
+*: Begin of change cockpit-320
+DATA: lr_cols TYPE REF TO cl_salv_columns.
+DATA: lr_col  TYPE REF TO cl_salv_column.
 
+lr_cols = gr_table->get_columns( ).
+lr_cols->set_optimize( 'X' ).
+{T$gst_fcat$$$
+lr_col = lr_cols->get_column( '&GST_FCAT-FIELDNAME&' ).
+if lr_col IS NOT INITIAL.
+  lr_col->set_short_text( '&GST_FCAT-SCRTEXT_S&' ).
+  lr_col->set_medium_text( '&GST_FCAT-SCRTEXT_M&' ).
+  lr_col->set_long_text( '&GST_FCAT-SCRTEXT_L&' ).
+  FREE lr_col. CLEAR lr_col.
+ENDIF.$$}
+*: End of change cockpit-320
 gr_table->set_screen_status(
     report        = 'SAPLSALV_METADATA_STATUS'
     pfstatus      = 'SALV_TABLE_STANDARD'
