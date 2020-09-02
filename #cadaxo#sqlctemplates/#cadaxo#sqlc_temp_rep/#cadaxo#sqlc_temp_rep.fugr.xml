@@ -599,7 +599,7 @@
        <NAME>GS_REPORT_ATTR-REPORT</NAME>
        <TEXT>________________________________________</TEXT>
        <LINE>002</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>040</LENGTH>
        <VISLENGTH>040</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -632,7 +632,7 @@
        <TEXT>______________________________________________________________________</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>003</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>070</LENGTH>
        <VISLENGTH>040</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -665,7 +665,7 @@
        <TEXT>_</TEXT>
        <DROPDOWN>K</DROPDOWN>
        <LINE>004</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>001</LENGTH>
        <VISLENGTH>040</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -698,7 +698,7 @@
        <TEXT>_</TEXT>
        <DROPDOWN>K</DROPDOWN>
        <LINE>005</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>001</LENGTH>
        <VISLENGTH>040</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -728,7 +728,7 @@
        <NAME>GS_REPORT_ATTR-AUTHORIZATION_GROUP</NAME>
        <TEXT>________</TEXT>
        <LINE>006</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>008</LENGTH>
        <VISLENGTH>008</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -756,7 +756,7 @@
        <TYPE>CHECK</TYPE>
        <NAME>GS_REPORT_ATTR-AUTHCHECK</NAME>
        <LINE>007</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>001</LENGTH>
        <VISLENGTH>001</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -786,7 +786,7 @@
        <NAME>GS_REPORT_ATTR-HEADER_INCLUDE</NAME>
        <TEXT>________________________________________</TEXT>
        <LINE>008</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>040</LENGTH>
        <VISLENGTH>040</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -814,7 +814,7 @@
        <TYPE>CHECK</TYPE>
        <NAME>GS_REPORT_ATTR-HEADER_NOSTD</NAME>
        <LINE>009</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>001</LENGTH>
        <VISLENGTH>001</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -848,9 +848,67 @@
        <TEXT>_</TEXT>
        <DROPDOWN>K</DROPDOWN>
        <LINE>010</LINE>
-       <COLUMN>023</COLUMN>
+       <COLUMN>028</COLUMN>
        <LENGTH>001</LENGTH>
        <VISLENGTH>040</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>OUTPUT_LAYOUT</NAME>
+       <TEXT>Layout_as_Selection_field</TEXT>
+       <LINE>011</LINE>
+       <COLUMN>002</COLUMN>
+       <LENGTH>025</LENGTH>
+       <VISLENGTH>025</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <GROUP1>L</GROUP1>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>CHECK</TYPE>
+       <NAME>GS_REPORT_ATTR-OUTPUT_LAYOUT</NAME>
+       <LINE>011</LINE>
+       <COLUMN>028</COLUMN>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>001</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <GROUP1>L</GROUP1>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>GROUP_BY_TAB</NAME>
+       <TEXT>Tabular_Selection_Blocks</TEXT>
+       <LINE>012</LINE>
+       <COLUMN>002</COLUMN>
+       <LENGTH>024</LENGTH>
+       <VISLENGTH>024</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>CHECK</TYPE>
+       <NAME>GS_REPORT_ATTR-TAB_BLKS</NAME>
+       <LINE>012</LINE>
+       <COLUMN>028</COLUMN>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>001</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <INPUT_FLD>X</INPUT_FLD>
@@ -904,7 +962,6 @@
       <RPY_DYFLOW>
        <LINE>  MODULE usr_check_consistency_0120.</LINE>
       </RPY_DYFLOW>
-      <RPY_DYFLOW/>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS ON VALUE-REQUEST.</LINE>

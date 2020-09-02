@@ -17,10 +17,8 @@
 $}REPORT &GS_REPORT_ATTR-REPORT&.
 {T$GST_HEADER$$$
 *&GST_HEADER-LINE&$$}
-
 {C$GS_REPORT_ATTR-ENH_INCLUDE <> ''$
 INCLUDE &GS_REPORT_ATTR-ENH_INCLUDE& IF FOUND.$}
-
 **********************************************************************
 * Data Definition
 **********************************************************************
@@ -39,7 +37,6 @@ DATA lr_events            TYPE REF TO cl_salv_events_table.
 
 FIELD-SYMBOLS: <gt_table>  TYPE table.
 FIELD-SYMBOLS: <gwa_table> TYPE any.
-
 {C$GS_EVT$
 **--------------------------------------------------------------------
 **       CLASS lcl_handle_events DEFINITION
@@ -78,20 +75,44 @@ CLASS lcl_handle_events DEFINITION.
 
 ENDCLASS.                    "lcl_handle_events DEFINITION
 $}
-
 **********************************************************************
 * Selection Screen
 **********************************************************************
 {T$GST_TABNAMES$TABLES:$$&GST_TABNAMES-TABNAME&$, $.}
 SELECTION-SCREEN: BEGIN OF BLOCK bl1 WITH FRAME TITLE text-t01.
+*:    begin of change#cockpit-456
+{C$GS_REPORT_ATTR-TAB_BLKS = ''$\
+*:    end of change#cockpit-456
 {T$GST_WHERE WHERE generate_option <> '03'$$$
 {C$GST_WHERE-PARAMNAME = 'UPT'$
 PARAMETERS: p_&GST_WHERE-PARAMNAME& TYPE$ \
 SELECT-OPTIONS: p_&GST_WHERE-PARAMNAME& FOR} \
 {C$GST_WHERE-TABLENAME$&GST_WHERE-TABLENAME&-$}\
 &GST_WHERE-FIELDNAME&.$$}
+*: begin of change / continuation of the else from C#cockpit-456
+$\
+{T$GST_TABNAMES$$$
+  SELECTION-SCREEN BEGIN OF BLOCK blk_&GST_TABNAMES-TABNAME& \
+  WITH FRAME TITLE t&GST_TABNAMES-TABNAME&.
+{T$GST_WHERE WHERE generate_option <> '03'$$$\
+{C$GST_WHERE-TABLENAME = GST_TABNAMES-TABNAME$
+{C$GST_WHERE-PARAMNAME = 'UPT'$\
+PARAMETERS: p_&GST_WHERE-PARAMNAME& TYPE$ \
+SELECT-OPTIONS: p_&GST_WHERE-PARAMNAME& FOR} \
+{C$GST_WHERE-TABLENAME$&GST_WHERE-TABLENAME&-$}\
+&GST_WHERE-FIELDNAME&.$}$$}":.$$}
+SELECTION-SCREEN END OF BLOCK blk_&GST_TABNAMES-TABNAME&.$$}
+{T$GST_WHERE WHERE PARAMNAME = 'UPT'$$$
+PARAMETERS: p_&GST_WHERE-PARAMNAME& TYPE \
+&GST_WHERE-FIELDNAME&.$$}
+}
+{C$GS_REPORT_ATTR-OUTPUT_LAYOUT NE ''$\
+SELECTION-SCREEN BEGIN OF LINE. SELECTION-SCREEN COMMENT (31) label.
+PARAMETERS: p_layout TYPE slis_vari LOWER CASE.
+SELECTION-SCREEN COMMENT (10) tvar. SELECTION-SCREEN END OF LINE.
+$}
+*: end of change#cockpit-456/455
 SELECTION-SCREEN: END OF BLOCK bl1.
-
 
 **********************************************************************
 * Initialization
@@ -107,6 +128,29 @@ INITIALIZATION.
 &GST_INIT-HIGHVALUE&.$}
 APPEND &GST_INIT-PARAMNAME&. $$}
 
+": begin of change#cockpit-456/455
+**********************************************************************
+* selection screen output
+**********************************************************************
+AT SELECTION-SCREEN OUTPUT.
+
+{C$GS_REPORT_ATTR-TAB_BLKS = 'X'$\
+DATA lv_table_desc TYPE as4text.
+{T$GST_TABNAMES$$${C$GST_TABNAMES-TABNAME$
+SELECT SINGLE ddtext
+FROM dd02t INTO lv_table_desc
+WHERE tabname    = '&GST_TABNAMES-TABNAME&'
+  AND ddlanguage = '&sy-langu&'.
+t&GST_TABNAMES-TABNAME& = lv_table_desc.$}$$}
+$}
+{C$GS_REPORT_ATTR-OUTPUT_LAYOUT NE ''$\
+  label = 'Layout'.
+  tvar = p_layout.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_layout.
+  PERFORM select_layout.
+$}
+": end of change#cockpit-456/455
 **********************************************************************
 * Start of Selection
 **********************************************************************
@@ -217,7 +261,6 @@ TRY.
         t_table      = <gt_table> ).
   CATCH cx_salv_msg.
 ENDTRY.
-
 {C$GS_REPORT_ATTR-LAYOUT <> 0$
 g_layout = gr_table->get_layout( ).
 g_key-report = sy-repid.
@@ -287,7 +330,17 @@ gr_table->display( ).
 * End of Selection
 **********************************************************************
 END-OF-SELECTION.
-
+": begin of change#cockpit-456/455
+{C$GS_REPORT_ATTR-OUTPUT_LAYOUT NE ''$\
+FORM select_layout.
+  DATA: ls_layout_key  TYPE salv_s_layout_key,
+        ls_layout_info TYPE salv_s_layout_info.
+ ls_layout_key-report = sy-repid.
+ ls_layout_info = cl_salv_layout_service=>f4_layouts( ls_layout_key ).
+ p_layout = ls_layout_info-layout.
+ENDFORM.                    "select_layout
+$}
+": end   of change#cockpit-456/455
 {C$GS_EVT$
 **--------------------------------------------------------------------
 **       CLASS lcl_handle_events IMPLEMENTATION
