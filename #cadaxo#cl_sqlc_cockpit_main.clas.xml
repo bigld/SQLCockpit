@@ -75,6 +75,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>012</KEY>
+     <ENTRY>Reference (sharing) with myself!</ENTRY>
+     <LENGTH>64</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>A01</KEY>
      <ENTRY>Local value</ENTRY>
      <LENGTH>11</LENGTH>
@@ -378,6 +384,18 @@
      <KEY>B43</KEY>
      <ENTRY>Search SQL</ENTRY>
      <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>B44</KEY>
+     <ENTRY>Share with myself</ENTRY>
+     <LENGTH>27</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>B45</KEY>
+     <ENTRY>Share with others</ENTRY>
+     <LENGTH>27</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -1214,6 +1232,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>012</KEY>
+       <ENTRY>Referenz (Teilen) mit mir selbst!</ENTRY>
+       <LENGTH>64</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>A01</KEY>
        <ENTRY>Ihr Wert</ENTRY>
        <LENGTH>11</LENGTH>
@@ -1517,6 +1541,18 @@
        <KEY>B43</KEY>
        <ENTRY>Suche SQL</ENTRY>
        <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>B44</KEY>
+       <ENTRY>Mit mir teilen</ENTRY>
+       <LENGTH>27</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>B45</KEY>
+       <ENTRY>Mit anderen teilen</ENTRY>
+       <LENGTH>27</LENGTH>
       </item>
       <item>
        <ID>I</ID>
@@ -3959,6 +3995,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>ON_SAVED_LIST_MENU_CLICK</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Event Handler Menu Button</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>ON_SAVED_LIST_SELECT_LINE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Eventhandler: on_saved_list_select_line</DESCRIPT>
@@ -4010,6 +4052,12 @@
      <CMPNAME>ON_SYMBOL_DRAG</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Eventhandler: ON_SYMBOL_DRAG</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>ON_SYMBOL_MENU_BUTTON</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Event Handler Menu Button</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>

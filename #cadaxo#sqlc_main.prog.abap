@@ -323,7 +323,12 @@ MODULE pai_0100 INPUT.
     WHEN 'GENERATE'.
       PERFORM generate_template.
     WHEN 'SQL_SHARE'.
-      PERFORM share_sql_area.
+      PERFORM share_sql_area
+      USING space space.                     "cockpit-420
+    WHEN 'SQL_SHR_ME'.                       "cockpit-420
+      DATA lv_uname TYPE /cadaxo/sqlcapi_receiver. "cockpit-420
+      lv_uname = sy-uname.                   "cockpit-420
+      PERFORM share_sql_area USING lv_uname text-002. "cockpit-420
     WHEN 'QUEUE'.
       PERFORM show_api_queue.
     WHEN 'SAVE_LISTS'.
@@ -459,7 +464,9 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 *       Show the API Queue Popup
 *----------------------------------------------------------------------*
-FORM share_sql_area.
+FORM share_sql_area
+  USING iv_receiver TYPE /cadaxo/sqlcapi_receiver "+Cockpit-420
+        iv_text     TYPE /CADAXO/SQLC_CHAR_1024. "+Cockpit-420
   DATA(lt_sql) = lcl_controller->get_sql_area_lt_code( ).                     "COCKPIT-295
   DATA l_message TYPE string.                                                 "COCKPIT-269
   DATA lr_exception             TYPE REF TO cx_root.                          "COCKPIT-269
@@ -475,7 +482,9 @@ FORM share_sql_area.
         CALL FUNCTION '/CADAXO/SQLC_SHARE'                                    "COCKPIT-295
           EXPORTING                                                           "COCKPIT-295
             iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-sql    "COCKPIT-295
-            it_sql         = lt_sql.                                          "COCKPIT-295
+            it_sql         = lt_sql                                          "COCKPIT-295
+            iv_receiver    = iv_receiver                                      "Cockpit-420
+            iv_text        = iv_text    .                                     "Cockpit-420
       ENDIF.                                                                  "COCKPIT-269
     CATCH /cadaxo/cx_sqlc_syntax_error INTO lr_exception.                     "COCKPIT-269
       l_message = lr_exception->get_text( ).                                  "COCKPIT-269

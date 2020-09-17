@@ -2538,6 +2538,14 @@
       <FUN_TEXT>Share SQL Editor</FUN_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
+      <CODE>SQL_SHR_ME</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <TEXT_NAME>ICON_WORKFLOW_INTERNAL_EVENT</TEXT_NAME>
+      <ICON_ID>@5M@</ICON_ID>
+      <FUN_TEXT>Share SQL with me</FUN_TEXT>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
       <CODE>SYNTCHECK</CODE>
       <TEXTNO>001</TEXTNO>
       <TEXT_TYPE>S</TEXT_TYPE>
@@ -2997,6 +3005,12 @@
       <FUNNO>001</FUNNO>
      </RSMPE_PFK>
      <RSMPE_PFK>
+      <CODE>000001</CODE>
+      <PFNO>47</PFNO>
+      <FUNCODE>SQL_SHR_ME</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
+     <RSMPE_PFK>
       <CODE>000002</CODE>
       <PFNO>00</PFNO>
       <FUNCODE>OK</FUNCODE>
@@ -3286,6 +3300,10 @@
      </RSMPE_STAF>
      <RSMPE_STAF>
       <STATUS>MAIN_0100</STATUS>
+      <FUNCTION>SQL_SHR_ME</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>MAIN_0100</STATUS>
       <FUNCTION>SYNTCHECK</FUNCTION>
      </RSMPE_STAF>
      <RSMPE_STAF>
@@ -3562,6 +3580,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>002</KEY>
+     <ENTRY>Reference (sharing) with myself!</ENTRY>
+     <LENGTH>64</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>B01</KEY>
      <ENTRY>SQL Trace</ENTRY>
      <LENGTH>9</LENGTH>
@@ -3605,7 +3629,7 @@
     <item>
      <ID>I</ID>
      <KEY>D04</KEY>
-     <ENTRY>In DEMO version template generation is not availabe!</ENTRY>
+     <ENTRY>In DEMO version template generation is not available!</ENTRY>
      <LENGTH>70</LENGTH>
     </item>
     <item>
@@ -3635,6 +3659,12 @@
        <KEY>001</KEY>
        <ENTRY>Ok</ENTRY>
        <LENGTH>2</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>002</KEY>
+       <ENTRY>Referenz (Teilen) mit mir selbst!</ENTRY>
+       <LENGTH>64</LENGTH>
       </item>
       <item>
        <ID>I</ID>
@@ -3688,7 +3718,7 @@
        <ID>I</ID>
        <KEY>Q03</KEY>
        <ENTRY>Einige Symbole existieren bereits. Welche sollen überschrieben werden?</ENTRY>
-       <LENGTH>72</LENGTH>
+       <LENGTH>75</LENGTH>
       </item>
       <item>
        <ID>I</ID>

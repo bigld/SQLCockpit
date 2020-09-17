@@ -30,7 +30,20 @@ MODULE pbo_3001 OUTPUT.
   ENDIF.
 
   gr_text_share_3001->delete_text( ). "TODO - SHOULD NOT BE NECESSARY
-
+*  begin of change 420
+  DATA: lt_self_share LIKE STANDARD TABLE OF gv_text.
+  IF gv_text IS NOT INITIAL.
+  APPEND gv_text TO lt_self_share.
+      gr_text_share_3001->set_text_as_r3table(
+        EXPORTING
+          table           = lt_self_share    " table with text
+        EXCEPTIONS
+          error_dp        = 1
+          error_dp_create = 2
+          others          = 3 ).
+          CLEAR lt_self_share.
+  ENDIF.
+*  end   of change 420
 ENDMODULE.
 MODULE pai_3001 INPUT.
 

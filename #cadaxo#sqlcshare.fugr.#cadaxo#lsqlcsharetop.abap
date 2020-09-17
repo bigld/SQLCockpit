@@ -32,3 +32,4 @@ DATA: gt_sql            TYPE /cadaxo/sqlccodeline_t.
 DATA: gt_symbols        TYPE /cadaxo/sqlc_symbol_t.
 DATA: gs_variant        TYPE /cadaxo/sqlc_il_variants.
 DATA: gs_saved_list     TYPE /cadaxo/sqlc_list_exp_sqlx.
+DATA: gv_text           TYPE /cadaxo/sqlc_char_1024.                               "Cockpit-420

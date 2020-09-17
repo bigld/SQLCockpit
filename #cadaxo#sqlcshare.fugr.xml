@@ -39,6 +39,16 @@
        <OPTIONAL>X</OPTIONAL>
        <TYP>/CADAXO/SQLC_LIST_EXP_SQLX</TYP>
       </RSIMP>
+      <RSIMP>
+       <PARAMETER>IV_RECEIVER</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
+       <TYP>/CADAXO/SQLCAPI_RECEIVER</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>IV_TEXT</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
+       <TYP>/CADAXO/SQLC_CHAR_1024</TYP>
+      </RSIMP>
      </IMPORT>
      <DOCUMENTATION>
       <RSFDO>
@@ -65,6 +75,16 @@
        <PARAMETER>IS_SAVED_LIST</PARAMETER>
        <KIND>P</KIND>
        <STEXT>SQL Cockpit - Saved List</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>IV_RECEIVER</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>SQL Cockpit - API Receiver</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>IV_TEXT</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Message Text</STEXT>
       </RSFDO>
      </DOCUMENTATION>
     </item>
