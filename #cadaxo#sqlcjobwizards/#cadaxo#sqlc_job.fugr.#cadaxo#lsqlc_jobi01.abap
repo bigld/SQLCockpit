@@ -41,9 +41,11 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 MODULE check_email_address INPUT.
 
-  PERFORM check_email_address USING /cadaxo/sqlc_jobwiz_fields-notification_email_flag
+  PERFORM check_email_address USING
+*                                    /cadaxo/sqlc_jobwiz_fields-notification_email_flag"Cockpit-451
                                     /cadaxo/sqlc_jobwiz_fields-notification_email1.
-  PERFORM check_email_address USING /cadaxo/sqlc_jobwiz_fields-notification_email_flag
+  PERFORM check_email_address USING
+*                                    /cadaxo/sqlc_jobwiz_fields-notification_email_flag"Cockpit-451
                                     /cadaxo/sqlc_jobwiz_fields-notification_email2.
 ENDMODULE.
 *&---------------------------------------------------------------------*
@@ -99,7 +101,8 @@ MODULE pai_0100 INPUT.
   ENDIF.
   <ls_swcont>-element = 'SAPMAIL'.
   <ls_swcont>-type    = 'C'.
-  IF /cadaxo/sqlc_jobwiz_fields-notification_sap_mail_flag = abap_true.
+*  IF /cadaxo/sqlc_jobwiz_fields-notification_sap_mail_flag = abap_true. "-Cockpit-451
+  IF /cadaxo/sqlc_jobwiz_fields-notification_sap_mail IS NOT INITIAL.  "+Cockpit-451
     <ls_swcont>-value = /cadaxo/sqlc_jobwiz_fields-notification_sap_mail.
   ELSE.
     <ls_swcont>-value = text-003.
@@ -112,38 +115,75 @@ MODULE pai_0100 INPUT.
   ENDIF.
   <ls_swcont>-element = 'ATTACHMENT'.
   <ls_swcont>-type    = 'C'.
-  IF /cadaxo/sqlc_jobwiz_fields-notif_email_attachment_flag = abap_true.
+  IF /cadaxo/sqlc_jobwiz_fields-notif_email_attachment_flag = abap_true."-Cockpit-451
     <ls_swcont>-value = text-004.
   ELSE.
     <ls_swcont>-value = text-003.
   ENDIF.
   <ls_swcont>-elemlength = strlen( <ls_swcont>-value ).
 
+* begin of insert+cockpit-451
+  IF /cadaxo/sqlc_jobwiz_fields-notification_email1 IS NOT INITIAL.
   ASSIGN gt_swcont[ element = 'EMAIL1' ] TO <ls_swcont>.
   IF sy-subrc <> 0.
     APPEND INITIAL LINE TO gt_swcont ASSIGNING <ls_swcont>.
   ENDIF.
   <ls_swcont>-element = 'EMAIL1'.
   <ls_swcont>-type    = 'C'.
-  IF /cadaxo/sqlc_jobwiz_fields-notification_email_flag = abap_true.
-    <ls_swcont>-value = /cadaxo/sqlc_jobwiz_fields-notification_email1.
-  ELSE.
-    <ls_swcont>-value = text-003.
-  ENDIF.
+  <ls_swcont>-value = /cadaxo/sqlc_jobwiz_fields-notification_email1.
   <ls_swcont>-elemlength = strlen( <ls_swcont>-value ).
+  ENDIF.
 
+  IF /cadaxo/sqlc_jobwiz_fields-notification_email2 IS NOT INITIAL.
   ASSIGN gt_swcont[ element = 'EMAIL2' ] TO <ls_swcont>.
   IF sy-subrc <> 0.
     APPEND INITIAL LINE TO gt_swcont ASSIGNING <ls_swcont>.
   ENDIF.
   <ls_swcont>-element = 'EMAIL2'.
   <ls_swcont>-type    = 'C'.
-  IF /cadaxo/sqlc_jobwiz_fields-notification_email_flag = abap_true.
-    <ls_swcont>-value = /cadaxo/sqlc_jobwiz_fields-notification_email2.
-  ELSE.
-    <ls_swcont>-value = text-003.
-  ENDIF.
+  <ls_swcont>-value = /cadaxo/sqlc_jobwiz_fields-notification_email2.
   <ls_swcont>-elemlength = strlen( <ls_swcont>-value ).
+  ENDIF.
+
+  IF /cadaxo/sqlc_jobwiz_fields-notification_email1 IS INITIAL AND /cadaxo/sqlc_jobwiz_fields-notification_email2 IS INITIAL.
+  ASSIGN gt_swcont[ element = 'EMAIL1' ] TO <ls_swcont>.
+  IF sy-subrc <> 0.
+    APPEND INITIAL LINE TO gt_swcont ASSIGNING <ls_swcont>.
+  ENDIF.
+  <ls_swcont>-element = 'EMAIL1'.
+  <ls_swcont>-type    = 'C'.
+  <ls_swcont>-value = text-003.
+  <ls_swcont>-elemlength = strlen( <ls_swcont>-value ).
+  ENDIF.
+* end   of insert+cockpit-451
+
+* begin   of comments -cockpit-451
+*  ASSIGN gt_swcont[ element = 'EMAIL1' ] TO <ls_swcont>.
+*  IF sy-subrc <> 0.
+*    APPEND INITIAL LINE TO gt_swcont ASSIGNING <ls_swcont>.
+*  ENDIF.
+*  <ls_swcont>-element = 'EMAIL1'.
+*  <ls_swcont>-type    = 'C'.
+*  IF /cadaxo/sqlc_jobwiz_fields-notification_email_flag = abap_true.
+*    <ls_swcont>-value = /cadaxo/sqlc_jobwiz_fields-notification_email1.
+*  ELSE.
+*    <ls_swcont>-value = text-003.
+*  ENDIF.
+*  <ls_swcont>-elemlength = strlen( <ls_swcont>-value ).
+*
+*  ASSIGN gt_swcont[ element = 'EMAIL2' ] TO <ls_swcont>.
+*  IF sy-subrc <> 0.
+*    APPEND INITIAL LINE TO gt_swcont ASSIGNING <ls_swcont>.
+*  ENDIF.
+*  <ls_swcont>-element = 'EMAIL2'.
+*  <ls_swcont>-type    = 'C'.
+*  IF /cadaxo/sqlc_jobwiz_fields-notification_email_flag = abap_true.
+*    <ls_swcont>-value = /cadaxo/sqlc_jobwiz_fields-notification_email2.
+*  ELSE.
+*    <ls_swcont>-value = text-003.
+*  ENDIF.
+*  <ls_swcont>-elemlength = strlen( <ls_swcont>-value ).
+* end   of comments -cockpit-451
 
 ENDMODULE.
 *&---------------------------------------------------------------------*
@@ -153,7 +193,8 @@ MODULE check_sap_user INPUT.
   DATA l_bname LIKE usr03-bname.
   DATA lt_user TYPE TABLE OF string.
 
-  IF /cadaxo/sqlc_jobwiz_fields-notification_sap_mail_flag <> space AND
+  IF
+*    /cadaxo/sqlc_jobwiz_fields-notification_sap_mail_flag <> space AND "-Cockpit-451
      /cadaxo/sqlc_jobwiz_fields-notification_sap_mail <> space.
 
     SPLIT /cadaxo/sqlc_jobwiz_fields-notification_sap_mail AT ';' INTO TABLE lt_user.

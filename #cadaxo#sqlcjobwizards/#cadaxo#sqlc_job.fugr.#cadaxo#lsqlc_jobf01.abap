@@ -252,12 +252,14 @@ FORM init_roadmap .
   ENDIF.
 
 ENDFORM.
-FORM check_email_address USING uv_email_flag TYPE flag                 "COCKPIT-298
+FORM check_email_address USING
+*                              uv_email_flag TYPE flag                 "COCKPIT-298 -Cocjpit451
                                uv_email      TYPE so_name.             "COCKPIT-298
 
   DATA: lt_email_string TYPE TABLE OF string.
 
-  IF uv_email_flag <> space AND
+  IF
+*    uv_email_flag <> space AND "Cockpit-451
      uv_email <> space.
     SPLIT uv_email AT ';' INTO TABLE lt_email_string.                  "COCKPIT-298
     LOOP AT lt_email_string ASSIGNING FIELD-SYMBOL(<ls_email_string>). "COCKPIT-298

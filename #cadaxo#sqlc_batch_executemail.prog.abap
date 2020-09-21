@@ -79,12 +79,18 @@ FORM email_notification .
 
   PERFORM get_job_status CHANGING lv_jobstate lv_jobstatetext.
 
-  IF ( gs_jobstart_conditions-notification_email_flag IS NOT INITIAL
-      AND ( gs_jobstart_conditions-notification_email1 IS NOT INITIAL OR
-            gs_jobstart_conditions-notification_email2 IS NOT INITIAL ) ) OR
-     ( gs_jobstart_conditions-notification_sap_mail_flag IS NOT INITIAL
-      AND gs_jobstart_conditions-notification_sap_mail IS NOT INITIAL ).
-
+* begin of comments cockpit-451
+*  IF ( gs_jobstart_conditions-notification_email_flag IS NOT INITIAL
+*      AND ( gs_jobstart_conditions-notification_email1 IS NOT INITIAL OR
+*            gs_jobstart_conditions-notification_email2 IS NOT INITIAL ) ) OR
+*     ( gs_jobstart_conditions-notification_sap_mail_flag IS NOT INITIAL
+*      AND gs_jobstart_conditions-notification_sap_mail IS NOT INITIAL ).
+* end of comments cockpit-451
+* begin of insert cockpit-451
+  IF  gs_jobstart_conditions-notification_email1 IS NOT INITIAL OR
+      gs_jobstart_conditions-notification_email2 IS NOT INITIAL OR
+      gs_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
+* end   of insert cockpit-451
     lr_send_request = cl_bcs=>create_persistent( ).
 
 * create subject
@@ -153,7 +159,8 @@ FORM email_notification .
     lr_send_request->set_sender( lr_sender ).
 
 * add the email receiver
-    IF NOT gs_jobstart_conditions-notification_email_flag IS INITIAL.
+*    IF NOT gs_jobstart_conditions-notification_email_flag IS INITIAL."-Cockpit-451
+    IF gs_jobstart_conditions-notification_email1 IS NOT INITIAL OR gs_jobstart_conditions-notification_email2 IS NOT INITIAL."+Cockpit-451
       SPLIT gs_jobstart_conditions-notification_email1 AT ';' INTO TABLE lt_string.                "COCKPIT-298
       APPEND LINES OF lt_string TO lt_email_string.                                                "COCKPIT-298
       SPLIT gs_jobstart_conditions-notification_email2 AT ';' INTO TABLE lt_string.                "COCKPIT-298
@@ -165,8 +172,9 @@ FORM email_notification .
     ENDIF.
 
 * add the sap receiver
-    IF NOT gs_jobstart_conditions-notification_sap_mail_flag IS INITIAL
-       AND gs_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
+    IF
+*NOT gs_jobstart_conditions-notification_sap_mail_flag IS INITIAL AND "-Cockpit-451
+      gs_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
 
       SPLIT gs_jobstart_conditions-notification_sap_mail AT ';' INTO TABLE lt_string.
 

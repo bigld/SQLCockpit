@@ -962,20 +962,17 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>CHECK</TYPE>
-       <NAME>/CADAXO/SQLC_JOBWIZ_FIELDS-NOTIFICATION_SAP_MAIL_FLAG</NAME>
-       <TEXT>SAP_Mail_______</TEXT>
+       <TYPE>TEXT</TYPE>
+       <NAME>SAP_MAIL</NAME>
+       <TEXT>SAP_Mail_Recipient(s)</TEXT>
        <LINE>002</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>017</LENGTH>
-       <VISLENGTH>017</VISLENGTH>
+       <LENGTH>021</LENGTH>
+       <VISLENGTH>021</VISLENGTH>
        <HEIGHT>001</HEIGHT>
-       <PUSH_FCODE>SEL_CHK_SAP_MAIL</PUSH_FCODE>
        <FORMAT>CHAR</FORMAT>
-       <FROM_DICT>X</FROM_DICT>
-       <MODIFIC>2</MODIFIC>
-       <INPUT_FLD>X</INPUT_FLD>
-       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <LABELLEFT>X</LABELLEFT>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
@@ -985,7 +982,7 @@
        <TEXT>____________________________________________________________________________________________________________________________________</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>002</LINE>
-       <COLUMN>022</COLUMN>
+       <COLUMN>024</COLUMN>
        <LENGTH>255</LENGTH>
        <VISLENGTH>055</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -998,20 +995,17 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>CHECK</TYPE>
-       <NAME>/CADAXO/SQLC_JOBWIZ_FIELDS-NOTIFICATION_EMAIL_FLAG</NAME>
-       <TEXT>eMail__________</TEXT>
-       <LINE>003</LINE>
+       <TYPE>TEXT</TYPE>
+       <NAME>EMAIL</NAME>
+       <TEXT>eMail_Recipient(s)</TEXT>
+       <LINE>004</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>017</LENGTH>
-       <VISLENGTH>017</VISLENGTH>
+       <LENGTH>018</LENGTH>
+       <VISLENGTH>018</VISLENGTH>
        <HEIGHT>001</HEIGHT>
-       <PUSH_FCODE>SEL_CHK_EMAIL</PUSH_FCODE>
        <FORMAT>CHAR</FORMAT>
-       <FROM_DICT>X</FROM_DICT>
-       <MODIFIC>2</MODIFIC>
-       <INPUT_FLD>X</INPUT_FLD>
-       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <LABELLEFT>X</LABELLEFT>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
@@ -1020,8 +1014,8 @@
        <NAME>/CADAXO/SQLC_JOBWIZ_FIELDS-NOTIFICATION_EMAIL1</NAME>
        <TEXT>____________________________________________________________________________________________________________________________________</TEXT>
        <ROLLING>X</ROLLING>
-       <LINE>003</LINE>
-       <COLUMN>022</COLUMN>
+       <LINE>004</LINE>
+       <COLUMN>024</COLUMN>
        <LENGTH>241</LENGTH>
        <VISLENGTH>055</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -1037,8 +1031,8 @@
        <NAME>/CADAXO/SQLC_JOBWIZ_FIELDS-NOTIFICATION_EMAIL2</NAME>
        <TEXT>____________________________________________________________________________________________________________________________________</TEXT>
        <ROLLING>X</ROLLING>
-       <LINE>004</LINE>
-       <COLUMN>022</COLUMN>
+       <LINE>005</LINE>
+       <COLUMN>024</COLUMN>
        <LENGTH>241</LENGTH>
        <VISLENGTH>055</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -1053,8 +1047,8 @@
        <TYPE>TEXT</TYPE>
        <NAME>GD_TXT_MAILSEP</NAME>
        <TEXT>Separate_multiple_email_recipients_with_;</TEXT>
-       <LINE>005</LINE>
-       <COLUMN>022</COLUMN>
+       <LINE>006</LINE>
+       <COLUMN>024</COLUMN>
        <LENGTH>041</LENGTH>
        <VISLENGTH>041</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -1067,7 +1061,7 @@
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLC_JOBWIZ_FIELDS-NOTIF_EMAIL_ATTACHMENT_FLAG</NAME>
        <TEXT>Attach_results________________</TEXT>
-       <LINE>006</LINE>
+       <LINE>008</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>032</LENGTH>
        <VISLENGTH>032</VISLENGTH>
@@ -1106,7 +1100,13 @@
        <LINE>  CHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>    FIELD: /cadaxo/sqlc_jobwiz_fields-notification_sap_mail_flag,</LINE>
+       <LINE>    FIELD:</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>*           /cadaxo/sqlc_jobwiz_fields-notification_sap_mail_flag,</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>&quot;-Cockpit-451</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>           /cadaxo/sqlc_jobwiz_fields-notification_sap_mail.</LINE>
@@ -1121,7 +1121,13 @@
        <LINE>  CHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>    FIELD: /cadaxo/sqlc_jobwiz_fields-notification_email_flag,</LINE>
+       <LINE>    FIELD:</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>*           /cadaxo/sqlc_jobwiz_fields-notification_email_flag,</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>&quot;-Cockpit-451</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>           /cadaxo/sqlc_jobwiz_fields-notification_email1,</LINE>
