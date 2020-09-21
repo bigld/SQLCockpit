@@ -100,28 +100,30 @@ ENDMODULE.                 " PAI_0130  INPUT
 *       text
 *----------------------------------------------------------------------*
 MODULE pbo_0150 OUTPUT.
-  LOOP AT SCREEN.
-    CASE screen-group1.
-      WHEN '001'.
-        IF NOT /cadaxo/sqlc_jobwiz_fields-notification_sap_mail_flag IS INITIAL.
-          screen-required = 1.
-        ELSE.
-          screen-required = 0.
-        ENDIF.
-      WHEN '002'.
-        IF NOT /cadaxo/sqlc_jobwiz_fields-notification_email_flag IS INITIAL.
-          screen-required = 1.
-        ELSE.
-          screen-required = 0.
-        ENDIF.
-*      WHEN '003'.
-*        IF NOT /cadaxo/sqlc_jobwiz_fields-notification_email_flag IS INITIAL.
-*          screen-input = 1.
+* begin of comments cockpit-451
+*  LOOP AT SCREEN.
+*    CASE screen-group1.
+*      WHEN '001'.
+*        IF NOT /cadaxo/sqlc_jobwiz_fields-notification_sap_mail_flag IS INITIAL.
+*          screen-required = 1.
+*        ELSE.
+*          screen-required = 0.
 *        ENDIF.
-    ENDCASE.
-
-    MODIFY SCREEN.
-  ENDLOOP.
+*      WHEN '002'.
+*        IF NOT /cadaxo/sqlc_jobwiz_fields-notification_email_flag IS INITIAL.
+*          screen-required = 1.
+*        ELSE.
+*          screen-required = 0.
+*        ENDIF.
+**      WHEN '003'.
+**        IF NOT /cadaxo/sqlc_jobwiz_fields-notification_email_flag IS INITIAL.
+**          screen-input = 1.
+**        ENDIF.
+*    ENDCASE.
+*
+*    MODIFY SCREEN.
+*  ENDLOOP.
+* end   of comments cockpit-451
 ENDMODULE.                 " PAI_0150  OUTPUT
 *&---------------------------------------------------------------------*
 *&      Module  PBO_0130  OUTPUT
