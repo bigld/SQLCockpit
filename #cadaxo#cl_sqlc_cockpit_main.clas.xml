@@ -81,6 +81,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>013</KEY>
+     <ENTRY>No existing variant was selected. Please select save option</ENTRY>
+     <LENGTH>118</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>A01</KEY>
      <ENTRY>Local value</ENTRY>
      <LENGTH>11</LENGTH>
@@ -396,6 +402,12 @@
      <KEY>B45</KEY>
      <ENTRY>Share with others</ENTRY>
      <LENGTH>27</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>B46</KEY>
+     <ENTRY>Update Variant</ENTRY>
+     <LENGTH>46</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -1238,6 +1250,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>013</KEY>
+       <ENTRY>Es wurde keine vorhandene Variante ausgewählt. Bitte wählen Sie die Option Speichern</ENTRY>
+       <LENGTH>118</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>A01</KEY>
        <ENTRY>Ihr Wert</ENTRY>
        <LENGTH>11</LENGTH>
@@ -1553,6 +1571,12 @@
        <KEY>B45</KEY>
        <ENTRY>Mit anderen teilen</ENTRY>
        <LENGTH>27</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>B46</KEY>
+       <ENTRY>Variante Aktualisieren</ENTRY>
+       <LENGTH>46</LENGTH>
       </item>
       <item>
        <ID>I</ID>
@@ -2567,8 +2591,20 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>C_WIDTH_RIGHT_CLIPBOARD</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>clipboard width</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>C_WIDTH_RIGHT_SYMBOLS</CMPNAME>
      <LANGU>D</LANGU>
+     <DESCRIPT>parameter width</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>C_WIDTH_RIGHT_SYMBOLS</CMPNAME>
+     <LANGU>E</LANGU>
      <DESCRIPT>parameter width</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
@@ -4334,6 +4370,12 @@
      <CMPNAME>UPDATE_SYMBOL_DB</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Update Symbols on DB</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>UPDATE_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Update Variant</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
