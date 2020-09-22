@@ -292,6 +292,7 @@ protected section.
   data G_RESULT_LAYOUT type LVC_S_LAYO .
   data G_RESULT_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
   data G_SHOW_CLIPBOARD type BOOLEAN .
+  data GS_SEL_VARIANT type /CADAXO/SQLC_IL_VARIANTS . "Cockpit-321
   data:
     BEGIN OF ms_additional_functions,                 "COCKPIT-48
         uptomenu TYPE REF TO /cadaxo/cl_sqlc_uptomenu,  "COCKPIT-48
@@ -784,10 +785,9 @@ protected section.
       !IR_API type ref to /CADAXO/CL_SQLC_COCKPIT_API
       !IS_ITEMS type /CADAXO/SQLCAPIP .
   methods SHARE_SAVED_LIST
-     importing
-      !iv_receiver TYPE /cadaxo/sqlcapi_receiver OPTIONAL   "+cockpit-420
-      !iv_text     TYPE /cadaxo/sqlc_char_1024   OPTIONAL.  "+cockpit-420
-        .
+    importing
+      !IV_RECEIVER type /CADAXO/SQLCAPI_RECEIVER optional   "+cockpit-420
+      !IV_TEXT type /CADAXO/SQLC_CHAR_1024 optional .       "+cockpit-420
   methods POPULATE_SAVED_LIST
     importing
       !IV_LIST_GUID type /CADAXO/SQLC_LIST_EXP_SQLX-LIST_GUID
@@ -814,6 +814,7 @@ protected section.
     importing
       !E_OBJECT
       !E_UCOMM .
+  methods UPDATE_VARIANT .
   PRIVATE SECTION.
 
     CONSTANTS:
@@ -2806,7 +2807,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ls_stb_button-function  = 'SQLVARSET'.
     ls_stb_button-icon      = icon_alv_variant_save.
     ls_stb_button-quickinfo = text-q40.
-    ls_stb_button-butn_type = cntb_btype_button.
+*    ls_stb_button-butn_type = cntb_btype_button.   "-Cockpit-321
+    ls_stb_button-butn_type = cntb_btype_dropdown.  "+Cockpit-321
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
     ls_stb_button-butn_type = cntb_btype_sep.
@@ -2883,10 +2885,17 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 * begin of change 420
     DATA(l_ctmenu2) = NEW cl_ctmenu( ).
-    l_ctmenu2->add_function( EXPORTING fcode = 'SQL_SHARE'   text = 'Share' checked = abap_true icon = icon_workflow_external_event ).
-    l_ctmenu2->add_function( EXPORTING fcode = 'SQL_SHR_ME'  text = 'Share With Me' ).
+    l_ctmenu2->add_function( EXPORTING fcode = 'SQL_SHARE'   text = text-b41 checked = abap_true icon = icon_workflow_external_event ).
+    l_ctmenu2->add_function( EXPORTING fcode = 'SQL_SHR_ME'  text = text-b44 ).
     gc_splitter_top_toolbar->set_static_ctxmenu( EXPORTING fcode = 'SQL_SHARE' ctxmenu = l_ctmenu2 ).
 * end   of change 420
+
+* begin of change 321
+    DATA(l_ctmenu3) = NEW cl_ctmenu( ).
+    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
+    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV gui_text( text-b46 ) ).
+    gc_splitter_top_toolbar->set_static_ctxmenu( EXPORTING fcode = 'SQLVARSET' ctxmenu = l_ctmenu3 ).
+* end   of change 321
 
     ms_additional_functions-uptomenu->set_static_menu( ). "COCKPIT-48
 
@@ -5869,31 +5878,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD get_variant.
-****************************************************************************************************
-* Description             : create result ui conrols                                               *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.03.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 28.03.2017 | Domi Bigl            | Load Variants w/o Symbols                   | COCKPIT-175    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 20.02.2018 | Dusan Sacha          | Symbols Multivalue Upgrade                  | COCKPIT-288    *
-****************************************************************************************************
 
-
-
-    DATA ls_il_variant TYPE /cadaxo/sqlc_il_variants.
     DATA l_sqlcvari    TYPE /cadaxo/sqlcvari.
     DATA lt_sqlcusym   TYPE TABLE OF /cadaxo/sqlcusym.
     DATA l_sqlcusym    LIKE LINE OF lt_sqlcusym.
@@ -5905,23 +5890,24 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     FIELD-SYMBOLS: <ls_symbol_ow> TYPE /cadaxo/sqlc_symbol_ow,
                    <ls_symbols>   LIKE LINE OF lt_symbols.
 
+    CLEAR : gs_sel_variant.
     CALL FUNCTION '/CADAXO/SQLC_MAINTAINT_VAR_UI'
       EXPORTING
         i_mode       = 'G'
       IMPORTING
-        e_il_variant = ls_il_variant.
+        e_il_variant = gs_sel_variant.
 
-    IF NOT ls_il_variant IS INITIAL.
+    IF NOT gs_sel_variant IS INITIAL.
 
 * set sql editor lines
-      me->set_sql_area( i_codelines_t =  ls_il_variant-t_sql  ).
+      me->set_sql_area( i_codelines_t =  gs_sel_variant-t_sql  ).
 
-      MOVE-CORRESPONDING ls_il_variant TO l_sqlcvari.
+      MOVE-CORRESPONDING gs_sel_variant TO l_sqlcvari.
 
-      l_sqlcvari-username = ls_il_variant-cruser.
+      l_sqlcvari-username = gs_sel_variant-cruser.
 
-      me->get_user_symbol_from_sql( EXPORTING i_varguid = ls_il_variant-varguid
-                                              i_sql     = ls_il_variant-t_sql
+      me->get_user_symbol_from_sql( EXPORTING i_varguid = gs_sel_variant-varguid
+                                              i_sql     = gs_sel_variant-t_sql
                                               i_type    = 'V'
                                     IMPORTING e_symbols = lt_symbols ).
       IF NOT lt_symbols IS INITIAL.
@@ -12020,6 +12006,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CASE i_ok_code.
       WHEN 'SQLVARSET'.
         me->create_variant( ).
+      WHEN 'SQLVARSET_UPD'.                             "Cockpit-321
+        me->update_variant( ).                       "Cockpit-321
       WHEN 'SQLVARGET'.
         me->get_variant( ).
 *    WHEN 'QUEUE'.       "Show Users Queue           "COCKPIT-233
@@ -15346,6 +15334,64 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
       ENDIF.
 
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD UPDATE_VARIANT.
+****************************************************************************************************
+* Description             : Save Variant Method                                              *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               :                          Company    : Cadaxo GmbH                          *
+* Date                    :                          Release    :                                  *
+
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 22.9.2020  | Pratik Patil         | Existing Variant Update                     | Cadaxo-321     *
+*            |                      |                                             |                *
+****************************************************************************************************
+    DATA: l_string      TYPE string.
+    DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t.           "COCKPIT-288 Insert
+
+ IF gs_sel_variant IS INITIAL.
+    MESSAGE text-013 TYPE 'I'.
+    RETURN.
+ ENDIF.
+
+    me->get_sql_area( IMPORTING e_code_string = l_string ).
+
+    IF NOT l_string IS INITIAL.
+
+      gs_sel_variant-t_sql     = me->get_sql_area_lt_code( ).
+
+      me->get_user_symbol_from_sql(
+        EXPORTING
+          i_sql      = gs_sel_variant-t_sql
+          i_type     = 'U'
+        IMPORTING
+          e_symbols  = lt_symbols ).
+
+      LOOP AT lt_symbols ASSIGNING FIELD-SYMBOL(<ls_symbol>).
+
+        APPEND CORRESPONDING #( <ls_symbol> ) TO gs_sel_variant-t_symbol. "COCKPIT-288 Insert
+
+      ENDLOOP.
+
+* execute create variant popup
+      CALL FUNCTION '/CADAXO/SQLC_CREATE_VARIANT_UI'
+        EXPORTING
+          i_mode     = 'I'
+          il_variant = gs_sel_variant.
+
+    ELSE.
+      MESSAGE e048(/cadaxo/sqlc).
     ENDIF.
 
   ENDMETHOD.
