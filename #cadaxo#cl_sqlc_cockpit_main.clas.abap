@@ -815,6 +815,9 @@ protected section.
       !E_OBJECT
       !E_UCOMM .
   methods UPDATE_VARIANT .
+  methods FILL_USED_SYMBOLS
+            RETURNING
+              VALUE(rt_symbols) TYPE /CADAXO/SQLCUSEDSYMBOLS_T.
   PRIVATE SECTION.
 
     CONSTANTS:
@@ -4437,6 +4440,37 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD FILL_USED_SYMBOLS.
+
+  DATA: lv_sql_string TYPE string.
+  DATA: lt_results    TYPE match_result_tab.
+  FIELD-SYMBOLS: <ls_result> LIKE LINE OF lt_results.
+
+    IF gc_abap_editor IS INITIAL AND gc_abap_editor_text IS INITIAL.
+      RETURN.
+    ENDIF.
+    me->get_sql_area( IMPORTING e_code_string    = lv_sql_string ).
+
+    /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex(
+      EXPORTING
+        i_where_syntax =     lv_sql_string
+      IMPORTING
+        e_result_tab   =     lt_results
+    ).
+
+      LOOP AT lt_results ASSIGNING <ls_result>.
+
+        DATA(l_from) = <ls_result>-offset + 1.
+        DATA(l_length) = <ls_result>-length - 2.
+
+        DATA(l_symbol_name) = lv_sql_string+l_from(l_length).
+        APPEND to_upper( l_symbol_name ) TO rt_symbols.
+
+      ENDLOOP.
+
+  ENDMETHOD.
+
+
   METHOD focus_symbol_alv_cell.
 ****************************************************************************************************
 * Description             : focus symbol alv cell                                                  *
@@ -5580,10 +5614,19 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 * If Flag is on, e.g. g_user_settings-only_used_symbols = 'X', or button is clicked
     IF g_user_settings-only_used_symbols = 'X'.               "CR22-002
-      SORT gt_used_symbols.                                   "CR22-002
+*      SORT gt_used_symbols.                                   "CR22-002 "*-Cockpit-431
+* begin of insert Cockpit-431
+    IF   gt_used_symbols IS NOT INITIAL.
+     DATA(lt_used_symbols) = gt_used_symbols.
+    ELSE.
+     lt_used_symbols = me->fill_used_symbols( ).
+    ENDIF.
+    SORT lt_used_symbols.
+* end of insert Cockpit-431
       LOOP AT gt_symbol INTO ls_symbol.                       "CR22-002
         lv_tabix = sy-tabix.                                  "CR22-002
-        READ TABLE gt_used_symbols FROM ls_symbol-symbol_name TRANSPORTING NO FIELDS. "CR22-002
+*       READ TABLE gt_used_symbols FROM ls_symbol-symbol_name TRANSPORTING NO FIELDS. "CR22-002"-Cockpit-431
+        READ TABLE lt_used_symbols FROM ls_symbol-symbol_name TRANSPORTING NO FIELDS. "CR22-002"+Cockpit-431
         IF sy-subrc <> 0.                                     "CR22-002
           DELETE gt_symbol INDEX lv_tabix.                    "CR22-002
         ENDIF.                                                "CR22-002
