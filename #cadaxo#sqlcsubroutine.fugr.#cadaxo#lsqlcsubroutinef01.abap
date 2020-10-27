@@ -130,8 +130,8 @@ FORM process_version_2 CHANGING e_error_message TYPE string
                                                     lt_symbol_ranges
                                            CHANGING lrx_root.
     IF lrx_root IS NOT INITIAL. "begin of +431
-        e_error_message = lrx_root->get_text( ).
-        RETURN.
+      e_error_message = lrx_root->get_text( ).
+      RETURN.
     ENDIF.  "end of +431
     GET RUN TIME FIELD l_to.
 

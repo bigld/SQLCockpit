@@ -268,6 +268,9 @@ protected section.
   data GS_SPLITTER_EDITOR type ref to CL_GUI_SPLITTER_CONTAINER .
   data GS_SPLITTER_LVL0 type ref to CL_GUI_SPLITTER_CONTAINER .
   data GS_SPLITTER_RESULTS type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_RESULTS_TAB type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_RESULTS_TABDAT type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GR_RESULTS_TAB_TOOLBAR type ref to CL_GUI_TOOLBAR .
   data GS_SPLITTER_RES_BUTTON type ref to CL_GUI_SPLITTER_CONTAINER .
   data GS_SPLITTER_SYMBOL type ref to CL_GUI_SPLITTER_CONTAINER .
   data GS_SPLITTER_SYMBOL_TOOLBAR type ref to CL_GUI_SPLITTER_CONTAINER .
@@ -299,6 +302,7 @@ protected section.
       END OF ms_additional_functions .
   data GT_SAVED_LIST_FIELDCAT type LVC_T_FCAT .
   data G_SAVED_LIST_GUI_CONTAINER type ref to CL_GUI_CUSTOM_CONTAINER .
+  data G_ACTIVE_LIST_TAB type I .
 
   methods CREATE_SYMBOL_MULTIVAL_TAB_DYN
     importing
@@ -638,6 +642,10 @@ protected section.
     for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
     importing
       !FCODE .
+  methods ON_TABBAR_TOOLBAR_FUNCSEL
+    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
+    importing
+      !FCODE .
   methods ON_SAVED_LIST_SELECT_LINE
     for event DOUBLE_CLICK of CL_GUI_ALV_GRID
     importing
@@ -816,8 +824,13 @@ protected section.
       !E_UCOMM .
   methods UPDATE_VARIANT .
   methods FILL_USED_SYMBOLS
-            RETURNING
-              VALUE(rt_symbols) TYPE /CADAXO/SQLCUSEDSYMBOLS_T.
+    returning
+      value(RT_SYMBOLS) type /CADAXO/SQLCUSEDSYMBOLS_T .
+  methods SHOW_RESULT_TAB .
+  methods SHOW_RESULT_TABLE
+    importing
+      !I_RESULT_DREF type ref to DATA
+      !I_TABIX type SY-TABIX .
   PRIVATE SECTION.
 
     CONSTANTS:
@@ -832,6 +845,7 @@ protected section.
         horizontal TYPE /cadaxo/sqlcreswindorientation VALUE 'H' ##NO_TEXT,
         vertical   TYPE /cadaxo/sqlcreswindorientation VALUE 'V' ##NO_TEXT,
         matrix     TYPE /cadaxo/sqlcreswindorientation VALUE 'M' ##NO_TEXT,
+        tab        type /cadaxo/sqlcreswindorientation value 'T' ##NO_TEXT,
       END OF cs_windowresolution .
     CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
     CONSTANTS c_program_symbols_hide TYPE flag VALUE space ##NO_TEXT.
@@ -1680,7 +1694,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                 me->ms_user_settings_xml-hd_fieldtext_a       TO me->g_user_settings-hd_fieldtext_a,
                 me->ms_user_settings_xml-editor_type          TO me->g_user_settings-editor_type,
                 me->ms_user_settings_xml-forwnavddleclipse    TO me->g_user_settings-forwnavddleclipse,
-                me->ms_user_settings_xml-forwnavdicteclipse   TO me->g_user_settings-forwnavdicteclipse.
+                me->ms_user_settings_xml-forwnavdicteclipse   TO me->g_user_settings-forwnavdicteclipse,
+                me->ms_user_settings_xml-domaintext           TO me->g_user_settings-domaintext.            "COCKPIT-458
 
 * Column Header - Fieldname or Fieldtext
           CASE me->ms_user_settings_xml-colhd_type.
@@ -1696,6 +1711,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
               me->g_user_settings-result_window_vertical   = abap_true.
             WHEN cs_windowresolution-horizontal.
               me->g_user_settings-result_window_horizontal = abap_true.
+            when cs_windowresolution-tab.
+              me->g_user_settings-result_window_tab = abap_true.
             WHEN OTHERS.
               me->g_user_settings-result_window_matrix     = abap_true.
           ENDCASE.
@@ -3731,6 +3748,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *            |                      |                                             | $001           *^
 *------------+----------------------+---------------------------------------------+----------------*
 * 19.02.2017 | Domi Bigl            | Runtime errors                              | COCKPIT-103    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 19.10.2020 | Kajtar Attila        | Add domain values                           | COCKPIT-458    *
 ****************************************************************************************************
 
     DATA l_result_details         TYPE /cadaxo/sqlcresult_details.
@@ -3756,7 +3775,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                gt_lvc_t_sort[],
                gt_lvc_t_filt[],
                gt_lvc_s_layo[],
-               gt_result_details[].
+               gt_result_details[],
+               g_active_list_tab.
 
         CLEAR gt_errors.                                                            "COCKPIT-103
 
@@ -3795,6 +3815,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings      = me->ms_user_settings_xml
                                                        i_progress_indicator = i_progress_indicator
                                              IMPORTING e_result_details     = l_result_details ).
+
+          "COCKPIT-458 BEGIN
+          IF <lr_cl_sql_parse>->g_select_version EQ /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_2.
+            IF <lr_cl_sql_parse>->g_main_ref->g_user_settings-domaintext EQ abap_true.
+              <lr_cl_sql_parse>->add_domain_value( ).
+              me->gt_lvc_t_fcat[ l_index_sql ] = <lr_cl_sql_parse>->gt_lvc_t_fcat.
+            ENDIF.
+          ENDIF.
+          "COCKPIT-458 END
 
           APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t.
 
@@ -11122,6 +11151,20 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                                   disabled = l_disabled
                                    text  = text-m10 ).
 
+    IF lv_no_toolbar = abap_false.
+      IF me->g_user_settings-result_window_tab <> space.
+        l_disabled = abap_true.
+      ELSE.
+        l_disabled = abap_false.
+      ENDIF.
+    ELSE.
+      l_disabled = abap_false.
+    ENDIF.
+    lr_alv_options_window->add_function(  EXPORTING fcode = 'WINDOW_TAB'
+                                  disabled = l_disabled
+                                   text  = text-m11 ).
+
+
     lr_alv_options->add_submenu(  EXPORTING menu = lr_alv_options_window
                                    disabled = lv_no_toolbar
                                    text  = text-m07 ).
@@ -11194,19 +11237,30 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         me->g_user_settings-result_window_horizontal   = space.
         me->g_user_settings-result_window_vertical     = abap_true.
         me->g_user_settings-result_window_matrix       = space.
+        me->g_user_settings-result_window_tab          = space.
         me->show_result( ).
       WHEN 'WINDOW_HORIZONTAL'.
         me->ms_user_settings_xml-reswindoworientation  = cs_windowresolution-horizontal.
         me->g_user_settings-result_window_horizontal   = abap_true.
         me->g_user_settings-result_window_vertical     = space.
         me->g_user_settings-result_window_matrix       = space.
+        me->g_user_settings-result_window_tab          = space.
         me->show_result( ).
       WHEN 'WINDOW_MATRIX'.
         me->ms_user_settings_xml-reswindoworientation  = cs_windowresolution-matrix.
         me->g_user_settings-result_window_horizontal   = space.
         me->g_user_settings-result_window_vertical     = space.
         me->g_user_settings-result_window_matrix       = abap_true.
+        me->g_user_settings-result_window_tab          = space.
         me->show_result( ).
+      WHEN 'WINDOW_TAB'.
+        me->ms_user_settings_xml-reswindoworientation  = cs_windowresolution-tab.
+        me->g_user_settings-result_window_horizontal   = space.
+        me->g_user_settings-result_window_vertical     = space.
+        me->g_user_settings-result_window_matrix       = space.
+        me->g_user_settings-result_window_tab          = abap_true.
+        me->show_result( ).
+
       WHEN c_cmd_result_footer_hide.
         me->ms_user_settings_xml-show_footer = abap_false.
         me->g_user_settings-show_footer      = abap_false.
@@ -11938,6 +11992,20 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         menu = lr_menu.
 
     ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD ON_TABBAR_TOOLBAR_FUNCSEL.
+
+    data code type string.
+    data number type n length 2.
+
+    split fcode at '_' into code number.
+
+    me->g_active_list_tab = number.
+
+    me->show_result( ).
 
   ENDMETHOD.
 
@@ -13915,6 +13983,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.07.2018 | Domi Bigl            | UP TO event, CC                             | COCKPIT-326    *
 *------------+----------------------+---------------------------------------------+----------------*
+* 06.10.2020 | Attila Kajtar        | Domain Text  checkbox                       | COCKPIT-458    *
+*------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
 ****************************************************************************************************
 
@@ -13956,6 +14026,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ms_user_settings_xml-editor_type          = i_settings-editor_type.
     ms_user_settings_xml-forwnavddleclipse    = i_settings-forwnavddleclipse.
     ms_user_settings_xml-forwnavdicteclipse   = i_settings-forwnavdicteclipse.
+    ms_user_settings_xml-domaintext           = i_settings-domaintext.             "COCKPIT-458
 
     CASE abap_true.
       WHEN i_settings-hd_fieldname.
@@ -13969,6 +14040,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         ms_user_settings_xml-reswindoworientation = cs_windowresolution-horizontal.
       WHEN i_settings-result_window_vertical.
         ms_user_settings_xml-reswindoworientation = cs_windowresolution-vertical.
+      when i_settings-result_window_tab.
+        ms_user_settings_xml-reswindoworientation = cs_windowresolution-tab.
       WHEN OTHERS.
         ms_user_settings_xml-reswindoworientation = cs_windowresolution-matrix.
     ENDCASE.
@@ -14033,7 +14106,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * refresh result list, if the user changed the window orientation
       IF l_settings-result_window_horizontal <> me->g_user_settings-result_window_horizontal OR
          l_settings-result_window_vertical   <> me->g_user_settings-result_window_vertical OR
-         l_settings-result_window_matrix     <> me->g_user_settings-result_window_matrix.
+         l_settings-result_window_matrix     <> me->g_user_settings-result_window_matrix or
+         l_settings-result_window_tab        <> me->g_user_settings-result_window_tab.
         me->show_result( ).
       ENDIF.
 
@@ -14690,220 +14764,226 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * clear alv controls
     free_result_controls( ).
 
+    IF ms_user_settings_xml-reswindoworientation = cs_windowresolution-tab.
+      show_result_tab( ).
+    ELSE.
+
 * create splitter rows
-    DESCRIBE TABLE gt_cl_sql_parse LINES l_lines.
+      DESCRIBE TABLE gt_cl_sql_parse LINES l_lines.
 
 * set rows & columns
-    me->calc_result_rows_and_cols( EXPORTING i_lines = l_lines
-                                   IMPORTING e_rows = l_rows
-                                             e_cols = l_cols ).
+      me->calc_result_rows_and_cols( EXPORTING i_lines = l_lines
+                                     IMPORTING e_rows = l_rows
+                                               e_cols = l_cols ).
 
-    gs_splitter_results->is_alive( ).
-    gs_splitter_results->is_valid( ).
-    IF g_is_its IS INITIAL.
-      gs_splitter_results->set_grid( EXPORTING rows = l_rows columns = l_cols ).
-    ENDIF.
+      gs_splitter_results->is_alive( ).
+      gs_splitter_results->is_valid( ).
+      IF g_is_its IS INITIAL.
+        gs_splitter_results->set_grid( EXPORTING rows = l_rows columns = l_cols ).
+      ENDIF.
 
-    LOOP AT dref_result_tab_t ASSIGNING <lr_dref_result>.
-      l_tabix = sy-tabix.
+      LOOP AT dref_result_tab_t ASSIGNING <lr_dref_result>.
+        l_tabix = sy-tabix.
 
-      READ TABLE gt_cl_sql_parse ASSIGNING <lr_sql> INDEX l_tabix.
-      ASSIGN <lr_dref_result>->* TO <lt_result>.
+        READ TABLE gt_cl_sql_parse ASSIGNING <lr_sql> INDEX l_tabix.
+        ASSIGN <lr_dref_result>->* TO <lt_result>.
 
 * create container and grid
-      APPEND INITIAL LINE TO gcont_grid_result_t ASSIGNING <l_cont_grid_result>.
+        APPEND INITIAL LINE TO gcont_grid_result_t ASSIGNING <l_cont_grid_result>.
 
-      IF l_tabix GT 1.
-        CASE ms_user_settings_xml-reswindoworientation.
-          WHEN cs_windowresolution-horizontal.
-            l_act_row = 1.
-            l_act_col = l_tabix.
-          WHEN cs_windowresolution-vertical.
-            l_act_row = l_tabix.
-            l_act_col = 1.
-          WHEN cs_windowresolution-matrix.
-            l_act_col = l_act_col + 1.
-            IF l_act_col GT l_cols.
+        IF l_tabix GT 1.
+          CASE ms_user_settings_xml-reswindoworientation.
+            WHEN cs_windowresolution-horizontal.
+              l_act_row = 1.
+              l_act_col = l_tabix.
+            WHEN cs_windowresolution-vertical.
+              l_act_row = l_tabix.
               l_act_col = 1.
-              l_act_row = l_act_row + 1.
-            ENDIF.
-        ENDCASE.
-      ELSE.
-        l_act_col = 1.
-        l_act_row = 1.
-      ENDIF.
+            WHEN cs_windowresolution-matrix.
+              l_act_col = l_act_col + 1.
+              IF l_act_col GT l_cols.
+                l_act_col = 1.
+                l_act_row = l_act_row + 1.
+              ENDIF.
+          ENDCASE.
+        ELSE.
+          l_act_col = 1.
+          l_act_row = 1.
+        ENDIF.
 
-      gs_splitter_results->get_container( EXPORTING row = l_act_row column = l_act_col
-                                          RECEIVING container = <l_cont_grid_result>-gui_container ).
+        gs_splitter_results->get_container( EXPORTING row = l_act_row column = l_act_col
+                                            RECEIVING container = <l_cont_grid_result>-gui_container ).
 
-      MOVE l_tabix TO l_num2.
+        MOVE l_tabix TO l_num2.
 
 * create container name
-      CONCATENATE 'CONTAINER_' l_num2 INTO l_cont_name.
+        CONCATENATE 'CONTAINER_' l_num2 INTO l_cont_name.
 
 * set the container name
-      <l_cont_grid_result>-gui_container->set_name( l_cont_name ).
+        <l_cont_grid_result>-gui_container->set_name( l_cont_name ).
 
 * get usersettings
-      IF me->g_user_settings-show_footer = abap_true.
-        lv_alv_rows = 3.
-      ELSE.
-        lv_alv_rows = 2.
-      ENDIF.
+        IF me->g_user_settings-show_footer = abap_true.
+          lv_alv_rows = 3.
+        ELSE.
+          lv_alv_rows = 2.
+        ENDIF.
 
 * create Splitter
-      CONCATENATE 'CONTAINER_SPLIT_' l_num2 INTO l_cont_name.
-      CREATE OBJECT <l_cont_grid_result>-gui_splitter
-        EXPORTING
-          parent  = <l_cont_grid_result>-gui_container
-          rows    = lv_alv_rows
-          columns = 1.
+        CONCATENATE 'CONTAINER_SPLIT_' l_num2 INTO l_cont_name.
+        CREATE OBJECT <l_cont_grid_result>-gui_splitter
+          EXPORTING
+            parent  = <l_cont_grid_result>-gui_container
+            rows    = lv_alv_rows
+            columns = 1.
 
-      <l_cont_grid_result>-gui_splitter->set_name( l_cont_name ).
-      <l_cont_grid_result>-gui_splitter->set_border( EXPORTING border = gfw_false ).
-      <l_cont_grid_result>-gui_splitter->set_mode( <l_cont_grid_result>-gui_splitter->mode_run ).
-      <l_cont_grid_result>-gui_splitter->set_row_mode( cl_gui_splitter_container=>mode_absolute ).
-      <l_cont_grid_result>-gui_splitter->set_row_height( id = 1 height = toolbar_row_height ).
-      <l_cont_grid_result>-gui_splitter->set_row_sash( id = 1 type = 1 value = cl_gui_splitter_container=>false  ).
-      <l_cont_grid_result>-gui_splitter->set_row_height( id = 3 height = toolbar_row_height ).
-      <l_cont_grid_result>-gui_splitter->set_row_sash( id = 3 type = 1 value = cl_gui_splitter_container=>false  ).
+        <l_cont_grid_result>-gui_splitter->set_name( l_cont_name ).
+        <l_cont_grid_result>-gui_splitter->set_border( EXPORTING border = gfw_false ).
+        <l_cont_grid_result>-gui_splitter->set_mode( <l_cont_grid_result>-gui_splitter->mode_run ).
+        <l_cont_grid_result>-gui_splitter->set_row_mode( cl_gui_splitter_container=>mode_absolute ).
+        <l_cont_grid_result>-gui_splitter->set_row_height( id = 1 height = toolbar_row_height ).
+        <l_cont_grid_result>-gui_splitter->set_row_sash( id = 1 type = 1 value = cl_gui_splitter_container=>false  ).
+        <l_cont_grid_result>-gui_splitter->set_row_height( id = 3 height = toolbar_row_height ).
+        <l_cont_grid_result>-gui_splitter->set_row_sash( id = 3 type = 1 value = cl_gui_splitter_container=>false  ).
 
-      <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = 2 column = 1
-                                                        RECEIVING container = lr_cont ).
+        <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = 2 column = 1
+                                                          RECEIVING container = lr_cont ).
 * build and set name of the grid
-      CONCATENATE 'CONTAINER_SPLIT_2_' l_num2 INTO l_cont_name.
-      lr_cont->set_name( l_cont_name ).
+        CONCATENATE 'CONTAINER_SPLIT_2_' l_num2 INTO l_cont_name.
+        lr_cont->set_name( l_cont_name ).
 
 * create the alv grid control
-      CREATE OBJECT <l_cont_grid_result>-gui_alv_grid
-        EXPORTING
-          i_lifetime = cl_gui_alv_grid=>lifetime_default
-          i_parent   = lr_cont.
+        CREATE OBJECT <l_cont_grid_result>-gui_alv_grid
+          EXPORTING
+            i_lifetime = cl_gui_alv_grid=>lifetime_default
+            i_parent   = lr_cont.
 
 * build and set name of the grid
-      CONCATENATE 'GC_GRID_RESULT_' l_num2 INTO l_grid_name.
-      <l_cont_grid_result>-gui_alv_grid->set_name( l_grid_name ).
+        CONCATENATE 'GC_GRID_RESULT_' l_num2 INTO l_grid_name.
+        <l_cont_grid_result>-gui_alv_grid->set_name( l_grid_name ).
 
-      CLEAR lt_lvc_t_sort.
-      CLEAR lt_lvc_t_filt.
+        CLEAR lt_lvc_t_sort.
+        CLEAR lt_lvc_t_filt.
 
 * get layout
-      IF gt_lvc_s_layo IS NOT INITIAL.                      "#4170
-        READ TABLE gt_lvc_s_layo INDEX l_tabix INTO l_result_layout."#4170 "RT239
-        IF l_result_layout IS INITIAL.                      "RT239
-          MOVE me->g_result_layout TO l_result_layout.      "RT239
-        ENDIF.                                              "RT239
-      ELSE.
-        MOVE me->g_result_layout TO l_result_layout.        "RT239
-      ENDIF.                                                "#4170  "RT239
+        IF gt_lvc_s_layo IS NOT INITIAL.                      "#4170
+          READ TABLE gt_lvc_s_layo INDEX l_tabix INTO l_result_layout."#4170 "RT239
+          IF l_result_layout IS INITIAL.                      "RT239
+            MOVE me->g_result_layout TO l_result_layout.      "RT239
+          ENDIF.                                              "RT239
+        ELSE.
+          MOVE me->g_result_layout TO l_result_layout.        "RT239
+        ENDIF.                                                "#4170  "RT239
 
-      READ TABLE gt_result_details INDEX l_tabix ASSIGNING <l_result_details>.
-      IF sy-subrc = 0.
+        READ TABLE gt_result_details INDEX l_tabix ASSIGNING <l_result_details>.
+        IF sy-subrc = 0.
 
 * create grid title (xx records ( y.yyyy Microseconds )
-        l_result_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = <l_result_details>-runtime
-                                                                                            i_lines   = <l_result_details>-lines ).
+          l_result_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = <l_result_details>-runtime
+                                                                                              i_lines   = <l_result_details>-lines ).
 * create footer line
-        lv_footer = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_footer("#4093
-                                                                        iv_mandant           = <l_result_details>-mandant"#4093
-                                                                        iv_syst              = <l_result_details>-syst"#4093
-                                                                        iv_create_timestamp  = <l_result_details>-create_timestamp"#4093
-                                                                        iv_uname             = <l_result_details>-uname )."#4093
-        IF NOT <l_result_details>-restricted_lines IS INITIAL."CDX130-017
-          l_show_message_restr_lines = <l_result_details>-maxsel."CDX130-017
-        ENDIF.                                              "CDX130-017
-      ENDIF.
+          lv_footer = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_footer("#4093
+                                                                          iv_mandant           = <l_result_details>-mandant"#4093
+                                                                          iv_syst              = <l_result_details>-syst"#4093
+                                                                          iv_create_timestamp  = <l_result_details>-create_timestamp"#4093
+                                                                          iv_uname             = <l_result_details>-uname )."#4093
+          IF NOT <l_result_details>-restricted_lines IS INITIAL."CDX130-017
+            l_show_message_restr_lines = <l_result_details>-maxsel."CDX130-017
+          ENDIF.                                              "CDX130-017
+        ENDIF.
 
 * get sort
-      READ TABLE gt_lvc_t_sort INDEX l_tabix INTO lt_lvc_t_sort.
+        READ TABLE gt_lvc_t_sort INDEX l_tabix INTO lt_lvc_t_sort.
 
 * get filter
-      READ TABLE gt_lvc_t_filt INDEX l_tabix INTO lt_lvc_t_filt.
+        READ TABLE gt_lvc_t_filt INDEX l_tabix INTO lt_lvc_t_filt.
 
 * set handler for drag/drop, double click and toolbar
-      SET HANDLER me->on_alv_drag                     FOR <l_cont_grid_result>-gui_alv_grid.
-      SET HANDLER me->on_alv_result_double_click     FOR <l_cont_grid_result>-gui_alv_grid.
-      SET HANDLER me->on_handle_result_toolbar      FOR <l_cont_grid_result>-gui_alv_grid.
+        SET HANDLER me->on_alv_drag                     FOR <l_cont_grid_result>-gui_alv_grid.
+        SET HANDLER me->on_alv_result_double_click     FOR <l_cont_grid_result>-gui_alv_grid.
+        SET HANDLER me->on_handle_result_toolbar      FOR <l_cont_grid_result>-gui_alv_grid.
 
-      SET HANDLER: me->on_handle_result_user_command  FOR <l_cont_grid_result>-gui_alv_grid,
-                   me->on_handle_result_context_menu  FOR <l_cont_grid_result>-gui_alv_grid,
-                   me->on_handle_result_end_of_page   FOR <l_cont_grid_result>-gui_alv_grid, "CDX Update Add On
-                   me->on_handle_result_menu_button   FOR <l_cont_grid_result>-gui_alv_grid.
+        SET HANDLER: me->on_handle_result_user_command  FOR <l_cont_grid_result>-gui_alv_grid,
+                     me->on_handle_result_context_menu  FOR <l_cont_grid_result>-gui_alv_grid,
+                     me->on_handle_result_end_of_page   FOR <l_cont_grid_result>-gui_alv_grid, "CDX Update Add On
+                     me->on_handle_result_menu_button   FOR <l_cont_grid_result>-gui_alv_grid.
 
-      <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = 1 column = 1
-                                                        RECEIVING container = lr_cont ).
+        <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = 1 column = 1
+                                                          RECEIVING container = lr_cont ).
 * build and set name of the grid
-      CONCATENATE 'CONTAINER_SPLIT_1_' l_num2 INTO l_cont_name.
-      lr_cont->set_name( l_cont_name ).
+        CONCATENATE 'CONTAINER_SPLIT_1_' l_num2 INTO l_cont_name.
+        lr_cont->set_name( l_cont_name ).
 
-      IF <lr_sql> IS ASSIGNED.
-        create_dyn_document(
+        IF <lr_sql> IS ASSIGNED.
+          create_dyn_document(
+            EXPORTING
+              i_parent      = lr_cont
+              i_sql         = <lr_sql>->sql_syntax
+              i_header_text = <l_result_details>-header_line_text "CR22-034
+            CHANGING
+              ic_document   = <l_cont_grid_result>-cl_document_header
+                 ).
+        ENDIF.
+
+* show result table
+        EXPORT grid_name FROM l_grid_name TO MEMORY ID 'GRID_NAME'.
+
+        "l_result_layout-no_keyfix = abap_true.
+
+        LOOP AT <lr_sql>->gt_lvc_t_fcat ASSIGNING FIELD-SYMBOL(<fcat>).
+          CASE <fcat>-fieldname.
+            WHEN 'CDXLINECOLOR'.
+              <fcat>-no_out = abap_true.
+          ENDCASE.
+        ENDLOOP.
+
+        l_result_layout-info_fname = 'CDXLINECOLOR'.
+
+        <l_cont_grid_result>-gui_alv_grid->set_table_for_first_display(
           EXPORTING
-            i_parent      = lr_cont
-            i_sql         = <lr_sql>->sql_syntax
-            i_header_text = <l_result_details>-header_line_text "CR22-034
+            i_bypassing_buffer            = abap_true
+            is_layout                     = l_result_layout
+            it_toolbar_excluding          = me->g_result_toolbar_excluding
           CHANGING
-            ic_document   = <l_cont_grid_result>-cl_document_header
-               ).
-      ENDIF.
+            it_fieldcatalog               = <lr_sql>->gt_lvc_t_fcat
+            it_outtab                     = <lt_result>
+            it_sort                       = lt_lvc_t_sort
+            it_filter                     = lt_lvc_t_filt
+          EXCEPTIONS
+            OTHERS                        = 1 ).
+        IF sy-subrc = 0.
+          "    CALL METHOD <l_cont_grid_result>-gui_alv_grid->set_toolbar_interactive.
+        ELSE.
+          MESSAGE e100(/cadaxo/sqlc).
+        ENDIF.
 
 * show result table
-      EXPORT grid_name FROM l_grid_name TO MEMORY ID 'GRID_NAME'.
-
-      "l_result_layout-no_keyfix = abap_true.
-
-      LOOP AT <lr_sql>->gt_lvc_t_fcat ASSIGNING FIELD-SYMBOL(<fcat>).
-        CASE <fcat>-fieldname.
-          WHEN 'CDXLINECOLOR'.
-            <fcat>-no_out = abap_true.
-        ENDCASE.
-      ENDLOOP.
-
-      l_result_layout-info_fname = 'CDXLINECOLOR'.
-
-      <l_cont_grid_result>-gui_alv_grid->set_table_for_first_display(
-        EXPORTING
-          i_bypassing_buffer            = abap_true
-          is_layout                     = l_result_layout
-          it_toolbar_excluding          = me->g_result_toolbar_excluding
-        CHANGING
-          it_fieldcatalog               = <lr_sql>->gt_lvc_t_fcat
-          it_outtab                     = <lt_result>
-          it_sort                       = lt_lvc_t_sort
-          it_filter                     = lt_lvc_t_filt
-        EXCEPTIONS
-          OTHERS                        = 1 ).
-      IF sy-subrc = 0.
-        "    CALL METHOD <l_cont_grid_result>-gui_alv_grid->set_toolbar_interactive.
-      ELSE.
-        MESSAGE e100(/cadaxo/sqlc).
-      ENDIF.
-
-* show result table
-      CLEAR l_grid_name.
-      EXPORT grid_name FROM l_grid_name TO MEMORY ID 'GRID_NAME'.
+        CLEAR l_grid_name.
+        EXPORT grid_name FROM l_grid_name TO MEMORY ID 'GRID_NAME'.
 
 * INS BEGIN #4093 - 20131210
 *     if footer is enabled(user settings)
-      IF lv_alv_rows = 3.
-        <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = 3 column = 1
-                                                          RECEIVING container = lr_cont1 ).
+        IF lv_alv_rows = 3.
+          <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = 3 column = 1
+                                                            RECEIVING container = lr_cont1 ).
 *     build and set name of the grid
-        CONCATENATE 'CONTAINER_SPLIT_3_' l_num2 INTO l_cont_name.
-        lr_cont1->set_name( l_cont_name ).
+          CONCATENATE 'CONTAINER_SPLIT_3_' l_num2 INTO l_cont_name.
+          lr_cont1->set_name( l_cont_name ).
 
-        create_dyn_document(
-          EXPORTING
-            i_parent    = lr_cont1
-            i_sql       = lv_footer
-          CHANGING
-            ic_document = <l_cont_grid_result>-cl_document_footer ).
-      ENDIF.
+          create_dyn_document(
+            EXPORTING
+              i_parent    = lr_cont1
+              i_sql       = lv_footer
+            CHANGING
+              ic_document = <l_cont_grid_result>-cl_document_footer ).
+        ENDIF.
 * INS END #4093 - 20131210
 
-      cl_gui_cfw=>flush( ). "COCKPIT-185
+        cl_gui_cfw=>flush( ). "COCKPIT-185
 
-    ENDLOOP.
+      ENDLOOP.
+
+    ENDIF.
 
 * CDX130-017 Begin
     IF NOT l_show_message_restr_lines IS INITIAL.
@@ -14911,6 +14991,365 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       CLEAR l_show_message_restr_lines.
     ENDIF.
 * CDX130-017 End
+  ENDMETHOD.
+
+
+  METHOD show_result_tab.
+
+    FIELD-SYMBOLS: <l_cont_grid_result> TYPE /cadaxo/sqlcclguicontainer,
+                   <lr_dref_result>     TYPE REF TO data.
+
+    IF g_is_its IS INITIAL.
+      gs_splitter_results->set_grid( EXPORTING rows = 1 columns = 1 ).
+    ENDIF.
+
+    if me->g_active_list_tab is initial.
+      me->g_active_list_tab = 1.
+    endif.
+
+    READ TABLE dref_result_tab_t ASSIGNING <lr_dref_result> INDEX me->g_active_list_tab.
+    IF sy-subrc = 0.
+      show_result_table( EXPORTING i_result_dref = <lr_dref_result>
+                                   i_tabix = sy-tabix ).
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD show_result_table.
+
+** data definition
+    DATA: l_lines        TYPE i,
+          l_grid_name    TYPE string,
+          l_cont_name    TYPE string,
+          l_tabix        TYPE i,
+          l_num2(2)      TYPE n,
+          l_cols         TYPE i,
+          lv_alv_rows    TYPE i,
+          l_act_col      TYPE i,
+          l_act_row      TYPE i,
+          lr_cont        TYPE REF TO cl_gui_container,
+          lr_cont1       TYPE REF TO cl_gui_container,
+          lr_tabbar_cont TYPE REF TO cl_gui_container,
+          "lr_tabbar_toolbar TYPE REF TO cl_gui_toolbar,
+
+          lv_footer      TYPE string.
+*
+    DATA  l_show_message_restr_lines TYPE i.
+*
+    DATA lt_lvc_t_sort       TYPE lvc_t_sort.
+    DATA lt_lvc_t_filt       TYPE lvc_t_filt.
+    DATA l_result_layout     LIKE g_result_layout.
+    DATA l_events TYPE cntl_simple_events.
+    DATA l_event  TYPE cntl_simple_event.
+    DATA ls_stb_button TYPE stb_button.
+    DATA lt_buttons TYPE ttb_button.
+    DATA l_numc2 TYPE n LENGTH 2.
+    DATA l_source_tables TYPE string.
+
+    FIELD-SYMBOLS: <l_cont_grid_result> TYPE /cadaxo/sqlcclguicontainer,
+                   <lr_sql>             TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse,
+                   <lt_result>          TYPE STANDARD TABLE,
+                   <l_result_details>   TYPE /cadaxo/sqlcresult_details.
+
+    l_tabix = i_tabix.
+
+    READ TABLE gt_cl_sql_parse ASSIGNING <lr_sql> INDEX l_tabix.
+    ASSIGN i_result_dref->* TO <lt_result>.
+
+* create container and grid
+    APPEND INITIAL LINE TO gcont_grid_result_t ASSIGNING <l_cont_grid_result>.
+
+    IF l_tabix GT 1.
+      CASE ms_user_settings_xml-reswindoworientation.
+        WHEN cs_windowresolution-horizontal.
+          l_act_row = 1.
+          l_act_col = l_tabix.
+        WHEN cs_windowresolution-vertical.
+          l_act_row = l_tabix.
+          l_act_col = 1.
+        WHEN cs_windowresolution-matrix.
+          l_act_col = l_act_col + 1.
+          IF l_act_col GT l_cols.
+            l_act_col = 1.
+            l_act_row = l_act_row + 1.
+          ENDIF.
+        WHEN cs_windowresolution-tab.
+          l_act_col = 1.
+          l_act_row = 1.
+      ENDCASE.
+    ELSE.
+      l_act_col = 1.
+      l_act_row = 1.
+    ENDIF.
+
+    gs_splitter_results->get_container( EXPORTING row = l_act_row column = l_act_col
+                                        RECEIVING container = <l_cont_grid_result>-gui_container ).
+
+
+    ms_user_settings_xml-reswindoworientation = cs_windowresolution-tab.
+
+
+
+
+    l_num2 = l_tabix.
+
+* create container name
+    CONCATENATE 'CONTAINER_' l_num2 INTO l_cont_name.
+
+* set the container name
+    <l_cont_grid_result>-gui_container->set_name( l_cont_name ).
+
+* get usersettings
+    IF me->g_user_settings-show_footer = abap_true.
+      lv_alv_rows = 3.
+    ELSE.
+      lv_alv_rows = 2.
+    ENDIF.
+
+    DATA lv_footer_id TYPE i.
+    DATA lv_result_id TYPE i.
+    DATA lv_select_id TYPE i.
+
+    IF ms_user_settings_xml-reswindoworientation = cs_windowresolution-tab.
+      lv_alv_rows = lv_alv_rows + 1.
+      lv_footer_id = 4.
+      lv_result_id = 3.
+      lv_select_id = 2.
+    ELSE.
+      lv_footer_id = 3.
+      lv_result_id = 2.
+      lv_select_id = 1.
+    ENDIF.
+
+* create Splitter
+    CONCATENATE 'CONTAINER_SPLIT_' l_num2 INTO l_cont_name.
+    CREATE OBJECT <l_cont_grid_result>-gui_splitter
+      EXPORTING
+        parent  = <l_cont_grid_result>-gui_container
+        rows    = lv_alv_rows
+        columns = 1.
+
+    <l_cont_grid_result>-gui_splitter->set_name( l_cont_name ).
+    <l_cont_grid_result>-gui_splitter->set_border( EXPORTING border = gfw_false ).
+    <l_cont_grid_result>-gui_splitter->set_mode( <l_cont_grid_result>-gui_splitter->mode_run ).
+    <l_cont_grid_result>-gui_splitter->set_row_mode( cl_gui_splitter_container=>mode_absolute ).
+
+    <l_cont_grid_result>-gui_splitter->set_row_height( id = lv_select_id height = toolbar_row_height ).
+    <l_cont_grid_result>-gui_splitter->set_row_sash( id = lv_select_id type = 1 value = cl_gui_splitter_container=>false  ).
+
+    <l_cont_grid_result>-gui_splitter->set_row_height( id = lv_footer_id height = toolbar_row_height ).
+    <l_cont_grid_result>-gui_splitter->set_row_sash( id = lv_footer_id type = 1 value = cl_gui_splitter_container=>false  ).
+
+    IF ms_user_settings_xml-reswindoworientation = cs_windowresolution-tab.
+
+
+      <l_cont_grid_result>-gui_splitter->set_row_height( id = 1 height = 32 ).
+      <l_cont_grid_result>-gui_splitter->set_row_sash( id = 1 type = 1 value = cl_gui_splitter_container=>false  ).
+
+      <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = 1 column = 1
+                                                        RECEIVING container = lr_tabbar_cont ).
+
+      lr_tabbar_cont->set_name( 'CONTAINER_SPLIT_TAB_BAR' ).
+
+      DATA(l_ctmenu) = NEW cl_ctmenu( ).
+
+      clear gr_results_tab_toolbar.
+
+      IF gr_results_tab_toolbar IS BOUND.
+
+      ELSE.
+
+        gr_results_tab_toolbar = NEW #( parent = lr_tabbar_cont
+                                        display_mode = cl_gui_toolbar=>m_mode_horizontal ).
+
+        LOOP AT gt_cl_sql_parse ASSIGNING FIELD-SYMBOL(<lr_sql_button>).
+
+          l_numc2 = sy-tabix.
+
+          CLEAR l_source_tables.
+
+          READ TABLE gt_result_details INDEX sy-tabix ASSIGNING <l_result_details>.
+          IF sy-subrc = 0 AND <l_result_details>-header_line_text IS NOT INITIAL.
+            l_source_tables = <l_result_details>-header_line_text.
+          ELSE.
+
+            LOOP AT <lr_sql_button>->result_source_t ASSIGNING FIELD-SYMBOL(<source>).
+              IF l_source_tables IS INITIAL.
+                l_source_tables = <source>-table.
+              ELSE.
+                l_source_tables = l_source_tables && ` ` && <source>-table.
+              ENDIF.
+            ENDLOOP.
+
+          ENDIF.
+
+          CLEAR: ls_stb_button.
+          ls_stb_button-function = 'LST_' && l_numc2.
+          ls_stb_button-text      = '#' && l_numc2 && ` ` && l_source_tables.
+          ls_stb_button-butn_type = cntb_btype_check.
+
+          IF l_numc2 = l_tabix.
+            ls_stb_button-checked = abap_true.
+          ELSE.
+            ls_stb_button-checked = abap_false.
+          ENDIF.
+          APPEND ls_stb_button TO lt_buttons.
+
+        ENDLOOP.
+
+        gr_results_tab_toolbar->add_button_group( EXPORTING data_table = lt_buttons ).
+
+
+        CLEAR l_events[].
+        l_event-eventid = cl_gui_toolbar=>m_id_function_selected.
+        l_event-appl_event = ' '.
+        APPEND l_event TO l_events.
+
+        gr_results_tab_toolbar->set_registered_events( EXPORTING events = l_events ).
+
+        SET HANDLER me->on_tabbar_toolbar_funcsel  FOR gr_results_tab_toolbar.
+
+      ENDIF.
+
+    ENDIF.
+
+    <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = lv_result_id column = 1
+                                                      RECEIVING container = lr_cont ).
+
+* build and set name of the grid
+    CONCATENATE 'CONTAINER_SPLIT_2_' l_num2 INTO l_cont_name.
+    lr_cont->set_name( l_cont_name ).
+
+* create the alv grid control
+    CREATE OBJECT <l_cont_grid_result>-gui_alv_grid
+      EXPORTING
+        i_lifetime = cl_gui_alv_grid=>lifetime_default
+        i_parent   = lr_cont.
+
+* build and set name of the grid
+    CONCATENATE 'GC_GRID_RESULT_' l_num2 INTO l_grid_name.
+    <l_cont_grid_result>-gui_alv_grid->set_name( l_grid_name ).
+
+    CLEAR lt_lvc_t_sort.
+    CLEAR lt_lvc_t_filt.
+
+* get layout
+    IF gt_lvc_s_layo IS NOT INITIAL.                      "#4170
+      READ TABLE gt_lvc_s_layo INDEX l_tabix INTO l_result_layout."#4170 "RT239
+      IF l_result_layout IS INITIAL.                      "RT239
+        MOVE me->g_result_layout TO l_result_layout.      "RT239
+      ENDIF.                                              "RT239
+    ELSE.
+      MOVE me->g_result_layout TO l_result_layout.        "RT239
+    ENDIF.                                                "#4170  "RT239
+
+    READ TABLE gt_result_details INDEX l_tabix ASSIGNING <l_result_details>.
+    IF sy-subrc = 0.
+
+* create grid title (xx records ( y.yyyy Microseconds )
+      l_result_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = <l_result_details>-runtime
+                                                                                          i_lines   = <l_result_details>-lines ).
+* create footer line
+      lv_footer = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_footer("#4093
+                                                                      iv_mandant           = <l_result_details>-mandant"#4093
+                                                                      iv_syst              = <l_result_details>-syst"#4093
+                                                                      iv_create_timestamp  = <l_result_details>-create_timestamp"#4093
+                                                                      iv_uname             = <l_result_details>-uname )."#4093
+      IF NOT <l_result_details>-restricted_lines IS INITIAL."CDX130-017
+        l_show_message_restr_lines = <l_result_details>-maxsel."CDX130-017
+      ENDIF.                                              "CDX130-017
+    ENDIF.
+
+* get sort
+    READ TABLE gt_lvc_t_sort INDEX l_tabix INTO lt_lvc_t_sort.
+
+* get filter
+    READ TABLE gt_lvc_t_filt INDEX l_tabix INTO lt_lvc_t_filt.
+
+* set handler for drag/drop, double click and toolbar
+    SET HANDLER me->on_alv_drag FOR <l_cont_grid_result>-gui_alv_grid.
+    SET HANDLER me->on_alv_result_double_click FOR <l_cont_grid_result>-gui_alv_grid.
+    SET HANDLER me->on_handle_result_toolbar FOR <l_cont_grid_result>-gui_alv_grid.
+
+    SET HANDLER: me->on_handle_result_user_command FOR <l_cont_grid_result>-gui_alv_grid,
+                 me->on_handle_result_context_menu FOR <l_cont_grid_result>-gui_alv_grid,
+                 me->on_handle_result_end_of_page FOR <l_cont_grid_result>-gui_alv_grid,
+                 me->on_handle_result_menu_button FOR <l_cont_grid_result>-gui_alv_grid.
+
+    <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = lv_select_id column = 1
+                                                      RECEIVING container = lr_cont ).
+* build and set name of the grid
+    CONCATENATE 'CONTAINER_SPLIT_1_' l_num2 INTO l_cont_name.
+    lr_cont->set_name( l_cont_name ).
+
+    IF <lr_sql> IS ASSIGNED.
+      create_dyn_document(
+        EXPORTING
+          i_parent      = lr_cont
+          i_sql         = <lr_sql>->sql_syntax
+          i_header_text = <l_result_details>-header_line_text "CR22-034
+        CHANGING
+          ic_document   = <l_cont_grid_result>-cl_document_header
+             ).
+    ENDIF.
+
+* show result table
+    EXPORT grid_name FROM l_grid_name TO MEMORY ID 'GRID_NAME'.
+
+    "l_result_layout-no_keyfix = abap_true.
+
+    LOOP AT <lr_sql>->gt_lvc_t_fcat ASSIGNING FIELD-SYMBOL(<fcat>).
+      CASE <fcat>-fieldname.
+        WHEN 'CDXLINECOLOR'.
+          <fcat>-no_out = abap_true.
+      ENDCASE.
+    ENDLOOP.
+
+    l_result_layout-info_fname = 'CDXLINECOLOR'.
+
+    <l_cont_grid_result>-gui_alv_grid->set_table_for_first_display(
+      EXPORTING
+        i_bypassing_buffer            = abap_true
+        is_layout                     = l_result_layout
+        it_toolbar_excluding          = me->g_result_toolbar_excluding
+      CHANGING
+        it_fieldcatalog               = <lr_sql>->gt_lvc_t_fcat
+        it_outtab                     = <lt_result>
+        it_sort                       = lt_lvc_t_sort
+        it_filter                     = lt_lvc_t_filt
+      EXCEPTIONS
+        OTHERS                        = 1 ).
+    IF sy-subrc = 0.
+      "    CALL METHOD <l_cont_grid_result>-gui_alv_grid->set_toolbar_interactive.
+    ELSE.
+      MESSAGE e100(/cadaxo/sqlc).
+    ENDIF.
+
+* show result table
+    CLEAR l_grid_name.
+    EXPORT grid_name FROM l_grid_name TO MEMORY ID 'GRID_NAME'.
+
+* INS BEGIN #4093 - 20131210
+*     if footer is enabled(user settings)
+    IF lv_alv_rows = lv_footer_id.
+      <l_cont_grid_result>-gui_splitter->get_container( EXPORTING row = lv_footer_id column = 1
+                                                        RECEIVING container = lr_cont1 ).
+*     build and set name of the grid
+      CONCATENATE 'CONTAINER_SPLIT_3_' l_num2 INTO l_cont_name.
+      lr_cont1->set_name( l_cont_name ).
+
+      create_dyn_document(
+        EXPORTING
+          i_parent    = lr_cont1
+          i_sql       = lv_footer
+        CHANGING
+          ic_document = <l_cont_grid_result>-cl_document_footer ).
+    ENDIF.
+* INS END #4093 - 20131210
+
+    cl_gui_cfw=>flush( ). "COCKPIT-185
+
   ENDMETHOD.
 
 

@@ -78,7 +78,7 @@ FUNCTION /cadaxo/sqlc_cds_view_display.
         l_to_row   = 22.
       ENDIF.
 
-      CALL SCREEN 0100 STARTING AT 10 l_from_row ENDING AT 149 l_to_row.
+      CALL SCREEN 0100 STARTING AT 5 l_from_row ENDING AT 149 l_to_row.
     CATCH: cx_dd_sobject_get, cx_dd_ddl_read.
   ENDTRY.
 ENDFUNCTION.
