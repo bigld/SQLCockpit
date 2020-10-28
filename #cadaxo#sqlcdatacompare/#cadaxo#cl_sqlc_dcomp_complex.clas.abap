@@ -52,6 +52,12 @@ public section.
         missing   TYPE c LENGTH 6,
         different TYPE c LENGTH 6,
         equal     TYPE c LENGTH 6,
+        percent_equal       TYPE p LENGTH 6 DECIMALS 2,
+        percent_different   TYPE p LENGTH 6 DECIMALS 2,
+        percent_missing     TYPE p LENGTH 6 DECIMALS 2,
+        percent_equal_c     TYPE c LENGTH 6,
+        percent_different_c TYPE c LENGTH 6,
+        percent_missing_c   TYPE c LENGTH 6,
       END OF gds_rows_comp_state .
   class-data:
     BEGIN OF gs_rows_comp_state,
@@ -100,6 +106,7 @@ public section.
   methods FREE .
     "! free results
   methods FREE_RESULTS .
+  methods DO_CHECK_HR .  "Cockpit-405
 protected section.
 
   types:
@@ -234,6 +241,7 @@ protected section.
   data GV_KEY_VALUE18 type ref to DATA .
   data GV_KEY_VALUE19 type ref to DATA .
   data GV_KEY_VALUE20 type ref to DATA .
+  data GV_ROW_BASED type ABAP_BOOL . "Cockpit-405
 
   methods FREE_NETPLAN .
     "! context menu request
@@ -548,6 +556,30 @@ protected section.
       !IV_FOCUS_ROW type LVC_S_ROW-INDEX
     raising
       /CADAXO/CX_SQLC_DCOMP_COMPLEX .
+  methods SWITCH_TO_HR .    "Cockpit-405
+  methods SWITCH_TO_VR .    "Cockpit-405
+  methods CREATE_COMPARE_RESULT_TABLE_HR . "Cockpit-405
+  methods COMPARE_SET_LINE_MISSING_HR "Cockpit-405
+    importing
+      !IS_LINE_S type ANY
+      !IS_LINE_T type ANY
+    changing
+      !CT_RESULT type STANDARD TABLE optional .
+  methods BUILD_RESULT_FCAT_LINE_HR "Cockpit-405
+    importing
+      !IV_INDEX_S type INT2
+      !IS_TABLE_DETAILS_S type TYS_TABLE_DETAILS
+      !IS_TABLE_DETAILS_T type TYS_TABLE_DETAILS
+      !IV_INDEX_T type INT2
+    returning
+      value(ES_FCAT) type LVC_S_FCAT .
+  methods UPDATE_STATUS_HR "Cockpit-405
+    importing
+      !IV_ROW_STATUS type I
+    changing
+      !EC_LIGHT_FIELD_s type CHAR1
+      !EC_LIGHT_FIELD_t type CHAR1 .
+    METHODS fill_gds_rows_comp_state."Cockpit402
 private section.
 
   constants C_PREFIX_SOURCE type CHAR2 value 'S_' ##NO_TEXT.
@@ -713,6 +745,95 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
         IF es_fcat-scrtext_l IS INITIAL AND es_fcat-scrtext_m IS INITIAL AND es_fcat-scrtext_s IS INITIAL.
           es_fcat-coltext = lv_name.
+        ENDIF.
+
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD build_result_fcat_line_hr.
+
+    DATA ls_component TYPE abap_componentdescr.
+    DATA lr_element   TYPE REF TO cl_abap_elemdescr.
+    DATA ls_dfies     TYPE dfies.
+    DATA lv_pos       TYPE i.
+
+    FIELD-SYMBOLS: <ls_dfies> TYPE /cadaxo/sqlcdfies.
+
+    CLEAR es_fcat.
+
+    READ TABLE is_table_details_s-cdxdfies INDEX iv_index_s ASSIGNING FIELD-SYMBOL(<ls_dfies_s>).
+    READ TABLE is_table_details_t-cdxdfies INDEX iv_index_t ASSIGNING FIELD-SYMBOL(<ls_dfies_t>).
+    IF sy-subrc = 0.
+
+      READ TABLE is_table_details_s-components_view INDEX iv_index_s ASSIGNING FIELD-SYMBOL(<ls_component_s>).
+      READ TABLE is_table_details_t-components_view INDEX iv_index_t ASSIGNING FIELD-SYMBOL(<ls_component_t>).
+      IF sy-subrc = 0.
+
+        IF <ls_component_t> = <ls_component_s>.
+          ls_component-name =  <ls_component_t>-name.
+          ls_component-type ?= <ls_component_t>-type.
+          ASSIGN <ls_dfies_s> TO <ls_dfies>.
+        ELSE.
+
+          IF <ls_component_t>-type->length > <ls_component_s>-type->length.
+            ls_component-type ?= <ls_component_t>-type.
+            ASSIGN <ls_dfies_t> TO <ls_dfies>.
+          ELSE.
+            ls_component-type ?= <ls_component_s>-type.
+            ASSIGN <ls_dfies_s> TO <ls_dfies>.
+          ENDIF.
+          ls_component-name = |{ <ls_component_s>-name }_{ <ls_component_t>-name }|.
+
+        ENDIF.
+
+        APPEND ls_component TO gt_components_compare.
+
+        lr_element ?= ls_component-type.
+        lr_element->get_ddic_field( EXPORTING p_langu = sy-langu
+                                    RECEIVING p_flddescr = ls_dfies
+                                    EXCEPTIONS no_ddic_type = 1
+                                               not_found    = 2
+                                               OTHERS       = 3 ).
+        IF sy-subrc = 0.
+
+          es_fcat = CORRESPONDING #( ls_dfies ).
+
+          IF ls_dfies-convexit IS NOT INITIAL.
+            CONCATENATE '==' ls_dfies-convexit INTO es_fcat-edit_mask.
+          ENDIF.
+
+        ELSE.
+
+          IF <ls_dfies> IS NOT INITIAL.
+            es_fcat = CORRESPONDING #( <ls_dfies> ).
+          ELSE.
+            es_fcat-inttype = ls_component-type->type_kind.
+            es_fcat-intlen = ls_component-type->length.
+          ENDIF.
+
+        ENDIF.
+
+        es_fcat-fieldname = ls_component-name.
+
+        lv_pos = lv_pos + 1.
+        es_fcat-col_pos   = lv_pos.
+
+        IF es_fcat-datatype = 'CHAR' OR
+           es_fcat-datatype = 'STRG' OR
+           ( es_fcat-datatype IS INITIAL AND es_fcat-inttype = 'C' ).
+          es_fcat-parameter0 = abap_true.
+        ENDIF.
+
+        IF <ls_component_t> NE <ls_component_s>.
+          es_fcat-scrtext_s = |{ <ls_dfies_s>-scrtext_s(5) }/{ <ls_dfies_t>-scrtext_s(4) }|.
+          es_fcat-scrtext_m = |{ <ls_dfies_s>-scrtext_m(10) }/{ <ls_dfies_t>-scrtext_m(9) }|.
+          es_fcat-scrtext_l = |{ <ls_dfies_s>-scrtext_l(20) }/{ <ls_dfies_t>-scrtext_l(19) }|.
+        ENDIF.
+
+        IF es_fcat-scrtext_l IS INITIAL AND es_fcat-scrtext_m IS INITIAL AND es_fcat-scrtext_s IS INITIAL.
+          es_fcat-coltext = <ls_component_s>-name.
         ENDIF.
 
       ENDIF.
@@ -999,6 +1120,74 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD compare_set_line_missing_hr.
+
+    FIELD-SYMBOLS: <lv_value_s>     TYPE any.
+    FIELD-SYMBOLS: <lv_value_t>     TYPE any.
+
+    APPEND INITIAL LINE TO ct_result ASSIGNING FIELD-SYMBOL(<ls_result_s>).
+    APPEND INITIAL LINE TO ct_result ASSIGNING FIELD-SYMBOL(<ls_result_t>).
+
+    ASSIGN COMPONENT c_fieldname_lights    OF STRUCTURE <ls_result_s> TO FIELD-SYMBOL(<lv_lights_s>).
+    ASSIGN COMPONENT c_fieldname_lights    OF STRUCTURE <ls_result_t> TO FIELD-SYMBOL(<lv_lights_t>).
+    ASSIGN COMPONENT 'CT'                  OF STRUCTURE <ls_result_s> TO FIELD-SYMBOL(<lt_lvc_col_s>).
+    ASSIGN COMPONENT 'CT'                  OF STRUCTURE <ls_result_t> TO FIELD-SYMBOL(<lt_lvc_col_t>).
+    ASSIGN COMPONENT 'TABNO'               OF STRUCTURE <ls_result_s> TO FIELD-SYMBOL(<lv_tabno_s>).
+    <lv_tabno_s> = '#1'.
+    ASSIGN COMPONENT 'TABNO'               OF STRUCTURE <ls_result_t> TO FIELD-SYMBOL(<lv_tabno_t>).
+    <lv_tabno_t> = '#2'.
+
+    LOOP AT me->gt_link ASSIGNING FIELD-SYMBOL(<ls_link>).
+
+      ASSIGN COMPONENT gs_source-link_fieldname OF STRUCTURE <ls_link> TO FIELD-SYMBOL(<lv_index_s>).
+      get_field_value( EXPORTING is_table_details = gs_source
+                                 iv_index         = <lv_index_s>
+                                 is_line          = is_line_s
+                       IMPORTING ev_value         = DATA(lv_value_ref_s)
+                                 ev_fieldname     = DATA(l_fieldname_s) ).
+      ASSIGN lv_value_ref_s->* TO <lv_value_s>.
+
+      ASSIGN COMPONENT gs_target-link_fieldname OF STRUCTURE <ls_link> TO FIELD-SYMBOL(<lv_index_t>).
+      get_field_value( EXPORTING is_table_details = gs_target
+                                 iv_index         = <lv_index_t>
+                                 is_line          = is_line_t
+                       IMPORTING ev_value         = DATA(lv_value_ref_t)
+                                 ev_fieldname     = DATA(l_fieldname_t) ).
+      ASSIGN lv_value_ref_t->* TO <lv_value_t>.
+
+      IF l_fieldname_s = l_fieldname_t.
+        DATA(l_fieldname) = l_fieldname_s.
+      ELSE.
+        l_fieldname = |{ l_fieldname_s }_{ l_fieldname_t }|.
+      ENDIF.
+
+      ASSIGN COMPONENT l_fieldname OF STRUCTURE <ls_result_s> TO FIELD-SYMBOL(<lv_value_compare_s>).
+      IF <lv_value_s> IS ASSIGNED.
+        <lv_value_compare_s> = <lv_value_s>.
+        UNASSIGN <lv_value_s>.
+      ENDIF.
+
+      ASSIGN COMPONENT l_fieldname OF STRUCTURE <ls_result_t> TO FIELD-SYMBOL(<lv_value_compare_t>).
+      IF <lv_value_t> IS ASSIGNED.
+        <lv_value_compare_t> = <lv_value_t>.
+        UNASSIGN <lv_value_t>.
+      ENDIF.
+
+      IF <ls_link>-type = c_linktype_key.
+        compare_set_col_color_key( EXPORTING iv_fieldname_source = l_fieldname  CHANGING  ct_lvc_col = <lt_lvc_col_s> ).
+        compare_set_col_color_key( EXPORTING iv_fieldname_target = l_fieldname  CHANGING  ct_lvc_col = <lt_lvc_col_t> ).
+      ELSE.
+        set_column_color( EXPORTING iv_fieldname = l_fieldname iv_col = 7 iv_int = 0  CHANGING  ct_lvc_t_col = <lt_lvc_col_s> )."+405
+        set_column_color( EXPORTING iv_fieldname = l_fieldname iv_col = 7 iv_int = 1  CHANGING  ct_lvc_t_col = <lt_lvc_col_t> )."+405
+      ENDIF.
+
+    ENDLOOP.
+
+    update_status_hr( EXPORTING iv_row_status = c_status_missing CHANGING ec_light_field_s = <lv_lights_s> ec_light_field_t = <lv_lights_t> ).
+
+  ENDMETHOD.
+
+
   METHOD constructor.
 
     CREATE DATA gs_source-data LIKE it_source.
@@ -1116,6 +1305,68 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
     ENDLOOP.
 
+    DELETE gt_result_fcat WHERE fieldname IS INITIAL.
+
+    lr_compare_structtype = cl_abap_structdescr=>create( EXPORTING p_components = gt_components_compare
+                                                                        p_strict     = space ).
+
+    lr_tabletype = cl_abap_tabledescr=>create( p_line_type  = lr_compare_structtype
+                                               p_table_kind = cl_abap_tabledescr=>tablekind_std
+                                               p_unique     = abap_false ).
+
+    CREATE DATA grt_compare_result TYPE HANDLE lr_tabletype.
+    CREATE DATA grs_compare_result TYPE HANDLE lr_compare_structtype.
+  ENDMETHOD.
+
+
+  METHOD create_compare_result_table_hr.
+
+    DATA: lr_abap_elemdescr     TYPE REF TO cl_abap_elemdescr.
+    DATA: lr_abap_typedescr     TYPE REF TO cl_abap_typedescr.
+    DATA: lr_compare_structtype TYPE REF TO cl_abap_structdescr .
+    DATA: ls_component          TYPE abap_componentdescr.
+    DATA: lr_tabletype          TYPE REF TO cl_abap_tabledescr.
+
+    FREE: gt_components_compare.
+    FREE: grt_compare_result.
+    FREE: grs_compare_result.
+
+    ls_component-name = 'TABNO'.
+    ls_component-type ?= cl_abap_elemdescr=>describe_by_data( '/CADAXO/SQLC_DATA_COMP_LST_NR' ).
+    APPEND ls_component TO gt_components_compare.
+
+    DATA ls_fcat_tabno TYPE lvc_s_fcat.
+    ls_fcat_tabno-fieldname = 'TABNO'.
+    ls_fcat_tabno-scrtext_s = 'Nr.'.
+    ls_fcat_tabno-scrtext_m = text-007.
+    ls_fcat_tabno-outputlen = '2'.
+    ls_fcat_tabno-datatype = '/CADAXO/SQLC_DATA_COMP_LST_NR'.
+    APPEND ls_fcat_tabno TO gt_result_fcat.
+
+* lights
+    cl_abap_elemdescr=>get_c( EXPORTING p_length = 1
+                              RECEIVING p_result = lr_abap_elemdescr ).
+    ls_component-name = c_fieldname_lights.
+    ls_component-type = lr_abap_elemdescr.
+    APPEND ls_component TO gt_components_compare.
+
+* colors
+    lr_abap_typedescr = cl_abap_typedescr=>describe_by_name( 'LVC_T_SCOL' ).
+    ls_component-name = 'CT'.
+    ls_component-type ?= lr_abap_typedescr.
+    APPEND ls_component TO gt_components_compare.
+
+* mapped columns
+    SORT me->gt_link BY type DESCENDING source ASCENDING.
+    LOOP AT me->gt_link ASSIGNING FIELD-SYMBOL(<ls_link>).
+      APPEND build_result_fcat_line_hr(
+        EXPORTING
+          iv_index_s         = <ls_link>-source
+          is_table_details_s = gs_source
+          is_table_details_t = gs_target
+          iv_index_t         = <ls_link>-target )
+          TO gt_result_fcat.
+    ENDLOOP.
     DELETE gt_result_fcat WHERE fieldname IS INITIAL.
 
     lr_compare_structtype = cl_abap_structdescr=>create( EXPORTING p_components = gt_components_compare
@@ -1384,7 +1635,250 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
       ENDLOOP.
     ENDIF.
 
-    gds_rows_comp_state = CORRESPONDING #( gs_rows_comp_state ).
+    fill_gds_rows_comp_state( )."cockpit+402
+  ENDMETHOD.
+
+
+  METHOD do_check_hr.
+
+    DATA lv_fieldname_source      TYPE string.
+    DATA lv_fieldname_target      TYPE string.
+    DATA lv_index                 TYPE n LENGTH 2.
+    DATA ls_progress_indi         TYPE tys_progress_indi.
+    DATA lv_row_status            TYPE i.
+    DATA lv_source_index          TYPE i.
+    DATA lv_target_index          TYPE i.
+    DATA lv_previous_target_index TYPE i.
+
+    FIELD-SYMBOLS: <lt_source> TYPE STANDARD TABLE.
+    FIELD-SYMBOLS: <lt_target> TYPE STANDARD TABLE.
+    FIELD-SYMBOLS: <lt_result> TYPE STANDARD TABLE.
+
+    FIELD-SYMBOLS: <lt_lvc_col_s>          TYPE lvc_t_scol.
+    FIELD-SYMBOLS: <lv_value_target>     TYPE any.
+
+    CLEAR: gt_result_fcat,
+           gds_rows_comp_state,
+           gs_rows_comp_state,
+           gv_difference_index,
+           gt_detailed_difference.
+
+    sort_original_data( ).
+
+    create_result_tables( ).
+
+    create_compare_result_table_hr( ).
+
+    ASSIGN gs_source-data->* TO <lt_source>.
+    ASSIGN gs_target-data->* TO <lt_target>.
+
+    dynamic_key_attributes_create( <lt_target>[ 1 ] ).
+
+    ASSIGN grs_compare_result->* TO FIELD-SYMBOL(<ls_compare_source>).
+    ASSIGN grs_compare_result->* TO FIELD-SYMBOL(<ls_compare_target>)."+405
+    ASSIGN grt_compare_result->* TO <lt_result>.
+
+    ASSIGN gv_key_value01->* TO FIELD-SYMBOL(<lv_key_value01>).
+    ASSIGN gv_key_value02->* TO FIELD-SYMBOL(<lv_key_value02>).
+    ASSIGN gv_key_value03->* TO FIELD-SYMBOL(<lv_key_value03>).
+    ASSIGN gv_key_value04->* TO FIELD-SYMBOL(<lv_key_value04>).
+    ASSIGN gv_key_value05->* TO FIELD-SYMBOL(<lv_key_value05>).
+    ASSIGN gv_key_value06->* TO FIELD-SYMBOL(<lv_key_value06>).
+    ASSIGN gv_key_value07->* TO FIELD-SYMBOL(<lv_key_value07>).
+    ASSIGN gv_key_value08->* TO FIELD-SYMBOL(<lv_key_value08>).
+    ASSIGN gv_key_value09->* TO FIELD-SYMBOL(<lv_key_value09>).
+    ASSIGN gv_key_value10->* TO FIELD-SYMBOL(<lv_key_value10>).
+    ASSIGN gv_key_value11->* TO FIELD-SYMBOL(<lv_key_value11>).
+    ASSIGN gv_key_value12->* TO FIELD-SYMBOL(<lv_key_value12>).
+    ASSIGN gv_key_value13->* TO FIELD-SYMBOL(<lv_key_value13>).
+    ASSIGN gv_key_value14->* TO FIELD-SYMBOL(<lv_key_value14>).
+    ASSIGN gv_key_value15->* TO FIELD-SYMBOL(<lv_key_value15>).
+    ASSIGN gv_key_value16->* TO FIELD-SYMBOL(<lv_key_value16>).
+    ASSIGN gv_key_value17->* TO FIELD-SYMBOL(<lv_key_value17>).
+    ASSIGN gv_key_value18->* TO FIELD-SYMBOL(<lv_key_value18>).
+    ASSIGN gv_key_value19->* TO FIELD-SYMBOL(<lv_key_value19>).
+    ASSIGN gv_key_value20->* TO FIELD-SYMBOL(<lv_key_value20>).
+
+
+    IF lines( <lt_source> ) > lines( <lt_target> ).
+      ls_progress_indi-lines_compare = lines( <lt_source> ).
+    ELSE.
+      ls_progress_indi-lines_compare = lines( <lt_target> ).
+    ENDIF.
+
+* compare data
+    LOOP AT <lt_source> ASSIGNING FIELD-SYMBOL(<ls_source>).
+
+      lv_source_index = sy-tabix.
+
+      show_progress_indicator( CHANGING cs_progress_inidcator = ls_progress_indi ).
+      CLEAR lv_row_status.
+      CLEAR lv_index.
+
+      LOOP AT me->gt_link ASSIGNING FIELD-SYMBOL(<ls_link>) WHERE type = c_linktype_key.
+        lv_index = lv_index + 1.
+        get_field_value( EXPORTING is_table_details = gs_source
+                                   iv_index         = <ls_link>-source
+                                   is_line          = <ls_source>
+                         IMPORTING ev_value         = DATA(lv_value_ref)
+                                   ev_fieldname     = lv_fieldname_source ).
+        ASSIGN lv_value_ref->* TO FIELD-SYMBOL(<lv_source_value>).
+        IF lv_fieldname_source IS NOT INITIAL.
+          DATA(lv_key_fieldname) = '<LV_KEY_VALUE' && lv_index && '>'.
+          ASSIGN (lv_key_fieldname) TO FIELD-SYMBOL(<lv_key_value_xx>).
+          IF sy-subrc = 0.
+            <lv_key_value_xx> = <lv_source_value>.
+          ENDIF.
+        ENDIF.
+      ENDLOOP.
+
+      READ TABLE <lt_target> WITH KEY (gv_key_name01) = <lv_key_value01>
+                                      (gv_key_name02) = <lv_key_value02>
+                                      (gv_key_name03) = <lv_key_value03>
+                                      (gv_key_name04) = <lv_key_value04>
+                                      (gv_key_name05) = <lv_key_value05>
+                                      (gv_key_name06) = <lv_key_value06>
+                                      (gv_key_name07) = <lv_key_value07>
+                                      (gv_key_name08) = <lv_key_value08>
+                                      (gv_key_name09) = <lv_key_value09>
+                                      (gv_key_name10) = <lv_key_value10>
+                                      (gv_key_name11) = <lv_key_value11>
+                                      (gv_key_name12) = <lv_key_value12>
+                                      (gv_key_name13) = <lv_key_value13>
+                                      (gv_key_name14) = <lv_key_value14>
+                                      (gv_key_name15) = <lv_key_value15>
+                                      (gv_key_name16) = <lv_key_value16>
+                                      (gv_key_name17) = <lv_key_value17>
+                                      (gv_key_name18) = <lv_key_value18>
+                                      (gv_key_name19) = <lv_key_value19>
+                                      (gv_key_name20) = <lv_key_value20>
+                                       ASSIGNING FIELD-SYMBOL(<ls_target>).
+      IF sy-subrc = 0.
+
+        lv_target_index = sy-tabix.
+
+        IF lv_previous_target_index + 1 < lv_target_index.
+          LOOP AT <lt_target> FROM lv_previous_target_index + 1 TO lv_target_index - 1 ASSIGNING FIELD-SYMBOL(<ls_previous_target>).
+
+            show_progress_indicator( CHANGING cs_progress_inidcator = ls_progress_indi ).
+
+            compare_set_line_missing_hr(
+              EXPORTING
+                is_line_s = space
+                is_line_t = <ls_previous_target>
+              CHANGING
+                ct_result = <lt_result> ).
+
+          ENDLOOP.
+        ENDIF.
+
+        lv_row_status = c_status_equal.
+
+        lv_previous_target_index = lv_target_index.
+
+        CLEAR <ls_compare_source>.
+        CLEAR <ls_compare_target>."+405
+        APPEND <ls_compare_source> TO <lt_result> ASSIGNING FIELD-SYMBOL(<ls_result_source>).
+        APPEND <ls_compare_target> TO <lt_result> ASSIGNING FIELD-SYMBOL(<ls_result_target>)."+405
+        DATA(lv_compare_index) = sy-tabix.
+
+        ASSIGN COMPONENT c_fieldname_lights OF STRUCTURE <ls_result_source> TO FIELD-SYMBOL(<lv_lights_s>).
+        ASSIGN COMPONENT 'CT' OF STRUCTURE <ls_result_source> TO <lt_lvc_col_s>.
+        ASSIGN COMPONENT 'TABNO' OF STRUCTURE <ls_result_source> TO FIELD-SYMBOL(<lv_tabno_s>).
+        <lv_tabno_s> = '#1'.
+
+        ASSIGN COMPONENT c_fieldname_lights OF STRUCTURE <ls_result_target> TO FIELD-SYMBOL(<lv_lights_t>)."+405
+        ASSIGN COMPONENT 'CT' OF STRUCTURE <ls_result_target> TO FIELD-SYMBOL(<lt_lvc_col_t>)."+405
+        ASSIGN COMPONENT 'TABNO' OF STRUCTURE <ls_result_target> TO FIELD-SYMBOL(<lv_tabno_t>).
+        <lv_tabno_t> = '#2'.
+
+        LOOP AT me->gt_link ASSIGNING <ls_link>.
+
+          get_field_value( EXPORTING is_table_details = gs_source
+                                     iv_index         = <ls_link>-source
+                                     is_line          = <ls_source>
+                           IMPORTING ev_value         = lv_value_ref
+                                     ev_fieldname     = lv_fieldname_source ).
+          ASSIGN lv_value_ref->* TO <lv_source_value>.
+
+          get_field_value( EXPORTING is_table_details = gs_target
+                                     iv_index         = <ls_link>-target
+                                     is_line          = <ls_target>
+                           IMPORTING ev_value         = lv_value_ref
+                                     ev_fieldname     = lv_fieldname_target ).
+          ASSIGN lv_value_ref->* TO <lv_value_target>.
+
+          IF lv_fieldname_source NE lv_fieldname_target.
+            lv_fieldname_source = lv_fieldname_target = |{ lv_fieldname_source }_{ lv_fieldname_target }|.
+          ENDIF.
+          ASSIGN COMPONENT lv_fieldname_source OF STRUCTURE <ls_result_source> TO FIELD-SYMBOL(<lv_value_compare_source>).
+          <lv_value_compare_source> = <lv_source_value>.
+
+          ASSIGN COMPONENT lv_fieldname_target OF STRUCTURE <ls_result_target> TO FIELD-SYMBOL(<lv_value_compare_target>)."+Cockpit405
+          <lv_value_compare_target> = <lv_value_target>.
+
+          IF <ls_link>-type = c_linktype_field.
+
+            IF <lv_value_compare_source> = <lv_value_compare_target>.
+
+              set_column_color( EXPORTING iv_fieldname = lv_fieldname_source iv_col = 7 iv_int = 0  CHANGING  ct_lvc_t_col = <lt_lvc_col_s> )."+405
+              set_column_color( EXPORTING iv_fieldname = lv_fieldname_target iv_col = 7 iv_int = 1  CHANGING  ct_lvc_t_col = <lt_lvc_col_t> )."+405
+
+            ELSE.
+
+              lv_row_status = c_status_different.
+
+                compare_column_name_diff( iv_fieldname = lv_fieldname_source iv_line_index = lv_compare_index ).
+                compare_column_name_diff( iv_fieldname = lv_fieldname_target iv_line_index = lv_compare_index ).
+
+                set_column_color( EXPORTING iv_fieldname = lv_fieldname_source iv_col = 3 iv_int = 0 CHANGING ct_lvc_t_col = <lt_lvc_col_s> ).
+                set_column_color( EXPORTING iv_fieldname = lv_fieldname_target iv_col = 3 iv_int = 1 CHANGING ct_lvc_t_col = <lt_lvc_col_t> ).
+
+            ENDIF.
+
+          ELSE."key field
+
+            compare_set_col_color_key( EXPORTING iv_fieldname_source = lv_fieldname_source  CHANGING  ct_lvc_col = <lt_lvc_col_s> ).
+            compare_set_col_color_key( EXPORTING iv_fieldname_target = lv_fieldname_target  CHANGING  ct_lvc_col = <lt_lvc_col_t> ).
+
+            compare_column_name_diff( iv_fieldname = lv_fieldname_source iv_line_index = 0 ).
+            compare_column_name_diff( iv_fieldname = lv_fieldname_target iv_line_index = 0 ).
+
+          ENDIF.
+
+        ENDLOOP.
+
+        update_status_hr( EXPORTING iv_row_status = lv_row_status CHANGING ec_light_field_s = <lv_lights_s> ec_light_field_t = <lv_lights_t> )."405
+
+      ELSE.
+
+        compare_set_line_missing_hr(
+          EXPORTING
+            is_line_s = <ls_source>
+            is_line_t = space
+          CHANGING
+            ct_result = <lt_result> ).
+
+      ENDIF.
+
+    ENDLOOP.
+
+    IF lv_previous_target_index < lines( <lt_target> ).
+      LOOP AT <lt_target> FROM lv_previous_target_index + 1 ASSIGNING <ls_target>.
+
+        show_progress_indicator( CHANGING cs_progress_inidcator = ls_progress_indi ).
+
+        compare_set_line_missing_hr(
+          EXPORTING
+            is_line_s =  space
+            is_line_t =  <ls_target>
+          CHANGING
+            ct_result = <lt_result>
+        ).
+      ENDLOOP.
+    ENDIF.
+
+    fill_gds_rows_comp_state( ).
 
   ENDMETHOD.
 
@@ -2339,6 +2833,14 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
     INSERT VALUE #( butn_type = cntb_btype_sep ) INTO e_object->mt_toolbar INDEX 8.
 
+*begin of insert 405
+    INSERT VALUE #( function  = 'TOGGLE_ROW_COLS'
+                    icon      = icon_invert_line
+                    butn_type = cntb_btype_button
+                    disabled  = abap_false
+                    quickinfo = text-008 ) INTO e_object->mt_toolbar INDEX 9.
+    INSERT VALUE #( butn_type = cntb_btype_sep ) INTO e_object->mt_toolbar INDEX 10.
+*end   of insert 405
   ENDMETHOD.
 
 
@@ -2368,6 +2870,16 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
           CATCH /cadaxo/cx_sqlc_dcomp_complex INTO lx_complex.
             MESSAGE lx_complex->get_text( ) TYPE 'S' DISPLAY LIKE 'E'.
         ENDTRY.
+*      begin of insert cockpit-405
+      WHEN 'TOGGLE_ROW_COLS'.
+        IF me->gv_row_based = abap_true.
+          me->gv_row_based = abap_false.
+          me->switch_to_vr( ).
+        ELSE.
+          me->gv_row_based = abap_true.
+          me->switch_to_hr( ).
+        ENDIF.
+*      end   of insert cockpit-405
     ENDCASE.
 
   ENDMETHOD.
@@ -2801,6 +3313,66 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD switch_to_hr.
+
+    DATA ls_layout TYPE lvc_s_layo.
+    FIELD-SYMBOLS <lt_compare_result> TYPE STANDARD TABLE.
+
+    me->do_check_hr( ).
+
+    gr_compare_results_grid->set_frontend_fieldcatalog( gt_result_fcat ).
+
+    CLEAR ls_layout.
+    ls_layout-excp_fname = c_fieldname_lights.
+    ls_layout-excp_led   = abap_true.
+    ls_layout-ctab_fname = 'CT'.
+    ls_layout-cwidth_opt = abap_false.
+    ls_layout-zebra =  abap_true.
+
+    ASSIGN grt_compare_result->* TO <lt_compare_result>.
+
+    gr_compare_results_grid->set_table_for_first_display( EXPORTING is_layout            = ls_layout
+                                                                    it_toolbar_excluding = gt_excluding_alv
+                                                          CHANGING  it_outtab            = <lt_compare_result>
+                                                                    it_fieldcatalog      = gt_result_fcat ).
+
+    SET HANDLER: on_handle_result_toolbar       FOR gr_compare_results_grid,
+                 on_handle_result_user_command  FOR gr_compare_results_grid.
+
+    update_filter( i_refresh_alv = abap_true ).
+
+  ENDMETHOD.
+
+
+  METHOD SWITCH_TO_VR.
+          me->do_check( ).
+      CALL METHOD gr_compare_results_grid->set_frontend_fieldcatalog( gt_result_fcat ).
+
+    DATA ls_layout TYPE lvc_s_layo.
+    FIELD-SYMBOLS <lt_compare_result> TYPE STANDARD TABLE.
+
+      CLEAR ls_layout.
+      ls_layout-excp_fname = c_fieldname_lights.
+      ls_layout-excp_led   = abap_true.
+      ls_layout-ctab_fname = 'CT'.
+      ls_layout-cwidth_opt = abap_false.
+      ASSIGN grt_compare_result->* TO <lt_compare_result>.
+
+
+      gr_compare_results_grid->set_table_for_first_display( EXPORTING is_layout            = ls_layout
+                                                                      it_toolbar_excluding = gt_excluding_alv
+                                                            CHANGING  it_outtab            = <lt_compare_result>
+                                                                      it_fieldcatalog      = gt_result_fcat ).
+
+      SET HANDLER: on_handle_result_toolbar       FOR gr_compare_results_grid,
+                   on_handle_result_user_command  FOR gr_compare_results_grid.
+
+      update_filter( i_refresh_alv = abap_true ).
+
+
+  ENDMETHOD.
+
+
   METHOD toggle_button.
 
     IF ic_button_flag = abap_false.
@@ -2900,4 +3472,29 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
+
+  METHOD UPDATE_STATUS_HR.
+
+    ASSIGN COMPONENT iv_row_status OF STRUCTURE gs_rows_comp_state TO FIELD-SYMBOL(<ls_count>).
+    IF sy-subrc = 0.
+      <ls_count> = <ls_count> + 1.
+      ec_light_field_s = iv_row_status.
+      ec_light_field_t = iv_row_status.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD fill_gds_rows_comp_state.
+
+    gds_rows_comp_state = CORRESPONDING #( gs_rows_comp_state ).
+    gds_rows_comp_state-percent_equal = ( gds_rows_comp_state-equal / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
+    gds_rows_comp_state-percent_different = ( gds_rows_comp_state-different / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
+    gds_rows_comp_state-percent_missing = ( gds_rows_comp_state-missing / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
+    gds_rows_comp_state-percent_equal_c = gds_rows_comp_state-percent_equal.
+    gds_rows_comp_state-percent_different_c = gds_rows_comp_state-percent_different.
+    gds_rows_comp_state-percent_missing_c = gds_rows_comp_state-percent_missing.
+
+  ENDMETHOD.
+
 ENDCLASS.
