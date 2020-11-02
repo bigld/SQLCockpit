@@ -516,30 +516,12 @@
       </RPY_DYCATT>
       <RPY_DYCATT>
        <TYPE>CUST_CTRL</TYPE>
-       <NAME>CC_PIE</NAME>
-       <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>007</LINE>
-       <COLUMN>147</COLUMN>
-       <LENGTH>039</LENGTH>
-       <HEIGHT>007</HEIGHT>
-      </RPY_DYCATT>
-      <RPY_DYCATT>
-       <TYPE>CUST_CTRL</TYPE>
        <NAME>CC_LEGEND</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>025</LINE>
-       <COLUMN>175</COLUMN>
-       <LENGTH>006</LENGTH>
-       <HEIGHT>002</HEIGHT>
-      </RPY_DYCATT>
-      <RPY_DYCATT>
-       <TYPE>CUST_CTRL</TYPE>
-       <NAME>CC_INFO_0300</NAME>
-       <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>026</LINE>
-       <COLUMN>158</COLUMN>
-       <LENGTH>014</LENGTH>
-       <HEIGHT>002</HEIGHT>
+       <LINE>007</LINE>
+       <COLUMN>148</COLUMN>
+       <LENGTH>037</LENGTH>
+       <HEIGHT>004</HEIGHT>
       </RPY_DYCATT>
      </CONTAINERS>
      <FIELDS>
@@ -701,32 +683,14 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEMPLATE</TYPE>
-       <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-PERCENT_EQUAL</NAME>
-       <TEXT>___,__</TEXT>
-       <LINE>006</LINE>
-       <COLUMN>148</COLUMN>
-       <LENGTH>006</LENGTH>
-       <VISLENGTH>006</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>DEC</FORMAT>
-       <OUTPUT_FLD>X</OUTPUT_FLD>
-       <OUTPUTONLY>X</OUTPUTONLY>
-       <REQU_ENTRY>N</REQU_ENTRY>
-       <BRIGHT>X</BRIGHT>
-       <_--32_DIMENS>X</_--32_DIMENS>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>%#AUTOTEXT005</NAME>
-       <TEXT>Legend_____________________________</TEXT>
-       <LINE>014</LINE>
+       <TEXT>Legend________________________________</TEXT>
+       <LINE>006</LINE>
        <COLUMN>147</COLUMN>
-       <LENGTH>036</LENGTH>
-       <VISLENGTH>036</VISLENGTH>
-       <HEIGHT>004</HEIGHT>
+       <LENGTH>039</LENGTH>
+       <VISLENGTH>039</VISLENGTH>
+       <HEIGHT>006</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -735,12 +699,12 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>%#AUTOTEXT015</NAME>
-       <TEXT>Info_______________________________</TEXT>
-       <LINE>018</LINE>
-       <COLUMN>150</COLUMN>
-       <LENGTH>036</LENGTH>
-       <VISLENGTH>036</VISLENGTH>
-       <HEIGHT>011</HEIGHT>
+       <TEXT>Info__________________________________</TEXT>
+       <LINE>012</LINE>
+       <COLUMN>147</COLUMN>
+       <LENGTH>039</LENGTH>
+       <VISLENGTH>039</VISLENGTH>
+       <HEIGHT>005</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -749,11 +713,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT016</NAME>
-       <TEXT>Percentage_of_equal_records:______</TEXT>
-       <LINE>019</LINE>
-       <COLUMN>151</COLUMN>
-       <LENGTH>034</LENGTH>
-       <VISLENGTH>034</VISLENGTH>
+       <TEXT>equal_records:_____</TEXT>
+       <LINE>013</LINE>
+       <COLUMN>148</COLUMN>
+       <LENGTH>019</LENGTH>
+       <VISLENGTH>019</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -763,27 +727,42 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-PERCENT_EQUAL_C</NAME>
-       <TEXT>_____</TEXT>
-       <LINE>020</LINE>
-       <COLUMN>151</COLUMN>
-       <LENGTH>005</LENGTH>
-       <VISLENGTH>005</VISLENGTH>
+       <TEXT>______</TEXT>
+       <LINE>013</LINE>
+       <COLUMN>168</COLUMN>
+       <LENGTH>006</LENGTH>
+       <VISLENGTH>006</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <REQU_ENTRY>N</REQU_ENTRY>
+       <RIGHT_JUST>X</RIGHT_JUST>
        <_--32_DIMENS>X</_--32_DIMENS>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT019</NAME>
+       <TEXT>%</TEXT>
+       <LINE>013</LINE>
+       <COLUMN>175</COLUMN>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>001</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT017</NAME>
-       <TEXT>Percentage_of_different_records:__</TEXT>
-       <LINE>021</LINE>
-       <COLUMN>151</COLUMN>
-       <LENGTH>034</LENGTH>
-       <VISLENGTH>034</VISLENGTH>
+       <TEXT>different_records:_</TEXT>
+       <LINE>014</LINE>
+       <COLUMN>148</COLUMN>
+       <LENGTH>019</LENGTH>
+       <VISLENGTH>019</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -793,27 +772,42 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-PERCENT_DIFFERENT_C</NAME>
-       <TEXT>_____</TEXT>
-       <LINE>022</LINE>
-       <COLUMN>151</COLUMN>
-       <LENGTH>005</LENGTH>
-       <VISLENGTH>005</VISLENGTH>
+       <TEXT>______</TEXT>
+       <LINE>014</LINE>
+       <COLUMN>168</COLUMN>
+       <LENGTH>006</LENGTH>
+       <VISLENGTH>006</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <REQU_ENTRY>N</REQU_ENTRY>
+       <RIGHT_JUST>X</RIGHT_JUST>
        <_--32_DIMENS>X</_--32_DIMENS>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT020</NAME>
+       <TEXT>%</TEXT>
+       <LINE>014</LINE>
+       <COLUMN>175</COLUMN>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>001</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT018</NAME>
-       <TEXT>Percentage_of_missing_records:____</TEXT>
-       <LINE>023</LINE>
-       <COLUMN>151</COLUMN>
-       <LENGTH>034</LENGTH>
-       <VISLENGTH>034</VISLENGTH>
+       <TEXT>missing_records:___</TEXT>
+       <LINE>015</LINE>
+       <COLUMN>148</COLUMN>
+       <LENGTH>019</LENGTH>
+       <VISLENGTH>019</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -823,16 +817,31 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-PERCENT_MISSING_C</NAME>
-       <TEXT>_____</TEXT>
-       <LINE>024</LINE>
-       <COLUMN>151</COLUMN>
-       <LENGTH>005</LENGTH>
-       <VISLENGTH>005</VISLENGTH>
+       <TEXT>______</TEXT>
+       <LINE>015</LINE>
+       <COLUMN>168</COLUMN>
+       <LENGTH>006</LENGTH>
+       <VISLENGTH>006</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <REQU_ENTRY>N</REQU_ENTRY>
+       <RIGHT_JUST>X</RIGHT_JUST>
        <_--32_DIMENS>X</_--32_DIMENS>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT021</NAME>
+       <TEXT>%</TEXT>
+       <LINE>015</LINE>
+       <COLUMN>175</COLUMN>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>001</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
