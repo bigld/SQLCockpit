@@ -4360,8 +4360,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
               l_event_periodic = abap_true.
           ENDCASE.
 
-          IF ls_jobstart_conditions-notification_email_flag = abap_true OR
-             ls_jobstart_conditions-notification_sap_mail_flag = abap_true.
+          IF ls_jobstart_conditions-notification_email1 IS NOT INITIAL
+          OR ls_jobstart_conditions-notification_email2 IS NOT INITIAL
+          OR ls_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
 
             l_btcjob_notif = '/CADAXO/MAIL_NOTIF'.
             l_event_param  = ls_sqlcsres-list_guid.
