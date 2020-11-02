@@ -511,26 +511,35 @@
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>147</LENGTH>
+       <LENGTH>145</LENGTH>
        <HEIGHT>028</HEIGHT>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>CUST_CTRL</TYPE>
+       <NAME>CC_PIE</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
+       <LINE>007</LINE>
+       <COLUMN>147</COLUMN>
+       <LENGTH>039</LENGTH>
+       <HEIGHT>007</HEIGHT>
       </RPY_DYCATT>
       <RPY_DYCATT>
        <TYPE>CUST_CTRL</TYPE>
        <NAME>CC_LEGEND</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>007</LINE>
-       <COLUMN>151</COLUMN>
-       <LENGTH>034</LENGTH>
-       <HEIGHT>005</HEIGHT>
+       <LINE>025</LINE>
+       <COLUMN>175</COLUMN>
+       <LENGTH>006</LENGTH>
+       <HEIGHT>002</HEIGHT>
       </RPY_DYCATT>
       <RPY_DYCATT>
        <TYPE>CUST_CTRL</TYPE>
        <NAME>CC_INFO_0300</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>025</LINE>
-       <COLUMN>151</COLUMN>
-       <LENGTH>034</LENGTH>
-       <HEIGHT>003</HEIGHT>
+       <LINE>026</LINE>
+       <COLUMN>158</COLUMN>
+       <LENGTH>014</LENGTH>
+       <HEIGHT>002</HEIGHT>
       </RPY_DYCATT>
      </CONTAINERS>
      <FIELDS>
@@ -539,11 +548,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>%#AUTOTEXT001</NAME>
-       <TEXT>Summary____________________________</TEXT>
+       <TEXT>Summary_______________________________</TEXT>
        <LINE>001</LINE>
-       <COLUMN>150</COLUMN>
-       <LENGTH>036</LENGTH>
-       <VISLENGTH>036</VISLENGTH>
+       <COLUMN>147</COLUMN>
+       <LENGTH>039</LENGTH>
+       <VISLENGTH>039</VISLENGTH>
        <HEIGHT>005</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -556,7 +565,7 @@
        <ICON_NAME>ICON_LED_GREEN</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
        <LINE>002</LINE>
-       <COLUMN>152</COLUMN>
+       <COLUMN>149</COLUMN>
        <LENGTH>004</LENGTH>
        <VISLENGTH>002</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -569,11 +578,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-EQUAL</NAME>
-       <TEXT>______</TEXT>
+       <TEXT>_____</TEXT>
        <LINE>002</LINE>
-       <COLUMN>155</COLUMN>
-       <LENGTH>006</LENGTH>
-       <VISLENGTH>006</VISLENGTH>
+       <COLUMN>152</COLUMN>
+       <LENGTH>005</LENGTH>
+       <VISLENGTH>005</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>
@@ -588,7 +597,7 @@
        <NAME>%#AUTOTEXT010</NAME>
        <TEXT>rows_are_equal____</TEXT>
        <LINE>002</LINE>
-       <COLUMN>164</COLUMN>
+       <COLUMN>165</COLUMN>
        <LENGTH>018</LENGTH>
        <VISLENGTH>018</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -603,7 +612,7 @@
        <ICON_NAME>ICON_LED_YELLOW</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
        <LINE>003</LINE>
-       <COLUMN>152</COLUMN>
+       <COLUMN>149</COLUMN>
        <LENGTH>004</LENGTH>
        <VISLENGTH>002</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -616,11 +625,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-DIFFERENT</NAME>
-       <TEXT>______</TEXT>
+       <TEXT>_____</TEXT>
        <LINE>003</LINE>
-       <COLUMN>155</COLUMN>
-       <LENGTH>006</LENGTH>
-       <VISLENGTH>006</VISLENGTH>
+       <COLUMN>152</COLUMN>
+       <LENGTH>005</LENGTH>
+       <VISLENGTH>005</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>
@@ -635,7 +644,7 @@
        <NAME>%#AUTOTEXT012</NAME>
        <TEXT>rows_are_different_</TEXT>
        <LINE>003</LINE>
-       <COLUMN>164</COLUMN>
+       <COLUMN>165</COLUMN>
        <LENGTH>019</LENGTH>
        <VISLENGTH>019</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -650,7 +659,7 @@
        <ICON_NAME>ICON_LED_RED</ICON_NAME>
        <WITH_ICON>X</WITH_ICON>
        <LINE>004</LINE>
-       <COLUMN>152</COLUMN>
+       <COLUMN>149</COLUMN>
        <LENGTH>004</LENGTH>
        <VISLENGTH>002</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -663,11 +672,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-MISSING</NAME>
-       <TEXT>______</TEXT>
+       <TEXT>_____</TEXT>
        <LINE>004</LINE>
-       <COLUMN>155</COLUMN>
-       <LENGTH>006</LENGTH>
-       <VISLENGTH>006</VISLENGTH>
+       <COLUMN>152</COLUMN>
+       <LENGTH>005</LENGTH>
+       <VISLENGTH>005</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>
@@ -682,7 +691,7 @@
        <NAME>%#AUTOTEXT014</NAME>
        <TEXT>rows_are_missing__</TEXT>
        <LINE>004</LINE>
-       <COLUMN>164</COLUMN>
+       <COLUMN>165</COLUMN>
        <LENGTH>018</LENGTH>
        <VISLENGTH>018</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -692,14 +701,32 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-PERCENT_EQUAL</NAME>
+       <TEXT>___,__</TEXT>
+       <LINE>006</LINE>
+       <COLUMN>148</COLUMN>
+       <LENGTH>006</LENGTH>
+       <VISLENGTH>006</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>DEC</FORMAT>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <OUTPUTONLY>X</OUTPUTONLY>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <BRIGHT>X</BRIGHT>
+       <_--32_DIMENS>X</_--32_DIMENS>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>%#AUTOTEXT005</NAME>
        <TEXT>Legend_____________________________</TEXT>
-       <LINE>006</LINE>
-       <COLUMN>150</COLUMN>
+       <LINE>014</LINE>
+       <COLUMN>147</COLUMN>
        <LENGTH>036</LENGTH>
        <VISLENGTH>036</VISLENGTH>
-       <HEIGHT>007</HEIGHT>
+       <HEIGHT>004</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -709,11 +736,11 @@
        <TYPE>FRAME</TYPE>
        <NAME>%#AUTOTEXT015</NAME>
        <TEXT>Info_______________________________</TEXT>
-       <LINE>013</LINE>
+       <LINE>018</LINE>
        <COLUMN>150</COLUMN>
        <LENGTH>036</LENGTH>
        <VISLENGTH>036</VISLENGTH>
-       <HEIGHT>016</HEIGHT>
+       <HEIGHT>011</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -723,7 +750,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT016</NAME>
        <TEXT>Percentage_of_equal_records:______</TEXT>
-       <LINE>014</LINE>
+       <LINE>019</LINE>
        <COLUMN>151</COLUMN>
        <LENGTH>034</LENGTH>
        <VISLENGTH>034</VISLENGTH>
@@ -737,7 +764,7 @@
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-PERCENT_EQUAL_C</NAME>
        <TEXT>_____</TEXT>
-       <LINE>015</LINE>
+       <LINE>020</LINE>
        <COLUMN>151</COLUMN>
        <LENGTH>005</LENGTH>
        <VISLENGTH>005</VISLENGTH>
@@ -753,7 +780,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT017</NAME>
        <TEXT>Percentage_of_different_records:__</TEXT>
-       <LINE>017</LINE>
+       <LINE>021</LINE>
        <COLUMN>151</COLUMN>
        <LENGTH>034</LENGTH>
        <VISLENGTH>034</VISLENGTH>
@@ -767,7 +794,7 @@
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-PERCENT_DIFFERENT_C</NAME>
        <TEXT>_____</TEXT>
-       <LINE>018</LINE>
+       <LINE>022</LINE>
        <COLUMN>151</COLUMN>
        <LENGTH>005</LENGTH>
        <VISLENGTH>005</VISLENGTH>
@@ -783,7 +810,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT018</NAME>
        <TEXT>Percentage_of_missing_records:____</TEXT>
-       <LINE>020</LINE>
+       <LINE>023</LINE>
        <COLUMN>151</COLUMN>
        <LENGTH>034</LENGTH>
        <VISLENGTH>034</VISLENGTH>
@@ -797,7 +824,7 @@
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_CONTROLLER-&gt;GDS_ROWS_COMP_STATE-PERCENT_MISSING_C</NAME>
        <TEXT>_____</TEXT>
-       <LINE>021</LINE>
+       <LINE>024</LINE>
        <COLUMN>151</COLUMN>
        <LENGTH>005</LENGTH>
        <VISLENGTH>005</VISLENGTH>

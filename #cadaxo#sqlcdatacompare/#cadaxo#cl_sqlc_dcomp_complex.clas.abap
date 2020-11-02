@@ -577,9 +577,9 @@ protected section.
     importing
       !IV_ROW_STATUS type I
     changing
-      !EC_LIGHT_FIELD_s type CHAR1
-      !EC_LIGHT_FIELD_t type CHAR1 .
-    METHODS fill_gds_rows_comp_state."Cockpit402
+      !EC_LIGHT_FIELD_S type CHAR1
+      !EC_LIGHT_FIELD_T type CHAR1 .
+  methods FILL_GDS_ROWS_COMP_STATE . "Cockpit402
 private section.
 
   constants C_PREFIX_SOURCE type CHAR2 value 'S_' ##NO_TEXT.
@@ -2034,6 +2034,19 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD fill_gds_rows_comp_state.
+
+    gds_rows_comp_state = CORRESPONDING #( gs_rows_comp_state ).
+    gds_rows_comp_state-percent_equal = ( gds_rows_comp_state-equal / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
+    gds_rows_comp_state-percent_different = ( gds_rows_comp_state-different / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
+    gds_rows_comp_state-percent_missing = ( gds_rows_comp_state-missing / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
+    gds_rows_comp_state-percent_equal_c = gds_rows_comp_state-percent_equal.
+    gds_rows_comp_state-percent_different_c = gds_rows_comp_state-percent_different.
+    gds_rows_comp_state-percent_missing_c = gds_rows_comp_state-percent_missing.
+
+  ENDMETHOD.
+
+
   METHOD free.
 
     free_netplan( ).
@@ -2987,6 +3000,11 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
     DATA ls_layout TYPE lvc_s_layo.
     DATA l_note    TYPE string.
     DATA lt_fcat TYPE lvc_t_fcat.
+*
+*    data cc_pie_chart type ref to CL_GUI_CUSTOM_CONTAINER.
+*    data gp_inst type ref to cl_gui_gp_pres.
+
+
 
     FIELD-SYMBOLS <lt_compare_result> TYPE STANDARD TABLE.
 
@@ -3004,6 +3022,17 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
       gr_text_info_0300->set_textstream( text = l_note ).
 
+*
+*
+*      cc_pie_chart = new #( container_name = 'CC_PIE' ).
+*      gp_inst = new #( ).
+*
+*      gp_inst->if_graphic_proxy~init(
+*                       exporting parent       = cc_pie_chart
+*                                 dc           = GDC_INST
+*                                 prod_id      = cl_gui_gp_pres=>co_prod_chart
+*                                 force_prod   = gfw_true
+*                       importing retval       = retval )
 
     ENDIF.
 
@@ -3484,17 +3513,4 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
-  METHOD fill_gds_rows_comp_state.
-
-    gds_rows_comp_state = CORRESPONDING #( gs_rows_comp_state ).
-    gds_rows_comp_state-percent_equal = ( gds_rows_comp_state-equal / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
-    gds_rows_comp_state-percent_different = ( gds_rows_comp_state-different / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
-    gds_rows_comp_state-percent_missing = ( gds_rows_comp_state-missing / ( gds_rows_comp_state-equal + gds_rows_comp_state-different + gds_rows_comp_state-missing ) ) * 100."+Cockpit402
-    gds_rows_comp_state-percent_equal_c = gds_rows_comp_state-percent_equal.
-    gds_rows_comp_state-percent_different_c = gds_rows_comp_state-percent_different.
-    gds_rows_comp_state-percent_missing_c = gds_rows_comp_state-percent_missing.
-
-  ENDMETHOD.
-
 ENDCLASS.
