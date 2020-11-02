@@ -785,7 +785,9 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
             ASSIGN <ls_dfies_s> TO <ls_dfies>.
           ENDIF.
           ls_component-name = |{ <ls_component_s>-name }_{ <ls_component_t>-name }|.
-
+          IF strlen( ls_component-name ) GT 30.
+          ls_component-name = ls_component-name(30).
+          ENDIF.
         ENDIF.
 
         APPEND ls_component TO gt_components_compare.
