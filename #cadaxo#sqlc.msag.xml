@@ -956,6 +956,12 @@
      <MSGNR>157</MSGNR>
      <TEXT>Please save the variant first</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>158</MSGNR>
+     <TEXT>Awesome! Content shared (for reference) with yourself.</TEXT>
+    </T100>
    </T100>
    <LONGTEXTS>
     <item>
@@ -3041,6 +3047,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>157</MSGNR>
      <TEXT>Bitte speichern Sie zuerst die Variante</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>158</MSGNR>
+     <TEXT>Großartig! Inhalte, die (als Referenz) mit Ihnen geteilt werden.</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>

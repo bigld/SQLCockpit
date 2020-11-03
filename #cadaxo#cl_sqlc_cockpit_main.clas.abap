@@ -2841,6 +2841,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ls_stb_button-butn_type = cntb_btype_dropdown.                    "+Cockpit420
     APPEND ls_stb_button TO gt_toolbuttons_top.                     "COCKPIT-233
     CLEAR ls_stb_button.                                            "COCKPIT-233
+
+    ls_stb_button-butn_type = cntb_btype_sep.
+    APPEND ls_stb_button TO gt_toolbuttons_top.
+    CLEAR ls_stb_button.
+
     ls_stb_button-function  = 'QUEUE'.                              "COCKPIT-233
     IF /cadaxo/cl_sqlc_cockpit_api=>check_own_queue( ) = abap_true. "COCKPIT-233
       ls_stb_button-icon      = icon_msg.                           "COCKPIT-233
@@ -11294,7 +11299,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     lr_menu->add_function(
       EXPORTING
         fcode = c_saved_list_share_oth
-        text  = text-b45
+        text  = text-b48
         icon  = icon_workflow_external_event
         insert_at_the_top = abap_true ).
     lr_menu->add_function(
@@ -11979,7 +11984,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     lr_menu->add_function(
       EXPORTING
         fcode = 'SYMBOL_EXPORT'
-        text  = text-b45
+        text  = text-b47
         icon  = icon_workflow_external_event
         insert_at_the_top = abap_true ).
     lr_menu->add_function(

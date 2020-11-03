@@ -3594,6 +3594,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>012</KEY>
+     <ENTRY>Reference (sharing) with myself!</ENTRY>
+     <LENGTH>64</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>B01</KEY>
      <ENTRY>SQL Trace</ENTRY>
      <LENGTH>9</LENGTH>
@@ -3670,6 +3676,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>012</KEY>
+       <ENTRY>Referenz (Teilen) mit mir selbst!</ENTRY>
+       <LENGTH>64</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>B01</KEY>
        <ENTRY>SQL Trace</ENTRY>
        <LENGTH>9</LENGTH>
@@ -3720,7 +3732,7 @@
        <ID>I</ID>
        <KEY>Q03</KEY>
        <ENTRY>Einige Symbole existieren bereits. Welche sollen überschrieben werden?</ENTRY>
-       <LENGTH>72</LENGTH>
+       <LENGTH>75</LENGTH>
       </item>
       <item>
        <ID>I</ID>

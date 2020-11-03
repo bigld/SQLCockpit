@@ -112,7 +112,11 @@ MODULE pai_3001 INPUT.
         MESSAGE lv_comm_error TYPE 'E'.
 
       ELSE.
+        IF g_receiver NE sy-uname.
         MESSAGE s126(/cadaxo/sqlc) WITH g_receiver.
+        ELSE.
+          MESSAGE s158(/cadaxo/sqlc).
+        ENDIF.
         lcl_worker=>leave_screen( ).
 
       ENDIF.

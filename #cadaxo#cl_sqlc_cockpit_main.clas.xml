@@ -411,6 +411,18 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>B47</KEY>
+     <ENTRY>Share Symbol</ENTRY>
+     <LENGTH>22</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>B48</KEY>
+     <ENTRY>Share Saved List</ENTRY>
+     <LENGTH>26</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>D01</KEY>
      <ENTRY>DEMO Version</ENTRY>
      <LENGTH>12</LENGTH>
@@ -1583,6 +1595,18 @@
        <KEY>B46</KEY>
        <ENTRY>Variante Aktualisieren</ENTRY>
        <LENGTH>46</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>B47</KEY>
+       <ENTRY>Symbol teilen</ENTRY>
+       <LENGTH>22</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>B48</KEY>
+       <ENTRY>Gespeicherte Liste teilen</ENTRY>
+       <LENGTH>26</LENGTH>
       </item>
       <item>
        <ID>I</ID>
