@@ -59,7 +59,7 @@ CLASS /CADAXO/CL_SQLC_CSV_CUST_UTIL IMPLEMENTATION.
         rv_converted_time = i_time_int.
       WHEN '02'.
         rv_converted_time = |{ i_time_int(2) }:{ i_time_int+2(2) }:{ i_time_int+4(2) }|.
-      WHEN '02'.
+      WHEN '03'.
         rv_converted_time = |{ i_time_int(2) }{ i_time_int+2(2) }|.
       WHEN '04'.
         rv_converted_time = |{ i_time_int(2) }:{ i_time_int+2(2) }|.
