@@ -3759,11 +3759,11 @@ METHOD parse_sql_i.
         l_length            TYPE i,
         l_message           TYPE string.
 
-  DATA: lt_split         TYPE TABLE OF t_split.
-  DATA: lt_match_results TYPE TABLE OF match_result.
+  DATA: lt_split            TYPE TABLE OF t_split.
+  DATA: lt_match_results    TYPE TABLE OF match_result.
   DATA: l_sql_string_c(100) TYPE c.
-  DATA: l_maxsel TYPE i.
-  DATA: l_sql_string TYPE string.
+  DATA: l_maxsel            TYPE i.
+  DATA: l_sql_string        TYPE string.
 
   DATA ls_adm_cust TYPE /cadaxo/sqlc_admin_cust.
 
@@ -3898,27 +3898,26 @@ METHOD parse_sql_i.
       l_foff = l_foff + 7.
     ELSE.
 
-      data tab_found type abap_bool.
-      clear tab_found.
-      SELECT SINGLE @abap_true FROM dd02l WHERE tabname = @l_sql_string_c
-                                     AND as4local = 'A'
-                                     INTO @tab_found.
-      if sy-subrc <> 0.
-         SELECT SINGLE @abap_true FROM ddldependency
-                                      WHERE objectname = @l_sql_string_c
-                                       INTO @tab_found.
-      endif.
 
-      IF tab_found = abap_true.
 
-        l_sql_string_c = `SELECT * FROM ` && l_sql_string_c.
-        sql_string = l_sql_string_c.
-        l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
-        l_cl_sql_parse->sql_syntax = l_sql_string_c.
-        l_foff = l_foff + 7.
+      IF /cadaxo/cl_sqlc_special_parse=>may_be_datasource( sql_string ).
+
+        IF /cadaxo/cl_sqlc_special_parse=>is_datasource( sql_string ).
+          l_sql_string_c = `SELECT * FROM ` && l_sql_string_c.
+          sql_string = l_sql_string_c.
+          l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
+          l_cl_sql_parse->sql_syntax = l_sql_string_c.
+          l_foff = l_foff + 7.
+        ELSE.
+          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
+            EXPORTING
+              textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_tab_1st.
+        ENDIF.
 
       ELSE.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
+          EXPORTING
+            textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_at_firs.
       ENDIF.
 
     ENDIF.
