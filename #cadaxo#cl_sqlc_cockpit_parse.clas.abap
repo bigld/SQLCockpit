@@ -31,6 +31,7 @@ public section.
       END OF gts_domval .
   types:
     gtt_domval TYPE TABLE OF gts_domval .
+
     "COCKPIT-458 END
   data G_HOLD_RESULT type CHAR1 .
   data COLUMN_SYNTAX type /CADAXO/SQLCSELECTCOLUMNSYNTAX .
@@ -73,6 +74,9 @@ public section.
   data G_NO_UPTO type FLAG .
   data GT_COMPONENTS type ABAP_COMPONENT_VIEW_TAB .
   data GT_SUB_COMPONENTS type ABAP_COMPONENT_TAB .
+  data GT_COMPONENTS_DOMVAL type /CADAXO/SQLCPARSECOMPONENT_T .
+  data COMPONENTS type /IWBEP/T_ABAP_COMPDESCR .
+  data COMP type /CADAXO/SQLC_COMPDESC_T .
 
   methods CONSTRUCTOR
     importing
@@ -249,6 +253,7 @@ protected section.
     exporting
       !E_SYMBOL_VARIABLE type GTT_SYMBOL_VARIABLE
     changing
+      !C_SQL_SYNTAX type STRING
       !I_WHERE_SYNTAX type STRING .
   class-methods IS_COUNT_STAR_ONLY
     importing
@@ -473,6 +478,61 @@ METHOD add_domain_value.
     ENDTRY.
   ENDLOOP.
 
+*  me->gt_components_domval = components_new. "COCKPIT-468
+*  "BEGIN OF COCKPIT-468
+*  DATA lt_comp TYPE /CADAXO/SQLC_COMPDESC_T.
+*  DATA lt_components TYPE /IWBEP/T_ABAP_COMPDESCR.
+*  DATA ls_components TYPE /IWBEP/S_ABAP_COMPDESCR.
+*  LOOP AT components_new INTO DATA(components).
+*    CLEAR: ls_components, lt_components.
+*    CASE components-type->kind .
+*      WHEN cl_abap_typedescr=>kind_struct.
+*
+*        DATA(o_struct_desc) = CAST cl_abap_structdescr( components-type ).
+*        lt_components = o_struct_desc->components.
+*
+*             DATA: struct_type TYPE REF TO cl_abap_structdescr,
+*           comp_tab TYPE cl_abap_structdescr=>component_table,
+*           comp LIKE LINE OF comp_tab,
+*           dref TYPE REF TO data.
+*
+*      LOOP AT lt_components INTO ls_components.
+*        comp-name = ls_components-name.
+*        CASE ls_components-type_kind.
+*          WHEN 'C'.
+*            comp-type = cl_abap_elemdescr=>get_c( ls_components-length ).
+*          WHEN 'D'.
+*            comp-type = cl_abap_elemdescr=>get_d( ).
+*          WHEN 'N'.
+*            comp-type = cl_abap_elemdescr=>get_n( ls_components-length ).
+*          WHEN 'P'.
+*            comp-type = cl_abap_elemdescr=>get_p(
+*                p_length                   = ls_components-length
+*                p_decimals                 = ls_components-decimals
+*            ).
+*          WHEN 'I'.
+*            comp-type = cl_abap_elemdescr=>get_i( ).
+*          WHEN OTHERS.
+*        ENDCASE.
+*        APPEND comp TO comp_tab.
+*      ENDLOOP.
+*      struct_type = cl_abap_structdescr=>create( comp_tab ).
+*
+*      CREATE DATA dref TYPE HANDLE struct_type.
+*
+*      WHEN cl_abap_typedescr=>kind_elem.
+*        DATA(o_elem_desc) = CAST cl_abap_elemdescr( components-type ).
+*        ls_components-name  = components-name.
+*        ls_components-type_kind = o_elem_desc->type_kind.
+*        ls_components-length    = o_elem_desc->length.
+*        ls_components-decimals  = o_elem_desc->decimals.
+*        APPEND ls_components TO lt_components.
+*      WHEN OTHERS.
+*    ENDCASE.
+*    APPEND lt_components TO lt_comp.
+*  ENDLOOP.
+*  me->comp = lt_comp.
+*  "END OF COCKPIT-468
   structure_new ?= cl_abap_structdescr=>create( components_new ).
 
   tabledescr_new ?= cl_abap_tabledescr=>create( structure_new ).
@@ -529,7 +589,7 @@ METHOD add_domain_value_elm.
 *                                                                                                  *
 * Date       | Developer            | Description                                 | Correction Nr. *
 *------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
+* 19.11.2020 | Attila Kajtar        | Saved lists is not working with Domain Text | COCKPIT-468    *
 ****************************************************************************************************
 
   DATA rollname_elem TYPE REF TO cl_abap_elemdescr.
@@ -3532,6 +3592,19 @@ METHOD get_multisymbol_data_table.
     IMPORTING
       e_result_tab   =     lt_results
   ).
+* begin of change COCKPIT-464
+  IF lt_results IS INITIAL.
+    SPLIT c_sql_syntax AT 'WHERE' INTO DATA(l_pre_syntax) DATA(l_post_syntax).
+    CONDENSE l_post_syntax.
+    /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex(
+    EXPORTING
+      i_where_syntax =     l_post_syntax
+    IMPORTING
+      e_result_tab   =     lt_results
+      ).
+    i_where_syntax = l_post_syntax.
+  ENDIF.
+* end of change COCKPIT-464
 
 "  FIND ALL OCCURRENCES OF REGEX '&(\w|/|-)+&' IN l_sql RESULTS lt_results.
 

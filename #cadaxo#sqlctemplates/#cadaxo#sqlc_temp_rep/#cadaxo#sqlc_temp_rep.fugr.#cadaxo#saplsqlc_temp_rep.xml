@@ -29,13 +29,13 @@
     <item>
      <ID>I</ID>
      <KEY>P01</KEY>
-     <ENTRY>overwrite</ENTRY>
+     <ENTRY>Overwrite</ENTRY>
      <LENGTH>15</LENGTH>
     </item>
     <item>
      <ID>I</ID>
      <KEY>P02</KEY>
-     <ENTRY>cancel</ENTRY>
+     <ENTRY>Cancel</ENTRY>
      <LENGTH>10</LENGTH>
     </item>
     <item>
@@ -71,19 +71,19 @@
     <item>
      <ID>I</ID>
      <KEY>P08</KEY>
-     <ENTRY>yes</ENTRY>
+     <ENTRY>Yes</ENTRY>
      <LENGTH>3</LENGTH>
     </item>
     <item>
      <ID>I</ID>
      <KEY>P09</KEY>
-     <ENTRY>no</ENTRY>
+     <ENTRY>No</ENTRY>
      <LENGTH>4</LENGTH>
     </item>
     <item>
      <ID>I</ID>
      <KEY>P10</KEY>
-     <ENTRY>change</ENTRY>
+     <ENTRY>Change</ENTRY>
      <LENGTH>6</LENGTH>
     </item>
     <item>

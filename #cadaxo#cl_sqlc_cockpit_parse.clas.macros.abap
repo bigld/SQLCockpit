@@ -194,7 +194,8 @@ DEFINE create_dynamic_select_subpool2.
     DATA lt_symbol_variable TYPE gtt_symbol_variable.
 
     me->get_multisymbol_data_table( IMPORTING e_symbol_variable = lt_symbol_variable
-                                    CHANGING  i_where_syntax    = me->where_syntax ).
+                                    CHANGING  c_sql_syntax      = me->sql_syntax "Cockpit-464
+                                              i_where_syntax    = me->where_syntax ).
 
 
     APPEND 'DATA: L_ROWS         TYPE I,' TO lt_abap_code.

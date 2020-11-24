@@ -587,7 +587,8 @@ METHOD save_list.
           <ls_cl_sql_parse>->gs_client_handling-using_client      TO ls_sqlcresultsave-parse-using_client,
           <ls_cl_sql_parse>->g_bypassing_buffer  TO ls_sqlcresultsave-parse-bypassing_buffer,
           <ls_cl_sql_parse>->subquery            TO ls_sqlcresultsave-parse-subquery.
-
+*          <ls_cl_sql_parse>->gt_components_domval   TO ls_sqlcresultsave-parse-components_domval,  "COCKPIT-468
+*          <ls_cl_sql_parse>->comp                   TO ls_sqlcresultsave-parse-comp.  "COCKPIT-468
     MOVE <ls_cl_sql_parse>->result_table TO ls_sqlcresult_ref-table_dref.
 
     ASSIGN ls_sqlcresult_ref-table_dref->* TO <ls_t>.
@@ -643,7 +644,7 @@ METHOD save_list.
 
   EXPORT result FROM lt_result_list_raw TO DATA BUFFER ls_sqlcress-rawresult.
 
-  ls_sqlcsres-space_cons_zip = XSTRLEN( ls_sqlcress-rawresult ) / 1024.
+  ls_sqlcsres-space_cons_zip = xstrlen( ls_sqlcress-rawresult ) / 1024.
 
 * Check if max_space_kb is not exceeded
 * get saved lists

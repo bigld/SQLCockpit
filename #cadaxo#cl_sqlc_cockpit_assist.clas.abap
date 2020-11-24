@@ -282,6 +282,16 @@ public section.
       value(IV_STRING) type STRING
     returning
       value(RV_FORMATTED) type STRING .
+  class-methods CREATE_DATA_REFERENCE_DOMVAL
+    importing
+      !IV_INTTYPE type INTTYPE
+      !IV_LENG type DDLENG
+      !IV_DECIMALS type DECIMALS
+      !IV_INTLEN type INTLEN
+      !IV_STRU_NAME type STRING
+    changing
+      value(RR_DATA) type ref to DATA
+      value(RR_DATA_DOMVAL) type ref to DATA .
   PROTECTED SECTION.
 
 *"* protected components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
@@ -813,6 +823,46 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
 
   METHOD create_data_reference.
+
+    DATA l_type_element TYPE REF TO cl_abap_elemdescr.
+
+    CLEAR rr_data.
+
+    CASE iv_inttype.
+      WHEN 'c' OR 'n' OR 'x'.
+        CREATE DATA rr_data TYPE (iv_inttype) LENGTH iv_leng.
+      WHEN 'd' OR 'f' OR 'i' OR 't' OR 'v'.
+        CREATE DATA rr_data TYPE (iv_inttype).
+      WHEN 's'.
+        CREATE DATA rr_data TYPE int2.
+      WHEN 'b'.
+        CREATE DATA rr_data TYPE int1.
+      WHEN '8'.
+        CALL METHOD cl_abap_elemdescr=>('GET_INT8')
+          RECEIVING
+            p_result = l_type_element.
+        CREATE DATA rr_data TYPE HANDLE l_type_element.
+      WHEN 'g'.
+        CREATE DATA rr_data TYPE string.
+      WHEN 'p'.
+        CREATE DATA rr_data TYPE p LENGTH iv_intlen DECIMALS iv_decimals.
+      WHEN 'y'.
+        CREATE DATA rr_data TYPE xstring.
+      WHEN 'a'.
+        CREATE DATA rr_data TYPE decfloat16.
+      WHEN 'e'.
+        CREATE DATA rr_data TYPE decfloat34.
+      WHEN space.
+        TRY.
+            CREATE DATA rr_data TYPE (iv_stru_name).
+          CATCH cx_sy_create_data_error.
+        ENDTRY.
+    ENDCASE.
+
+  ENDMETHOD.
+
+
+  METHOD CREATE_DATA_REFERENCE_DOMVAL.
 
     DATA l_type_element TYPE REF TO cl_abap_elemdescr.
 
