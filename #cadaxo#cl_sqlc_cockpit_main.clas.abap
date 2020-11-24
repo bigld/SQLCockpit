@@ -3531,7 +3531,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     DATA: ls_variant    TYPE /cadaxo/sqlc_il_variants.
     DATA: l_string      TYPE string.
     DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t.           "COCKPIT-288 Insert
-
+    DATA: lv_variant_created TYPE /cadaxo/sqlcvari_name.       "COCKPIT-321
 * get editor
     me->get_sql_area( IMPORTING e_code_string = l_string ).
 
@@ -3557,22 +3557,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         EXPORTING
           i_mode     = 'I'
           il_variant = ls_variant
-          " importing
-      "   ls_variant = ls_variant_created
-        .
+        CHANGING
+          cvari_name = lv_variant_created. "COCKPIT-321
 
-      "  if ls_variant-varname is not initial.
-
-      IF 1 = 2.
-
-        "  gs_sel_variant = CORRESPONDINg #( ls_variant_created ).
-
-        "   gs_sel_variant must be set
-        "  Te
-
+      "begin of COCKPIT-321
+      IF lv_variant_created IS NOT INITIAL.
+        gs_sel_variant-varname = lv_variant_created.
         DATA(l_ctmenu3) = NEW cl_ctmenu( ).
         l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
-        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( |{ text-b46 } { gs_sel_variant-varname }| )
+        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( |{ text-b46 } { lv_variant_created }| )
                                                                    disabled = abap_false ).
 
         gc_splitter_top_toolbar->set_static_ctxmenu(
@@ -3582,8 +3575,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         ).
 
       ENDIF.
-
-      "     endif.
+      "end of COCKPIT-321
 
     ELSE.
       MESSAGE e048(/cadaxo/sqlc).

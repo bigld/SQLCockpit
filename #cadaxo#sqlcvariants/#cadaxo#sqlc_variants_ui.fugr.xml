@@ -27,6 +27,14 @@
        <TYP>/CADAXO/SQLC_IL_VARIANTS</TYP>
       </RSIMP>
      </IMPORT>
+     <CHANGING>
+      <RSCHA>
+       <PARAMETER>CVARI_NAME</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
+       <REFERENCE>X</REFERENCE>
+       <TYP>/CADAXO/SQLCVARI_NAME</TYP>
+      </RSCHA>
+     </CHANGING>
      <DOCUMENTATION>
       <RSFDO>
        <PARAMETER>I_MODE</PARAMETER>
@@ -37,6 +45,11 @@
        <PARAMETER>IL_VARIANT</PARAMETER>
        <KIND>P</KIND>
        <STEXT>SQL Cockpit - Interaction Layer Variants</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>CVARI_NAME</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>SQL Cockpit - Variant name</STEXT>
       </RSFDO>
      </DOCUMENTATION>
     </item>
