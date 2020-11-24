@@ -3557,32 +3557,33 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         EXPORTING
           i_mode     = 'I'
           il_variant = ls_variant
-       " importing
-       "   ls_variant = ls_variant_created
-          .
+          " importing
+      "   ls_variant = ls_variant_created
+        .
 
-   "  if ls_variant-varname is not initial.
+      "  if ls_variant-varname is not initial.
 
-   if 1 = 2.
+      IF 1 = 2.
 
-  "  gs_sel_variant = CORRESPONDINg #( ls_variant_created ).
+        "  gs_sel_variant = CORRESPONDINg #( ls_variant_created ).
 
- "   gs_sel_variant must be set
+        "   gs_sel_variant must be set
+        "  Test
 
-    DATA(l_ctmenu3) = NEW cl_ctmenu( ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = conv #( |{ text-b46 } { gs_sel_variant-varname }| )
-                                                               disabled = abap_false ).
+        DATA(l_ctmenu3) = NEW cl_ctmenu( ).
+        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
+        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( |{ text-b46 } { gs_sel_variant-varname }| )
+                                                                   disabled = abap_false ).
 
-      gc_splitter_top_toolbar->set_static_ctxmenu(
-        EXPORTING
-          fcode                = 'SQLVARSET'
-          ctxmenu              = l_ctmenu3
-      ).
+        gc_splitter_top_toolbar->set_static_ctxmenu(
+          EXPORTING
+            fcode                = 'SQLVARSET'
+            ctxmenu              = l_ctmenu3
+        ).
 
- endif.
+      ENDIF.
 
-"     endif.
+      "     endif.
 
     ELSE.
       MESSAGE e048(/cadaxo/sqlc).
