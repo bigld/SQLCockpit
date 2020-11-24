@@ -22,7 +22,17 @@ public section.
       END OF gts_symbol_variable .
   types:
     gtt_symbol_variable TYPE TABLE OF gts_symbol_variable .
+  types:
+    "COCKPIT-458 BEGIN
+    BEGIN OF gts_domval,
+        name         TYPE string,
+        name_desc    TYPE string,
+        fixed_values TYPE ddfixvalues,
+      END OF gts_domval .
+  types:
+    gtt_domval TYPE TABLE OF gts_domval .
 
+    "COCKPIT-458 END
   data G_HOLD_RESULT type CHAR1 .
   data COLUMN_SYNTAX type /CADAXO/SQLCSELECTCOLUMNSYNTAX .
   data WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX .
@@ -62,6 +72,11 @@ public section.
   data COLUMN_WORDS_T type /CADAXO/SQLCCODELINE_T .
   data GT_RESULT_DDFIELDS_ALL type /CADAXO/SQLCDFIES_T .
   data G_NO_UPTO type FLAG .
+  data GT_COMPONENTS type ABAP_COMPONENT_VIEW_TAB .
+  data GT_SUB_COMPONENTS type ABAP_COMPONENT_TAB .
+  data GT_COMPONENTS_DOMVAL type /CADAXO/SQLCPARSECOMPONENT_T .
+  data COMPONENTS type /IWBEP/T_ABAP_COMPDESCR .
+  data COMP type /CADAXO/SQLC_COMPDESC_T .
 
   methods CONSTRUCTOR
     importing
@@ -188,11 +203,32 @@ public section.
       !P_TASK type CLIKE
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods ADD_DOMAIN_VALUE_ELM
+    exporting
+      !E_ELM type ABAP_SIMPLE_COMPONENTDESCR
+      !E_PARENT_STR_NAME type STRING
+    changing
+      !C_DOMAIN_VALUES type GTT_DOMVAL
+      !C_DOMAIN_VALUE type GTS_DOMVAL
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods ADD_DOMAIN_VALUE_SUB
+    exporting
+      !E_COMP type ABAP_SIMPLE_COMPONENTDESCR
+    changing
+      !C_COMPONENTS_NEW type ABAP_COMPONENT_TAB
+      !C_DOMAIN_VALUES type GTT_DOMVAL
+      !C_DOMAIN_VALUE type GTS_DOMVAL
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods ADD_DOMAIN_VALUE
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
 protected section.
-*"* protected components of class /CADAXO/CL_SQLC_COCKPIT_PARSE
-*"* do not include other source files here!!!
 
   types:
+*"* protected components of class /CADAXO/CL_SQLC_COCKPIT_PARSE
+*"* do not include other source files here!!!
     BEGIN OF gts_subpool_result,
            task TYPE char32.
           INCLUDE type /cadaxo/sqlcresult_details.
@@ -217,6 +253,7 @@ protected section.
     exporting
       !E_SYMBOL_VARIABLE type GTT_SYMBOL_VARIABLE
     changing
+      !C_SQL_SYNTAX type STRING
       !I_WHERE_SYNTAX type STRING .
   class-methods IS_COUNT_STAR_ONLY
     importing
@@ -359,15 +396,356 @@ protected section.
     importing
       !I_STRING type STRING .
 private section.
+
 *"* private components of class /CADAXO/CL_SQLC_COCKPIT_PARSE
 *"* do not include other source files here!!!
-
   data G_MAIN_REF_ID type I .
 ENDCLASS.
 
 
 
 CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
+
+
+METHOD add_domain_value.
+****************************************************************************************************
+* Description             : Add Domainvalues to Result List                                        *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations : COCKPIT-458                                                            *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Attila Kajtar            Company    : CADAXO GesmbH                    *
+* Date                    : 21.10.2020               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       :                          Company    : CADAXO GesmbH                    *
+* Date                    : 21.10.2020                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 | Correction Nr. *
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+****************************************************************************************************
+  DATA structure TYPE REF TO cl_abap_structdescr.
+  DATA structure_new TYPE REF TO cl_abap_structdescr.
+  DATA sub_structure TYPE REF TO cl_abap_structdescr.
+  DATA tabledescr TYPE REF TO cl_abap_tabledescr.
+  DATA tabledescr_new TYPE REF TO cl_abap_tabledescr.
+  DATA elementdescr TYPE REF TO cl_abap_elemdescr.
+  DATA lv_string TYPE string.
+  DATA components_new TYPE abap_component_tab.
+  DATA domain_values TYPE STANDARD TABLE OF gts_domval.
+  DATA domain_value TYPE gts_domval.
+  DATA result_new TYPE REF TO data.
+  DATA result_struct_new TYPE REF TO data.
+  FIELD-SYMBOLS <result_table> TYPE STANDARD TABLE.
+  FIELD-SYMBOLS <result_new> TYPE STANDARD TABLE.
+
+  ASSIGN me->result_table->* TO <result_table>.
+  tabledescr ?= cl_abap_tabledescr=>describe_by_data( <result_table> ).
+  structure ?= tabledescr->get_table_line_type( ).
+  me->gt_components = structure->get_included_view( ).
+
+  LOOP AT me->gt_components ASSIGNING FIELD-SYMBOL(<comp>).
+    TRY.
+
+        CLEAR me->gt_sub_components.
+        sub_structure ?= <comp>-type.
+
+        add_domain_value_sub(
+          IMPORTING
+            e_comp                       = <comp>
+          CHANGING
+            c_components_new             = components_new
+            c_domain_values              = domain_values
+            c_domain_value               = domain_value
+        ).
+
+      CATCH cx_sy_move_cast_error.
+        elementdescr ?= <comp>-type.
+
+        add_domain_value_elm(
+          IMPORTING
+            e_elm                        = <comp>
+            e_parent_str_name            = lv_string
+          CHANGING
+            c_domain_values              = domain_values
+            c_domain_value               = domain_value
+        ).
+
+        APPEND LINES OF me->gt_sub_components TO components_new.
+    ENDTRY.
+  ENDLOOP.
+
+*  me->gt_components_domval = components_new. "COCKPIT-468
+*  "BEGIN OF COCKPIT-468
+*  DATA lt_comp TYPE /CADAXO/SQLC_COMPDESC_T.
+*  DATA lt_components TYPE /IWBEP/T_ABAP_COMPDESCR.
+*  DATA ls_components TYPE /IWBEP/S_ABAP_COMPDESCR.
+*  LOOP AT components_new INTO DATA(components).
+*    CLEAR: ls_components, lt_components.
+*    CASE components-type->kind .
+*      WHEN cl_abap_typedescr=>kind_struct.
+*
+*        DATA(o_struct_desc) = CAST cl_abap_structdescr( components-type ).
+*        lt_components = o_struct_desc->components.
+*
+*             DATA: struct_type TYPE REF TO cl_abap_structdescr,
+*           comp_tab TYPE cl_abap_structdescr=>component_table,
+*           comp LIKE LINE OF comp_tab,
+*           dref TYPE REF TO data.
+*
+*      LOOP AT lt_components INTO ls_components.
+*        comp-name = ls_components-name.
+*        CASE ls_components-type_kind.
+*          WHEN 'C'.
+*            comp-type = cl_abap_elemdescr=>get_c( ls_components-length ).
+*          WHEN 'D'.
+*            comp-type = cl_abap_elemdescr=>get_d( ).
+*          WHEN 'N'.
+*            comp-type = cl_abap_elemdescr=>get_n( ls_components-length ).
+*          WHEN 'P'.
+*            comp-type = cl_abap_elemdescr=>get_p(
+*                p_length                   = ls_components-length
+*                p_decimals                 = ls_components-decimals
+*            ).
+*          WHEN 'I'.
+*            comp-type = cl_abap_elemdescr=>get_i( ).
+*          WHEN OTHERS.
+*        ENDCASE.
+*        APPEND comp TO comp_tab.
+*      ENDLOOP.
+*      struct_type = cl_abap_structdescr=>create( comp_tab ).
+*
+*      CREATE DATA dref TYPE HANDLE struct_type.
+*
+*      WHEN cl_abap_typedescr=>kind_elem.
+*        DATA(o_elem_desc) = CAST cl_abap_elemdescr( components-type ).
+*        ls_components-name  = components-name.
+*        ls_components-type_kind = o_elem_desc->type_kind.
+*        ls_components-length    = o_elem_desc->length.
+*        ls_components-decimals  = o_elem_desc->decimals.
+*        APPEND ls_components TO lt_components.
+*      WHEN OTHERS.
+*    ENDCASE.
+*    APPEND lt_components TO lt_comp.
+*  ENDLOOP.
+*  me->comp = lt_comp.
+*  "END OF COCKPIT-468
+  structure_new ?= cl_abap_structdescr=>create( components_new ).
+
+  tabledescr_new ?= cl_abap_tabledescr=>create( structure_new ).
+
+  CREATE DATA result_new TYPE HANDLE tabledescr_new.
+  CREATE DATA result_struct_new TYPE HANDLE structure_new.
+
+  ASSIGN result_new->* TO <result_new>.
+  ASSIGN result_struct_new->* TO FIELD-SYMBOL(<result_struct_new>).
+
+  LOOP AT <result_table> ASSIGNING FIELD-SYMBOL(<result_line>).
+    CLEAR: <result_struct_new>.
+    MOVE-CORRESPONDING <result_line> TO <result_struct_new>.
+
+    LOOP AT domain_values ASSIGNING FIELD-SYMBOL(<domain_value>).
+      ASSIGN COMPONENT <domain_value>-name OF STRUCTURE <result_line> TO FIELD-SYMBOL(<value_key>).
+      ASSIGN COMPONENT <domain_value>-name_desc OF STRUCTURE <result_struct_new> TO FIELD-SYMBOL(<value_description>).
+
+      IF <value_key> IS ASSIGNED AND <value_description> IS ASSIGNED.
+        READ TABLE <domain_value>-fixed_values WITH KEY low = <value_key> ASSIGNING FIELD-SYMBOL(<dom_value>).
+        IF sy-subrc = 0.
+          <value_description> = <dom_value>-ddtext.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+
+    APPEND <result_struct_new> TO <result_new>.
+  ENDLOOP.
+
+  LOOP AT gt_lvc_t_fcat ASSIGNING FIELD-SYMBOL(<lvc_s_fcat>).
+    <lvc_s_fcat>-col_pos = sy-tabix.
+  ENDLOOP.
+
+  me->result_table = result_new.
+
+ENDMETHOD.
+
+
+METHOD add_domain_value_elm.
+****************************************************************************************************
+* Description             : Add Domainvalues to Result List Element processing                     *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations : COCKPIT-458                                                            *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Attila Kajtar            Company    : CADAXO GesmbH                    *
+* Date                    : 21.10.2020               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       :                          Company    : CADAXO GesmbH                    *
+* Date                    : 21.10.2020                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 | Correction Nr. *
+*------------+----------------------+---------------------------------------------+----------------*
+* 19.11.2020 | Attila Kajtar        | Saved lists is not working with Domain Text | COCKPIT-468    *
+****************************************************************************************************
+
+  DATA rollname_elem TYPE REF TO cl_abap_elemdescr.
+  DATA component_new TYPE abap_componentdescr.
+  DATA l_fcat_line TYPE lvc_s_fcat.
+  DATA fieldname TYPE string.
+  DATA fieldname_fcat TYPE string.
+  DATA result_ddfields TYPE /cadaxo/sqlcdfies.
+
+  component_new-name = e_elm-name.
+  component_new-type = e_elm-type.
+  APPEND component_new TO me->gt_sub_components.
+
+  IF e_parent_str_name IS NOT INITIAL.
+    fieldname = e_parent_str_name && '-' && e_elm-name.
+  ELSE.
+    fieldname = e_elm-name.
+  ENDIF.
+
+  READ TABLE me->gt_lvc_t_fcat WITH KEY fieldname = fieldname ASSIGNING FIELD-SYMBOL(<fcat>).
+  IF sy-subrc = 0.
+    IF <fcat>-domname IS NOT INITIAL.
+      rollname_elem ?= cl_abap_elemdescr=>describe_by_name( <fcat>-rollname ).
+      DATA(fixed_values) = rollname_elem->get_ddic_fixed_values( ).
+
+      IF fixed_values IS NOT INITIAL.
+        component_new-name = 'Q' && to_upper( cl_system_uuid=>create_uuid_c22_static( ) ).
+        REPLACE ALL OCCURRENCES OF '}' IN component_new-name WITH 'A'.
+        REPLACE ALL OCCURRENCES OF '{' IN component_new-name WITH 'B'.
+
+        IF NOT line_exists( c_domain_values[ name = e_elm-name ] ).
+          IF e_parent_str_name IS NOT INITIAL.
+            c_domain_value-name = e_parent_str_name && '-' && e_elm-name.
+            c_domain_value-name_desc = e_parent_str_name && '-' && component_new-name.
+          ELSE.
+            c_domain_value-name = e_elm-name.
+            c_domain_value-name_desc = component_new-name.
+          ENDIF.
+          c_domain_value-fixed_values = fixed_values.
+          APPEND c_domain_value TO c_domain_values.
+        ENDIF.
+
+        IF e_parent_str_name IS NOT INITIAL.
+          l_fcat_line-fieldname = e_parent_str_name && '-' && component_new-name.
+        ELSE.
+          l_fcat_line-fieldname = component_new-name.
+        ENDIF.
+
+        READ TABLE gt_lvc_t_fcat WITH KEY fieldname = fieldname INTO DATA(lvc_t_fcat).
+        DATA(tab) = sy-tabix + 1.
+        IF lvc_t_fcat IS NOT INITIAL.
+          l_fcat_line-reptext   = lvc_t_fcat-reptext.
+          l_fcat_line-scrtext_s = lvc_t_fcat-scrtext_s.
+          l_fcat_line-scrtext_m = lvc_t_fcat-scrtext_m.
+          l_fcat_line-scrtext_l = lvc_t_fcat-scrtext_l.
+
+          CLEAR: l_fcat_line-coltext.
+
+          IF me->g_user_settings-colhd_type EQ '1' OR
+            me->g_user_settings-colhd_type  EQ space.
+            l_fcat_line-coltext     =  component_new-name.
+            IF NOT me->g_user_settings-hd_show_alias IS INITIAL.
+              IF e_parent_str_name IS INITIAL.
+                l_fcat_line-coltext = component_new-name.
+              ELSE.
+                l_fcat_line-coltext = e_parent_str_name && '~' && component_new-name.
+              ENDIF.
+            ENDIF.
+          ELSE.
+            IF NOT me->g_user_settings-hd_fieldname IS INITIAL.
+              l_fcat_line-coltext = e_elm-name.
+            ENDIF.
+            CASE abap_true.
+              WHEN me->g_user_settings-hd_fieldtext_s.
+                MOVE l_fcat_line-scrtext_s TO l_fcat_line-coltext.
+              WHEN me->g_user_settings-hd_fieldtext_m.
+                MOVE l_fcat_line-scrtext_m TO l_fcat_line-coltext.
+              WHEN me->g_user_settings-hd_fieldtext_l.
+                MOVE l_fcat_line-scrtext_l TO l_fcat_line-coltext.
+            ENDCASE.
+          ENDIF.
+
+          IF l_fcat_line-coltext IS INITIAL AND me->g_user_settings-hd_fieldtext_a IS INITIAL.
+            l_fcat_line-coltext = lvc_t_fcat-fieldname.
+          ENDIF.
+          l_fcat_line-col_pos = tab.
+          l_fcat_line-outputlen = 60.
+          INSERT l_fcat_line INTO me->gt_lvc_t_fcat INDEX tab.
+        ENDIF.
+
+        component_new-type = cl_abap_elemdescr=>get_c( p_length = 60 ).
+        APPEND component_new TO me->gt_sub_components.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+ENDMETHOD.
+
+
+METHOD add_domain_value_sub.
+****************************************************************************************************
+* Description             : Add Domainvalues to Result Substructure                                *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations : COCKPIT-458                                                            *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Attila Kajtar            Company    : CADAXO GesmbH                    *
+* Date                    : 21.10.2020               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       :                          Company    : CADAXO GesmbH                    *
+* Date                    : 21.10.2020                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 | Correction Nr. *
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+****************************************************************************************************
+
+  DATA lr_substructure TYPE REF TO cl_abap_structdescr.
+  DATA sub_structure_check TYPE REF TO cl_abap_structdescr.
+  DATA component_new TYPE abap_componentdescr.
+  DATA structure_new TYPE REF TO cl_abap_structdescr.
+
+  lr_substructure ?= e_comp-type.
+  DATA(components) =  lr_substructure->get_included_view( ).
+
+  LOOP AT components ASSIGNING FIELD-SYMBOL(<comp>).
+    TRY.
+        sub_structure_check ?= <comp>-type.
+        add_domain_value_sub( IMPORTING e_comp           = <comp>
+                              CHANGING  c_components_new = c_components_new
+                                        c_domain_values	 = c_domain_values
+                                        c_domain_value   = c_domain_value
+                                         ).
+      CATCH cx_sy_move_cast_error.
+        add_domain_value_elm(
+          IMPORTING
+            e_elm                        = <comp>
+            e_parent_str_name            = e_comp-name
+          CHANGING
+            c_domain_values              = c_domain_values
+            c_domain_value               = c_domain_value
+        ).
+    ENDTRY.
+
+  ENDLOOP.
+
+  structure_new ?= cl_abap_structdescr=>create( me->gt_sub_components ).
+
+  component_new-name = e_comp-name.
+  component_new-type = structure_new.
+  APPEND component_new TO c_components_new.
+
+ENDMETHOD.
 
 
 METHOD blacklist_check_tables.
@@ -1820,7 +2198,7 @@ ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_004 SPOTS /cadaxo/sqlc_ehnsp_cls_s
 END-ENHANCEMENT-SECTION.
 
 * Marco m_execute_select
-m_execute_select.
+  m_execute_select.
 
   DATA: l_from    TYPE i,
         l_to      TYPE i,
@@ -1875,9 +2253,9 @@ m_execute_select.
   TRY.
 ***    IF me->column_syntax EQ 'COUNT( * )' OR                       "bigld COCKPIT-100
 ***       me->column_syntax EQ 'COUNT(*)'   AND                      "bigld COCKPIT-100
-        IF is_count_star_only( me->column_syntax ) AND                "bigld COCKPIT-100
-           me->group_syntax  IS INITIAL AND
-           me->subquery  IS INITIAL.
+      IF is_count_star_only( me->column_syntax ) AND                "bigld COCKPIT-100
+         me->group_syntax  IS INITIAL AND
+         me->subquery  IS INITIAL.
 
         IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
           /cadaxo/cl_sqlc_cockpit_assist=>sql_trace_on(
@@ -2502,7 +2880,7 @@ m_execute_select.
 
   ENDTRY.
 
- ENDMETHOD.
+ENDMETHOD.
 
 
 METHOD execute_select_v_2.
@@ -3214,6 +3592,19 @@ METHOD get_multisymbol_data_table.
     IMPORTING
       e_result_tab   =     lt_results
   ).
+* begin of change COCKPIT-464
+  IF lt_results IS INITIAL.
+    SPLIT c_sql_syntax AT 'WHERE' INTO DATA(l_pre_syntax) DATA(l_post_syntax).
+    CONDENSE l_post_syntax.
+    /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex(
+    EXPORTING
+      i_where_syntax =     l_post_syntax
+    IMPORTING
+      e_result_tab   =     lt_results
+      ).
+    i_where_syntax = l_post_syntax.
+  ENDIF.
+* end of change COCKPIT-464
 
 "  FIND ALL OCCURRENCES OF REGEX '&(\w|/|-)+&' IN l_sql RESULTS lt_results.
 
@@ -3441,11 +3832,11 @@ METHOD parse_sql_i.
         l_length            TYPE i,
         l_message           TYPE string.
 
-  DATA: lt_split         TYPE TABLE OF t_split.
-  DATA: lt_match_results TYPE TABLE OF match_result.
+  DATA: lt_split            TYPE TABLE OF t_split.
+  DATA: lt_match_results    TYPE TABLE OF match_result.
   DATA: l_sql_string_c(100) TYPE c.
-  DATA: l_maxsel TYPE i.
-  DATA: l_sql_string TYPE string.
+  DATA: l_maxsel            TYPE i.
+  DATA: l_sql_string        TYPE string.
 
   DATA ls_adm_cust TYPE /cadaxo/sqlc_admin_cust.
 
@@ -3580,27 +3971,26 @@ METHOD parse_sql_i.
       l_foff = l_foff + 7.
     ELSE.
 
-      data tab_found type abap_bool.
-      clear tab_found.
-      SELECT SINGLE @abap_true FROM dd02l WHERE tabname = @l_sql_string_c
-                                     AND as4local = 'A'
-                                     INTO @tab_found.
-      if sy-subrc <> 0.
-         SELECT SINGLE @abap_true FROM ddldependency
-                                      WHERE objectname = @l_sql_string_c
-                                       INTO @tab_found.
-      endif.
 
-      IF tab_found = abap_true.
 
-        l_sql_string_c = `SELECT * FROM ` && l_sql_string_c.
-        sql_string = l_sql_string_c.
-        l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
-        l_cl_sql_parse->sql_syntax = l_sql_string_c.
-        l_foff = l_foff + 7.
+      IF /cadaxo/cl_sqlc_special_parse=>may_be_datasource( sql_string ).
+
+        IF /cadaxo/cl_sqlc_special_parse=>is_datasource( sql_string ).
+          l_sql_string_c = `SELECT * FROM ` && l_sql_string_c.
+          sql_string = l_sql_string_c.
+          l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
+          l_cl_sql_parse->sql_syntax = l_sql_string_c.
+          l_foff = l_foff + 7.
+        ELSE.
+          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
+            EXPORTING
+              textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_tab_1st.
+        ENDIF.
 
       ELSE.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
+          EXPORTING
+            textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_at_firs.
       ENDIF.
 
     ENDIF.

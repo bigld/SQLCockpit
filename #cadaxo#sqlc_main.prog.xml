@@ -68,7 +68,7 @@
       <TYPE>M</TYPE>
       <NEXTSCREEN>0500</NEXTSCREEN>
       <LINES>024</LINES>
-      <COLUMNS>108</COLUMNS>
+      <COLUMNS>110</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -100,7 +100,7 @@
        <LINE>006</LINE>
        <COLUMN>058</COLUMN>
        <LENGTH>017</LENGTH>
-       <HEIGHT>003</HEIGHT>
+       <HEIGHT>004</HEIGHT>
       </RPY_DYCATT>
      </CONTAINERS>
      <FIELDS>
@@ -176,7 +176,7 @@
        <COLUMN>056</COLUMN>
        <LENGTH>053</LENGTH>
        <VISLENGTH>053</VISLENGTH>
-       <HEIGHT>005</HEIGHT>
+       <HEIGHT>006</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -214,20 +214,6 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>FRAME</TYPE>
-       <NAME>%#AUTOTEXT007</NAME>
-       <TEXT>Symbols_____________________________________________</TEXT>
-       <LINE>010</LINE>
-       <COLUMN>056</COLUMN>
-       <LENGTH>053</LENGTH>
-       <VISLENGTH>053</VISLENGTH>
-       <HEIGHT>005</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <REQU_ENTRY>N</REQU_ENTRY>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-RESULT_BUTTONS</NAME>
        <TEXT>Show_Result_Buttons______</TEXT>
@@ -246,18 +232,32 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
-       <NAME>/CADAXO/SQLCUSRP_DYN-SYMBOLS_SHOW</NAME>
-       <TEXT>Show_Symbol_ALV_____________</TEXT>
+       <NAME>/CADAXO/SQLCUSRP_DYN-DOMAINTEXT</NAME>
+       <TEXT>Add_Domain_Text_____</TEXT>
        <LINE>011</LINE>
-       <COLUMN>058</COLUMN>
-       <LENGTH>030</LENGTH>
-       <VISLENGTH>030</VISLENGTH>
+       <COLUMN>032</COLUMN>
+       <LENGTH>022</LENGTH>
+       <VISLENGTH>022</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <FROM_DICT>X</FROM_DICT>
-       <MODIFIC>F</MODIFIC>
+       <MODIFIC>3</MODIFIC>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>FRAME</TYPE>
+       <NAME>%#AUTOTEXT007</NAME>
+       <TEXT>Symbols_____________________________________________</TEXT>
+       <LINE>011</LINE>
+       <COLUMN>056</COLUMN>
+       <LENGTH>053</LENGTH>
+       <VISLENGTH>053</VISLENGTH>
+       <HEIGHT>005</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
@@ -280,8 +280,8 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
-       <NAME>/CADAXO/SQLCUSRP_DYN-SYMBOLS_PROGRAM_SHOW</NAME>
-       <TEXT>Program_Symbols_____________</TEXT>
+       <NAME>/CADAXO/SQLCUSRP_DYN-SYMBOLS_SHOW</NAME>
+       <TEXT>Show_Symbol_ALV_____________</TEXT>
        <LINE>012</LINE>
        <COLUMN>058</COLUMN>
        <LENGTH>030</LENGTH>
@@ -314,12 +314,12 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
-       <NAME>/CADAXO/SQLCUSRP_DYN-ONLY_USED_SYMBOLS</NAME>
-       <TEXT>Only_used_symbols___</TEXT>
+       <NAME>/CADAXO/SQLCUSRP_DYN-SYMBOLS_PROGRAM_SHOW</NAME>
+       <TEXT>Program_Symbols_____________</TEXT>
        <LINE>013</LINE>
        <COLUMN>058</COLUMN>
-       <LENGTH>022</LENGTH>
-       <VISLENGTH>022</VISLENGTH>
+       <LENGTH>030</LENGTH>
+       <VISLENGTH>030</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <FROM_DICT>X</FROM_DICT>
@@ -337,6 +337,23 @@
        <COLUMN>004</COLUMN>
        <LENGTH>027</LENGTH>
        <VISLENGTH>027</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <FROM_DICT>X</FROM_DICT>
+       <MODIFIC>F</MODIFIC>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>CHECK</TYPE>
+       <NAME>/CADAXO/SQLCUSRP_DYN-ONLY_USED_SYMBOLS</NAME>
+       <TEXT>Only_used_symbols___</TEXT>
+       <LINE>014</LINE>
+       <COLUMN>058</COLUMN>
+       <LENGTH>022</LENGTH>
+       <VISLENGTH>022</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <FROM_DICT>X</FROM_DICT>
@@ -380,54 +397,11 @@
        <TYPE>FRAME</TYPE>
        <NAME>%#AUTOTEXT008</NAME>
        <TEXT>Initial_date_selection______________________________</TEXT>
-       <LINE>015</LINE>
+       <LINE>016</LINE>
        <COLUMN>056</COLUMN>
        <LENGTH>053</LENGTH>
        <VISLENGTH>053</VISLENGTH>
        <HEIGHT>004</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <REQU_ENTRY>N</REQU_ENTRY>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEXT</TYPE>
-       <NAME>%#AUTOTEXT009</NAME>
-       <TEXT>History_last____</TEXT>
-       <LINE>016</LINE>
-       <COLUMN>058</COLUMN>
-       <LENGTH>016</LENGTH>
-       <VISLENGTH>016</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <REQU_ENTRY>N</REQU_ENTRY>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEMPLATE</TYPE>
-       <NAME>/CADAXO/SQLCUSRP_DYN-HISTORY_LAST_X_DAYS</NAME>
-       <TEXT>__</TEXT>
-       <LINE>016</LINE>
-       <COLUMN>075</COLUMN>
-       <LENGTH>002</LENGTH>
-       <VISLENGTH>002</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>NUMC</FORMAT>
-       <INPUT_FLD>X</INPUT_FLD>
-       <OUTPUT_FLD>X</OUTPUT_FLD>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEXT</TYPE>
-       <NAME>%#AUTOTEXT010</NAME>
-       <TEXT>days</TEXT>
-       <LINE>016</LINE>
-       <COLUMN>078</COLUMN>
-       <LENGTH>004</LENGTH>
-       <VISLENGTH>004</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
@@ -449,8 +423,8 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
-       <NAME>%#AUTOTEXT011</NAME>
-       <TEXT>Jobmonitor_last_</TEXT>
+       <NAME>%#AUTOTEXT009</NAME>
+       <TEXT>History_last____</TEXT>
        <LINE>017</LINE>
        <COLUMN>058</COLUMN>
        <LENGTH>016</LENGTH>
@@ -463,7 +437,7 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
-       <NAME>/CADAXO/SQLCUSRP_DYN-JOB_LAST_X_DAYS</NAME>
+       <NAME>/CADAXO/SQLCUSRP_DYN-HISTORY_LAST_X_DAYS</NAME>
        <TEXT>__</TEXT>
        <LINE>017</LINE>
        <COLUMN>075</COLUMN>
@@ -471,7 +445,6 @@
        <VISLENGTH>002</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>NUMC</FORMAT>
-       <FROM_DICT>X</FROM_DICT>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
       </RPY_DYFATC>
@@ -479,7 +452,7 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
-       <NAME>%#AUTOTEXT012</NAME>
+       <NAME>%#AUTOTEXT010</NAME>
        <TEXT>days</TEXT>
        <LINE>017</LINE>
        <COLUMN>078</COLUMN>
@@ -524,6 +497,50 @@
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <DICT_I_VAL>X</DICT_I_VAL>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT011</NAME>
+       <TEXT>Jobmonitor_last_</TEXT>
+       <LINE>018</LINE>
+       <COLUMN>058</COLUMN>
+       <LENGTH>016</LENGTH>
+       <VISLENGTH>016</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>/CADAXO/SQLCUSRP_DYN-JOB_LAST_X_DAYS</NAME>
+       <TEXT>__</TEXT>
+       <LINE>018</LINE>
+       <COLUMN>075</COLUMN>
+       <LENGTH>002</LENGTH>
+       <VISLENGTH>002</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>NUMC</FORMAT>
+       <FROM_DICT>X</FROM_DICT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT012</NAME>
+       <TEXT>days</TEXT>
+       <LINE>018</LINE>
+       <COLUMN>078</COLUMN>
+       <LENGTH>004</LENGTH>
+       <VISLENGTH>004</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
@@ -786,6 +803,21 @@
        <FORMAT>CHAR</FORMAT>
        <FROM_DICT>X</FROM_DICT>
        <MODIFIC>F</MODIFIC>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>RADIOGROUP</CONT_TYPE>
+       <CONT_NAME>%A_/CADAXO/SQLCUSRP_DYN-RESULT_WINDOW_VERTICAL</CONT_NAME>
+       <TYPE>RADIO</TYPE>
+       <NAME>/CADAXO/SQLCUSRP_DYN-RESULT_WINDOW_TAB</NAME>
+       <TEXT>Tab</TEXT>
+       <LINE>009</LINE>
+       <COLUMN>058</COLUMN>
+       <LENGTH>005</LENGTH>
+       <VISLENGTH>005</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
       </RPY_DYFATC>
@@ -3562,6 +3594,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>012</KEY>
+     <ENTRY>Reference (sharing) with myself!</ENTRY>
+     <LENGTH>64</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>B01</KEY>
      <ENTRY>SQL Trace</ENTRY>
      <LENGTH>9</LENGTH>
@@ -3638,6 +3676,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>012</KEY>
+       <ENTRY>Referenz (Teilen) mit mir selbst!</ENTRY>
+       <LENGTH>64</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>B01</KEY>
        <ENTRY>SQL Trace</ENTRY>
        <LENGTH>9</LENGTH>
@@ -3688,7 +3732,7 @@
        <ID>I</ID>
        <KEY>Q03</KEY>
        <ENTRY>Einige Symbole existieren bereits. Welche sollen überschrieben werden?</ENTRY>
-       <LENGTH>72</LENGTH>
+       <LENGTH>75</LENGTH>
       </item>
       <item>
        <ID>I</ID>

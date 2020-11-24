@@ -203,7 +203,7 @@ MODULE check_sap_user INPUT.
       SELECT SINGLE bname FROM usr02 INTO l_bname
              WHERE bname = <user>.
       IF sy-subrc <> 0.
-        MESSAGE e018(/cadaxo/sqlc) WITH /cadaxo/sqlc_jobwiz_fields-notification_sap_mail.
+        MESSAGE e018(/cadaxo/sqlc) WITH <user>.
       ENDIF.
     ENDLOOP.
   ENDIF.

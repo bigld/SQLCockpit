@@ -25,7 +25,10 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util DEFINITION
         VALUE(rv_converted_time) TYPE char8 .
 ENDCLASS.
 
-CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
+
+
+CLASS /CADAXO/CL_SQLC_CSV_CUST_UTIL IMPLEMENTATION.
+
 
   METHOD convert_date.
 
@@ -37,7 +40,7 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
       WHEN '03'.""YYYY.MM.DD
         rv_converted_date = |{ i_date(4) }.{ i_date+4(2) }.{ i_date+6(2) }|.
       WHEN '04'."DDMMYYYY
-        rv_converted_date = |{ i_date(4) }{ i_date+4(2) }{ i_date+6(2) }|.
+        rv_converted_date = |{ i_date+6(2) }{ i_date+4(2) }{ i_date(4) }|.
       WHEN '05'."DD-MM-YYYY
         rv_converted_date = |{ i_date+6(2) }-{ i_date+4(2) }-{ i_date(4) }|.
       WHEN '06'."DD.MM.YYYY
@@ -48,6 +51,7 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD convert_time.
 
     CASE i_time_type.
@@ -55,7 +59,7 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
         rv_converted_time = i_time_int.
       WHEN '02'.
         rv_converted_time = |{ i_time_int(2) }:{ i_time_int+2(2) }:{ i_time_int+4(2) }|.
-      WHEN '02'.
+      WHEN '03'.
         rv_converted_time = |{ i_time_int(2) }{ i_time_int+2(2) }|.
       WHEN '04'.
         rv_converted_time = |{ i_time_int(2) }:{ i_time_int+2(2) }|.
@@ -64,6 +68,7 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
     ENDCASE.
 
   ENDMETHOD.
+
 
   METHOD get_separator.
 

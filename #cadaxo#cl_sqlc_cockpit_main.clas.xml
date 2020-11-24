@@ -411,6 +411,18 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>B47</KEY>
+     <ENTRY>Share Symbol</ENTRY>
+     <LENGTH>22</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>B48</KEY>
+     <ENTRY>Share Saved List</ENTRY>
+     <LENGTH>26</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>D01</KEY>
      <ENTRY>DEMO Version</ENTRY>
      <LENGTH>12</LENGTH>
@@ -654,6 +666,12 @@
      <KEY>M10</KEY>
      <ENTRY>Matrix</ENTRY>
      <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>M11</KEY>
+     <ENTRY>Tab</ENTRY>
+     <LENGTH>13</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -1041,6 +1059,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>Q63</KEY>
+     <ENTRY>Do you want to add the SQL query at the end of the editor or do you want to replace the whole editor?</ENTRY>
+     <LENGTH>104</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>S01</KEY>
      <ENTRY>Deleting jobs ...</ENTRY>
      <LENGTH>30</LENGTH>
@@ -1149,6 +1173,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>T17</KEY>
+     <ENTRY>Add SQL query to editor</ENTRY>
+     <LENGTH>104</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>TAB</KEY>
      <ENTRY>Table</ENTRY>
      <LENGTH>15</LENGTH>
@@ -1176,6 +1206,18 @@
      <KEY>X04</KEY>
      <ENTRY>No</ENTRY>
      <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>X05</KEY>
+     <ENTRY>Add</ENTRY>
+     <LENGTH>13</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>X06</KEY>
+     <ENTRY>Replace</ENTRY>
+     <LENGTH>16</LENGTH>
     </item>
    </TPOOL>
    <I18N_TPOOL>
@@ -1580,6 +1622,18 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>B47</KEY>
+       <ENTRY>Symbol teilen</ENTRY>
+       <LENGTH>22</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>B48</KEY>
+       <ENTRY>Gespeicherte Liste teilen</ENTRY>
+       <LENGTH>26</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>D01</KEY>
        <ENTRY>DEMO Version</ENTRY>
        <LENGTH>12</LENGTH>
@@ -1823,6 +1877,12 @@
        <KEY>M10</KEY>
        <ENTRY>Matrix</ENTRY>
        <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>M11</KEY>
+       <ENTRY>Tab</ENTRY>
+       <LENGTH>13</LENGTH>
       </item>
       <item>
        <ID>I</ID>
@@ -2210,6 +2270,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>Q63</KEY>
+       <ENTRY>Möchten Sie die SQL-Abfrage am Ende des Editors hinzufügen oder den gesamten Editor ersetzen?</ENTRY>
+       <LENGTH>104</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>S01</KEY>
        <ENTRY>Jobs werden gelöscht ...</ENTRY>
        <LENGTH>30</LENGTH>
@@ -2318,6 +2384,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>T17</KEY>
+       <ENTRY>SQL-Abfrage zum Editor hinzufügen</ENTRY>
+       <LENGTH>104</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>TAB</KEY>
        <ENTRY>Tabelle</ENTRY>
        <LENGTH>15</LENGTH>
@@ -2345,6 +2417,18 @@
        <KEY>X04</KEY>
        <ENTRY>Nein</ENTRY>
        <LENGTH>12</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>X05</KEY>
+       <ENTRY>Hinzufügen</ENTRY>
+       <LENGTH>13</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>X06</KEY>
+       <ENTRY>Ersetzen</ENTRY>
+       <LENGTH>16</LENGTH>
       </item>
      </TEXTPOOL>
     </item>
@@ -2708,6 +2792,12 @@
      <CMPNAME>EXECUTE_SQL_BACKGROUND_WIZ</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Call background wizard</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>FILL_USED_SYMBOLS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Fill used symbols</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
@@ -3131,6 +3221,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>GR_RESULTS_TAB_TOOLBAR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Toolbar Control</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>GR_USER_LOG</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>SQL Cockpit - Userlog</DESCRIPT>
@@ -3156,6 +3252,18 @@
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>GS_SPLITTER_RESULTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Splitter Control</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>GS_SPLITTER_RESULTS_TAB</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Splitter Control</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>GS_SPLITTER_RESULTS_TABDAT</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Splitter Control</DESCRIPT>
     </SEOCOMPOTX>
@@ -4097,6 +4205,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>ON_TABBAR_TOOLBAR_FUNCSEL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Eventhandler: ON_RESULT_TOOLBAR_FUNCSEL</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>ON_TOOLBAR_FUNCTION_SELECTED</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Eventhandler: ON_TOOLBAR_FUNCTION_SELECTED</DESCRIPT>
@@ -4310,6 +4424,18 @@
      <CMPNAME>SHOW_RESULT</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Result ALVs</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>SHOW_RESULT_TAB</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>show result tab</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>SHOW_RESULT_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>show result table</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>

@@ -100,7 +100,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_API IMPLEMENTATION.
 
 
   METHOD add_item.
@@ -146,27 +146,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
         INSERT INTO /cadaxo/sqlcapip VALUES ls_pos.
       CATCH  /cadaxo/cx_sqlc_syntax_error ##NO_HANDLER.
     ENDTRY.
-
-  ENDMETHOD.
-
-  METHOD get_objecttype_handler.
-
-    CASE iv_typ.
-      WHEN cs_api_types-sql.
-        e_objecttype_api  = NEW /cadaxo/cl_sqlc_api_ot_sql( ).
-
-      WHEN cs_api_types-symbols.
-        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_symbol( ).
-
-      WHEN cs_api_types-variant.
-        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_variant( ).
-
-      WHEN cs_api_types-savedlist.
-        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_savedli( ).
-
-      WHEN OTHERS.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
-    ENDCASE.
 
   ENDMETHOD.
 
@@ -327,32 +306,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD get_share_factory.
-****************************************************************************************************
-* Description             : Create Share Factory                                                   *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-* Creates and returns an instance for new API call                                                 *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Harald Wiesinger         Company    : CADAXO GesmbH                    *
-* Date                    : 01.08.2017               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-    CREATE OBJECT ro_instance.
-
-    ro_instance->set_header_id( EXPORTING iv_id = iv_id ).
-
-  ENDMETHOD.
-
   METHOD create_share_factory.
 ****************************************************************************************************
 * Description             : Create Share Factory                                                   *
@@ -469,6 +422,28 @@ CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD get_objecttype_handler.
+
+    CASE iv_typ.
+      WHEN cs_api_types-sql.
+        e_objecttype_api  = NEW /cadaxo/cl_sqlc_api_ot_sql( ).
+
+      WHEN cs_api_types-symbols.
+        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_symbol( ).
+
+      WHEN cs_api_types-variant.
+        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_variant( ).
+
+      WHEN cs_api_types-savedlist.
+        e_objecttype_api = NEW /cadaxo/cl_sqlc_api_ot_savedli( ).
+
+      WHEN OTHERS.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
+    ENDCASE.
+
+  ENDMETHOD.
+
+
   METHOD get_own_queue.
 ****************************************************************************************************
 * Description             : Get own queue                                                          *
@@ -498,10 +473,16 @@ CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
       EXPORTING
         domname   = '/CADAXO/SQLCAPI_POSITION_TYP'
         text      = abap_true
+        langu     = '*'         "COCKPIT-463 "read all values
       TABLES
         dd07v_tab = position_type_sylangu_texts
       EXCEPTIONS
         OTHERS    = 1.
+* begin of insert +cockpit463
+DATA(position_type_altlangu_texts) = position_type_sylangu_texts.
+DELETE position_type_sylangu_texts WHERE ddlanguage NE sy-langu.
+DELETE position_type_altlangu_texts WHERE ddlanguage = sy-langu.
+* end   of insert +cockpit463
 
     SELECT *
         FROM /cadaxo/sqlcapih
@@ -540,14 +521,21 @@ CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
         LOOP AT lt_items ASSIGNING FIELD-SYMBOL(<ls_item>).
 
           IF line_exists( position_type_sylangu_texts[ valpos = <ls_item>-typ ] ).
-            DATA(type_text) = position_type_sylangu_texts[ valpos = <ls_item>-typ ]-ddtext.
+            DATA(type_text) = position_type_sylangu_texts[ valpos = <ls_item>-typ ddlanguage = sy-langu ]-ddtext."+Cockpit-463
+*           DATA(type_text) = position_type_sylangu_texts[ valpos = <ls_item>-typ ]-ddtext."-Cockpit-463
           ELSE.
             RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
           ENDIF.
           FIELD-SYMBOLS <type_field> TYPE /cadaxo/sqlcapi_queue_postype.
           ASSIGN COMPONENT |{ condense( val = type_text from = | | to = || ) }| OF STRUCTURE <ls_queue> TO <type_field>.
           IF sy-subrc <> 0.
-            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
+*         begin of insert cockpit-463
+           DATA(type_text_alt) = position_type_altlangu_texts[ valpos = <ls_item>-typ ]-ddtext.
+           ASSIGN COMPONENT |{ condense( val = type_text_alt from = | | to = || ) }| OF STRUCTURE <ls_queue> TO <type_field>.
+            IF sy-subrc <> 0.
+*         end   of insert cockpit-463
+              RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
+            ENDIF."+cockpit-463
           ENDIF.
           <type_field>-position_typ = <ls_item>-typ.
 
@@ -568,6 +556,33 @@ CLASS /cadaxo/cl_sqlc_cockpit_api IMPLEMENTATION.
       ENDIF.
 
     ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD get_share_factory.
+****************************************************************************************************
+* Description             : Create Share Factory                                                   *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+* Creates and returns an instance for new API call                                                 *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Harald Wiesinger         Company    : CADAXO GesmbH                    *
+* Date                    : 01.08.2017               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
+* Date                    : xx.xx.2010                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+****************************************************************************************************
+    CREATE OBJECT ro_instance.
+
+    ro_instance->set_header_id( EXPORTING iv_id = iv_id ).
 
   ENDMETHOD.
 

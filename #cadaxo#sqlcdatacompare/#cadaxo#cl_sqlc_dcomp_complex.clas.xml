@@ -50,6 +50,18 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>007</KEY>
+     <ENTRY>List Number</ENTRY>
+     <LENGTH>21</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>008</KEY>
+     <ENTRY>Toggle ALV Output</ENTRY>
+     <LENGTH>27</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>I01</KEY>
      <ENTRY>Fields can be connected with drag and drop.</ENTRY>
      <LENGTH>60</LENGTH>
@@ -193,6 +205,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>007</KEY>
+       <ENTRY>Listennr.</ENTRY>
+       <LENGTH>21</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>I01</KEY>
        <ENTRY>Felder können mittels Drag and Drop verbunden werden</ENTRY>
        <LENGTH>60</LENGTH>
@@ -322,6 +340,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>BUILD_RESULT_FCAT_LINE_HR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>build result fcat line - HR mode</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
      <CMPNAME>BUILD_SORT_TABLE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>build sort table</DESCRIPT>
@@ -388,6 +412,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>COMPARE_SET_LINE_MISSING_HR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Missing line HR mode</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
      <CMPNAME>CONSTRUCTOR</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Constructor</DESCRIPT>
@@ -415,6 +445,12 @@
      <CMPNAME>DO_CHECK</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>do check</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>DO_CHECK_HR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>do check for horizantal table display</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
@@ -742,6 +778,18 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SWITCH_TO_HR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Switch to Horizantal Cascading in ALV Table Compare Display</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>SWITCH_TO_VR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Switch to Vertical Cascading in ALV Table Compare Display</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
      <CMPNAME>TOGGLE_BUTTON</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>toggle button</DESCRIPT>
@@ -763,6 +811,12 @@
      <CMPNAME>UPDATE_STATUS</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>update status</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_DCOMP_COMPLEX</CLSNAME>
+     <CMPNAME>UPDATE_STATUS_HR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>update status - HR mode</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
   </asx:values>

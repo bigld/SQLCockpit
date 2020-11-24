@@ -328,7 +328,7 @@ MODULE pai_0100 INPUT.
     WHEN 'SQL_SHR_ME'.                       "cockpit-420
       DATA lv_uname TYPE /cadaxo/sqlcapi_receiver. "cockpit-420
       lv_uname = sy-uname.                   "cockpit-420
-      PERFORM share_sql_area USING lv_uname text-002. "cockpit-420
+      PERFORM share_sql_area USING lv_uname text-012. "cockpit-420
     WHEN 'QUEUE'.
       PERFORM show_api_queue.
     WHEN 'SAVE_LISTS'.
