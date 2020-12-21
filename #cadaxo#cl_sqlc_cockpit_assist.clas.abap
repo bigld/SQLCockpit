@@ -251,6 +251,11 @@ public section.
       !IV_DECIMALS type DECIMALS
       !IV_INTLEN type INTLEN
       !IV_STRU_NAME type STRING
+      !IV_TABIX type SYST_TABIX
+      !IV_DOMAINTEXT type /CADAXO/SQLCADDDOMAINTEXT
+      !IT_COMPONENTS_DOMVAL type /CADAXO/SQLCPARSECOMPONENT_T
+      !IT_COMP type /CADAXO/SQLC_COMPDESC_T
+      !IT_DOMVAL type /CADAXO/SQLC_DOMVAL_T
     returning
       value(RR_DATA) type ref to DATA .
   class-methods CONVERT_VALUE_INT_TO_EDITOR
@@ -282,16 +287,6 @@ public section.
       value(IV_STRING) type STRING
     returning
       value(RV_FORMATTED) type STRING .
-  class-methods CREATE_DATA_REFERENCE_DOMVAL
-    importing
-      !IV_INTTYPE type INTTYPE
-      !IV_LENG type DDLENG
-      !IV_DECIMALS type DECIMALS
-      !IV_INTLEN type INTLEN
-      !IV_STRU_NAME type STRING
-    changing
-      value(RR_DATA) type ref to DATA
-      value(RR_DATA_DOMVAL) type ref to DATA .
   PROTECTED SECTION.
 
 *"* protected components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
@@ -825,6 +820,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
   METHOD create_data_reference.
 
     DATA l_type_element TYPE REF TO cl_abap_elemdescr.
+    DATA struct_type TYPE REF TO cl_abap_structdescr.                  "COCKPIT-468
+    DATA comp_tab TYPE cl_abap_structdescr=>component_table.           "COCKPIT-468
+    DATA comp     LIKE LINE OF comp_tab.                               "COCKPIT-468
+    DATA lt_comp  TYPE /cadaxo/sqlc_t_abap_compdescr.                  "COCKPIT-468
+    FIELD-SYMBOLS: <fs_components> TYPE /cadaxo/sqlc_s_abap_compdescr. "COCKPIT-468
 
     CLEAR rr_data.
 
@@ -854,47 +854,42 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
         CREATE DATA rr_data TYPE decfloat34.
       WHEN space.
         TRY.
-            CREATE DATA rr_data TYPE (iv_stru_name).
-          CATCH cx_sy_create_data_error.
-        ENDTRY.
-    ENDCASE.
-
-  ENDMETHOD.
-
-
-  METHOD CREATE_DATA_REFERENCE_DOMVAL.
-
-    DATA l_type_element TYPE REF TO cl_abap_elemdescr.
-
-    CLEAR rr_data.
-
-    CASE iv_inttype.
-      WHEN 'c' OR 'n' OR 'x'.
-        CREATE DATA rr_data TYPE (iv_inttype) LENGTH iv_leng.
-      WHEN 'd' OR 'f' OR 'i' OR 't' OR 'v'.
-        CREATE DATA rr_data TYPE (iv_inttype).
-      WHEN 's'.
-        CREATE DATA rr_data TYPE int2.
-      WHEN 'b'.
-        CREATE DATA rr_data TYPE int1.
-      WHEN '8'.
-        CALL METHOD cl_abap_elemdescr=>('GET_INT8')
-          RECEIVING
-            p_result = l_type_element.
-        CREATE DATA rr_data TYPE HANDLE l_type_element.
-      WHEN 'g'.
-        CREATE DATA rr_data TYPE string.
-      WHEN 'p'.
-        CREATE DATA rr_data TYPE p LENGTH iv_intlen DECIMALS iv_decimals.
-      WHEN 'y'.
-        CREATE DATA rr_data TYPE xstring.
-      WHEN 'a'.
-        CREATE DATA rr_data TYPE decfloat16.
-      WHEN 'e'.
-        CREATE DATA rr_data TYPE decfloat34.
-      WHEN space.
-        TRY.
-            CREATE DATA rr_data TYPE (iv_stru_name).
+            "COCKPIT-468
+            IF iv_domaintext IS INITIAL.
+              CREATE DATA rr_data TYPE (iv_stru_name).
+            ELSE.
+              READ TABLE it_comp INTO lt_comp INDEX iv_tabix.
+              LOOP AT lt_comp ASSIGNING <fs_components>.
+                CLEAR: comp.
+                comp-name = <fs_components>-name.
+                CASE <fs_components>-type_kind.
+                  WHEN 'C'.
+                    <fs_components>-length = <fs_components>-length / 2.
+                    comp-type = cl_abap_elemdescr=>get_c( <fs_components>-length ).
+                  WHEN 'D'.
+                    comp-type = cl_abap_elemdescr=>get_d( ).
+                  WHEN 'N'.
+                    <fs_components>-length = <fs_components>-length / 2.
+                    comp-type = cl_abap_elemdescr=>get_n( <fs_components>-length ).
+                  WHEN 'P'.
+                    comp-type = cl_abap_elemdescr=>get_p(
+                        p_length                   = <fs_components>-length
+                        p_decimals                 = <fs_components>-decimals
+                    ).
+                  WHEN 'I'.
+                    comp-type = cl_abap_elemdescr=>get_i( ).
+                  WHEN 'T'.
+                    comp-type = cl_abap_elemdescr=>get_t( ).
+                  WHEN 'X'.
+                    comp-type = cl_abap_elemdescr=>get_x( p_length = <fs_components>-length ).
+                  WHEN OTHERS.
+                ENDCASE.
+                APPEND comp TO comp_tab.
+              ENDLOOP.
+              struct_type = cl_abap_structdescr=>create( comp_tab ).
+              CREATE DATA rr_data TYPE HANDLE struct_type.
+            ENDIF.
+            "COCKPIT-468
           CATCH cx_sy_create_data_error.
         ENDTRY.
     ENDCASE.

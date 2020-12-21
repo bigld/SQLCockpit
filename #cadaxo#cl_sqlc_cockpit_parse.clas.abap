@@ -75,6 +75,7 @@ public section.
   data GT_COMPONENTS type ABAP_COMPONENT_VIEW_TAB .
   data GT_SUB_COMPONENTS type ABAP_COMPONENT_TAB .
   data GT_COMPONENTS_DOMVAL type /CADAXO/SQLCPARSECOMPONENT_T .
+  data GT_DOMVAL type /CADAXO/SQLC_DOMVAL_T .
   data COMPONENTS type /IWBEP/T_ABAP_COMPDESCR .
   data COMP type /CADAXO/SQLC_COMPDESC_T .
 
@@ -425,7 +426,7 @@ METHOD add_domain_value.
 *                                                                                                  *
 * Date       | Developer            | Description                                 | Correction Nr. *
 *------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
+* 07.12.2020 | A. Kajtar            | Saved List error                            | COCKPIT-468    *
 ****************************************************************************************************
   DATA structure TYPE REF TO cl_abap_structdescr.
   DATA structure_new TYPE REF TO cl_abap_structdescr.
@@ -439,6 +440,9 @@ METHOD add_domain_value.
   DATA domain_value TYPE gts_domval.
   DATA result_new TYPE REF TO data.
   DATA result_struct_new TYPE REF TO data.
+  DATA ls_components TYPE /cadaxo/sqlc_s_abap_compdescr.              "COCKPIT-468
+  DATA lt_components TYPE /cadaxo/sqlc_t_abap_compdescr.              "COCKPIT-468
+  DATA lt_comp       TYPE /cadaxo/sqlc_compdesc_t.                    "COCKPIT-468
   FIELD-SYMBOLS <result_table> TYPE STANDARD TABLE.
   FIELD-SYMBOLS <result_new> TYPE STANDARD TABLE.
 
@@ -477,62 +481,30 @@ METHOD add_domain_value.
         APPEND LINES OF me->gt_sub_components TO components_new.
     ENDTRY.
   ENDLOOP.
+  "BEGIN OF COCKPIT-468
+  me->gt_components_domval = components_new.
+  MOVE-CORRESPONDING domain_values TO me->gt_domval.
 
-*  me->gt_components_domval = components_new. "COCKPIT-468
-*  "BEGIN OF COCKPIT-468
-*  DATA lt_comp TYPE /CADAXO/SQLC_COMPDESC_T.
-*  DATA lt_components TYPE /IWBEP/T_ABAP_COMPDESCR.
-*  DATA ls_components TYPE /IWBEP/S_ABAP_COMPDESCR.
-*  LOOP AT components_new INTO DATA(components).
-*    CLEAR: ls_components, lt_components.
-*    CASE components-type->kind .
-*      WHEN cl_abap_typedescr=>kind_struct.
-*
-*        DATA(o_struct_desc) = CAST cl_abap_structdescr( components-type ).
-*        lt_components = o_struct_desc->components.
-*
-*             DATA: struct_type TYPE REF TO cl_abap_structdescr,
-*           comp_tab TYPE cl_abap_structdescr=>component_table,
-*           comp LIKE LINE OF comp_tab,
-*           dref TYPE REF TO data.
-*
-*      LOOP AT lt_components INTO ls_components.
-*        comp-name = ls_components-name.
-*        CASE ls_components-type_kind.
-*          WHEN 'C'.
-*            comp-type = cl_abap_elemdescr=>get_c( ls_components-length ).
-*          WHEN 'D'.
-*            comp-type = cl_abap_elemdescr=>get_d( ).
-*          WHEN 'N'.
-*            comp-type = cl_abap_elemdescr=>get_n( ls_components-length ).
-*          WHEN 'P'.
-*            comp-type = cl_abap_elemdescr=>get_p(
-*                p_length                   = ls_components-length
-*                p_decimals                 = ls_components-decimals
-*            ).
-*          WHEN 'I'.
-*            comp-type = cl_abap_elemdescr=>get_i( ).
-*          WHEN OTHERS.
-*        ENDCASE.
-*        APPEND comp TO comp_tab.
-*      ENDLOOP.
-*      struct_type = cl_abap_structdescr=>create( comp_tab ).
-*
-*      CREATE DATA dref TYPE HANDLE struct_type.
-*
-*      WHEN cl_abap_typedescr=>kind_elem.
-*        DATA(o_elem_desc) = CAST cl_abap_elemdescr( components-type ).
-*        ls_components-name  = components-name.
-*        ls_components-type_kind = o_elem_desc->type_kind.
-*        ls_components-length    = o_elem_desc->length.
-*        ls_components-decimals  = o_elem_desc->decimals.
-*        APPEND ls_components TO lt_components.
-*      WHEN OTHERS.
-*    ENDCASE.
-*    APPEND lt_components TO lt_comp.
-*  ENDLOOP.
-*  me->comp = lt_comp.
-*  "END OF COCKPIT-468
+  LOOP AT components_new INTO DATA(components).
+    CLEAR: ls_components, lt_components.
+    CASE components-type->kind .
+      WHEN cl_abap_typedescr=>kind_struct.
+        DATA(o_struct_desc) = CAST cl_abap_structdescr( components-type ).
+        lt_components = o_struct_desc->components.
+        APPEND lt_components TO lt_comp.
+      WHEN cl_abap_typedescr=>kind_elem.
+        DATA(o_elem_desc) = CAST cl_abap_elemdescr( components-type ).
+        ls_components-name  = components-name.
+        ls_components-type_kind = o_elem_desc->type_kind.
+        ls_components-length    = o_elem_desc->length.
+        ls_components-decimals  = o_elem_desc->decimals.
+        APPEND ls_components TO lt_components.
+        APPEND lt_components TO lt_comp.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDLOOP.
+  me->comp = lt_comp.
+  "END OF COCKPIT-468
   structure_new ?= cl_abap_structdescr=>create( components_new ).
 
   tabledescr_new ?= cl_abap_tabledescr=>create( structure_new ).
