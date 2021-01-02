@@ -4,8 +4,7 @@
   <asx:values>
    <VSEOCLASS>
     <CLSNAME>/CADAXO/CL_SQLC_TEMPLATE</CLSNAME>
-    <LANGU>E</LANGU>
-    <DESCRIPT>SQL Cockpit - Template Generation Base</DESCRIPT>
+    <LANGU>D</LANGU>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

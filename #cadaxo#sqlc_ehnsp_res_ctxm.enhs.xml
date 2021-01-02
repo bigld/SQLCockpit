@@ -3,7 +3,6 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <TOOL>BADI_DEF</TOOL>
-   <SHORTTEXT>SQL Cockpit - Enhancement Spot - Result List Conext Menu</SHORTTEXT>
    <BADI_DATA>
     <ENH_BADI_DATA>
      <BADI_NAME>/CADAXO/SQLC_BADI_RES_CTXM</BADI_NAME>

@@ -32,9 +32,7 @@ FUNCTION /cadaxo/sqlc_temp_rep_wiz.
 
   PERFORM init_roadmap.
 
-
-
-  CALL SCREEN 0100 STARTING AT 20 2 ENDING AT 140 22.
+  CALL SCREEN 0100 STARTING AT 20 2 ENDING AT 140 23.
 
   PERFORM get_selopt.
   PERFORM get_enh_include.

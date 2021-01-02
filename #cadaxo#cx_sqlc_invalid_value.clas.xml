@@ -4,8 +4,8 @@
   <asx:values>
    <VSEOCLASS>
     <CLSNAME>/CADAXO/CX_SQLC_INVALID_VALUE</CLSNAME>
-    <LANGU>E</LANGU>
-    <DESCRIPT>SQL Cockpit - Invalide Value</DESCRIPT>
+    <LANGU>D</LANGU>
+    <DESCRIPT>SQL Cockpit - Invalid Value</DESCRIPT>
     <CATEGORY>40</CATEGORY>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>

@@ -515,7 +515,7 @@ METHOD save_list.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
+* 07.12.2020 | A.Kajtar             | Saved List error in case of Add Domain func.|  COCKPIT-468   *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
@@ -586,9 +586,10 @@ METHOD save_list.
           <ls_cl_sql_parse>->gs_client_handling-client_specified  TO ls_sqlcresultsave-parse-client_specified,
           <ls_cl_sql_parse>->gs_client_handling-using_client      TO ls_sqlcresultsave-parse-using_client,
           <ls_cl_sql_parse>->g_bypassing_buffer  TO ls_sqlcresultsave-parse-bypassing_buffer,
-          <ls_cl_sql_parse>->subquery            TO ls_sqlcresultsave-parse-subquery.
-*          <ls_cl_sql_parse>->gt_components_domval   TO ls_sqlcresultsave-parse-components_domval,  "COCKPIT-468
-*          <ls_cl_sql_parse>->comp                   TO ls_sqlcresultsave-parse-comp.  "COCKPIT-468
+          <ls_cl_sql_parse>->subquery            TO ls_sqlcresultsave-parse-subquery,
+          <ls_cl_sql_parse>->gt_components_domval   TO ls_sqlcresultsave-parse-components_domval,  "COCKPIT-468
+          <ls_cl_sql_parse>->comp                   TO ls_sqlcresultsave-parse-comp,               "COCKPIT-468
+          <ls_cl_sql_parse>->gt_domval              TO ls_sqlcresultsave-parse-domval.             "COCKPIT-468
     MOVE <ls_cl_sql_parse>->result_table TO ls_sqlcresult_ref-table_dref.
 
     ASSIGN ls_sqlcresult_ref-table_dref->* TO <ls_t>.
