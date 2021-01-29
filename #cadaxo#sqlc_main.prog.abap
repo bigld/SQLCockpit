@@ -513,6 +513,7 @@ FORM generate_template.
 *                 <lt_result_table> TYPE STANDARD TABLE, "COCKPIT-19
                  <lr_lvc_t_fcat>   TYPE lvc_t_fcat.
 
+  lcl_controller->gt_cl_sql_parse_beftempgen = lcl_controller->gt_cl_sql_parse."COCKPIT-274
   TRY.
 
       DATA(lt_parser_before) = lcl_controller->gt_cl_sql_parse.                          "COCKPIT-168

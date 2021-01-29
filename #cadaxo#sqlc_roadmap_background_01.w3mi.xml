@@ -9,19 +9,19 @@
      <RELID>MI</RELID>
      <OBJID>/CADAXO/SQLC_ROADMAP_BACKGROUND_01</OBJID>
      <NAME>fileextension</NAME>
-     <VALUE>.jpg</VALUE>
+     <VALUE>.png</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
      <RELID>MI</RELID>
      <OBJID>/CADAXO/SQLC_ROADMAP_BACKGROUND_01</OBJID>
      <NAME>filename</NAME>
-     <VALUE>background.jpg</VALUE>
+     <VALUE>background_wizard.png</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
      <RELID>MI</RELID>
      <OBJID>/CADAXO/SQLC_ROADMAP_BACKGROUND_01</OBJID>
      <NAME>mimetype</NAME>
-     <VALUE>image/jpg</VALUE>
+     <VALUE>image/png</VALUE>
     </WWWPARAMS>
    </PARAMS>
   </asx:values>

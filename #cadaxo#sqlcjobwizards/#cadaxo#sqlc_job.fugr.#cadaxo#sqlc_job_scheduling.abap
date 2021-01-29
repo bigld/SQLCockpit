@@ -9,7 +9,7 @@ FUNCTION /cadaxo/sqlc_job_scheduling.
 
   PERFORM init_roadmap.
 
-  CALL SCREEN 0100 STARTING AT 20 2 ENDING AT 128 22.
+  CALL SCREEN 0100 STARTING AT 20 2 ENDING AT 130 22.
 
   e_start_conditions = /cadaxo/sqlc_jobwiz_fields.
 

@@ -31,8 +31,8 @@ public section.
   constants C_OKCODE_CLIPBOARD type SYUCOMM value 'CLIPBOARD' ##NO_TEXT.
   constants C_OKCODE_SYMBOLS type SYUCOMM value 'SYMBOL' ##NO_TEXT.
   constants C_SAVED_LIST_SHARE type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE' ##NO_TEXT.
-  constants C_SAVED_LIST_SHARE_OTH type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE_OTH' ##NO_TEXT."+COCKPIT420
-  constants C_SAVED_LIST_SHARE_ME type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE_ME' ##NO_TEXT."+COCKPIT420
+  constants C_SAVED_LIST_SHARE_OTH type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE_OTH' ##NO_TEXT. "+COCKPIT420
+  constants C_SAVED_LIST_SHARE_ME type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE_ME' ##NO_TEXT. "+COCKPIT420
   constants C_SQLEDITOR_NAME type STRING value 'CADAXO_SQL_EDITOR' ##NO_TEXT.
   constants GC_SAVED_LIST_SHARED type /CADAXO/SQLC_LIST_TYPE value 'SHR' ##NO_TEXT.
   constants GC_SAVED_LIST_JOB type /CADAXO/SQLC_LIST_TYPE value 'JOB' ##NO_TEXT.
@@ -62,6 +62,9 @@ public section.
   data G_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN .
   data MS_USER_SETTINGS_XML type /CADAXO/SQLCUSRP_XML read-only .
   data MV_TOOLBAR_RESULT_ACTIVE type UI_FUNC read-only value C_CMD_HOME ##NO_TEXT.
+  data G_TRSTART_UZEIT type SYST_UZEIT .
+  data G_TRSTART_DATUM type SYST_DATUM .
+  data GT_CL_SQL_PARSE_BEFTEMPGEN type /CADAXO/SQLC_CL_COCKPIT_PARSET .
 
   events SETTINGS_CHANGED_UPTO
     exporting
@@ -209,8 +212,12 @@ public section.
     exporting
       !EV_OUTPUT_CSV type T_STRING
       !EV_CANCEL type ABAP_BOOL .
+  methods CHECK_DBTABLE_MODIFICATION
+    returning
+      value(R_ANSWER) type CHAR1 .
 protected section.
 
+  data G_TRSTART_TIMESTAMP type TIMESTAMP .
   class-data GCONT_SPLITTER_TOP_TOOLBAR type ref to CL_GUI_CONTAINER .
   class-data:
     gt_item_vari               TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY .
@@ -1255,6 +1262,58 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD check_dbtable_modification.
+    DATA lt_tables TYPE TABLE OF string.
+    DATA lt_restab TYPE TABLE OF string.
+    data timestamp type timestamp.
+
+    LOOP AT me->gt_cl_sql_parse INTO DATA(ls_cl_sql_parse).
+      IF count( val   = ls_cl_sql_parse->source_syntax
+                regex = `(\s\S|^\S)` ) = 1.
+        APPEND ls_cl_sql_parse->source_syntax TO lt_tables.
+      ELSE.
+        SPLIT ls_cl_sql_parse->source_syntax AT space INTO TABLE DATA(itab).
+        READ TABLE itab INDEX 1 INTO DATA(lv_first).
+        APPEND lv_first TO lt_tables.
+        LOOP AT itab INTO DATA(str).
+          TRANSLATE str TO UPPER CASE.
+          CHECK str EQ 'JOIN'.
+          READ TABLE itab INDEX sy-tabix + 1 INTO DATA(tmp).
+          TRANSLATE tmp TO UPPER CASE.
+          APPEND tmp TO lt_tables.
+        ENDLOOP.
+      ENDIF.
+    ENDLOOP.
+
+    CHECK lt_tables IS NOT INITIAL.
+    SORT lt_tables.
+    DELETE ADJACENT DUPLICATES FROM lt_tables.
+
+    LOOP AT lt_tables ASSIGNING FIELD-SYMBOL(<table>).
+
+*      cl_abap_typedescr=>describe_by_name( EXPORTING p_name = CONV tabname( <table> )
+*                                           RECEIVING p_descr_ref = DATA(tabletype)
+*                                           EXCEPTIONS OTHERS = 1 ).
+*      IF sy-subrc = 0.
+*        tabletype->get_ddic_header( RECEIVING p_header = DATA(ddic_header)
+*                                    EXCEPTIONS OTHERS = 2 ).
+*
+*        timestamp = ddic_header-crstamp.
+*        convert time stamp timestamp time zone sy-zonlo into date datA(tmp_date) time data(tmp_time).
+*        convert date tmp_date time tmp_time into time stamp timestamp time zone 'UTC'.
+*
+*        IF sy-subrc = 0 AND ( timestamp > me->g_trstart_timestamp ).
+*          MESSAGE s159(/cadaxo/sqlc) WITH <table> DISPLAY LIKE 'E'.
+*          r_answer = '2'.
+*          EXIT.
+*        ENDIF.
+*      ENDIF.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
   METHOD check_sql_syntax.
 ****************************************************************************************************
 * Description             : Check SQL Syntax                                                       *
@@ -1920,6 +1979,12 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     ms_additional_functions-uptomenu = NEW #( me->ms_user_settings_xml-maxsel ).
     SET HANDLER ms_additional_functions-uptomenu->on_usersettings_changed FOR me.
+
+*   begin of COCKPIT-371
+    me->g_trstart_uzeit = sy-uzeit.
+    me->g_trstart_datum = sy-datum.
+    get TIME STAMP FIELD me->g_trstart_timestamp.
+*   end   of COCKPIT-371
 
   ENDMETHOD.
 
@@ -2732,7 +2797,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *------------+----------------------+---------------------------------------------+----------------*
 * 03.03.2018 | Domi Bigl            | CC Refactoring                              | COCKPIT-48     *
 *------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
+* 25.11.2020 | Attila Kajtar        | Feedback/Support 3.3.0                      | COCKPIT-321    *
 *            |                      |                                             |                *
 ****************************************************************************************************
 
@@ -3526,12 +3591,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 20.2.2018  | Dusan Sacha          | Symbols Multi Value Upgrade                 | Cadaxo-288     *
-*            |                      |                                             |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 25.11.2020 | Attila Kajtar        | Feedback/Support 3.3.0                      | COCKPIT-321    *
 ****************************************************************************************************
     DATA: ls_variant    TYPE /cadaxo/sqlc_il_variants.
     DATA: l_string      TYPE string.
     DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t.           "COCKPIT-288 Insert
-
+    DATA: lv_variant_created TYPE /cadaxo/sqlcvari_name.       "COCKPIT-321 KA
 * get editor
     me->get_sql_area( IMPORTING e_code_string = l_string ).
 
@@ -3557,33 +3623,25 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         EXPORTING
           i_mode     = 'I'
           il_variant = ls_variant
-       " importing
-       "   ls_variant = ls_variant_created
-          .
+        CHANGING
+          c_vari_name = lv_variant_created. "COCKPIT-321 KA
 
-   "  if ls_variant-varname is not initial.
+      "begin of COCKPIT-321
+      IF lv_variant_created IS NOT INITIAL.
+        gs_sel_variant-varname = lv_variant_created.
+        DATA(l_ctmenu3) = NEW cl_ctmenu( ).
+        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
+        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( |{ text-b46 } { lv_variant_created }| )
+                                                                   disabled = abap_false ).
 
-   if 1 = 2.
+        gc_splitter_top_toolbar->set_static_ctxmenu(
+          EXPORTING
+            fcode                = 'SQLVARSET'
+            ctxmenu              = l_ctmenu3
+        ).
 
-  "  gs_sel_variant = CORRESPONDINg #( ls_variant_created ).
-
- "   gs_sel_variant must be set
-
-* Change ?!
-    DATA(l_ctmenu3) = NEW cl_ctmenu( ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = conv #( |{ text-b46 } { gs_sel_variant-varname }| )
-                                                               disabled = abap_false ).
-
-      gc_splitter_top_toolbar->set_static_ctxmenu(
-        EXPORTING
-          fcode                = 'SQLVARSET'
-          ctxmenu              = l_ctmenu3
-      ).
-
- endif.
-
-"     endif.
+      ENDIF.
+      "end of COCKPIT-321
 
     ELSE.
       MESSAGE e048(/cadaxo/sqlc).
@@ -3800,6 +3858,12 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         me->save_hold_lists( ).
 
         me->check_sql_syntax( ).
+
+        "COCKPIT-371 BEGIN
+        IF me->check_dbtable_modification( ) = 2.
+          EXIT.
+        ENDIF.
+        "COCKPIT-371 END
 
         me->free_result_controls( ).
 
@@ -7194,7 +7258,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * gets the new (refreshed) values from <lr_cl_sql_parse>->result_table and writes it (ultimately) into mt_outtab of <l_cont_grid_result>-gui_alv_grid
             ASSIGN <lr_dref>->* TO <lt_result_old>.           "CR22-032
             ASSIGN <lr_cl_sql_parse>->result_table->* TO <lt_result_new>."CR22-032
-            <lt_result_old> = <lt_result_new>.                "CR22-032
+            <lr_cl_sql_parse>->result_table = <lr_dref>.       "COCKPIT-464
+*            <lt_result_old> = <lt_result_new>.                "CR22-032
 
             <l_cont_grid_result>-gui_alv_grid->refresh_table_display( ).
 
@@ -8636,6 +8701,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
           lcl_template_class->execute_template_generation( ).
 
+          "COCKPIT-274 BEGIN
+          IF lines( <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen ) > 1.
+            me->gt_cl_sql_parse = <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen. "me->gt_cl_sql_parse_beftempgen.
+          ENDIF.
+          "COCKPIT-274 END
 
           cl_gui_cfw=>set_new_ok_code( new_code = 'CANCEL' ).
 
@@ -12262,6 +12332,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
             me->check_sql_syntax( i_use_local_parser = abap_true ).
 * message - no syntax error
             MESSAGE s002(/cadaxo/sqlc).
+            "COCKPIT-371 BEGIN
+            IF me->check_dbtable_modification( ) = 2.
+              EXIT.
+            ENDIF.
+            "COCKPIT-371 END
           CATCH /cadaxo/cx_sqlc_syntax_error.
         ENDTRY.
       WHEN 'HELP'.        "Show Online Documentation
@@ -13002,8 +13077,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     DATA lv_guid22(22)            TYPE c.
     DATA lv_component             TYPE string.
     DATA l_string                 TYPE string.
-*    DATA lt_components_domval     TYPE /cadaxo/sqlcparsecomponent_t. "COCKPIT-468
-*    DATA lt_comp                  TYPE /CADAXO/SQLC_COMPDESC_T. "COCKPIT-468
+    DATA lt_components_domval     TYPE /cadaxo/sqlcparsecomponent_t. "COCKPIT-468
+    DATA lt_comp                  TYPE /cadaxo/sqlc_compdesc_t.      "COCKPIT-468
+    DATA lt_domval                TYPE /cadaxo/sqlc_domval_t.        "COCKPIT-468
     FIELD-SYMBOLS: <lt_result_table> TYPE ANY TABLE, "STANDARD TABLE.
                    <ls_lvc_t_fcat>   TYPE LINE OF lvc_t_fcat.
 
@@ -13054,15 +13130,17 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
             ls_sqlcresultsave-parse-result_fieldcatalog         TO lt_saved_lvc_t_fcat,
             ls_sqlcresultsave-parse-result_sort                 TO lt_saved_lvc_t_sort,
             ls_sqlcresultsave-parse-result_filt                 TO lt_saved_lvc_t_filt,
-            ls_sqlcresultsave-parse-result_layo                 TO ls_saved_lvc_s_layo."#4170
-*            ls_sqlcresultsave-parse-components_domval           TO lt_components_domval, "COCKPIT-468
-*            ls_sqlcresultsave-parse-comp                        TO lt_comp. "COCKPIT-468
+            ls_sqlcresultsave-parse-result_layo                 TO ls_saved_lvc_s_layo, "#4170
+            ls_sqlcresultsave-parse-components_domval           TO lt_components_domval, "COCKPIT-468
+            ls_sqlcresultsave-parse-comp                        TO lt_comp,              "COCKPIT-468
+            ls_sqlcresultsave-parse-domval                      TO lt_domval.            "COCKPIT-468
       MOVE abap_true TO lr_sqlc_cl_cockpit_parse->g_saved_list.
 
 * NEW Start
       DATA l_result_ddfields LIKE LINE OF ls_sqlcresultsave-parse-result_ddfields.
       DATA lr_data TYPE REF TO data.
       DATA: l_sql_abap_componentdescr TYPE abap_componentdescr.
+      DATA(tabix) = 1.                                            "COCKPIT-468
 
       LOOP AT ls_sqlcresultsave-parse-result_ddfields INTO l_result_ddfields.
 
@@ -13083,19 +13161,22 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           ENDCASE.
         ELSE.
 * End RT145
-
+          "COCKPIT-468
           lr_data = /cadaxo/cl_sqlc_cockpit_assist=>create_data_reference(
             EXPORTING
-              iv_inttype   = l_result_ddfields-inttype
-              iv_leng      = l_result_ddfields-leng
-              iv_decimals  = l_result_ddfields-decimals
-              iv_intlen    = l_result_ddfields-intlen
-              iv_stru_name = l_result_ddfields-stru_name ).
-
+              iv_inttype           = l_result_ddfields-inttype
+              iv_leng              = l_result_ddfields-leng
+              iv_decimals          = l_result_ddfields-decimals
+              iv_intlen            = l_result_ddfields-intlen
+              iv_stru_name         = l_result_ddfields-stru_name
+              iv_tabix             = tabix
+              iv_domaintext        = me->g_user_settings-domaintext
+              it_components_domval = lt_components_domval
+              it_comp              = lt_comp
+              it_domval            = lt_domval  ).
+          "COCKPIT-468
           IF lr_data IS NOT INITIAL.
             l_sql_abap_componentdescr-type ?= cl_abap_typedescr=>describe_by_data_ref( lr_data )."RT145
-          ELSE.
-
           ENDIF.
         ENDIF.
 
@@ -13155,49 +13236,25 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         ENDIF.
 
         APPEND l_sql_abap_componentdescr TO lr_sqlc_cl_cockpit_parse->result_component_t.
+        "COCKPIT-468
+        tabix = tabix + 1.
+        DATA lr_data_domval TYPE REF TO data.
+        IF me->g_user_settings-domaintext EQ abap_true.
+          READ TABLE lt_domval WITH KEY name = l_sql_abap_componentdescr-name INTO DATA(ls_domval).
+          IF sy-subrc EQ 0.
+            l_sql_abap_componentdescr-name = ls_domval-name_desc.
+            CREATE DATA lr_data_domval TYPE c LENGTH 60.
+            IF lr_data_domval IS NOT INITIAL.
+              l_sql_abap_componentdescr-type ?= cl_abap_typedescr=>describe_by_data_ref( lr_data_domval ).
+            ENDIF.
+            APPEND l_sql_abap_componentdescr TO lr_sqlc_cl_cockpit_parse->result_component_t.
+            tabix = tabix + 1.
+          ENDIF.
+        ENDIF.
+        "COCKPIT-468
       ENDLOOP.
 
-
-
 * NEW End
-
-*"COCKPIT-468
-*  DATA: struct_type TYPE REF TO cl_abap_structdescr.
-*  DATA: comp_tab    TYPE cl_abap_structdescr=>component_table,
-*           comp     LIKE LINE OF comp_tab.
-*  DATA: dref TYPE REF TO data.
-*  IF me->g_user_settings-domaintext EQ abap_true.
-*    LOOP AT lt_comp INTO DATA(lt_components).
-*      LOOP AT lt_components INTO DATA(ls_components).
-*        comp-name = ls_components-name.
-*        CASE ls_components-type_kind.
-*          WHEN 'C'.
-*            comp-type = cl_abap_elemdescr=>get_c( ls_components-length ).
-*          WHEN 'D'.
-*            comp-type = cl_abap_elemdescr=>get_d( ).
-*          WHEN 'N'.
-*            comp-type = cl_abap_elemdescr=>get_n( ls_components-length ).
-*          WHEN 'P'.
-*            comp-type = cl_abap_elemdescr=>get_p(
-*                p_length                   = ls_components-length
-*                p_decimals                 = ls_components-decimals
-*            ).
-*          WHEN 'I'.
-*            comp-type = cl_abap_elemdescr=>get_i( ).
-*          WHEN OTHERS.
-*        ENDCASE.
-*        APPEND comp TO comp_tab.
-*        ENDLOOP.
-*        struct_type = cl_abap_structdescr=>create( comp_tab ).
-*        CREATE DATA dref TYPE HANDLE struct_type.
-*        l_sql_abap_componentdescr-type ?= cl_abap_typedescr=>describe_by_data_ref( dref ).
-*        READ TABLE ls_sqlcresultsave-parse-result_ddfields INTO l_result_ddfields INDEX 1.
-*        MOVE l_result_ddfields-fieldname TO l_sql_abap_componentdescr-name.
-*        INSERT l_sql_abap_componentdescr INTO lr_sqlc_cl_cockpit_parse->result_component_t INDEX 1.
-*        APPEND l_sql_abap_componentdescr TO lr_sqlc_cl_cockpit_parse->result_component_t.
-*    ENDLOOP.
-*  ENDIF.
-*"COCKPIT-468
 
 
 * create fieldcatalog
@@ -13301,10 +13358,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                                        IMPORTING raw_out = ls_result_list_raw ).
       TRY.
           IMPORT result TO <lt_result_table>[] FROM DATA BUFFER ls_result_list_raw IGNORING STRUCTURE BOUNDARIES.
-         CATCH cx_sy_import_mismatch_error.
-*        CATCH cx_sy_import_mismatch_error INTO DATA(ref). "COCKPIT-468
-*          DATA(err_telo) = ref->get_longtext( ). "COCKPIT-468
-*          DATA(err_text) = ref->get_text( ).     "COCKPIT-468
+*        CATCH cx_sy_import_mismatch_error.
+        CATCH cx_sy_import_mismatch_error INTO DATA(ref). "COCKPIT-468
+          DATA(err_telo) = ref->get_longtext( ).          "COCKPIT-468
+          DATA(err_text) = ref->get_text( ).              "COCKPIT-468
       ENDTRY.
 
       FREE: ls_result_list_raw.
@@ -15322,7 +15379,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
       DATA(l_ctmenu) = NEW cl_ctmenu( ).
 
-      clear gr_results_tab_toolbar.
+      CLEAR gr_results_tab_toolbar.
 
       IF gr_results_tab_toolbar IS BOUND.
 
@@ -15466,7 +15523,14 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     EXPORT grid_name FROM l_grid_name TO MEMORY ID 'GRID_NAME'.
 
     "l_result_layout-no_keyfix = abap_true.
-
+    "COCKPIT-274 BEGIN
+    IF <lr_sql> IS ASSIGNED.
+      IF <lr_sql>->gt_lvc_t_fcat IS INITIAL.
+        <lr_sql>->gt_lvc_t_fcat = <lr_sql>->create_alv_field_catalog( i_user_settings   = me->g_user_settings
+                                                                      i_dragdrop_handle = dragdrop_handle ).
+      ENDIF.
+    ENDIF.
+    "COCKPIT-274 END
     LOOP AT <lr_sql>->gt_lvc_t_fcat ASSIGNING FIELD-SYMBOL(<fcat>).
       CASE <fcat>-fieldname.
         WHEN 'CDXLINECOLOR'.
@@ -16005,7 +16069,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 22.9.2020  | Pratik Patil         | Existing Variant Update                     | Cadaxo-321     *
-*            |                      |                                             |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 25.11.2020 | Attila Kajtar        | Feedback/Support 3.3.0                      | COCKPIT-321    *
 ****************************************************************************************************
     DATA: l_string      TYPE string.
     DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t.           "COCKPIT-288 Insert
@@ -16038,7 +16103,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       CALL FUNCTION '/CADAXO/SQLC_CREATE_VARIANT_UI'
         EXPORTING
           i_mode     = 'I'
-          il_variant = gs_sel_variant.
+          il_variant = gs_sel_variant
+          i_mode_variant = 'U'. "COCKPIT-321 KA
 
     ELSE.
       MESSAGE e048(/cadaxo/sqlc).

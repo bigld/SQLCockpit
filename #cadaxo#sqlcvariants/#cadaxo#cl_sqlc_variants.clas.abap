@@ -22,6 +22,7 @@ public section.
   data G_DESCRIPTION_LANGUAGE type LANGU .
   data G_DESCRIPTION type /CADAXO/SQLCVARI_DESCR .
   data G_DESCRIPTION_CHANGED type CHAR1 .
+  data G_MODE_VARIANT type CHAR1 .
 
   methods FREE .
   methods SET_MODE
@@ -655,6 +656,17 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 
   METHOD create_0200_controls.
+
+    "begin of COCKPIT-321 KA
+    LOOP AT SCREEN.
+      IF screen-name EQ 'GCL_CONTROLLER->GS_IL_VARIANTS-VARNAME'
+      AND me->g_mode_variant = 'U'.
+        screen-input = 0.
+        CLEAR: me->g_mode_variant.
+      ENDIF.
+      MODIFY SCREEN.
+    ENDLOOP.
+    "end   of COCKPIT-321
 
   ENDMETHOD.
 

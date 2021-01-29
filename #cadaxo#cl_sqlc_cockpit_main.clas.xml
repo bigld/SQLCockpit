@@ -1065,6 +1065,18 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>Q64</KEY>
+     <ENTRY>Selected database table was modified during runtime</ENTRY>
+     <LENGTH>102</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>Q65</KEY>
+     <ENTRY>The selected query could not be executed, because the database table was modified. Please restart the SQL Cockpit transaction.</ENTRY>
+     <LENGTH>132</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>S01</KEY>
      <ENTRY>Deleting jobs ...</ENTRY>
      <LENGTH>30</LENGTH>
@@ -2489,6 +2501,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>CHECK_DBTABLE_MODIFICATION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check if database tables were modified during runtime exec.</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>CHECK_SQL_SYNTAX</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Check SQL Syntax</DESCRIPT>
@@ -3311,6 +3329,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>GT_CL_SQL_PARSE_BEFTEMPGEN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of /CADAXO/SQLC_CL_COCKPIT_PARSE</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>GT_ELEMENTINFO</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>SQL Cockpit - Table of /CADAXO/SQLC_ELEMENTINFO</DESCRIPT>
@@ -3782,6 +3806,24 @@
      <CMPNAME>G_SYMBOL_TOOLBAR_EXCLUDING</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Exclude toolbarbuttons of symbol</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>G_TRSTART_DATUM</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ABAP System Field: Current Date of Application Server</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>G_TRSTART_TIMESTAMP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>UTC Time Stamp in Short Form (YYYYMMDDhhmmss)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>G_TRSTART_UZEIT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ABAP System Field: Current Time of Application Server</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>

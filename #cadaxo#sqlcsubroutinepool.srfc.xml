@@ -8,12 +8,6 @@
      <VERSION>A</VERSION>
      <FUNCNAME>/CADAXO/SQLCSUBROUTINEPOOL</FUNCNAME>
     </HEADER>
-    <TEXT>
-     <ID>/CADAXO/SQLCSUBROUTINEPOOL</ID>
-     <VERSION>A</VERSION>
-     <LANG>E</LANG>
-     <SHORTTEXT>Default RFC Service for Function-Module: /CADAXO/SQLCSUBROUTINEPOOL</SHORTTEXT>
-    </TEXT>
    </SRFC>
   </asx:values>
  </asx:abap>

@@ -4,6 +4,9 @@ FUNCTION /cadaxo/sqlc_create_variant_ui.
 *"  IMPORTING
 *"     REFERENCE(I_MODE) TYPE  CHAR1 DEFAULT 'I'
 *"     REFERENCE(IL_VARIANT) TYPE  /CADAXO/SQLC_IL_VARIANTS
+*"     REFERENCE(I_MODE_VARIANT) TYPE  CHAR1 OPTIONAL
+*"  CHANGING
+*"     REFERENCE(C_VARI_NAME) TYPE  /CADAXO/SQLCVARI_NAME OPTIONAL
 *"----------------------------------------------------------------------
 ****************************************************************************************************
 * Description             : Variants Create UI                                                     *
@@ -40,7 +43,11 @@ FUNCTION /cadaxo/sqlc_create_variant_ui.
   "APPEND 'INSERT_VAR' TO gt_excl_fcode_insert_var.
   "APPEND 'DOWNLD_VAR' TO gt_excl_fcode_downld_var.
 
+  gcl_controller->g_mode_variant = i_mode_variant."COCKPIT-321 KA
+
   CALL SCREEN 0200 STARTING AT 30 7 ENDING AT 90 12.
+
+  c_vari_name = gcl_controller->gs_il_variants-varname."COCKPIT-321 KA
 
 * free
   gcl_controller->free( ).

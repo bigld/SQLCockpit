@@ -8,12 +8,6 @@
      <VERSION>A</VERSION>
      <FUNCNAME>/CADAXO/SQLC_SQL_SEARCH</FUNCNAME>
     </HEADER>
-    <TEXT>
-     <ID>/CADAXO/SQLC_SQL_SEARCH</ID>
-     <VERSION>A</VERSION>
-     <LANG>E</LANG>
-     <SHORTTEXT>Default RFC Service for Function-Module: /CADAXO/SQLC_SQL_SEARCH</SHORTTEXT>
-    </TEXT>
    </SRFC>
   </asx:values>
  </asx:abap>

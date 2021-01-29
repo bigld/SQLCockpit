@@ -8,12 +8,6 @@
      <VERSION>A</VERSION>
      <FUNCNAME>/CADAXO/SQLC_SHARE</FUNCNAME>
     </HEADER>
-    <TEXT>
-     <ID>/CADAXO/SQLC_SHARE</ID>
-     <VERSION>A</VERSION>
-     <LANG>E</LANG>
-     <SHORTTEXT>Default RFC Service for Function-Module: /CADAXO/SQLC_SHARE</SHORTTEXT>
-    </TEXT>
    </SRFC>
   </asx:values>
  </asx:abap>
