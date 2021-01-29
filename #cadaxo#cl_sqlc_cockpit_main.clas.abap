@@ -212,9 +212,6 @@ public section.
     exporting
       !EV_OUTPUT_CSV type T_STRING
       !EV_CANCEL type ABAP_BOOL .
-  methods CHECK_DBTABLE_MODIFICATION
-    returning
-      value(R_ANSWER) type CHAR1 .
 protected section.
 
   data G_TRSTART_TIMESTAMP type TIMESTAMP .
@@ -311,6 +308,9 @@ protected section.
   data G_SAVED_LIST_GUI_CONTAINER type ref to CL_GUI_CUSTOM_CONTAINER .
   data G_ACTIVE_LIST_TAB type I .
 
+  methods CHECK_DBTABLE_MODIFICATION
+    returning
+      value(R_ANSWER) type CHAR1 .
   methods CREATE_SYMBOL_MULTIVAL_TAB_DYN
     importing
       !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
@@ -1265,7 +1265,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   METHOD check_dbtable_modification.
     DATA lt_tables TYPE TABLE OF string.
     DATA lt_restab TYPE TABLE OF string.
-    data timestamp type timestamp.
+    DATA timestamp TYPE timestamp.
 
     LOOP AT me->gt_cl_sql_parse INTO DATA(ls_cl_sql_parse).
       IF count( val   = ls_cl_sql_parse->source_syntax
@@ -1291,23 +1291,32 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     LOOP AT lt_tables ASSIGNING FIELD-SYMBOL(<table>).
 
-*      cl_abap_typedescr=>describe_by_name( EXPORTING p_name = CONV tabname( <table> )
-*                                           RECEIVING p_descr_ref = DATA(tabletype)
-*                                           EXCEPTIONS OTHERS = 1 ).
-*      IF sy-subrc = 0.
-*        tabletype->get_ddic_header( RECEIVING p_header = DATA(ddic_header)
-*                                    EXCEPTIONS OTHERS = 2 ).
-*
-*        timestamp = ddic_header-crstamp.
-*        convert time stamp timestamp time zone sy-zonlo into date datA(tmp_date) time data(tmp_time).
-*        convert date tmp_date time tmp_time into time stamp timestamp time zone 'UTC'.
-*
-*        IF sy-subrc = 0 AND ( timestamp > me->g_trstart_timestamp ).
-*          MESSAGE s159(/cadaxo/sqlc) WITH <table> DISPLAY LIKE 'E'.
-*          r_answer = '2'.
-*          EXIT.
-*        ENDIF.
-*      ENDIF.
+      cl_abap_typedescr=>describe_by_name( EXPORTING p_name = CONV tabname( <table> )
+                                           RECEIVING p_descr_ref = DATA(tabletype)
+                                           EXCEPTIONS OTHERS = 1 ).
+      IF sy-subrc = 0.
+        tabletype->get_ddic_header( RECEIVING p_header = DATA(ddic_header)
+                                    EXCEPTIONS OTHERS = 2 ).
+
+        IF sy-subrc = 0 and ddic_header-crstamp IS NOT INITIAL.
+
+          timestamp = ddic_header-crstamp.
+
+          CONVERT TIME STAMP timestamp TIME ZONE 'UTC  ' INTO DATE DATA(tmp_date) TIME DATA(tmp_time).
+          CONVERT DATE tmp_date TIME tmp_time INTO TIME STAMP timestamp TIME ZONE sy-zonlo.
+
+          IF sy-subrc = 0 AND ( timestamp > me->g_trstart_timestamp ).
+
+            MESSAGE s159(/cadaxo/sqlc) WITH <table> INTO DATA(message).
+
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
+              EXPORTING
+                textid        = /cadaxo/cx_sqlc_syntax_error=>/cadaxo/cx_sqlc_syntax_error
+                message       = message.
+
+          ENDIF.
+        ENDIF.
+      ENDIF.
 
     ENDLOOP.
 
@@ -3859,11 +3868,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
         me->check_sql_syntax( ).
 
-        "COCKPIT-371 BEGIN
-        IF me->check_dbtable_modification( ) = 2.
-          EXIT.
-        ENDIF.
-        "COCKPIT-371 END
+        me->check_dbtable_modification( ).
 
         me->free_result_controls( ).
 
@@ -12330,13 +12335,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       WHEN 'SYNTCHECK'.   "Syntaxcheck
         TRY.
             me->check_sql_syntax( i_use_local_parser = abap_true ).
-* message - no syntax error
+
             MESSAGE s002(/cadaxo/sqlc).
-            "COCKPIT-371 BEGIN
-            IF me->check_dbtable_modification( ) = 2.
-              EXIT.
-            ENDIF.
-            "COCKPIT-371 END
+
           CATCH /cadaxo/cx_sqlc_syntax_error.
         ENDTRY.
       WHEN 'HELP'.        "Show Online Documentation
