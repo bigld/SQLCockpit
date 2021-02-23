@@ -12325,7 +12325,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       WHEN 'EXECUTEJOB'.
         me->store_sql_to_hist( ).
         me->execute_sql_background_wiz( ).
-      WHEN 'EXECUTE'.
+      WHEN 'EXECUTE'."COCKPIT-474
         me->store_sql_to_hist( ).
         me->execute_sql( ).
       WHEN 'SQL_BACK'.    "Go Back
