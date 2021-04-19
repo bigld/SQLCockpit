@@ -67,8 +67,8 @@
       <DESCRIPT>SQL Cockpit - User Preferences</DESCRIPT>
       <TYPE>M</TYPE>
       <NEXTSCREEN>0500</NEXTSCREEN>
-      <LINES>024</LINES>
-      <COLUMNS>110</COLUMNS>
+      <LINES>026</LINES>
+      <COLUMNS>114</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -547,11 +547,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>ADT_FRAME</NAME>
-       <TEXT>ABAP_Development_Tool_for_SAP_NetWeaver___________________________________________________________________</TEXT>
+       <TEXT>ABAP_Development_Tool_for_SAP_NetWeaver____________________________________________________________________</TEXT>
        <LINE>020</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>107</LENGTH>
-       <VISLENGTH>107</VISLENGTH>
+       <LENGTH>108</LENGTH>
+       <VISLENGTH>108</VISLENGTH>
        <HEIGHT>004</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -634,6 +634,53 @@
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>FRAME</TYPE>
+       <NAME>SHOWRELEASEINFOS</NAME>
+       <TEXT>Show_Release_Infos_________________________________________________________________________________________</TEXT>
+       <LINE>024</LINE>
+       <COLUMN>002</COLUMN>
+       <LENGTH>108</LENGTH>
+       <VISLENGTH>108</VISLENGTH>
+       <HEIGHT>003</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>RELEASE_INFO</NAME>
+       <TEXT>Release_Info</TEXT>
+       <LINE>025</LINE>
+       <COLUMN>003</COLUMN>
+       <LENGTH>012</LENGTH>
+       <VISLENGTH>012</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>/CADAXO/SQLCUSRP_DYN-RELEASE_TYPE</NAME>
+       <TEXT>_</TEXT>
+       <DROPDOWN>K</DROPDOWN>
+       <LINE>025</LINE>
+       <COLUMN>016</COLUMN>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>014</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <FROM_DICT>X</FROM_DICT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <POSS_ENTRY>1</POSS_ENTRY>
+       <DICT_I_VAL>X</DICT_I_VAL>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>

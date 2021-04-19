@@ -13,8 +13,10 @@ public section.
 
   constants C_CMD_CREATE_SYMBOL type UI_FUNC value 'CREATE_SYMBOL' ##NO_TEXT.
   constants C_CMD_HOME type UI_FUNC value 'HOME' ##NO_TEXT.
+  constants C_CMD_INSERT_CC type UI_FUNC value 'INSERT_CC' ##NO_TEXT.
   constants C_CMD_INSERT_CDS_ENTITY type UI_FUNC value 'INSERT_CDS_ENTITY' ##NO_TEXT.
   constants C_CMD_INSERT_SY_FIELD type UI_FUNC value 'INSERT_SY_FIELD' ##NO_TEXT.
+  constants C_CMD_INSERT_HEADER type UI_FUNC value 'INSERT_HEADER' ##NO_TEXT.
   constants C_CMD_INSERT_TABLE type UI_FUNC value 'INSERT_TABLE' ##NO_TEXT.
   constants C_CMD_JOBMONITOR type UI_FUNC value 'JOBMONITOR' ##NO_TEXT.
   constants C_CMD_PP type UI_FUNC value 'PP' ##NO_TEXT.
@@ -838,6 +840,7 @@ protected section.
     importing
       !I_RESULT_DREF type ref to DATA
       !I_TABIX type SY-TABIX .
+  methods TIPPSANDTRICKS .
   PRIVATE SECTION.
 
     CONSTANTS:
@@ -1763,7 +1766,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                 me->ms_user_settings_xml-editor_type          TO me->g_user_settings-editor_type,
                 me->ms_user_settings_xml-forwnavddleclipse    TO me->g_user_settings-forwnavddleclipse,
                 me->ms_user_settings_xml-forwnavdicteclipse   TO me->g_user_settings-forwnavdicteclipse,
-                me->ms_user_settings_xml-domaintext           TO me->g_user_settings-domaintext.            "COCKPIT-458
+                me->ms_user_settings_xml-domaintext           TO me->g_user_settings-domaintext,           "COCKPIT-458
+                me->ms_user_settings_xml-release_type         TO me->g_user_settings-release_type.         "COCKPIT-98
 
 * Column Header - Fieldname or Fieldtext
           CASE me->ms_user_settings_xml-colhd_type.
@@ -2315,6 +2319,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
       me->set_result_toolbar_active( i_fcode = c_cmd_home ).
 
+      me->tippsandtricks( ). "COCKPIT-98
+
     ENDIF.
 
   ENDMETHOD.
@@ -2424,6 +2430,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     DATA: ls_lvc_s_layo TYPE lvc_s_layo,
           lt_fieldcat   TYPE lvc_t_fcat.
+    DATA: lv_param_val  TYPE /cadaxo/sqlcparameter_val. "COCKPIT-403
     DATA shellstyle TYPE i.
     shellstyle = cl_gui_container=>ws_visible + cl_gui_container=>ws_child.
 
@@ -2449,6 +2456,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     gs_splitter_editor->set_row_sash( id = 2 type = 1 value = gs_splitter_editor->false   ).
 
     IF me->g_abap_editor_type = 'A' AND g_is_its IS INITIAL.
+
+      "COCKPIT-403
+      SELECT SINGLE parameter_value INTO lv_param_val
+      FROM /cadaxo/sqlcparv WHERE parameter_id = 'SOURCE_CODE_GUI'.
+      IF sy-subrc EQ 0.
+        cl_gui_sourceedit=>l_gui_version = lv_param_val.
+      ENDIF.
+      "COCKPIT-403
+
       CREATE OBJECT gc_abap_editor
         EXPORTING
           parent = gcont_abap_editor.
@@ -5655,10 +5671,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
            symbol_datatype                                                "COCKPIT-240
            FROM /cadaxo/sqlcusym
              INTO CORRESPONDING FIELDS OF TABLE lt_user_symbol
-             WHERE username = sy-uname
-           ORDER BY symbol_name.                                          "COCKPIT-240
+             WHERE username = sy-uname.
+*             ORDER BY symbol_name.                                          "COCKPIT-240 "COCKPIT-403
     IF sy-subrc = 0.
-
+      SORT lt_user_symbol BY symbol_name."COCKPIT-403
       LOOP AT lt_user_symbol ASSIGNING <ls_user_symbol>.
 
         "     Get Multi Values Count
@@ -8779,6 +8795,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     menu->add_function( fcode = c_cmd_insert_table      text  = text-b04 ).
     menu->add_function( fcode = c_cmd_insert_cds_entity text = text-b38 ).
     menu->add_function( fcode = c_cmd_insert_sy_field   text  = text-b05 ). "CDX25012010
+    menu->add_function( fcode = c_cmd_insert_cc         text = text-b49 ). "COCKPIT-474 'Insert Code Completion'
+    menu->add_function( fcode = c_cmd_insert_header     text = text-b50 ). "COCKPIT-472 'Insert Header
     menu->add_function( fcode = c_cmd_pp                text = text-b34 ).  "COCKPIT-260
 
     lr_submenu_symbols = NEW #( ).
@@ -8860,6 +8878,16 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           MOVE l_tabname TO l_string.
           me->insert_table_to_editor( EXPORTING i_string = l_string ).
         ENDIF.
+      WHEN c_cmd_insert_cc.     "COCKPIT-474
+        /cadaxo/cl_sqlc_cockpit_assist=>code_completion( EXPORTING i_abap_editor = gc_abap_editor
+                                                         IMPORTING e_string      = l_string ).
+        IF sy-subrc = 0 AND NOT l_string IS INITIAL.
+          me->insert_table_to_editor( EXPORTING i_string = l_string  ).
+        ENDIF.
+      WHEN c_cmd_insert_header. "COCKPIT-472
+        /cadaxo/cl_sqlc_cockpit_assist=>insert_select_header(
+                  CHANGING co_abap_editor = gc_abap_editor ).
+
       WHEN c_cmd_insert_sy_field. "insert system fields                    "CDX25012010
         /cadaxo/cl_sqlc_cockpit_assist=>value_help_sy_fields(          "CDX25012010
                           IMPORTING e_fieldname = l_string             "CDX25012010
@@ -12325,9 +12353,12 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       WHEN 'EXECUTEJOB'.
         me->store_sql_to_hist( ).
         me->execute_sql_background_wiz( ).
-      WHEN 'EXECUTE'.""COCKPIT-474
+      WHEN 'EXECUTE'.
         me->store_sql_to_hist( ).
         me->execute_sql( ).
+        DATA: o_join TYPE REF TO /CADAXO/CL_SQLC_JOIN_COMPLET. "COCKPIT-474
+        o_join = NEW #( o_abapedit = me->gc_abap_editor ).
+        o_join->disassemble_sql( ).
       WHEN 'SQL_BACK'.    "Go Back
         me->move_back_to_sql( ).
       WHEN 'SQL_FORW'.    "Go Next
@@ -14253,6 +14284,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ms_user_settings_xml-forwnavddleclipse    = i_settings-forwnavddleclipse.
     ms_user_settings_xml-forwnavdicteclipse   = i_settings-forwnavdicteclipse.
     ms_user_settings_xml-domaintext           = i_settings-domaintext.             "COCKPIT-458
+    ms_user_settings_xml-release_type         = i_settings-release_type.           "COCKPIT-98
 
     CASE abap_true.
       WHEN i_settings-hd_fieldname.
@@ -15887,6 +15919,27 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ENDIF.
 
     CALL METHOD cl_gui_cfw=>flush.
+
+  ENDMETHOD.
+
+
+  METHOD tippsandtricks.
+    DATA: lv_res TYPE c.
+
+    IF me->g_user_settings-release_type NE 'N'.
+      IF me->g_user_settings-release_type = 'O'.
+        me->g_user_settings-release_type = 'N'.
+        me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
+      ENDIF.
+
+      CALL FUNCTION '/CADAXO/SQLCTIPPSANDTRICKS'
+        IMPORTING
+          ev_res = lv_res.
+      IF lv_res EQ '2'.
+        me->g_user_settings-release_type = 'N'.
+        me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
+      ENDIF.
+    ENDIF.
 
   ENDMETHOD.
 

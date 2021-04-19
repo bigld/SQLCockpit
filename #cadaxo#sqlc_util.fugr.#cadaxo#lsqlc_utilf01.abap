@@ -37,6 +37,14 @@ FORM pai_0100_form .
         PERFORM leave_screen.
       ENDIF.
 
+*begin of insert cockpit478
+    WHEN 'DOWNLOAD'.
+        gc_value_textarea->save_as_local_file( ).
+        IF sy-subrc = 0.
+          MESSAGE s160(/cadaxo/sqlc).
+        ENDIF.
+*end   of insert cockpit478
+
     WHEN gc_cancl_code.
       PERFORM leave_screen.
   ENDCASE.

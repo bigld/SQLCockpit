@@ -968,6 +968,12 @@
      <MSGNR>159</MSGNR>
      <TEXT>Table &amp;1 was modified during runtime. Please restart the SQL Cockpit</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>160</MSGNR>
+     <TEXT>Data was successfully downloaded.</TEXT>
+    </T100>
    </T100>
    <LONGTEXTS>
     <item>
@@ -3063,6 +3069,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>159</MSGNR>
      <TEXT>Tabelle &amp;1 wurde zur Laufzeit verändert. Bitte SQL Cockpit neu starten.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>160</MSGNR>
+     <TEXT>Daten wurden erfolgreich heruntergeladen.</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>

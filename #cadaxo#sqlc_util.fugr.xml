@@ -151,6 +151,14 @@
       <PATH>A</PATH>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
+      <CODE>DOWNLOAD</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <TEXT_NAME>ICON_EXPORT</TEXT_NAME>
+      <ICON_ID>@49@</ICON_ID>
+      <FUN_TEXT>Download</FUN_TEXT>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
       <CODE>OK</CODE>
       <TEXTNO>001</TEXTNO>
       <TEXT_TYPE>S</TEXT_TYPE>
@@ -165,13 +173,19 @@
       <PFK_CODE>000001</PFK_CODE>
       <CODE>0001</CODE>
       <NO>01</NO>
-      <PFNO>08</PFNO>
+      <PFNO>11</PFNO>
      </RSMPE_BUT>
      <RSMPE_BUT>
       <PFK_CODE>000001</PFK_CODE>
       <CODE>0001</CODE>
       <NO>02</NO>
       <PFNO>12</PFNO>
+     </RSMPE_BUT>
+     <RSMPE_BUT>
+      <PFK_CODE>000001</PFK_CODE>
+      <CODE>0001</CODE>
+      <NO>03</NO>
+      <PFNO>00</PFNO>
      </RSMPE_BUT>
     </BUT>
     <PFK>
@@ -189,6 +203,12 @@
      </RSMPE_PFK>
      <RSMPE_PFK>
       <CODE>000001</CODE>
+      <PFNO>11</PFNO>
+      <FUNCODE>DOWNLOAD</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
+     <RSMPE_PFK>
+      <CODE>000001</CODE>
       <PFNO>12</PFNO>
       <FUNCODE>CANCEL</FUNCODE>
       <FUNNO>001</FUNNO>
@@ -198,6 +218,10 @@
      <RSMPE_STAF>
       <STATUS>MAIN_0100</STATUS>
       <FUNCTION>CANCEL</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>MAIN_0100</STATUS>
+      <FUNCTION>DOWNLOAD</FUNCTION>
      </RSMPE_STAF>
      <RSMPE_STAF>
       <STATUS>MAIN_0100</STATUS>
