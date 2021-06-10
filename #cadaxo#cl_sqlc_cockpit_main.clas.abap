@@ -67,6 +67,8 @@ public section.
   data G_TRSTART_UZEIT type SYST_UZEIT .
   data G_TRSTART_DATUM type SYST_DATUM .
   data GT_CL_SQL_PARSE_BEFTEMPGEN type /CADAXO/SQLC_CL_COCKPIT_PARSET .
+  constants c_release_type_always type /CADAXO/SQLCRELEASE_TYPE value 'A' ##NO_TEXT.
+  constants c_release_type_once type /CADAXO/SQLCRELEASE_TYPE value 'O' ##NO_TEXT.
 
   events SETTINGS_CHANGED_UPTO
     exporting
@@ -163,7 +165,7 @@ public section.
   methods PAI_2000
     importing
       !I_OK_CODE type SY-UCOMM .
-  methods PARAM_REPLACE_TAGS
+  class-methods PARAM_REPLACE_TAGS
     changing
       !DATA type STRING .
   methods PBO_0100 .
@@ -841,77 +843,77 @@ protected section.
       !I_RESULT_DREF type ref to DATA
       !I_TABIX type SY-TABIX .
   methods TIPPSANDTRICKS .
-  PRIVATE SECTION.
+private section.
 
-    CONSTANTS:
-      BEGIN OF cs_symbol_type,
+  constants:
+    BEGIN OF cs_symbol_type,
         user    TYPE char1 VALUE 'U' ##NO_TEXT,
         program TYPE char1 VALUE 'P' ##NO_TEXT,
         create  TYPE char1 VALUE 'C' ##NO_TEXT,
         modify  TYPE char1 VALUE 'M' ##NO_TEXT,
       END OF cs_symbol_type .
-    CONSTANTS:
-      BEGIN OF cs_windowresolution,
+  constants:
+    BEGIN OF cs_windowresolution,
         horizontal TYPE /cadaxo/sqlcreswindorientation VALUE 'H' ##NO_TEXT,
         vertical   TYPE /cadaxo/sqlcreswindorientation VALUE 'V' ##NO_TEXT,
         matrix     TYPE /cadaxo/sqlcreswindorientation VALUE 'M' ##NO_TEXT,
         tab        type /cadaxo/sqlcreswindorientation value 'T' ##NO_TEXT,
       END OF cs_windowresolution .
-    CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
-    CONSTANTS c_program_symbols_hide TYPE flag VALUE space ##NO_TEXT.
-    CONSTANTS c_program_symbols_show TYPE flag VALUE 'X' ##NO_TEXT.
-    CONSTANTS c_symbol_type TYPE /cadaxo/sqlcapi_position_typ VALUE '3' ##NO_TEXT.
-    CONSTANTS c_width_right_clipboard TYPE i VALUE 500 ##NO_TEXT.
-    CONSTANTS c_width_right_symbols TYPE i VALUE 500 ##NO_TEXT.
-    CONSTANTS c_width_right_window TYPE i VALUE 500 ##NO_TEXT.
-    CONSTANTS gc_fcode_csv TYPE ui_func VALUE 'EXPORT_CSV' ##NO_TEXT.
-    CLASS-DATA gt_main_classes TYPE gtt_main_classes .
-    CLASS-DATA g_main_counter TYPE i .
-    DATA gcont_html_viewer TYPE REF TO cl_gui_container .
-    DATA gr_alv_symb_ow TYPE REF TO cl_gui_alv_grid .
-    DATA gr_cc_alv_symb_ow TYPE REF TO cl_gui_custom_container .
-    DATA gt_elementinfo TYPE /cadaxo/sqlc_elementinfo_t .
-    DATA gt_headerlines TYPE /cadaxo/sqlcheaderlines_t .
-    DATA gt_history_log TYPE /cadaxo/sqlclogalv_t .
+  constants C_CMD_SHOW_LOG type STRING value 'SHOW_LOG ' ##NO_TEXT.
+  constants C_PROGRAM_SYMBOLS_HIDE type FLAG value SPACE ##NO_TEXT.
+  constants C_PROGRAM_SYMBOLS_SHOW type FLAG value 'X' ##NO_TEXT.
+  constants C_SYMBOL_TYPE type /CADAXO/SQLCAPI_POSITION_TYP value '3' ##NO_TEXT.
+  constants C_WIDTH_RIGHT_CLIPBOARD type I value 500 ##NO_TEXT.
+  constants C_WIDTH_RIGHT_SYMBOLS type I value 500 ##NO_TEXT.
+  constants C_WIDTH_RIGHT_WINDOW type I value 500 ##NO_TEXT.
+  constants GC_FCODE_CSV type UI_FUNC value 'EXPORT_CSV' ##NO_TEXT.
+  class-data GT_MAIN_CLASSES type GTT_MAIN_CLASSES .
+  class-data G_MAIN_COUNTER type I .
+  data GCONT_HTML_VIEWER type ref to CL_GUI_CONTAINER .
+  data GR_ALV_SYMB_OW type ref to CL_GUI_ALV_GRID .
+  data GR_CC_ALV_SYMB_OW type ref to CL_GUI_CUSTOM_CONTAINER .
+  data GT_ELEMENTINFO type /CADAXO/SQLC_ELEMENTINFO_T .
+  data GT_HEADERLINES type /CADAXO/SQLCHEADERLINES_T .
+  data GT_HISTORY_LOG type /CADAXO/SQLCLOGALV_T .
     " DATA gt_html_demoversion TYPE gtt_char255 .
     " DATA gt_html_html_startup TYPE gtt_char255 .
-    DATA gt_jobs TYPE /cadaxo/sqlcjobsalv_t .
-    DATA gt_lvc_s_layo TYPE /cadaxo/sqlc_t_lvc_s_filt .
-    DATA gt_lvc_t_filt TYPE /cadaxo/sqlc_t_lvc_t_filt .
-    DATA gt_lvc_t_sort TYPE /cadaxo/sqlc_t_lvc_t_sort .
-    DATA gt_saved_lists TYPE /cadaxo/sqlcsresalv_t .
-    DATA gt_selected_disp TYPE lvc_t_row .
-    DATA gt_selected_rows TYPE lvc_t_row .
-    DATA gt_symbol TYPE /cadaxo/sqlc_symbol_t .
-    DATA gt_symbol_delete TYPE /cadaxo/sqlc_symbol_t .
-    DATA gt_symbol_ow TYPE /cadaxo/sqlc_symbol_ow_t .
-    DATA gt_symbol_selected TYPE /cadaxo/sqlc_symbol_t .
-    DATA gt_toolbuttons_clipboard TYPE ttb_button .
-    DATA gt_toolbuttons_result TYPE ttb_button .
-    DATA gt_toolbuttons_symbol TYPE ttb_button .
-    DATA gv_selected_counter TYPE sy-tabix .
-    DATA gv_selected_total TYPE sy-tabix .
-    DATA g_abap_editor_type TYPE char1 VALUE 'A' ##NO_TEXT.
-    DATA g_auth_sql_cockpit_actvt TYPE activ_auth .
-    DATA g_curr_col TYPE lvc_fname .
-    DATA g_curr_row TYPE /cadaxo/sqlcsymbol_name .
-    DATA g_free_space_kb TYPE int4 .
-    DATA g_html_request TYPE c .
-    DATA g_is_its TYPE char1 VALUE space ##NO_TEXT.
-    DATA g_progress_indicator_msg TYPE string .
-    DATA g_sel_hist_timestamp_from TYPE timestamp .
-    DATA g_sel_hist_timestamp_to TYPE timestamp .
-    DATA g_sel_job_timestamp_from TYPE timestamp .
-    DATA g_sel_job_timestamp_to TYPE timestamp .
-    DATA g_symbol_toolbar_excluding TYPE ui_functions .
-    DATA g_version_nr TYPE string VALUE '3.4' ##NO_TEXT.
+  data GT_JOBS type /CADAXO/SQLCJOBSALV_T .
+  data GT_LVC_S_LAYO type /CADAXO/SQLC_T_LVC_S_FILT .
+  data GT_LVC_T_FILT type /CADAXO/SQLC_T_LVC_T_FILT .
+  data GT_LVC_T_SORT type /CADAXO/SQLC_T_LVC_T_SORT .
+  data GT_SAVED_LISTS type /CADAXO/SQLCSRESALV_T .
+  data GT_SELECTED_DISP type LVC_T_ROW .
+  data GT_SELECTED_ROWS type LVC_T_ROW .
+  data GT_SYMBOL type /CADAXO/SQLC_SYMBOL_T .
+  data GT_SYMBOL_DELETE type /CADAXO/SQLC_SYMBOL_T .
+  data GT_SYMBOL_OW type /CADAXO/SQLC_SYMBOL_OW_T .
+  data GT_SYMBOL_SELECTED type /CADAXO/SQLC_SYMBOL_T .
+  data GT_TOOLBUTTONS_CLIPBOARD type TTB_BUTTON .
+  data GT_TOOLBUTTONS_RESULT type TTB_BUTTON .
+  data GT_TOOLBUTTONS_SYMBOL type TTB_BUTTON .
+  data GV_SELECTED_COUNTER type SY-TABIX .
+  data GV_SELECTED_TOTAL type SY-TABIX .
+  data G_ABAP_EDITOR_TYPE type CHAR1 value 'A' ##NO_TEXT.
+  data G_AUTH_SQL_COCKPIT_ACTVT type ACTIV_AUTH .
+  data G_CURR_COL type LVC_FNAME .
+  data G_CURR_ROW type /CADAXO/SQLCSYMBOL_NAME .
+  data G_FREE_SPACE_KB type INT4 .
+  data G_HTML_REQUEST type C .
+  data G_IS_ITS type CHAR1 value SPACE ##NO_TEXT.
+  data G_PROGRESS_INDICATOR_MSG type STRING .
+  data G_SEL_HIST_TIMESTAMP_FROM type TIMESTAMP .
+  data G_SEL_HIST_TIMESTAMP_TO type TIMESTAMP .
+  data G_SEL_JOB_TIMESTAMP_FROM type TIMESTAMP .
+  data G_SEL_JOB_TIMESTAMP_TO type TIMESTAMP .
+  data G_SYMBOL_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
+  class-data G_VERSION_NR type STRING value '3.4' ##NO_TEXT.
 
-    METHODS call_admin .
-    METHODS _split_error_text
-      IMPORTING
-        !is_error  TYPE /cadaxo/sqlcsyntaxerror
-      CHANGING
-        !ct_errors TYPE /cadaxo/sqlcsyntaxerror_t .
+  methods CALL_ADMIN .
+  methods _SPLIT_ERROR_TEXT
+    importing
+      !IS_ERROR type /CADAXO/SQLCSYNTAXERROR
+    changing
+      !CT_ERRORS type /CADAXO/SQLCSYNTAXERROR_T .
 ENDCLASS.
 
 
@@ -1626,6 +1628,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     toolbar_row_height = calculate_height_for_button( ).
     toolbar_col_width = calculate_width_for_button( ).
 
+    /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value(
+        EXPORTING
+          i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
+       RECEIVING
+         r_parameter_value    = g_version_nr
+        EXCEPTIONS
+          OTHERS              = 2
+             ).
+
   ENDMETHOD.
 
 
@@ -1767,7 +1778,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                 me->ms_user_settings_xml-forwnavddleclipse    TO me->g_user_settings-forwnavddleclipse,
                 me->ms_user_settings_xml-forwnavdicteclipse   TO me->g_user_settings-forwnavdicteclipse,
                 me->ms_user_settings_xml-domaintext           TO me->g_user_settings-domaintext,           "COCKPIT-458
-                me->ms_user_settings_xml-release_type         TO me->g_user_settings-release_type.         "COCKPIT-98
+                me->ms_user_settings_xml-release_type         TO me->g_user_settings-release_type,         "COCKPIT-98
+                me->ms_user_settings_xml-release_number       TO me->g_user_settings-release_number.       "COCKPIT-98
 
 * Column Header - Fieldname or Fieldtext
           CASE me->ms_user_settings_xml-colhd_type.
@@ -1977,15 +1989,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     me->set_initial_date_history( ).
     me->set_initial_date_jobmonitor( ).
 
-* Version number
-    /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value(
-        EXPORTING
-          i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
-       RECEIVING
-         r_parameter_value    = g_version_nr
-        EXCEPTIONS
-          OTHERS              = 2
-             ).
+
 
 
     gr_user_log = NEW #( ).
@@ -8721,7 +8725,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                            i_templ_name   = <l_sql_template_alv>-template_name.
 
           lcl_template_class->execute_template_generation( ).
-
+          CLEAR: lcl_template_class. "COCKPIT-409
           "COCKPIT-274 BEGIN
           IF lines( <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen ) > 1.
             me->gt_cl_sql_parse = <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen. "me->gt_cl_sql_parse_beftempgen.
@@ -9109,7 +9113,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     DATA l_from       TYPE i.
     DATA l_to         TYPE i.
     DATA l_len        TYPE i.
-    DATA lr_parser    TYPE REF TO cl_abap_parser.
+    DATA lr_parser    TYPE REF TO cl_abap_parser."/cadaxo/cl_sqlc_abap_parser. "COCKPIT-481
     DATA lt_source    TYPE sourcetable.
     DATA lt_dfies     TYPE ddfields.
     DATA ld_color(1)  TYPE c.
@@ -12356,9 +12360,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       WHEN 'EXECUTE'.
         me->store_sql_to_hist( ).
         me->execute_sql( ).
-        DATA: o_join TYPE REF TO /CADAXO/CL_SQLC_JOIN_COMPLET. "COCKPIT-474
-        o_join = NEW #( o_abapedit = me->gc_abap_editor ).
-        o_join->disassemble_sql( ).
+*        DATA: o_join TYPE REF TO /CADAXO/CL_SQLC_JOIN_COMPLET. "COCKPIT-474
+*        o_join = NEW #( o_abapedit = me->gc_abap_editor ).
+*        o_join->disassemble_sql( ). * DUMP ~ SELECT ....AND PARTNER IN &PARTNER&
       WHEN 'SQL_BACK'.    "Go Back
         me->move_back_to_sql( ).
       WHEN 'SQL_FORW'.    "Go Next
@@ -14285,6 +14289,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ms_user_settings_xml-forwnavdicteclipse   = i_settings-forwnavdicteclipse.
     ms_user_settings_xml-domaintext           = i_settings-domaintext.             "COCKPIT-458
     ms_user_settings_xml-release_type         = i_settings-release_type.           "COCKPIT-98
+    ms_user_settings_xml-release_number       = i_settings-release_number.         "COCKPIT-98
 
     CASE abap_true.
       WHEN i_settings-hd_fieldname.
@@ -15924,21 +15929,35 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD tippsandtricks.
-    DATA: lv_res TYPE c.
+    DATA lv_release_type TYPE /cadaxo/sqlcrelease_type.
 
-    IF me->g_user_settings-release_type NE 'N'.
-      IF me->g_user_settings-release_type = 'O'.
-        me->g_user_settings-release_type = 'N'.
-        me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
-      ENDIF.
+    /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value( EXPORTING  i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
+                                                         RECEIVING  r_parameter_value   = DATA(lv_version)
+                                                         EXCEPTIONS parameter_not_found = 1 ).
+
+    IF me->g_user_settings-release_type EQ space.
+      me->g_user_settings-release_type = /cadaxo/cl_sqlc_cockpit_main=>c_release_type_always.
+      me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
+    ENDIF.
+
+    IF me->g_user_settings-release_type   EQ /cadaxo/cl_sqlc_cockpit_main=>c_release_type_always
+    OR me->g_user_settings-release_number NE lv_version.
 
       CALL FUNCTION '/CADAXO/SQLCTIPPSANDTRICKS'
         IMPORTING
-          ev_res = lv_res.
-      IF lv_res EQ '2'.
-        me->g_user_settings-release_type = 'N'.
+          ev_release_type = lv_release_type
+        EXCEPTIONS
+          cancel_by_user  = 1
+          OTHERS          = 2.
+
+      IF sy-subrc EQ 0.
+        IF lv_release_type IS NOT INITIAL.
+          me->g_user_settings-release_type = lv_release_type.
+        ENDIF.
+        me->g_user_settings-release_number = lv_version.
         me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
       ENDIF.
+
     ENDIF.
 
   ENDMETHOD.
