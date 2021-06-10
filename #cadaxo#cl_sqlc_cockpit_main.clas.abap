@@ -770,6 +770,14 @@ protected section.
       !XPOS
       !YPOS
       !SENDER .
+  methods ON_EDITOR_INSERT_PATTERN
+    for event INSERT_PATTERN of CL_GUI_ABAPEDIT
+    importing
+      !DATATYPE
+      !FLAGS
+      !PATTERNKEY
+      !XPOS
+      !YPOS .
   methods GET_CURRENT_GRID_NUMBER
     returning
       value(R_GRID_NUMBER) type I .
@@ -9087,6 +9095,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
+  method ON_EDITOR_INSERT_PATTERN.
+
+    "COCKPIT-481 Code Completion Insertation
+
+  endmethod.
+
+
   METHOD on_editor_quick_info.
 ****************************************************************************************************
 *Description             : on editor - quick info                                                  *
@@ -9113,7 +9128,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     DATA l_from       TYPE i.
     DATA l_to         TYPE i.
     DATA l_len        TYPE i.
-    DATA lr_parser    TYPE REF TO cl_abap_parser."/cadaxo/cl_sqlc_abap_parser. "COCKPIT-481
+    DATA lr_parser    TYPE REF TO cl_abap_parser.
     DATA lt_source    TYPE sourcetable.
     DATA lt_dfies     TYPE ddfields.
     DATA ld_color(1)  TYPE c.

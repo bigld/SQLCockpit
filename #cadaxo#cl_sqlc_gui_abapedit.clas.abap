@@ -132,6 +132,15 @@ CLASS /CADAXO/CL_SQLC_GUI_ABAPEDIT IMPLEMENTATION.
   METHOD show_completion_results.
 
     DATA compl_result TYPE STANDARD TABLE OF scc_completion.
+"COCKPIT-481
+*    DATA lt_code      TYPE /cadaxo/sqlccodeline_t.
+*
+*    me->get_selection_pos( IMPORTING from_line = DATA(l_from_line)
+*                                     from_pos  = DATA(l_from_pos)
+*                                     to_line   = DATA(l_to_line)
+*                                     to_pos    = DATA(l_to_pos) ).
+*
+*    me->get_text( IMPORTING table = lt_code ).
 
     APPEND LINES OF completion_results TO compl_result.
 
