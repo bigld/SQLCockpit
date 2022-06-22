@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    view related FORM routines
-*   generation date: 11.04.2010 at 17:15:55 by user CADAXO
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 *...processing: /CADAXO/SQLCVGRV................................*
 FORM GET_DATA_/CADAXO/SQLCVGRV.

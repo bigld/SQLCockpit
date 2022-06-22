@@ -6,8 +6,8 @@
    <INCLUDES>
     <SOBJ_NAME>/CADAXO/LSQLCJCHEF00</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCJCHEI00</SOBJ_NAME>
-    <SOBJ_NAME>/CADAXO/LSQLCJCHETOP</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCJCHET00</SOBJ_NAME>
+    <SOBJ_NAME>/CADAXO/LSQLCJCHETOP</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/SAPLSQLCJCHE</SOBJ_NAME>
    </INCLUDES>
    <FUNCTIONS>
@@ -376,7 +376,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCHE</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCHE-GUID_HEADER</NAME>
-       <TEXT>Variant_Guid____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>040</LENGTH>
@@ -393,7 +392,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCHE</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCHE-LEFT_TABLE</NAME>
-       <TEXT>Table_Name______________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>040</LENGTH>
@@ -410,7 +408,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCHE</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCHE-JOIN_TYPE</NAME>
-       <TEXT>JOIN_Type_______________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>040</LENGTH>
@@ -427,7 +424,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCHE</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCHE-JOINED_TABLE</NAME>
-       <TEXT>Table_Name______________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>040</LENGTH>
@@ -444,7 +440,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCHE</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCHE-CNT</NAME>
-       <TEXT>Count___________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>005</COLUMN>
        <LENGTH>040</LENGTH>
@@ -461,7 +456,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCHE</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCHE-LOGSYS</NAME>
-       <TEXT>Logical_system__________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>006</COLUMN>
        <LENGTH>040</LENGTH>
@@ -478,7 +472,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCHE</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCHE-SQLCYEAR</NAME>
-       <TEXT>Year____________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>007</COLUMN>
        <LENGTH>040</LENGTH>
@@ -495,7 +488,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCHE</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCHE-SQLCMONTH</NAME>
-       <TEXT>Month___________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>008</COLUMN>
        <LENGTH>040</LENGTH>

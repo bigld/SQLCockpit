@@ -7,8 +7,8 @@
     <SOBJ_NAME>/CADAXO/LSQLCSYMBF00</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCSYMBF01</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCSYMBI00</SOBJ_NAME>
-    <SOBJ_NAME>/CADAXO/LSQLCSYMBTOP</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCSYMBT00</SOBJ_NAME>
+    <SOBJ_NAME>/CADAXO/LSQLCSYMBTOP</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/SAPLSQLCSYMB</SOBJ_NAME>
    </INCLUDES>
    <FUNCTIONS>
@@ -377,7 +377,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCSYMB</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCSYMB-SYMBOL</NAME>
-       <TEXT>Symbol_Name_____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>040</LENGTH>
@@ -394,7 +393,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCSYMB</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCSYMB-SYMBOL_DESCR</NAME>
-       <TEXT>User_Comment____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>040</LENGTH>
@@ -411,7 +409,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCSYMB</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCSYMB-SYMBOL_VALUE</NAME>
-       <TEXT>Symbol_Value____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>040</LENGTH>
@@ -428,7 +425,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCSYMB</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCSYMB-SYMBOL_CLASS</NAME>
-       <TEXT>Symbol_Class____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>040</LENGTH>
@@ -717,7 +713,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCSYMB</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCSYMB-SYMBOL</NAME>
-       <TEXT>Symbol_Name_____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>040</LENGTH>
@@ -734,7 +729,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCSYMB</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCSYMB-SYMBOL_DESCR</NAME>
-       <TEXT>User_Comment____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>040</LENGTH>
@@ -751,7 +745,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCSYMB</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCSYMB-SYMBOL_VALUE</NAME>
-       <TEXT>Symbol_Value____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>040</LENGTH>
@@ -768,7 +761,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCSYMB</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCSYMB-SYMBOL_CLASS</NAME>
-       <TEXT>Symbol_Class____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>040</LENGTH>

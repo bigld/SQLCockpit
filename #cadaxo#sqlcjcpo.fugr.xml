@@ -6,8 +6,8 @@
    <INCLUDES>
     <SOBJ_NAME>/CADAXO/LSQLCJCPOF00</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCJCPOI00</SOBJ_NAME>
-    <SOBJ_NAME>/CADAXO/LSQLCJCPOTOP</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCJCPOT00</SOBJ_NAME>
+    <SOBJ_NAME>/CADAXO/LSQLCJCPOTOP</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/SAPLSQLCJCPO</SOBJ_NAME>
    </INCLUDES>
    <FUNCTIONS>
@@ -376,7 +376,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCPO</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCPO-GUID_HEADER</NAME>
-       <TEXT>Variant_Guid____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>040</LENGTH>
@@ -393,7 +392,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCPO</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCPO-GUID_POSTION</NAME>
-       <TEXT>Variant_Guid____________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>040</LENGTH>
@@ -410,7 +408,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCPO</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCPO-LEFT_FIELD</NAME>
-       <TEXT>Table_Name______________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>040</LENGTH>
@@ -427,7 +424,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCPO</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCPO-COND</NAME>
-       <TEXT>Op______________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>040</LENGTH>
@@ -444,7 +440,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCPO</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCPO-JOINED_FIELD</NAME>
-       <TEXT>Table_Name______________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>005</COLUMN>
        <LENGTH>040</LENGTH>
@@ -476,7 +471,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCJCPO</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCJCPO-CNT</NAME>
-       <TEXT>Count___________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>007</COLUMN>
        <LENGTH>040</LENGTH>

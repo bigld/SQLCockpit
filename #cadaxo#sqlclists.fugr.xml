@@ -65,7 +65,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLCSRES-DESCRIPTION</NAME>
-       <TEXT>Name____________</TEXT>
        <LINE>002</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>016</LENGTH>

@@ -10,6 +10,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
     CONSTANTS c_param_version TYPE /cadaxo/sqlcparameter_id VALUE 'CADAXO_VERSION' ##NO_TEXT.
     CONSTANTS c_source_length TYPE i VALUE 80 ##NO_TEXT.
     CLASS-DATA gr_settings TYPE REF TO if_pretty_printer_settings .
+    CONSTANTS c_release_info_link TYPE /cadaxo/sqlcparameter_id VALUE 'RELEASE_INFO_LINK' ##NO_TEXT.
 
     CLASS-METHODS find_symbol_regex
       IMPORTING
@@ -160,8 +161,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
       IMPORTING
         VALUE(i_addon)        TYPE /cadaxo/sqlcaddon_id
         VALUE(it_customizing) TYPE ANY TABLE .
-    CLASS-METHODS get_addon_customizing IMPORTING VALUE(i_addon) TYPE /cadaxo/sqlcaddon_id
-                                        EXPORTING et_customizing TYPE ANY TABLE.
+    CLASS-METHODS get_addon_customizing
+      IMPORTING
+        VALUE(i_addon)  TYPE /cadaxo/sqlcaddon_id
+      EXPORTING
+        !et_customizing TYPE ANY TABLE .
     CLASS-METHODS set_adm_customizing
       IMPORTING
         VALUE(i_customizing) TYPE any .
@@ -224,9 +228,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
         !c_string TYPE string
       RAISING
         /cadaxo/cx_sqlc_symb_not_found .
-    CLASS-METHODS format_abap_code
-      CHANGING
-        !ct_code TYPE /cadaxo/sqlcstring_t .
+    CLASS-METHODS format_abap_code IMPORTING i_line_size TYPE i DEFAULT /cadaxo/cl_sqlc_cockpit_assist=>c_source_length
+                                   CHANGING  ct_code     TYPE /cadaxo/sqlcstring_t.
     CLASS-METHODS foreward_navigation_adt_stob
       IMPORTING
         !i_ddobjname TYPE ddobjname .
@@ -1138,7 +1141,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist IMPLEMENTATION.
     LOOP AT ct_code ASSIGNING FIELD-SYMBOL(<lv_abap_code>).
 
       l_pos_from = 0.
-      l_pos_to   = c_source_length.
+      l_pos_to   = i_line_size.
+      IF l_pos_to > 255.
+        l_pos_to = 255. "MAX
+      ENDIF.
       l_do_while = abap_false.
 
       IF strlen( <lv_abap_code> ) LE l_pos_to.
@@ -1261,12 +1267,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist IMPLEMENTATION.
       SELECT SINGLE settings FROM /cadaxo/sqlcadoc
              WHERE addon    = @i_addon
                AND delivery = @abap_false
-             INTO @data(addon_settings).
+             INTO @DATA(addon_settings).
 
       IF sy-subrc = 0 AND addon_settings IS NOT INITIAL.
 
         cl_abap_gzip=>decompress_text( EXPORTING gzip_in  = addon_settings
-                                       IMPORTING text_out = data(xml) ).
+                                       IMPORTING text_out = DATA(xml) ).
 
         CALL TRANSFORMATION id SOURCE XML xml
                                RESULT result_save = et_customizing.

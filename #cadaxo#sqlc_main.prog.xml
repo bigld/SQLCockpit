@@ -68,7 +68,7 @@
       <TYPE>M</TYPE>
       <NEXTSCREEN>0500</NEXTSCREEN>
       <LINES>026</LINES>
-      <COLUMNS>114</COLUMNS>
+      <COLUMNS>115</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -137,7 +137,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-SQL_TRACE</NAME>
-       <TEXT>SQL_Trace</TEXT>
        <LINE>002</LINE>
        <COLUMN>059</COLUMN>
        <LENGTH>011</LENGTH>
@@ -154,7 +153,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-TABLEBUFFER_TRACE</NAME>
-       <TEXT>Tablebuffer_Trace</TEXT>
        <LINE>003</LINE>
        <COLUMN>059</COLUMN>
        <LENGTH>019</LENGTH>
@@ -185,7 +183,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-HD_SHOW_ALIAS</NAME>
-       <TEXT>Show_alias_in_header_____</TEXT>
        <LINE>008</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>027</LENGTH>
@@ -216,7 +213,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-RESULT_BUTTONS</NAME>
-       <TEXT>Show_Result_Buttons______</TEXT>
        <LINE>011</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>027</LENGTH>
@@ -233,7 +229,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-DOMAINTEXT</NAME>
-       <TEXT>Add_Domain_Text_____</TEXT>
        <LINE>011</LINE>
        <COLUMN>032</COLUMN>
        <LENGTH>022</LENGTH>
@@ -264,7 +259,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-RESULT_DOUBLECLICK</NAME>
-       <TEXT>Double-click_____________</TEXT>
        <LINE>012</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>027</LENGTH>
@@ -298,7 +292,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>CHECK</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-USE_CONVEXIT</NAME>
-       <TEXT>Use_Convertion_Exit______</TEXT>
        <LINE>013</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>027</LENGTH>
@@ -380,7 +373,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-MAXSEL</NAME>
-       <TEXT>_______.___</TEXT>
        <LINE>015</LINE>
        <COLUMN>025</COLUMN>
        <LENGTH>011</LENGTH>
@@ -485,7 +477,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-EDITOR_TYPE</NAME>
-       <TEXT>__</TEXT>
        <DROPDOWN>L</DROPDOWN>
        <LINE>018</LINE>
        <COLUMN>010</COLUMN>
@@ -517,7 +508,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-JOB_LAST_X_DAYS</NAME>
-       <TEXT>__</TEXT>
        <LINE>018</LINE>
        <COLUMN>075</COLUMN>
        <LENGTH>002</LENGTH>
@@ -547,11 +537,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>ADT_FRAME</NAME>
-       <TEXT>ABAP_Development_Tool_for_SAP_NetWeaver____________________________________________________________________</TEXT>
+       <TEXT>ABAP_Development_Tool_for_SAP_NetWeaver___________________________________________________________________</TEXT>
        <LINE>020</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>108</LENGTH>
-       <VISLENGTH>108</VISLENGTH>
+       <LENGTH>107</LENGTH>
+       <VISLENGTH>107</VISLENGTH>
        <HEIGHT>004</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -640,11 +630,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>SHOWRELEASEINFOS</NAME>
-       <TEXT>Show_Release_Infos_________________________________________________________________________________________</TEXT>
+       <TEXT>Show_Release_Infos________________________________________________________________________________________</TEXT>
        <LINE>024</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>108</LENGTH>
-       <VISLENGTH>108</VISLENGTH>
+       <LENGTH>107</LENGTH>
+       <VISLENGTH>107</VISLENGTH>
        <HEIGHT>003</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -668,7 +658,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-RELEASE_TYPE</NAME>
-       <TEXT>_</TEXT>
        <DROPDOWN>K</DROPDOWN>
        <LINE>025</LINE>
        <COLUMN>016</COLUMN>
@@ -735,7 +724,6 @@
        <CONT_NAME>%A_/CADAXO/SQLCUSRP_DYN-HD_FIELDTEXT_A</CONT_NAME>
        <TYPE>RADIO</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-HD_FIELDTEXT_A</NAME>
-       <TEXT>automatic_text___________</TEXT>
        <LINE>004</LINE>
        <COLUMN>006</COLUMN>
        <LENGTH>027</LENGTH>
@@ -753,7 +741,6 @@
        <CONT_NAME>%A_/CADAXO/SQLCUSRP_DYN-HD_FIELDTEXT_A</CONT_NAME>
        <TYPE>RADIO</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-HD_FIELDTEXT_S</NAME>
-       <TEXT>short_fieldtext__________</TEXT>
        <LINE>005</LINE>
        <COLUMN>006</COLUMN>
        <LENGTH>027</LENGTH>
@@ -771,7 +758,6 @@
        <CONT_NAME>%A_/CADAXO/SQLCUSRP_DYN-HD_FIELDTEXT_A</CONT_NAME>
        <TYPE>RADIO</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-HD_FIELDTEXT_M</NAME>
-       <TEXT>middle_fieldtext_________</TEXT>
        <LINE>006</LINE>
        <COLUMN>006</COLUMN>
        <LENGTH>027</LENGTH>
@@ -789,7 +775,6 @@
        <CONT_NAME>%A_/CADAXO/SQLCUSRP_DYN-HD_FIELDTEXT_A</CONT_NAME>
        <TYPE>RADIO</TYPE>
        <NAME>/CADAXO/SQLCUSRP_DYN-HD_FIELDTEXT_L</NAME>
-       <TEXT>long_fieldtext___________</TEXT>
        <LINE>007</LINE>
        <COLUMN>006</COLUMN>
        <LENGTH>027</LENGTH>
@@ -986,7 +971,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLCSRES-DESCRIPTION</NAME>
-       <TEXT>Name____________</TEXT>
        <LINE>002</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>016</LENGTH>
@@ -1057,8 +1041,8 @@
       <DESCRIPT>SQL Cockpit - Admin (new)</DESCRIPT>
       <TYPE>M</TYPE>
       <NEXTSCREEN>0900</NEXTSCREEN>
-      <LINES>027</LINES>
-      <COLUMNS>110</COLUMNS>
+      <LINES>035</LINES>
+      <COLUMNS>111</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -1072,7 +1056,7 @@
        <LINE>001</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>108</LENGTH>
-       <HEIGHT>027</HEIGHT>
+       <HEIGHT>035</HEIGHT>
       </RPY_DYCATT>
       <RPY_DYCATT>
        <TYPE>SUBSCREEN</TYPE>
@@ -1081,7 +1065,7 @@
        <LINE>003</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>106</LENGTH>
-       <HEIGHT>024</HEIGHT>
+       <HEIGHT>032</HEIGHT>
        <C_SCROLL_V>X</C_SCROLL_V>
        <C_SCROLL_H>X</C_SCROLL_H>
       </RPY_DYCATT>
@@ -1395,7 +1379,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_ADMIN_CUST-MAXSPACE</NAME>
-       <TEXT>Max._space_per_user</TEXT>
        <LINE>003</LINE>
        <COLUMN>077</COLUMN>
        <LENGTH>019</LENGTH>

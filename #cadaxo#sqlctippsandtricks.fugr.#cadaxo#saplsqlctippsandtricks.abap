@@ -1,8 +1,8 @@
 *******************************************************************
 *   System-defined Include-files.                                 *
 *******************************************************************
-  INCLUDE /CADAXO/LSQLCTIPPSANDTRICKSTOP.    " Global Data
-  INCLUDE /CADAXO/LSQLCTIPPSANDTRICKSUXX.    " Function Modules
+  INCLUDE /cadaxo/lsqlctippsandtrickstop.    " Global Data
+  INCLUDE /cadaxo/lsqlctippsandtricksuxx.    " Function Modules
 
 *******************************************************************
 *   User-defined Include-files (if necessary).                    *
@@ -14,8 +14,6 @@
 * INCLUDE /CADAXO/LSQLCTIPPSANDTRICKSP...    " Local class implement.
 * INCLUDE /CADAXO/LSQLCTIPPSANDTRICKST99.    " ABAP Unit tests
 
-INCLUDE /cadaxo/lsqlctippsandtrickso01.
+  INCLUDE /cadaxo/lsqlctippsandtrickso01.
 
-INCLUDE /cadaxo/lsqlctippsandtricksi01.
-
-INCLUDE /cadaxo/lsqlctippsandtricksf01.
+  INCLUDE /cadaxo/lsqlctippsandtricksi01.

@@ -1,7 +1,6 @@
 FUNCTION-POOL /cadaxo/sqlctippsandtricks.   "MESSAGE-ID ..
-
+* declare Constants
+CONSTANTS c_container TYPE char7 VALUE 'CC_HTML'.
 * declaration of global data
-DATA: gv_title   TYPE syucomm.
-DATA: gv_code    TYPE sy-ucomm.
-DATA: gv_res     TYPE c.
-DATA: gv_version TYPE /cadaxo/sqlcparameter_val VALUE '3.7'.
+DATA gv_code           TYPE sy-ucomm.
+DATA gv_release_type   TYPE /cadaxo/sqlcrelease_type.

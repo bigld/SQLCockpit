@@ -974,6 +974,12 @@
      <MSGNR>160</MSGNR>
      <TEXT>Data was successfully downloaded.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>161</MSGNR>
+     <TEXT>More than 10 filter criteria is not supported!</TEXT>
+    </T100>
    </T100>
    <LONGTEXTS>
     <item>
@@ -3074,6 +3080,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>160</MSGNR>
      <TEXT>Daten wurden erfolgreich heruntergeladen.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>161</MSGNR>
+     <TEXT>Mehr als 10 Filterkriterien werden nicht unterstützt!</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>
