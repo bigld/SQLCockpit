@@ -51,7 +51,7 @@
       <TYPE>N</TYPE>
       <NEXTSCREEN>0100</NEXTSCREEN>
       <LINES>022</LINES>
-      <COLUMNS>123</COLUMNS>
+      <COLUMNS>124</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -64,8 +64,8 @@
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
        <LINE>002</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>123</LENGTH>
-       <HEIGHT>018</HEIGHT>
+       <LENGTH>124</LENGTH>
+       <HEIGHT>021</HEIGHT>
       </RPY_DYCATT>
      </CONTAINERS>
      <FIELDS>
@@ -74,11 +74,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>G_SQL</NAME>
-       <TEXT>___________________________________________________________________________________________________________________________</TEXT>
+       <TEXT>____________________________________________________________________________________________________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>123</LENGTH>
-       <VISLENGTH>123</VISLENGTH>
+       <LENGTH>124</LENGTH>
+       <VISLENGTH>124</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>

@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    view related data declarations
-*   generation date: 08.03.2021 at 14:04:22
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 *...processing: /CADAXO/SQLCJCHE................................*
 DATA:  BEGIN OF STATUS_/CADAXO/SQLCJCHE              .   "state vector

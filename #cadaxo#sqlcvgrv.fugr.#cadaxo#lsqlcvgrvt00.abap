@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    view related data declarations
-*   generation date: 10.09.2012 at 01:05:52 by user CADAXO
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 *...processing: /CADAXO/SQLCVGRV................................*
 TABLES: /CADAXO/SQLCVGRV, */CADAXO/SQLCVGRV. "view work areas

@@ -348,9 +348,9 @@ FORM personal_settings .
   /cadaxo/sqlcusrp_dyn = lcl_controller->g_user_settings.
 
   g_col = ( sy-scols / 2 ) - 54.
-  g_row = ( sy-srows / 2 ) - 12.
+  g_row = ( sy-srows / 2 ) - 14.
   g_col_t = g_col + 108.
-  g_row_t = g_row + 21.
+  g_row_t = g_row + 25.
 
   CALL SCREEN 500 STARTING AT g_col g_row ENDING AT g_col_t g_row_t.
 ENDFORM.                    " PERSONAL_SETTINGS
@@ -582,7 +582,7 @@ FORM admin_settings .
   g_col = ( sy-scols / 2 ) - 55.
   g_row = 2.
   g_col_t = g_col + 110.
-  g_row_t = g_row + 25.
+  g_row_t = g_row + 35.
 
   CALL SCREEN 900 STARTING AT g_col g_row ENDING AT g_col_t g_row_t.
 

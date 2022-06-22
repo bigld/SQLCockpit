@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    generated viewmaintenance function pool
-*   generation date: 18.06.2010 at 13:24:36 by user CADAXO
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 *******************************************************************
 *   System-defined Include-files.                                 *

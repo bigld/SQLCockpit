@@ -2,7 +2,7 @@
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_FUGR" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
-   <AREAT>Share SQL and Symbols</AREAT>
+   <AREAT>SQL Cockpit - Share SQL and Symbols</AREAT>
    <INCLUDES>
     <SOBJ_NAME>/CADAXO/LSQLCSHARECL0</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCSHAREO01</SOBJ_NAME>

@@ -511,6 +511,7 @@
       <RPY_DYFLOW>
        <LINE>                 g_current_subdynpro.</LINE>
       </RPY_DYFLOW>
+      <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
@@ -678,7 +679,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_TEMP_REP_ATTR-APPLICATION</NAME>
-       <TEXT>Application____</TEXT>
        <LINE>005</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -827,7 +827,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_TEMP_REP_ATTR-LAYOUT</NAME>
-       <TEXT>Layout_Restriction__</TEXT>
        <LINE>010</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>020</LENGTH>
@@ -1093,7 +1092,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_TEMP_REP_ATTR-APPLICATION</NAME>
-       <TEXT>Application____</TEXT>
        <LINE>005</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>

@@ -2970,6 +2970,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
     DATA l_row_index TYPE i.
     DATA ls_il_vnfa  LIKE LINE OF me->gt_il_vnfa.
     DATA l_trkorr    TYPE trkorr.
+    DATA trtask      TYPE trkorr.
     DATA lt_e071     TYPE TABLE OF e071.
     DATA lt_e071k    TYPE TABLE OF e071k.
     DATA ls_e071     TYPE e071.
@@ -2993,24 +2994,22 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 * select the transport request
       CALL FUNCTION 'TR_ORDER_CHOICE_CORRECTION'
         EXPORTING
-          iv_category            = 'CUST'  "Customizing
-          iv_cli_dep             = 'X'
+          iv_category = 'CUST'  "Customizing
+          iv_cli_dep  = abap_true
         IMPORTING
-          ev_order               = l_trkorr
+          ev_order    = l_trkorr
+          ev_task     = trtask
         EXCEPTIONS
-          invalid_category       = 1
-          no_correction_selected = 2
-          OTHERS                 = 3.
+          OTHERS      = 3.
       IF sy-subrc EQ 0.
 
 * lock the transport request
         CALL FUNCTION 'ENQUEUE_E_TRKORR'
           EXPORTING
-            trkorr         = l_trkorr
+            trkorr       = l_trkorr
           EXCEPTIONS
-            foreign_lock   = 1
-            system_failure = 2
-            OTHERS         = 3.
+            foreign_lock = 1
+            OTHERS       = 3.
         IF sy-subrc  =    1.
           l_user = sy-msgv1.
           MESSAGE e009(/cadaxo/sqlc) WITH l_trkorr l_user.
@@ -3018,14 +3017,14 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 * fill the e071/e071k structures
           CLEAR: ls_e071, ls_e071k.
-          MOVE: l_trkorr           TO ls_e071-trkorr,
+          MOVE: trtask             TO ls_e071-trkorr,
                 'R3TR'             TO ls_e071-pgmid,
                 'TABU'             TO ls_e071-object,
                 '/CADAXO/SQLCVNHD' TO ls_e071-obj_name,
                 'K'                TO ls_e071-objfunc.
           APPEND ls_e071 TO lt_e071.
 
-          MOVE: l_trkorr           TO ls_e071k-trkorr,
+          MOVE: trtask             TO ls_e071k-trkorr,
                 'R3TR'             TO ls_e071k-pgmid,
                 'TABU'             TO ls_e071k-object,
                 '/CADAXO/SQLCVNHD' TO ls_e071k-objname,
@@ -3033,7 +3032,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
                 'TABU'             TO ls_e071k-mastertype.
 
 * build the table key
-          MOVE <ls_variant>-varguid TO l_varguid.
+          l_varguid = <ls_variant>-varguid.
           CONCATENATE sy-mandt l_varguid INTO ls_e071k-tabkey RESPECTING BLANKS.
 
           APPEND ls_e071k TO lt_e071k.
@@ -3041,7 +3040,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 * symbols
           CLEAR ls_e071.
-          MOVE: l_trkorr           TO ls_e071-trkorr,
+          MOVE: trtask             TO ls_e071-trkorr,
                 'R3TR'             TO ls_e071-pgmid,
                 'TABU'             TO ls_e071-object,
                 '/CADAXO/SQLCVNSY' TO ls_e071-obj_name,
@@ -3050,7 +3049,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
           CLEAR ls_e071k.
 
-          MOVE: l_trkorr           TO ls_e071k-trkorr,
+          MOVE: trtask             TO ls_e071k-trkorr,
                 'R3TR'             TO ls_e071k-pgmid,
                 'TABU'             TO ls_e071k-object,
                 '/CADAXO/SQLCVNSY' TO ls_e071k-objname,
@@ -3063,7 +3062,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 * texts
           CLEAR ls_e071.
-          MOVE: l_trkorr           TO ls_e071-trkorr,
+          MOVE: trtask             TO ls_e071-trkorr,
                 'R3TR'             TO ls_e071-pgmid,
                 'TABU'             TO ls_e071-object,
                 '/CADAXO/SQLCVNTX' TO ls_e071-obj_name,
@@ -3072,7 +3071,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
           CLEAR ls_e071k.
 
-          MOVE: l_trkorr           TO ls_e071k-trkorr,
+          MOVE: trtask             TO ls_e071k-trkorr,
                 'R3TR'             TO ls_e071k-pgmid,
                 'TABU'             TO ls_e071k-object,
                 '/CADAXO/SQLCVNTX' TO ls_e071k-objname,
@@ -3086,17 +3085,14 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 * add the objects to the transport request
           CALL FUNCTION 'TRINT_APPEND_COMM'
             EXPORTING
-              wi_sel_e071        = 'X'
-              wi_sel_e071k       = 'X'
-              wi_trkorr          = l_trkorr
+              wi_sel_e071  = abap_true
+              wi_sel_e071k = abap_true
+              wi_trkorr    = trtask
             TABLES
-              wt_e071            = lt_e071
-              wt_e071k           = lt_e071k
+              wt_e071      = lt_e071
+              wt_e071k     = lt_e071k
             EXCEPTIONS
-              e071k_append_error = 1
-              e071_append_error  = 2
-              trkorr_empty       = 3
-              OTHERS             = 4.
+              OTHERS       = 1.
           IF sy-subrc EQ 0.
 * unlock the transport request
             CALL FUNCTION 'DEQUEUE_E_TRKORR'

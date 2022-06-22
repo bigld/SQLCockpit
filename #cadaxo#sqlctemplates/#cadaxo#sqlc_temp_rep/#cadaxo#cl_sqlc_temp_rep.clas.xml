@@ -85,12 +85,6 @@
       </item>
       <item>
        <ID>I</ID>
-       <KEY>P05</KEY>
-       <ENTRY>Das Include enthält Syntaxfehler - Bitte setzten Sie sich mittels Feedback Mail mit c</ENTRY>
-       <LENGTH>85</LENGTH>
-      </item>
-      <item>
-       <ID>I</ID>
        <KEY>T01</KEY>
        <ENTRY>Selektion</ENTRY>
        <LENGTH>9</LENGTH>
@@ -98,11 +92,6 @@
      </TEXTPOOL>
     </item>
    </I18N_TPOOL>
-   <I18N_LINES>
-    <item>
-     <LANGUAGE>D</LANGUAGE>
-    </item>
-   </I18N_LINES>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_TEMP_REP</CLSNAME>

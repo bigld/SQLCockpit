@@ -20,13 +20,15 @@
 * 25.02.2018 | Domi Bigl            | CC-Cleanup, multiple receiver               | COCKPIT-298    *
 *------------+----------------------+---------------------------------------------+----------------*
 * 01.02.2019 | Pat                  | added email attachment (result table)       | Cockpit-366    *
-*                                     in subroutine attach_results                                   *
+*            |                      | in subroutine attach_results                |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 15.06.2022 | Domi Bigl            | Wrong list in job notification mail + CC    | COCKPIT-488    *
 ****************************************************************************************************
 REPORT  /cadaxo/sqlc_batch_executemail.
 
-DATA gs_sqlcsres TYPE /cadaxo/sqlcsres.
+DATA gs_sqlcsres            TYPE /cadaxo/sqlcsres.
 DATA gs_jobstart_conditions TYPE /cadaxo/sqlc_jobwiz_fields.
-DATA gv_xml TYPE string.
+DATA gv_xml                 TYPE string.
 
 SELECTION-SCREEN: BEGIN OF BLOCK bl1 WITH FRAME.
 PARAMETERS: pjobguid TYPE /cadaxo/sqlc_jobguid OBLIGATORY.
@@ -34,22 +36,40 @@ SELECTION-SCREEN: END OF BLOCK bl1.
 
 START-OF-SELECTION.
 
-  SELECT SINGLE jobstartcond
-                jobname
-                jobcount
-                FROM /cadaxo/sqlcsres INTO CORRESPONDING FIELDS OF gs_sqlcsres WHERE list_guid = pjobguid.
-  IF sy-subrc EQ 0.
+  CALL FUNCTION 'GET_JOB_RUNTIME_INFO'
+    IMPORTING
+      jobcount = gs_sqlcsres-jobcount
+      jobname  = gs_sqlcsres-jobname
+    EXCEPTIONS
+      OTHERS   = 1.
 
+  IF sy-subrc = 0.
+    SELECT SINGLE *
+           FROM /cadaxo/sqlcsres
+           WHERE jobcount       = @gs_sqlcsres-jobcount
+             AND jobname        = @gs_sqlcsres-jobname
+             AND root_list_guid = @pjobguid
+           INTO @gs_sqlcsres.
+    IF sy-subrc <> 0.
+      "previous version?
+      SELECT SINGLE *
+             FROM /cadaxo/sqlcsres
+             INTO CORRESPONDING FIELDS OF gs_sqlcsres WHERE list_guid = pjobguid.
+      DATA(no_attachment) = abap_true.
+    ENDIF.
+    IF sy-subrc = 0.
 * unzip and convert start conditions
-    cl_abap_gzip=>decompress_text( EXPORTING gzip_in  = gs_sqlcsres-jobstartcond
-                                   IMPORTING text_out = gv_xml ).
+      cl_abap_gzip=>decompress_text( EXPORTING gzip_in  = gs_sqlcsres-jobstartcond
+                                     IMPORTING text_out = gv_xml ).
 
-    CALL TRANSFORMATION id
-       SOURCE XML gv_xml
-       RESULT settings = gs_jobstart_conditions.
+      CALL TRANSFORMATION id
+         SOURCE XML gv_xml
+         RESULT settings = gs_jobstart_conditions.
 
 * create notification mail(s)
-    PERFORM email_notification.
+      PERFORM email_notification.
+
+    ENDIF.
 
   ENDIF.
 
@@ -79,18 +99,11 @@ FORM email_notification .
 
   PERFORM get_job_status CHANGING lv_jobstate lv_jobstatetext.
 
-* begin of comments cockpit-451
-*  IF ( gs_jobstart_conditions-notification_email_flag IS NOT INITIAL
-*      AND ( gs_jobstart_conditions-notification_email1 IS NOT INITIAL OR
-*            gs_jobstart_conditions-notification_email2 IS NOT INITIAL ) ) OR
-*     ( gs_jobstart_conditions-notification_sap_mail_flag IS NOT INITIAL
-*      AND gs_jobstart_conditions-notification_sap_mail IS NOT INITIAL ).
-* end of comments cockpit-451
-* begin of insert cockpit-451
   IF  gs_jobstart_conditions-notification_email1 IS NOT INITIAL OR
       gs_jobstart_conditions-notification_email2 IS NOT INITIAL OR
       gs_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
-* end   of insert cockpit-451
+
+
     lr_send_request = cl_bcs=>create_persistent( ).
 
 * create subject
@@ -231,38 +244,31 @@ FORM attach_results  CHANGING pr_document TYPE REF TO cl_document_bcs.
         ls_result_csv     TYPE string,
         ls_result_xstring TYPE xstring,
         lt_result         TYPE solix_tab,
-        lr_zip            TYPE REF TO cl_abap_zip,
         lx_zip_file       TYPE xstring,
-        lv_filename       TYPE string,
-        lv_tabix_c        TYPE c length 2.
+        lv_filename       TYPE string.
 
   FIELD-SYMBOLS : <lt_result_table> TYPE ANY TABLE,
                   <lr_dref_result>  TYPE REF TO data.
 
-  SELECT SINGLE * FROM /cadaxo/sqlcsres INTO @DATA(ls_sqlcsres) WHERE list_guid = @pjobguid.
-  IF sy-subrc = 0.
-    SELECT SINGLE * FROM /cadaxo/sqlcress INTO @DATA(ls_sqlcress) WHERE ress_guid = @ls_sqlcsres-ress_guid.
+  IF no_attachment = abap_false.
+
+    SELECT SINGLE * FROM /cadaxo/sqlcress INTO @DATA(ls_sqlcress) WHERE ress_guid = @gs_sqlcsres-ress_guid.
     IF sy-subrc = 0.
 
-      CREATE OBJECT lr_cockpit_main.
-      CALL METHOD lr_cockpit_main->prepare_result_table
-        EXPORTING
-          is_sqlcsres = ls_sqlcsres
-          is_sqlcress = ls_sqlcress.
+      lr_cockpit_main = NEW #( ).
+      lr_cockpit_main->prepare_result_table( is_sqlcsres = gs_sqlcsres
+                                             is_sqlcress = ls_sqlcress ).
 
-      CREATE OBJECT lr_zip.
+      data(zip) = NEW cl_abap_zip( ).
 
       LOOP AT lr_cockpit_main->dref_result_tab_t ASSIGNING <lr_dref_result>.
-        DATA(lv_tabix) = sy-tabix.
+        DATA(tabix) = sy-tabix.
         ASSIGN <lr_dref_result>->* TO <lt_result_table>.
 
         CLEAR t_result_csv.
-        CALL METHOD lr_cockpit_main->get_csv_from_int_tab
-          EXPORTING
-            it_table      = <lt_result_table>
-            i_grid_i      = lv_tabix
-          IMPORTING
-            ev_output_csv = t_result_csv.
+        lr_cockpit_main->get_csv_from_int_tab( EXPORTING it_table      = <lt_result_table>
+                                                         i_grid_i      = tabix
+                                               IMPORTING ev_output_csv = t_result_csv ).
 
         ls_result_csv = lr_cockpit_main->get_csv_line_from_tab( t_result_csv ).
 
@@ -275,17 +281,13 @@ FORM attach_results  CHANGING pr_document TYPE REF TO cl_document_bcs.
         ENDTRY.
 
         CLEAR lv_filename.
-        lv_tabix_c = lv_tabix.
-      "  CONCATENATE sy-datum sy-uzeit INTO DATA(lv_date_time) SEPARATED BY '_'.
-      "  CONCATENATE 'Result_Table' lv_tabix_c lv_date_time INTO lv_filename SEPARATED BY '_'.
-
-        lv_filename = |Result_Table_{ lv_tabix }_{ sy-datum }_{ sy-uzeit }|.
+        lv_filename = |Result_Table_{ tabix }_{ sy-datum }_{ sy-uzeit }|.
 
 
         CONCATENATE lv_filename '.csv' INTO lv_filename.
 
-        lr_zip->add( name = lv_filename  content = ls_result_xstring ).
-        ls_result_xstring = lr_zip->save( ).
+        zip->add( name = lv_filename  content = ls_result_xstring ).
+        ls_result_xstring = zip->save( ).
 
         CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
           EXPORTING
@@ -296,23 +298,19 @@ FORM attach_results  CHANGING pr_document TYPE REF TO cl_document_bcs.
       ENDLOOP.
 
       IF lt_result IS NOT INITIAL.
-        DATA lv_subject TYPE sood-objdes.
-      "  CONCATENATE 'SQL_Result' lv_date_time INTO lv_subject SEPARATED BY '_'.
 
-        lv_subject = |SQL_Result_{ sy-datum }_{ sy-uzeit }|.
+        DATA(subject) = CONV sood-objdes( |SQL_Result_{ sy-datum }_{ sy-uzeit }.zip| ).
 
-        CONCATENATE lv_subject '.zip' INTO lv_subject.
         TRY.
-            CALL METHOD pr_document->add_attachment
-              EXPORTING
-                i_attachment_type    = 'BIN'
-                i_attachment_subject = lv_subject
-                i_att_content_hex    = lt_result.
+            pr_document->add_attachment( i_attachment_type    = 'BIN'
+                                         i_attachment_subject = subject
+                                         i_att_content_hex    = lt_result ).
           CATCH cx_document_bcs .
         ENDTRY.
       ENDIF.
 
     ENDIF.
+
   ENDIF.
 
 ENDFORM.

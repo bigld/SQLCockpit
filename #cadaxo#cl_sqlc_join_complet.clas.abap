@@ -92,6 +92,9 @@ public section.
   methods CC_JOIN_DB
     exporting
       !E_RES type /CADAXO/SQLCJCRES_TY .
+  methods CALCULATE_POSITION
+    exporting
+      !E_RES type /CADAXO/SQLCJCRES_TY .
 protected section.
 
   methods BUILD_FCAT .
@@ -115,6 +118,13 @@ protected section.
       !IV_RES type STRING
     returning
       value(RV_JOIN_TYPE) type RSDDBJOINTP .
+  methods CALCULATE_TOP
+    exporting
+      !E_EXPR1 type STRING
+      !E_EXPR2 type STRING .
+  methods CALCULATE_BOTTOM
+    exporting
+      !E_TEXT type /CADAXO/SQLCJCTEXT_TY .
   PRIVATE SECTION.
 
     EVENTS double_click .
@@ -163,6 +173,7 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
     gt_text_fcat[ 1 ]-no_out = abap_true.
     gt_res_fcat[ 1 ]-no_out  = abap_true.
+    gt_res_fcat[ 2 ]-no_out  = abap_true.
     gt_text_fcat[ 2 ]-outputlen = '000100'.
     gt_res_fcat[ 2 ]-outputlen  = '000010'.
 
@@ -173,6 +184,80 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
     rs_layout-no_toolbar = abap_true.
     rs_layout-zebra = abap_true.
+
+  ENDMETHOD.
+
+
+  METHOD calculate_bottom.
+
+    IF lines( gt_parsed_table ) > 1.
+      IF line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "4
+                   ddlanguage = sy-langu ] )
+      AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'JOIN'.
+        cc_on( IMPORTING e_text = gt_text ).
+      ENDIF.
+    ENDIF.
+
+    IF lines( gt_parsed_table ) > 3.
+      IF  to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 3 ] ) = 'JOIN' "5
+      AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'AS'.
+        cc_on( IMPORTING e_text = gt_text ).
+      ENDIF.
+    ENDIF.
+
+    IF to_upper( gt_parsed_table[ lines( gt_parsed_table ) ] ) EQ 'ON'. "6.
+      cc_on( IMPORTING e_text = gt_text ).
+    ENDIF.
+
+    e_text = gt_text.
+
+  ENDMETHOD.
+
+
+  METHOD calculate_position.
+
+    IF lines( gt_parsed_table ) > 1.
+      IF line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "1
+                   ddlanguage = sy-langu ] )
+      AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'FROM'.
+        cc_join_db( IMPORTING e_res = gt_res ).
+      ENDIF.
+    ENDIF.
+
+    IF lines( gt_parsed_table ) > 3.
+      IF  to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 3 ] ) = 'FROM' "2
+      AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'AS'.
+        cc_join_db( IMPORTING e_res = gt_res ).
+      ENDIF.
+    ENDIF.
+
+    IF lines( gt_parsed_table ) > 1.
+      IF to_upper( gt_parsed_table[ lines( gt_parsed_table ) ] ) = 'JOIN'. "3.
+        cc_join_db( IMPORTING e_res = gt_res ).
+      ENDIF.
+    ENDIF.
+
+    e_res = gt_res.
+
+  ENDMETHOD.
+
+
+  METHOD calculate_top.
+
+    IF lines( gt_parsed_table ) > 1.
+      IF ( line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "4
+                   ddlanguage = sy-langu ] )
+      AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'JOIN' ).
+        e_expr1 = abap_true.
+      ENDIF.
+    ENDIF.
+
+    IF lines( gt_parsed_table ) > 3.
+      IF  to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 3 ] ) = 'JOIN' "2
+      AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'AS'.
+        e_expr2 = abap_true.
+      ENDIF.
+    ENDIF.
 
   ENDMETHOD.
 
@@ -290,7 +375,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
         CLEAR: lt_strtable.
         gs_sqlcjche-joined_table = to_upper( gs_sqlcjche-joined_table ).
 
-        APPEND VALUE #( guid_header = gs_sqlcjche-guid_header join_type = gs_sqlcjche-join_type tabname = gs_sqlcjche-joined_table nr = gs_sqlcjche-cnt
+        APPEND VALUE #( guid_header = gs_sqlcjche-guid_header join_type = gs_sqlcjche-join_type
+        join_name = get_join_type( gs_sqlcjche-join_type ) tabname = gs_sqlcjche-joined_table nr = gs_sqlcjche-cnt
         ddtext = CONV as4text( gt_dd02t[ tabname = gs_sqlcjche-joined_table ddlanguage = sy-langu ]-ddtext ) ) TO lt_restable.
 
       ENDLOOP.
@@ -348,7 +434,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
         OTHERS          = 3.
     IF  sy-subrc        EQ 0
     AND lt_ddshretval[] IS NOT INITIAL.
-      e_string = CONV string( lt_ddshretval[ 1 ]-fieldval ).
+*      e_string = CONV string( lt_ddshretval[ 1 ]-fieldval ).
+      e_string = lt_ddshretval[ 1 ]-fieldval.
     ENDIF.
 
   ENDMETHOD.
@@ -437,7 +524,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
         OTHERS          = 3.
     IF  sy-subrc        EQ 0
     AND lt_ddshretval[] IS NOT INITIAL.
-      e_string = CONV string( lt_ddshretval[ 1 ]-fieldval ).
+*      e_string = CONV string( lt_ddshretval[ 1 ]-fieldval ).
+      e_string = lt_ddshretval[ 1 ]-fieldval.
       CONDENSE e_string.
     ENDIF.
 
@@ -448,71 +536,40 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
     go_abap_editor = o_abapedit.
 
-    me->tables_from_db( ).
-    me->tables_from_editor( ).
+    tables_from_db( ).
+    tables_from_editor( ).
 
   ENDMETHOD.
 
 
   METHOD create_alv_controls.
-    DATA: lv_expr4  TYPE string.
-    DATA: lv_expr5  TYPE string.
-    DATA(ls_layout) = me->build_layout( ).
 
-    IF me->gv_refresh EQ abap_false.
-
-      IF lines( gt_parsed_table ) > 1.
-        IF line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "1
-                     ddlanguage = sy-langu ] )
-        AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'FROM'.
-          me->cc_join_db( IMPORTING e_res = gt_res ).
-        ENDIF.
-      ENDIF.
-
-      IF lines( gt_parsed_table ) > 3.
-        IF  to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 3 ] ) = 'FROM' "2
-        AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'AS'.
-          me->cc_join_db( IMPORTING e_res = gt_res ).
-        ENDIF.
-      ENDIF.
-
-      IF to_upper( gt_parsed_table[ lines( gt_parsed_table ) ] ) = 'JOIN'. "3.
-        me->cc_join_db( IMPORTING e_res = gt_res ).
-      ENDIF.
-
-      me->build_fcat( ).
-
+    IF gv_refresh EQ abap_false.
+      calculate_position( IMPORTING e_res = gt_res ).
+      build_fcat( ).
     ELSE.
-      me->gv_refresh = abap_false.
+      gv_refresh = abap_false.
     ENDIF.
 
     IF go_container IS NOT BOUND.
       go_container = NEW cl_gui_custom_container( container_name = 'CC_CONT' ).
-      go_splitter = NEW cl_gui_splitter_container(
-          parent  = go_container
-          rows    = 2
-          columns = 1 ).
+      go_splitter = NEW cl_gui_splitter_container( parent  = go_container
+                                                   rows    = 2
+                                                   columns = 1 ).
+      go_splitter->set_row_height( id     = 1
+                                   height = 60 ).
 
-      go_splitter->set_row_height( id = 1 height = 60 ).
+      DATA(ls_layout) = me->build_layout( ).
+
       "Top
-      IF lines( gt_parsed_table ) > 1.
-        IF ( line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "4
-                     ddlanguage = sy-langu ] )
-        AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'JOIN' ).
-          lv_expr4 = abap_true.
-        ENDIF.
-      ENDIF.
-      IF lines( gt_parsed_table ) > 3.
-        IF  to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 3 ] ) = 'JOIN' "2
-        AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'AS'.
-          lv_expr5 = abap_true.
-        ENDIF.
-      ENDIF.
+      calculate_top( IMPORTING e_expr1 = DATA(lv_expr1)
+                               e_expr2 = DATA(lv_expr2) ).
 
       IF to_upper( gt_parsed_table[ lines( gt_parsed_table ) ] ) NE 'ON' "6.
-      AND lv_expr4 NE abap_true
-      AND lv_expr5 NE abap_true.
-        gr_top_alv_grid = NEW cl_gui_alv_grid( i_parent = go_splitter->get_container( row = 1 column = 1 ) ).
+      AND lv_expr1 NE abap_true
+      AND lv_expr2 NE abap_true.
+        gr_top_alv_grid = NEW cl_gui_alv_grid( i_parent = go_splitter->get_container( row    = 1
+                                                                                      column = 1 ) ).
         cl_gui_cfw=>flush( ).
         gr_top_alv_grid->set_table_for_first_display(
            EXPORTING
@@ -523,23 +580,9 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
                ).
         SET HANDLER me->handle_double_click_top FOR gr_top_alv_grid .
       ENDIF.
+
       "Bottom
-      IF lines( gt_parsed_table ) > 1.
-        IF line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "4
-                     ddlanguage = sy-langu ] )
-        AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'JOIN'.
-          me->cc_on( IMPORTING e_text = gt_text ).
-        ENDIF.
-      ENDIF.
-      IF lines( gt_parsed_table ) > 3.
-        IF  to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 3 ] ) = 'JOIN' "5
-        AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'AS'.
-          me->cc_on( IMPORTING e_text = gt_text ).
-        ENDIF.
-      ENDIF.
-      IF to_upper( gt_parsed_table[ lines( gt_parsed_table ) ] ) EQ 'ON'. "6.
-        me->cc_on( IMPORTING e_text = gt_text ).
-      ENDIF.
+      calculate_bottom( IMPORTING e_text = gt_text ).
 
       gr_bottom_alv_grid = NEW cl_gui_alv_grid( i_parent = go_splitter->get_container( row = 2 column = 1 ) ).
       cl_gui_cfw=>flush( ).
@@ -592,11 +635,11 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
     DATA: lt_codetab    TYPE /cadaxo/sqlccodeline_t.
     DATA: l_str         TYPE string.
     DATA: ls_resstruc   TYPE t_as.
-    DATA: ls_join       TYPE /CADAXO/SQLCJCRES.
+    DATA: ls_join       TYPE /cadaxo/sqlcjcres.
     DATA: lt_restable   TYPE TABLE OF t_as.
     DATA: lt_head       TYPE TABLE OF /cadaxo/sqlcjche.
     DATA: lt_item       TYPE TABLE OF /cadaxo/sqlcjcpo.
-    DATA: lt_join       TYPE /CADAXO/SQLCJCRES_TY.
+    DATA: lt_join       TYPE /cadaxo/sqlcjcres_ty.
     DATA: ev_guid_32_he TYPE guid_32.
     DATA: ev_guid_32_it TYPE guid_32.
     DATA: subrc         TYPE sy-subrc.
@@ -614,6 +657,7 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
       EXCEPTIONS
         error_dp               = 1
         error_cntl_call_method = 2 ).
+
     "Split the SQL query into an internal table
     CLEAR: l_str.
     LOOP AT lt_codetab INTO DATA(code).
@@ -683,11 +727,6 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
       IF lv_struca IS INITIAL.
         LOOP AT me->gt_seltable INTO DATA(lv_seltable).
           DATA(ind) = sy-tabix.
-*          cl_abap_structdescr=>describe_by_name(
-*           EXPORTING
-*             p_name = lv_tableb
-*           EXCEPTIONS
-*             OTHERS = 1 ).
           CALL FUNCTION 'DB_EXISTS_TABLE'
             EXPORTING
               tabname = lv_tabb
@@ -704,12 +743,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
           ENDIF.
         ENDLOOP.
       ENDIF.
+
       "Check if table name is valid, read the real table name in case of AS cmd
-*      cl_abap_structdescr=>describe_by_name(
-*       EXPORTING
-*         p_name = lv_tablea
-*       EXCEPTIONS
-*         OTHERS = 1 ).
       CALL FUNCTION 'DB_EXISTS_TABLE'
         EXPORTING
           tabname = lv_taba
@@ -719,11 +754,7 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
       IF lv_subrca NE 0.
         IF gt_astable[ as = to_upper( lv_tablea ) ]-tabname IS NOT INITIAL.
           lv_taba = gt_astable[ as = to_upper( lv_tablea ) ]-tabname.
-*          cl_abap_structdescr=>describe_by_name(
-*           EXPORTING
-*             p_name = lv_tablea
-*           EXCEPTIONS
-*             OTHERS = 1 ).
+
           CALL FUNCTION 'DB_EXISTS_TABLE'
             EXPORTING
               tabname = lv_taba
@@ -732,12 +763,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
           lv_subrca = subrc.
         ENDIF.
       ENDIF.
+
       "Check if table name is valid, read the real table name in case of AS cmd
-*      cl_abap_structdescr=>describe_by_name(
-*       EXPORTING
-*         p_name = lv_tableb
-*       EXCEPTIONS
-*         OTHERS = 1 ).
       CALL FUNCTION 'DB_EXISTS_TABLE'
         EXPORTING
           tabname = lv_tabb
@@ -747,11 +774,6 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
       IF lv_subrcb NE 0.
         IF gt_astable[ as = to_upper( lv_tableb ) ]-tabname IS NOT INITIAL.
           lv_tabb = gt_astable[ as = to_upper( lv_tableb ) ]-tabname.
-*          cl_abap_structdescr=>describe_by_name(
-*           EXPORTING
-*             p_name = lv_tableb
-*           EXCEPTIONS
-*             OTHERS = 1 ).
           CALL FUNCTION 'DB_EXISTS_TABLE'
             EXPORTING
               tabname = lv_tabb
@@ -764,37 +786,47 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
       IF  lv_subrca EQ 0
       AND lv_subrcb EQ 0.
         IF NOT line_exists( lt_head[ left_table = lv_taba joined_table = lv_tabb ] ).
-*          CALL FUNCTION 'GUID_CREATE'
-*            IMPORTING
-*              ev_guid_32 = ev_guid_32_he.
-          DATA random TYPE i.
-          CALL FUNCTION 'GENERAL_GET_RANDOM_INT'
-            EXPORTING
-              range  = 100
+          CALL FUNCTION 'GUID_CREATE'
             IMPORTING
-              random = random.
-          ev_guid_32_he = random.
+              ev_guid_32 = ev_guid_32_he.
           CONDENSE ev_guid_32_he.
 
           READ TABLE lt_join INTO ls_join INDEX lv_join_cnt.
           lv_join_cnt = lv_join_cnt + 1.
 
           "join implement should be implemented
-          APPEND VALUE #( guid_header = ev_guid_32_he left_table = lv_taba join_type = ls_join-join_type joined_table = lv_tabb ) TO lt_head.
+          APPEND VALUE #( guid_header  = ev_guid_32_he
+                          left_table   = lv_taba
+                          join_type    = ls_join-join_type
+                          joined_table = lv_tabb ) TO lt_head.
         ENDIF.
 
-*        CALL FUNCTION 'GUID_CREATE'
-*          IMPORTING
-*            ev_guid_32 = ev_guid_32_it.
-        CALL FUNCTION 'GENERAL_GET_RANDOM_INT'
-          EXPORTING
-            range  = 100
+        CALL FUNCTION 'GUID_CREATE'
           IMPORTING
-            random = random.
-        ev_guid_32_it = random.
+            ev_guid_32 = ev_guid_32_it.
         CONDENSE ev_guid_32_it.
-        APPEND VALUE #( guid_header = ev_guid_32_he guid_postion = ev_guid_32_it
-        left_field = lv_struca cond = ls_resstruc-cond joined_field = lv_strucb operator = ls_resstruc-operator ) TO lt_item.
+        CASE ls_resstruc-cond.
+          WHEN '='.
+            ls_resstruc-cond = 'EQ'.
+          WHEN '<>'.
+            ls_resstruc-cond = 'NE'.
+          WHEN '<'.
+            ls_resstruc-cond = 'LT'.
+          WHEN '>'.
+            ls_resstruc-cond = 'GT'.
+          WHEN '<='.
+            ls_resstruc-cond = 'LE'.
+          WHEN '>='.
+            ls_resstruc-cond = 'GE'.
+          WHEN OTHERS.
+            ls_resstruc-cond = to_upper( ls_resstruc-cond ).
+        ENDCASE.
+        APPEND VALUE #( guid_header  = ev_guid_32_he
+                        guid_postion = ev_guid_32_it
+                        left_field   = lv_struca
+                        cond         = ls_resstruc-cond
+                        joined_field = lv_strucb
+                        operator     = ls_resstruc-operator ) TO lt_item.
 
       ENDIF.
     ENDLOOP.
@@ -802,7 +834,6 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
     me->fill_db_tables( EXPORTING it_head = lt_head
                                   it_item = lt_item ).
 
-    " entry should be saved into db if it is not exist yet
   ENDMETHOD.
 
 
