@@ -16,6 +16,16 @@ FUNCTION /cadaxo/sqlc_temp_rep_wiz.
   CLEAR: wa_locked, g_sett_loaded.
   CLEAR: wa_checked.
 
+  IF gcc_description IS BOUND. "COCKPIT-409
+    gcc_description->finalize( ).
+    CLEAR: gcc_description.
+  ENDIF.
+
+  IF gcc_roadmap IS BOUND.     "COCKPIT-409
+    gcc_roadmap->finalize( ).
+    CLEAR: gcc_roadmap.
+  ENDIF.
+
   CASE c_templ_name.
     WHEN '/CADAXO/REPORT_S'.
       gs_report_attr-schemename    = 'REPORT1'.

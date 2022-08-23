@@ -18,19 +18,19 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>001</MSGNR>
-     <TEXT>Variant &amp;1 inserted.</TEXT>
+     <TEXT>Variant &amp;1 inserted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>002</MSGNR>
-     <TEXT>Variant &amp;1 updated.</TEXT>
+     <TEXT>Variant &amp;1 updated</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>003</MSGNR>
-     <TEXT>Variant &amp;1 deleted.</TEXT>
+     <TEXT>Variant &amp;1 deleted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -42,7 +42,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>005</MSGNR>
-     <TEXT>XPRA: Job converted. &amp;1 &amp;2 &amp;3 &amp;4.</TEXT>
+     <TEXT>XPRA: Job converted. &amp;1 &amp;2 &amp;3 &amp;4</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -60,49 +60,49 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>020</MSGNR>
-     <TEXT>User &amp;1 was assigned to role &amp;2.</TEXT>
+     <TEXT>User &amp;1 was assigned to role &amp;2</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>021</MSGNR>
-     <TEXT>User &amp;1 was remove from role &amp;2.</TEXT>
+     <TEXT>User &amp;1 was remove from role &amp;2</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>022</MSGNR>
-     <TEXT>User &amp;1 was created.</TEXT>
+     <TEXT>User &amp;1 was created</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>023</MSGNR>
-     <TEXT>User &amp;1 was deleted.</TEXT>
+     <TEXT>User &amp;1 was deleted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>024</MSGNR>
-     <TEXT>Role &amp;1 was created.</TEXT>
+     <TEXT>Role &amp;1 was created</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>025</MSGNR>
-     <TEXT>Role &amp;1 was deleted.</TEXT>
+     <TEXT>Role &amp;1 was deleted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>026</MSGNR>
-     <TEXT>Description of role &amp;1 was set to &amp;2.</TEXT>
+     <TEXT>Description of role &amp;1 was set to &amp;2</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>027</MSGNR>
-     <TEXT>Table &amp;1 was added to role &amp;2.</TEXT>
+     <TEXT>Table &amp;1 was added to role &amp;2</TEXT>
     </T100>
    </T100>
    <I18N_LANGS>
@@ -124,17 +124,17 @@
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>001</MSGNR>
-     <TEXT>Variante &amp;1 eingefügt.</TEXT>
+     <TEXT>Variante &amp;1 eingefügt</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>002</MSGNR>
-     <TEXT>Variante &amp;1 geändert.</TEXT>
+     <TEXT>Variante &amp;1 geändert</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>003</MSGNR>
-     <TEXT>Variante &amp;1 gelöscht.</TEXT>
+     <TEXT>Variante &amp;1 gelöscht</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
@@ -144,7 +144,7 @@
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>005</MSGNR>
-     <TEXT>XPRA: Job konvertiert. &amp;1 &amp;2 &amp;3 &amp;4.</TEXT>
+     <TEXT>XPRA: Job konvertiert. &amp;1 &amp;2 &amp;3 &amp;4</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
@@ -159,42 +159,42 @@
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>020</MSGNR>
-     <TEXT>Benutzer &amp;1 wurde der Rolle &amp;2 zugewiesen.</TEXT>
+     <TEXT>Benutzer &amp;1 wurde der Rolle &amp;2 zugewiesen</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>021</MSGNR>
-     <TEXT>Benutzer &amp;1 wurde von der Rolle &amp;2 entfernt.</TEXT>
+     <TEXT>Benutzer &amp;1 wurde von der Rolle &amp;2 entfernt</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>022</MSGNR>
-     <TEXT>Benutzer &amp;1 wurde angelegt.</TEXT>
+     <TEXT>Benutzer &amp;1 wurde angelegt</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>023</MSGNR>
-     <TEXT>Benutzer &amp;1 wurde gelöscht.</TEXT>
+     <TEXT>Benutzer &amp;1 wurde gelöscht</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>024</MSGNR>
-     <TEXT>Rolle &amp;1 wurde angelegt.</TEXT>
+     <TEXT>Rolle &amp;1 wurde angelegt</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>025</MSGNR>
-     <TEXT>Rolle &amp;1 wurde gelöscht.</TEXT>
+     <TEXT>Rolle &amp;1 wurde gelöscht</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>026</MSGNR>
-     <TEXT>Beschreibung der Rolle &amp;1 wurde gesetzt auf &amp;2.</TEXT>
+     <TEXT>Beschreibung der Rolle &amp;1 wurde gesetzt auf &amp;2</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>027</MSGNR>
-     <TEXT>Tabelle &amp;1 wurde zur Rolle &amp;2 hinzugefügt.</TEXT>
+     <TEXT>Tabelle &amp;1 wurde zur Rolle &amp;2 hinzugefügt</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>

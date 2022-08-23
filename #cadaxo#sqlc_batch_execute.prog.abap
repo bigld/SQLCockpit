@@ -26,6 +26,6 @@ PARAMETERS: pjobguid TYPE /cadaxo/sqlc_jobguid OBLIGATORY.
 
 START-OF-SELECTION.
 
-  /cadaxo/cl_sqlc_cockpit_main=>execute_sql_background( i_list_guid = pjobguid ).
+  /cadaxo/cl_sqlc_cockpit_main=>execute_sql_background( pjobguid ).
 
 END-OF-SELECTION.

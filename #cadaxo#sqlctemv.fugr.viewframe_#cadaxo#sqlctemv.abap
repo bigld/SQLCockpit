@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    program for:   VIEWFRAME_/CADAXO/SQLCTEMV
-*   generation date: 06.04.2010 at 13:37:25 by user CADAXO
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 FUNCTION VIEWFRAME_/CADAXO/SQLCTEMV    .
 

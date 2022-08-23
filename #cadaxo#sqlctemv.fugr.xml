@@ -7,8 +7,8 @@
     <SOBJ_NAME>/CADAXO/LSQLCTEMVF00</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCTEMVF01</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCTEMVI00</SOBJ_NAME>
-    <SOBJ_NAME>/CADAXO/LSQLCTEMVTOP</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/LSQLCTEMVT00</SOBJ_NAME>
+    <SOBJ_NAME>/CADAXO/LSQLCTEMVTOP</SOBJ_NAME>
     <SOBJ_NAME>/CADAXO/SAPLSQLCTEMV</SOBJ_NAME>
    </INCLUDES>
    <FUNCTIONS>
@@ -648,7 +648,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCTEMV</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCTEMV-TEMPLATE_NAME</NAME>
-       <TEXT>Template_Name___________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>040</LENGTH>
@@ -665,7 +664,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCTEMV</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCTEMV-TEMPLATE_CLASS</NAME>
-       <TEXT>Template_Class__________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>040</LENGTH>
@@ -682,7 +680,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCTEMV</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCTEMV-TEMPLATE_DESC</NAME>
-       <TEXT>Template_Description____________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>040</LENGTH>
@@ -699,7 +696,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCTEMV</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCTEMV-FLAG_ACTIVE</NAME>
-       <TEXT>Active__________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>040</LENGTH>
@@ -901,7 +897,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLCTEMT-TEMPLATE_NAME</NAME>
-       <TEXT>Template_Name__</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>015</LENGTH>
@@ -918,7 +913,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>/CADAXO/SQLCTEMT-TEMPLATE_NAME</NAME>
-       <TEXT>____________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>017</COLUMN>
        <LENGTH>020</LENGTH>
@@ -936,7 +930,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLCTEMT-LANGUAGE</NAME>
-       <TEXT>Language_______</TEXT>
        <LINE>002</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>015</LENGTH>
@@ -953,7 +946,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>/CADAXO/SQLCTEMT-LANGUAGE</NAME>
-       <TEXT>__</TEXT>
        <LINE>002</LINE>
        <COLUMN>017</COLUMN>
        <LENGTH>002</LENGTH>
@@ -989,7 +981,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLCTEMT-TEMPLATE_DESC</NAME>
-       <TEXT>Template_Description</TEXT>
        <LINE>005</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>020</LENGTH>
@@ -1195,7 +1186,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCTEMV</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCTEMV-TEMPLATE_NAME</NAME>
-       <TEXT>Template_Name___________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>040</LENGTH>
@@ -1212,7 +1202,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCTEMV</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCTEMV-TEMPLATE_CLASS</NAME>
-       <TEXT>Template_Class__________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>040</LENGTH>
@@ -1229,7 +1218,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCTEMV</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCTEMV-TEMPLATE_DESC</NAME>
-       <TEXT>Template_Description____________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>040</LENGTH>
@@ -1246,7 +1234,6 @@
        <CONT_NAME>TCTRL_/CADAXO/SQLCTEMV</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*/CADAXO/SQLCTEMV-FLAG_ACTIVE</NAME>
-       <TEXT>Active__________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>040</LENGTH>

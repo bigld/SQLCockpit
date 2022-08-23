@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    view related data declarations
-*   generation date: 19.02.2013 at 10:49:53 by user CADAXO
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 *...processing: /CADAXO/SQLCTEMT................................*
 DATA:  BEGIN OF STATUS_/CADAXO/SQLCTEMT              .   "state vector

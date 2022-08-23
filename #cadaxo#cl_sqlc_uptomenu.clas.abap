@@ -147,9 +147,16 @@ CLASS /CADAXO/CL_SQLC_UPTOMENU IMPLEMENTATION.
 * 04.02.2019 | Pratik Patil         | shifted endtry to ensure no updates to button   | COCKPIT-354*
 *                                     when user cancels upto rows manual pop-up       |            *
 ****************************************************************************************************
+* 02.06.2021 | Attila Kajtar        | In case of 'Up To Rows' button, if function code| COCKPIT-480*
+*                                     is constant SETUPTO, then exit from user command|            *
+****************************************************************************************************
 
 
     DATA(lv_suffix) = replace( val = iv_fcode sub = c_cmd_set_upto with = '' ).
+
+    IF lv_suffix IS INITIAL.  "COCKPIT-480
+      RETURN.                 "COCKPIT-480
+    ENDIF.                    "COCKPIT-480
 
     ASSIGN mt_row_commands[ cmd_suffix = lv_suffix ] TO FIELD-SYMBOL(<row_command>).
 

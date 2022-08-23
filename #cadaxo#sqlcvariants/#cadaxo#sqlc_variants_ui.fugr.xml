@@ -211,7 +211,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_IL_VARIANTS-VARNAME</NAME>
-       <TEXT>Name______</TEXT>
        <LINE>002</LINE>
        <COLUMN>082</COLUMN>
        <LENGTH>010</LENGTH>
@@ -381,7 +380,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_IL_VARIANTS-CRUSER</NAME>
-       <TEXT>Created_by_____</TEXT>
        <LINE>028</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -413,7 +411,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_IL_VARIANTS-CHUSER</NAME>
-       <TEXT>Changed_by_____</TEXT>
        <LINE>028</LINE>
        <COLUMN>039</COLUMN>
        <LENGTH>015</LENGTH>
@@ -445,7 +442,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_IL_VARIANTS-CRDATE</NAME>
-       <TEXT>Created_on_____</TEXT>
        <LINE>029</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -477,7 +473,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_IL_VARIANTS-CHDATE</NAME>
-       <TEXT>Changed_on_____</TEXT>
        <LINE>029</LINE>
        <COLUMN>039</COLUMN>
        <LENGTH>015</LENGTH>
@@ -603,7 +598,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_IL_VARIANTS-VARNAME</NAME>
-       <TEXT>Name______________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>018</LENGTH>
@@ -636,7 +630,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_IL_VARIANTS-VARGROUP</NAME>
-       <TEXT>Group_____________</TEXT>
        <LINE>002</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>018</LENGTH>
@@ -699,7 +692,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>/CADAXO/SQLC_IL_VNTX-VARDESCRIPTION</NAME>
-       <TEXT>Short_Description_</TEXT>
        <LINE>004</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>018</LENGTH>

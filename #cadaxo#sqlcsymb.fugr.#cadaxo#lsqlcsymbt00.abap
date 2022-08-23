@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    view related data declarations
-*   generation date: 10.10.2012 at 19:38:32 by user CADAXO
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 *...processing: /CADAXO/SQLCSYMB................................*
 DATA:  BEGIN OF STATUS_/CADAXO/SQLCSYMB              .   "state vector

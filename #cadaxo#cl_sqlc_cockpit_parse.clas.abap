@@ -178,6 +178,10 @@ public section.
       !E_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods CHECK_SQL_ODATA_SYNTAX
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR
+      /CADAXO/CX_SQLC_ODATA_GEN .
   methods SERIALIZE
     exporting
       !E_XML type STRING .
@@ -1139,6 +1143,41 @@ ENDMETHOD.
 
 
   ENDMETHOD.
+
+
+METHOD CHECK_SQL_ODATA_SYNTAX.
+****************************************************************************************************
+* Description ....... Checks the Syntax of a sql statement for OData Generating                                        *
+* Developer ......... Dusan Sacha      Date .... 24.06.2022                                 *
+* Status ............ xxxxxxxxx                                                                    *                                                                                                  *
+* Qual. Check(opt.)       :        Company    : CADAXO GesmbH                    *
+* Date                    :                                                             *
+****************************************************************************************************
+* Date       | User              | Description                                       |             *
+*------------+-------------------+---------------------------------------------------+-------------*
+* <date>     | <developer name>  | <short description>                               |             *
+*------------+-------------------+---------------------------------------------------+-------------*
+*            |                   |                                                   |             *
+*------------+-------------------+---------------------------------------------------+-------------*
+*            |                   |                                                   |             *
+*------------+-------------------+---------------------------------------------------+-------------*
+*            |                   |                                                   |             *
+****************************************************************************************************
+
+    "No Select * allowed for OData Generation
+    IF me->column_syntax EQ '*' OR me->column_syntax CS '~*'.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
+    ENDIF.
+
+    "Only new OpenSQL syntax is allowed for OData Generation
+    IF me->g_select_version <> 2.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_gen.
+    ENDIF.
+
+
+
+
+ENDMETHOD.
 
 
 METHOD check_sql_string_includes_subq.

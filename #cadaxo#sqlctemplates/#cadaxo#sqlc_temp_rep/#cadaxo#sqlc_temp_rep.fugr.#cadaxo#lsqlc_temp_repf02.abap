@@ -576,6 +576,7 @@ FORM user_command_0100 .
         IMPORTING
           answer                = l_answer.
       IF l_answer = 1.
+        PERFORM clear_global. "COCKPIT-409
         IF NOT wa_locked IS INITIAL.
           CALL FUNCTION 'DEQUEUE_ESRDIRE'
             EXPORTING
@@ -593,6 +594,7 @@ FORM user_command_0100 .
       ENDIF.
 
     WHEN 'COMPLETE'.
+      PERFORM clear_global. "COCKPIT-409
       SET SCREEN 0.
       LEAVE SCREEN.
     WHEN 'NEXTSTEP'.
@@ -773,3 +775,17 @@ FORM gen_inc_name USING    u_repname
   ENDIF.
 
 ENDFORM.                    "GEN_INC_NAME
+*&---------------------------------------------------------------------*
+*&      Form  CLEAR_GLOBAL
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM clear_global .
+
+  gcc_description->free( ).
+  gcc_roadmap->free( ).
+
+ENDFORM.

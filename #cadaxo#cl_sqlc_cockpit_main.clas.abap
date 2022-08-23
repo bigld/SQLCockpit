@@ -1,845 +1,847 @@
-class /CADAXO/CL_SQLC_COCKPIT_MAIN definition
-  public
-  create public .
+CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
+  PUBLIC
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  types:
-    t_symbol_db TYPE TABLE OF /cadaxo/sqlcusym .
-  types:
-    gtt_char255 TYPE TABLE OF char255 .
-  types:
-    t_string    TYPE TABLE OF string .
+    TYPES:
+      t_symbol_db TYPE TABLE OF /cadaxo/sqlcusym .
+    TYPES:
+      gtt_char255 TYPE TABLE OF char255 .
+    TYPES:
+      t_string    TYPE TABLE OF string .
 
-  constants C_CMD_CREATE_SYMBOL type UI_FUNC value 'CREATE_SYMBOL' ##NO_TEXT.
-  constants C_CMD_HOME type UI_FUNC value 'HOME' ##NO_TEXT.
-  constants C_CMD_INSERT_CDS_ENTITY type UI_FUNC value 'INSERT_CDS_ENTITY' ##NO_TEXT.
-  constants C_CMD_INSERT_SY_FIELD type UI_FUNC value 'INSERT_SY_FIELD' ##NO_TEXT.
-  constants C_CMD_INSERT_TABLE type UI_FUNC value 'INSERT_TABLE' ##NO_TEXT.
-  constants C_CMD_JOBMONITOR type UI_FUNC value 'JOBMONITOR' ##NO_TEXT.
-  constants C_CMD_PP type UI_FUNC value 'PP' ##NO_TEXT.
-  constants C_CMD_RESULT_FOOTER_HIDE type UI_FUNC value 'HIDE_FOOTER' ##NO_TEXT.
-  constants C_CMD_RESULT_FOOTER_SHOW type UI_FUNC value 'SHOW_FOOTER' ##NO_TEXT.
-  constants C_CMD_RESULT_TOOLBAR_HIDE type UI_FUNC value 'HIDE_RESULT_TOOLBAR' ##NO_TEXT.
-  constants C_CMD_RESULT_TOOLBAR_SHOW type UI_FUNC value 'SHOW_RESULT_TOOLBAR' ##NO_TEXT.
-  constants C_CMD_SHOW_FULL_VALUE type UI_FUNC value 'SHOW_FULL_VALUE' ##NO_TEXT.
-  constants C_CMD_SHOW_RESULT_TABLE type UI_FUNC value 'SHOW_RESULT_TABLE' ##NO_TEXT.
-  constants C_CMD_SHOW_SAVED_LISTS type UI_FUNC value 'SHOW_SAVED_LISTS' ##NO_TEXT.
-  constants C_CMD_SHOW_VALUE_AS type UI_FUNC value 'SHOW_VALUE_AS' ##NO_TEXT.
-  constants C_CMD_SHOW_VALUE_AS_HTML_BROW type UI_FUNC value 'SHOW_VALUE_AS_HTML_BROW' ##NO_TEXT.
-  constants C_CMD_SHOW_VALUE_AS_XML_BROW type UI_FUNC value 'SHOW_VALUE_AS_XML_BROW' ##NO_TEXT.
-  constants C_OKCODE_CLIPBOARD type SYUCOMM value 'CLIPBOARD' ##NO_TEXT.
-  constants C_OKCODE_SYMBOLS type SYUCOMM value 'SYMBOL' ##NO_TEXT.
-  constants C_SAVED_LIST_SHARE type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE' ##NO_TEXT.
-  constants C_SAVED_LIST_SHARE_OTH type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE_OTH' ##NO_TEXT. "+COCKPIT420
-  constants C_SAVED_LIST_SHARE_ME type STB_BUTTON-FUNCTION value 'SAVED_LIST_SHARE_ME' ##NO_TEXT. "+COCKPIT420
-  constants C_SQLEDITOR_NAME type STRING value 'CADAXO_SQL_EDITOR' ##NO_TEXT.
-  constants GC_SAVED_LIST_SHARED type /CADAXO/SQLC_LIST_TYPE value 'SHR' ##NO_TEXT.
-  constants GC_SAVED_LIST_JOB type /CADAXO/SQLC_LIST_TYPE value 'JOB' ##NO_TEXT.
-  constants GC_SAVED_LIST_MANUALLY type /CADAXO/SQLC_LIST_TYPE value 'MAN' ##NO_TEXT.
-  constants GC_SYMBOL_SEPARATOR type CHAR3 value '###' ##NO_TEXT.
-  class-data GT_USED_SYMBOLS type /CADAXO/SQLCUSEDSYMBOLS_T .
-  class-data TOOLBAR_COL_WIDTH type INT4 read-only .
-  class-data TOOLBAR_ROW_HEIGHT type INT4 read-only .
-  data DRAGDROP_HANDLE type I .
-  data DREF_RESULT_TAB_T type /CADAXO/SQLC_DREF_RESULT_TAB_T .
-  data GC_ABAP_PARSER type ref to CL_ABAP_PARSER .
-  data GC_SPLITTER_TOP_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GR_USER_LOG type ref to /CADAXO/CL_SQLC_USER_LOG .
-  data GT_CL_SQL_PARSE type /CADAXO/SQLC_CL_COCKPIT_PARSET .
-  data GT_CL_SQL_PARSE_HOLD type /CADAXO/SQLC_CL_COCKPIT_PARSET .
-  data GT_ERRORS type /CADAXO/SQLCSYNTAXERROR_T .
-  data GT_LVC_T_FCAT type FIELDCAT1 .
-  data GT_LVC_T_FCAT_HOLD like GT_LVC_T_FCAT .
-  data GT_RESULT_DETAILS type /CADAXO/SQLCRESULT_DETAILS_T .
-  data GT_RESULT_DETAILS_HOLD like GT_RESULT_DETAILS .
-  data GT_RESULT_TAB_HOLD like DREF_RESULT_TAB_T .
-  data G_AUTH type /CADAXO/SQLCROLE_AUTH_XML .
-  data G_MY_MAIN_ID type I read-only .
-  data G_SQL_POS type I .
-  data G_SQL_PROGRESS_ON type BOOLEAN .
-  data G_SQL_TRACE_ON type BOOLEAN .
-  data G_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN .
-  data MS_USER_SETTINGS_XML type /CADAXO/SQLCUSRP_XML read-only .
-  data MV_TOOLBAR_RESULT_ACTIVE type UI_FUNC read-only value C_CMD_HOME ##NO_TEXT.
-  data G_TRSTART_UZEIT type SYST_UZEIT .
-  data G_TRSTART_DATUM type SYST_DATUM .
-  data GT_CL_SQL_PARSE_BEFTEMPGEN type /CADAXO/SQLC_CL_COCKPIT_PARSET .
+    CONSTANTS c_cmd_create_symbol TYPE ui_func VALUE 'CREATE_SYMBOL' ##NO_TEXT.
+    CONSTANTS c_cmd_home TYPE ui_func VALUE 'HOME' ##NO_TEXT.
+    CONSTANTS c_cmd_insert_cc TYPE ui_func VALUE 'INSERT_CC' ##NO_TEXT.
+    CONSTANTS c_cmd_insert_cds_entity TYPE ui_func VALUE 'INSERT_CDS_ENTITY' ##NO_TEXT.
+    CONSTANTS c_cmd_insert_sy_field TYPE ui_func VALUE 'INSERT_SY_FIELD' ##NO_TEXT.
+    CONSTANTS c_cmd_insert_header TYPE ui_func VALUE 'INSERT_HEADER' ##NO_TEXT.
+    CONSTANTS c_cmd_insert_table TYPE ui_func VALUE 'INSERT_TABLE' ##NO_TEXT.
+    CONSTANTS c_cmd_jobmonitor TYPE ui_func VALUE 'JOBMONITOR' ##NO_TEXT.
+    CONSTANTS c_cmd_pp TYPE ui_func VALUE 'PP' ##NO_TEXT.
+    CONSTANTS c_cmd_result_footer_hide TYPE ui_func VALUE 'HIDE_FOOTER' ##NO_TEXT.
+    CONSTANTS c_cmd_result_footer_show TYPE ui_func VALUE 'SHOW_FOOTER' ##NO_TEXT.
+    CONSTANTS c_cmd_result_toolbar_hide TYPE ui_func VALUE 'HIDE_RESULT_TOOLBAR' ##NO_TEXT.
+    CONSTANTS c_cmd_result_toolbar_show TYPE ui_func VALUE 'SHOW_RESULT_TOOLBAR' ##NO_TEXT.
+    CONSTANTS c_cmd_show_full_value TYPE ui_func VALUE 'SHOW_FULL_VALUE' ##NO_TEXT.
+    CONSTANTS c_cmd_show_result_table TYPE ui_func VALUE 'SHOW_RESULT_TABLE' ##NO_TEXT.
+    CONSTANTS c_cmd_show_saved_lists TYPE ui_func VALUE 'SHOW_SAVED_LISTS' ##NO_TEXT.
+    CONSTANTS c_cmd_show_value_as TYPE ui_func VALUE 'SHOW_VALUE_AS' ##NO_TEXT.
+    CONSTANTS c_cmd_show_value_as_html_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_HTML_BROW' ##NO_TEXT.
+    CONSTANTS c_cmd_show_value_as_xml_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_XML_BROW' ##NO_TEXT.
+    CONSTANTS c_okcode_clipboard TYPE syucomm VALUE 'CLIPBOARD' ##NO_TEXT.
+    CONSTANTS c_okcode_symbols TYPE syucomm VALUE 'SYMBOL' ##NO_TEXT.
+    CONSTANTS c_saved_list_share TYPE stb_button-function VALUE 'SAVED_LIST_SHARE' ##NO_TEXT.
+    CONSTANTS c_saved_list_share_oth TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_OTH' ##NO_TEXT.   "+COCKPIT420
+    CONSTANTS c_saved_list_share_me TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_ME' ##NO_TEXT.   "+COCKPIT420
+    CONSTANTS c_sqleditor_name TYPE string VALUE 'CADAXO_SQL_EDITOR' ##NO_TEXT.
+    CONSTANTS c_template_name_odata TYPE /cadaxo/sqlctempl_name VALUE '/CADAXO/ODATA' ##NO_TEXT.
+    CONSTANTS gc_saved_list_shared TYPE /cadaxo/sqlc_list_type VALUE 'SHR' ##NO_TEXT.
+    CONSTANTS gc_saved_list_job TYPE /cadaxo/sqlc_list_type VALUE 'JOB' ##NO_TEXT.
+    CONSTANTS gc_saved_list_manually TYPE /cadaxo/sqlc_list_type VALUE 'MAN' ##NO_TEXT.
+    CONSTANTS gc_symbol_separator TYPE char3 VALUE '###' ##NO_TEXT.
+    CLASS-DATA gt_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
+    CLASS-DATA toolbar_col_width TYPE int4 READ-ONLY .
+    CLASS-DATA toolbar_row_height TYPE int4 READ-ONLY .
+    DATA dragdrop_handle TYPE i .
+    DATA dref_result_tab_t TYPE /cadaxo/sqlc_dref_result_tab_t .
+    DATA gc_abap_parser TYPE REF TO cl_abap_parser .
+    DATA gc_splitter_top_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gr_user_log TYPE REF TO /cadaxo/cl_sqlc_user_log .
+    DATA gt_cl_sql_parse TYPE /cadaxo/sqlc_cl_cockpit_parset .
+    DATA gt_cl_sql_parse_hold TYPE /cadaxo/sqlc_cl_cockpit_parset .
+    DATA gt_errors TYPE /cadaxo/sqlcsyntaxerror_t .
+    DATA gt_lvc_t_fcat TYPE fieldcat1 .
+    DATA gt_lvc_t_fcat_hold LIKE gt_lvc_t_fcat .
+    DATA gt_result_details TYPE /cadaxo/sqlcresult_details_t .
+    DATA gt_result_details_hold LIKE gt_result_details .
+    DATA gt_result_tab_hold LIKE dref_result_tab_t .
+    DATA g_auth TYPE /cadaxo/sqlcrole_auth_xml .
+    DATA g_my_main_id TYPE i READ-ONLY .
+    DATA g_sql_pos TYPE i .
+    DATA g_sql_progress_on TYPE boolean .
+    DATA g_sql_trace_on TYPE boolean .
+    DATA g_user_settings TYPE /cadaxo/sqlcusrp_dyn .
+    DATA ms_user_settings_xml TYPE /cadaxo/sqlcusrp_xml READ-ONLY .
+    DATA mv_toolbar_result_active TYPE ui_func READ-ONLY VALUE c_cmd_home ##NO_TEXT.
+    DATA g_trstart_uzeit TYPE syst_uzeit .
+    DATA g_trstart_datum TYPE syst_datum .
+    DATA gt_cl_sql_parse_beftempgen TYPE /cadaxo/sqlc_cl_cockpit_parset .
+    CONSTANTS c_release_type_always TYPE /cadaxo/sqlcrelease_type VALUE 'A' ##NO_TEXT.
+    CONSTANTS c_release_type_once TYPE /cadaxo/sqlcrelease_type VALUE 'O' ##NO_TEXT.
 
-  events SETTINGS_CHANGED_UPTO
-    exporting
-      value(I_NEW_UPTO) type /CADAXO/SQLCMAXSEL .
+    EVENTS settings_changed_upto
+      EXPORTING
+        VALUE(i_new_upto) TYPE /cadaxo/sqlcmaxsel .
 
-  class-methods CALCULATE_HEIGHT_FOR_BUTTON
-    returning
-      value(E_HEIGHT) type INT4 .
-  class-methods CALCULATE_WIDTH_FOR_BUTTON
-    returning
-      value(E_WIDTH) type INT4 .
-  class-methods API_EXECUTE_SQL
-    importing
-      !I_SQL_STRING type /CADAXO/SQLCSQL_STRING
-    exporting
-      !ET_TABLE_REF type /CADAXO/SQLCRESULT_REF_T .
-  class-methods CHECK_ADMIN_AUTH
-    returning
-      value(R_TRUE) type CHAR1 .
-  class-methods CLASS_CONSTRUCTOR .
-  class-methods EXECUTE_SQL_BACKGROUND
-    importing
-      !I_LIST_GUID type /CADAXO/SQLC_LISTGUID .
-  class-methods MATCH_SAVED_FIELDCAT_ORIG
-    importing
-      !IT_FCAT type LVC_T_FCAT
-      !I_TABNAME type TABNAME
-      !IT_RESULT_TABLE type ANY
-    returning
-      value(RT_FCAT) type LVC_T_FCAT .
-  class-methods MATCH_SAVED_FILTER
-    importing
-      !IT_FILTER type LVC_T_FILT
-      !I_TABNAME type TABNAME
-      !IT_RESULT_TABLE type ANY
-    returning
-      value(RT_FILTER) type LVC_T_FILT .
-  class-methods MATCH_SAVED_SORT
-    importing
-      !IT_SORT type LVC_T_SORT
-      !I_TABNAME type TABNAME
-      !IT_RESULT_TABLE type ANY
-    returning
-      value(RT_SORT) type LVC_T_SORT .
-  class-methods SET_GT_USED_SYMBOLS
-    importing
-      !I_USED_SYMBOLS type /CADAXO/SQLCUSEDSYMBOLS_T .
-  class-methods TRIGGER_HTML
-    importing
-      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID default 'HTML_STARTUP'
-      !I_MAIN_REF_ID type I .
-  methods CHECK_SQL_SYNTAX
-    importing
-      !I_USE_LOCAL_PARSER type CHAR1 optional
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR
-      /CADAXO/CX_SQLC_INVALID_VALUE .
-  methods CONSTRUCTOR .
-  methods GET_CONTENT
-    importing
-      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID default 'HTML_STARTUP'
-      !I_VIEWER type ref to CL_GUI_HTML_VIEWER optional
-      !I_MIME type FLAG default SPACE
-    exporting
-      !ET_CONTENT type GTT_CHAR255
-      !E_SIZE type INT4
-      !E_ASSIGEND_URL type C
-      !E_HTML_STRING type STRING .
-  methods GET_SQL_AREA
-    exporting
-      !E_CODE_STRING type STRING
-      !E_CODE_STRING_CR type STRING
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods GET_SQL_HIST_LINES
-    returning
-      value(R_SQL_HIST_LINES) type I .
-  methods IS_RESULT_FILLED
-    returning
-      value(R_FILLED) type ABAP_BOOL .
-  methods PAI_0100
-    importing
-      !I_OK_CODE type SY-UCOMM .
-  methods PAI_0700
-    importing
-      !I_OK_CODE type SY-UCOMM .
-  methods PAI_0800
-    importing
-      !I_OK_CODE type SY-UCOMM
-      !I_SQLCSRES type /CADAXO/SQLCSRES .
-  methods PAI_3000
-    importing
-      !I_OK_CODE type SY-UCOMM .
-  methods PAI_2000
-    importing
-      !I_OK_CODE type SY-UCOMM .
-  methods PARAM_REPLACE_TAGS
-    changing
-      !DATA type STRING .
-  methods PBO_0100 .
-  methods PBO_0700 .
-  methods PBO_0800 .
-  methods PBO_3000 .
+    CLASS-METHODS calculate_height_for_button
+      RETURNING
+        VALUE(e_height) TYPE int4 .
+    CLASS-METHODS calculate_width_for_button
+      RETURNING
+        VALUE(e_width) TYPE int4 .
+    CLASS-METHODS api_execute_sql
+      IMPORTING
+        !i_sql_string TYPE /cadaxo/sqlcsql_string
+      EXPORTING
+        !et_table_ref TYPE /cadaxo/sqlcresult_ref_t .
+    CLASS-METHODS check_admin_auth
+      RETURNING
+        VALUE(r_true) TYPE char1 .
+    CLASS-METHODS class_constructor .
+    CLASS-METHODS execute_sql_background
+      IMPORTING
+        !i_list_guid TYPE /cadaxo/sqlc_listguid .
+    CLASS-METHODS match_saved_fieldcat_orig
+      IMPORTING
+        !it_fcat         TYPE lvc_t_fcat
+        !i_tabname       TYPE tabname
+        !it_result_table TYPE any
+      RETURNING
+        VALUE(rt_fcat)   TYPE lvc_t_fcat .
+    CLASS-METHODS match_saved_filter
+      IMPORTING
+        !it_filter       TYPE lvc_t_filt
+        !i_tabname       TYPE tabname
+        !it_result_table TYPE any
+      RETURNING
+        VALUE(rt_filter) TYPE lvc_t_filt .
+    CLASS-METHODS match_saved_sort
+      IMPORTING
+        !it_sort         TYPE lvc_t_sort
+        !i_tabname       TYPE tabname
+        !it_result_table TYPE any
+      RETURNING
+        VALUE(rt_sort)   TYPE lvc_t_sort .
+    CLASS-METHODS set_gt_used_symbols
+      IMPORTING
+        !i_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
+    CLASS-METHODS trigger_html
+      IMPORTING
+        !i_html_id     TYPE /cadaxo/sqlcparameter_id DEFAULT 'HTML_STARTUP'
+        !i_main_ref_id TYPE i .
+    METHODS check_sql_syntax
+      IMPORTING
+        !i_use_local_parser TYPE char1 OPTIONAL
+      RAISING
+        /cadaxo/cx_sqlc_syntax_error
+        /cadaxo/cx_sqlc_invalid_value .
+    METHODS constructor .
+    METHODS get_content
+      IMPORTING
+        !i_html_id      TYPE /cadaxo/sqlcparameter_id DEFAULT 'HTML_STARTUP'
+        !i_viewer       TYPE REF TO cl_gui_html_viewer OPTIONAL
+        !i_mime         TYPE flag DEFAULT space
+      EXPORTING
+        !et_content     TYPE gtt_char255
+        !e_size         TYPE int4
+        !e_assigend_url TYPE c
+        !e_html_string  TYPE string .
+    METHODS get_sql_area
+      EXPORTING
+        !e_code_string    TYPE string
+        !e_code_string_cr TYPE string
+      RAISING
+        /cadaxo/cx_sqlc_syntax_error .
+    METHODS get_sql_hist_lines
+      RETURNING
+        VALUE(r_sql_hist_lines) TYPE i .
+    METHODS is_result_filled
+      RETURNING
+        VALUE(r_filled) TYPE abap_bool .
+    METHODS pai_0100
+      IMPORTING
+        !i_ok_code TYPE sy-ucomm .
+    METHODS pai_0700
+      IMPORTING
+        !i_ok_code TYPE sy-ucomm .
+    METHODS pai_0800
+      IMPORTING
+        !i_ok_code  TYPE sy-ucomm
+        !i_sqlcsres TYPE /cadaxo/sqlcsres .
+    METHODS pai_3000
+      IMPORTING
+        !i_ok_code TYPE sy-ucomm .
+    METHODS pai_2000
+      IMPORTING
+        !i_ok_code TYPE sy-ucomm .
+    CLASS-METHODS param_replace_tags
+      CHANGING
+        !data TYPE string .
+    METHODS pbo_0100 .
+    METHODS pbo_0700 .
+    METHODS pbo_0800 .
+    METHODS pbo_3000 .
     "! PBO for Dynpro 2000
-  methods PBO_2000 .
-  methods SAVE_CLIPBOARD .
-  methods SET_CLIPBOARD_ALV .
+    METHODS pbo_2000 .
+    METHODS save_clipboard .
+    METHODS set_clipboard_alv .
     "! get sql area
     "! @parameter planetype | Type of plane
-  methods GET_SQL_AREA_LT_CODE
-    returning
-      value(R_LT_CODE) type /CADAXO/SQLCCODELINE_T .
-  methods SET_SYMBOL_ALV .
-  methods SET_USER_SETTINGS
-    importing
-      !I_SETTINGS type /CADAXO/SQLCUSRP_DYN .
-  methods HANDLE_MSG_EXCEPTION
-    importing
-      !I_MSG type STRING
-      !I_EXCEPTION type ref to CX_ROOT .
-  methods PREPARE_RESULT_TABLE
-    importing
-      !IS_SQLCSRES type /CADAXO/SQLCSRES
-      !IS_SQLCRESS type /CADAXO/SQLCRESS .
-  methods GET_CSV_FROM_INT_TAB
-    importing
-      !IT_TABLE type ANY TABLE
-      !I_GRID_I type I
-    exporting
-      !EV_OUTPUT_CSV type T_STRING .
-  methods GET_CSV_LINE_FROM_TAB
-    importing
-      !IT_CSV_TAB type T_STRING
-    returning
-      value(RV_CSV_LINE) type STRING .
-  methods CREATE_SYMBOL_DB
-    importing
-      !IT_SYMBOL_CREATE type T_SYMBOL_DB
-    returning
-      value(RV_SUCCESS) type BOOLEAN .
-  methods GET_CSV_FROM_INT_TAB_CUST
-    importing
-      !IT_TABLE type ANY TABLE
-      !I_GRID_I type I
-    exporting
-      !EV_OUTPUT_CSV type T_STRING
-      !EV_CANCEL type ABAP_BOOL .
-protected section.
+    METHODS get_sql_area_lt_code
+      RETURNING
+        VALUE(r_lt_code) TYPE /cadaxo/sqlccodeline_t .
+    METHODS set_symbol_alv .
+    METHODS set_user_settings
+      IMPORTING
+        !i_settings TYPE /cadaxo/sqlcusrp_dyn .
+    METHODS handle_msg_exception
+      IMPORTING
+        !i_msg       TYPE string
+        !i_exception TYPE REF TO cx_root .
+    METHODS prepare_result_table
+      IMPORTING
+        !is_sqlcsres TYPE /cadaxo/sqlcsres
+        !is_sqlcress TYPE /cadaxo/sqlcress .
 
-  data G_TRSTART_TIMESTAMP type TIMESTAMP .
-  class-data GCONT_SPLITTER_TOP_TOOLBAR type ref to CL_GUI_CONTAINER .
-  class-data:
-    gt_item_vari               TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY .
-  class-data GT_NODE_VARI type TREEV_NTAB .
-  data DRAGDROP_BEHAVIOUR_ALV type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_CLIPBOARD type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_EDITOR type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_ELEMENTINFO type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_LOG type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_SYMBOL type ref to CL_DRAGDROP .
-  data DRAGDROP_HANDLE_ELEMENTINFO type I .
-  data DRAGDROP_HANDLE_LOG type I .
-  data DRAGDROP_HANDLE_SYMBOL type I .
-  data GCONT_ABAP_EDITOR type ref to CL_GUI_CONTAINER .
-  data GCONT_ABAP_ERROR type ref to CL_GUI_CONTAINER .
-  data GCONT_ABAP_SPLITTER type ref to CL_GUI_CONTAINER .
-  data GCONT_ALV_QUEUE type ref to CL_GUI_CUSTOM_CONTAINER .
-  data GCONT_ALV_TEMPLATE type ref to CL_GUI_CUSTOM_CONTAINER .
-  data GCONT_CLIPBOARD type ref to CL_GUI_CONTAINER .
-  data GCONT_CLIPBOARD_TEXTEDIT type ref to CL_GUI_CONTAINER .
-  data GCONT_CLIPBOARD_TOOLBAR type ref to CL_GUI_CONTAINER .
-  data GCONT_CLIPBOARD_TOOLBAR_BTNS type ref to CL_GUI_CONTAINER .
-  data GCONT_CLIPBOARD_TOOLBAR_IMG type ref to CL_GUI_CONTAINER .
-  data GCONT_ELEMENTINFO type ref to CL_GUI_CONTAINER .
-  data GCONT_GRID_ELEMENTINFO_T type /CADAXO/SQLCCLGUICONTAINER_T .
-  data GCONT_GRID_RESULTS type ref to CL_GUI_CONTAINER .
-  data GCONT_GRID_RESULT_T type /CADAXO/SQLCCLGUICONTAINER_T .
-  data GCONT_GRID_SYMBOL_T type /CADAXO/SQLCCLGUICONTAINER_T .
-  data GCONT_RESULT_BOTTOM type ref to CL_GUI_CONTAINER .
-  data GCONT_RESULT_TOOLBAR type ref to CL_GUI_CONTAINER .
-  data GCONT_SPLITTER_BOTTOM type ref to CL_GUI_CONTAINER .
-  data GCONT_SPLITTER_TOP type ref to CL_GUI_CONTAINER .
-  data GCONT_SYMBOL type ref to CL_GUI_CONTAINER .
-  data GCONT_SYMBOL_TOOLBAR type ref to CL_GUI_CONTAINER .
-  data GCONT_SYMBOL_TOOLBAR_BTNS type ref to CL_GUI_CONTAINER .
-  data GCONT_SYMBOL_TOOLBAR_IMG type ref to CL_GUI_CONTAINER .
-  data GCONT_TOOLBAR_ELEMENTINFO type ref to CL_GUI_CONTAINER .
-  data GC_ABAP_EDITOR type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT .
-  data GC_ABAP_EDITOR_TEXT type ref to CL_GUI_TEXTEDIT .
-  data GC_ABAP_ERROR type ref to CL_GUI_ALV_GRID .
-  data GC_ALV_QUEUE_3000 type ref to CL_GUI_ALV_GRID .
-  data GC_ALV_TEMPLATE_2000 type ref to CL_GUI_ALV_GRID .
-  data GC_CLIPBOARD_TEXTEDIT type ref to CL_GUI_TEXTEDIT .
-  data GC_CLIPBOARD_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GC_CLIPBOARD_TOOLBAR_IMG type ref to CL_GUI_PICTURE .
-  data GC_ELEMENTINFO_ALV type ref to CL_GUI_ALV_GRID .
-  data GC_HTML_VIEWER type ref to CL_GUI_HTML_VIEWER .
-  data GC_RESULT_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GC_SPLITTER type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GC_SYMBOL_ALV type ref to CL_GUI_ALV_GRID .
-  data GC_SYMBOL_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GC_SYMBOL_TOOLBAR_IMG type ref to CL_GUI_PICTURE .
-  data GS_SPLITTER_BOTTOM type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_CLIPBOARD type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_EDITOR type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_LVL0 type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_RESULTS type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_RESULTS_TAB type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_RESULTS_TABDAT type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GR_RESULTS_TAB_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GS_SPLITTER_RES_BUTTON type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_SYMBOL type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_SYMBOL_TOOLBAR type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_TOOLBAR type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_TOP type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GT_CLIPBOARD type /CADAXO/SQLCCLIPBOARD_T .
-  data GT_QUEUE type /CADAXO/SQLCAPI_QUEUE_T .
-  data GT_SOURCE_RUNTIME_BEFORE type /CADAXO/SQLCCODELINE_T .
-  data GT_SQL_HIST type /CADAXO/SQLCHISTLINE_T .
-  data:
-    gt_sql_log TYPE TABLE OF /cadaxo/sqlclog .
-  data GT_TEMPLATES type /CADAXO/SQLCTEMP_ALV_T .
-  data GT_TOOLBUTTONS_TOP type TTB_BUTTON .
-  data GT_VARIANT type /CADAXO/SQLCVARI_ALV_T .
-  data GV_EXPORT_TYPE type /CADAXO/SQLCAPI_POSITION_TYP .
-  data G_CLIENT_CATEGORY type CCCATEGORY .
-  data G_CLIENT_LOGSYS type LOGSYS .
-  data G_CONT_PERS_PREFERENCES type CHAR1 .
-  data G_HEIGHT type I .
-  data G_HISTORY_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
-  data G_JOBMONITOR_TOOLBAR_EX type UI_FUNCTIONS .
-  data G_RESULT_LAYOUT type LVC_S_LAYO .
-  data G_RESULT_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
-  data G_SHOW_CLIPBOARD type BOOLEAN .
-  data GS_SEL_VARIANT type /CADAXO/SQLC_IL_VARIANTS . "Cockpit-321
-  data:
-    BEGIN OF ms_additional_functions,                 "COCKPIT-48
+    METHODS create_symbol_db
+      IMPORTING
+        !it_symbol_create TYPE t_symbol_db
+      RETURNING
+        VALUE(rv_success) TYPE boolean .
+
+  PROTECTED SECTION.
+
+    DATA g_trstart_timestamp TYPE timestamp .
+    CLASS-DATA gcont_splitter_top_toolbar TYPE REF TO cl_gui_container .
+    CLASS-DATA:
+      gt_item_vari               TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY .
+    CLASS-DATA gt_node_vari TYPE treev_ntab .
+    DATA dragdrop_behaviour_alv TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_clipboard TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_editor TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_elementinfo TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_log TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_symbol TYPE REF TO cl_dragdrop .
+    DATA dragdrop_handle_elementinfo TYPE i .
+    DATA dragdrop_handle_log TYPE i .
+    DATA dragdrop_handle_symbol TYPE i .
+    DATA gcont_abap_editor TYPE REF TO cl_gui_container .
+    DATA gcont_abap_error TYPE REF TO cl_gui_container .
+    DATA gcont_abap_splitter TYPE REF TO cl_gui_container .
+    DATA gcont_alv_queue TYPE REF TO cl_gui_custom_container .
+    DATA gcont_alv_template TYPE REF TO cl_gui_custom_container .
+    DATA gcont_clipboard TYPE REF TO cl_gui_container .
+    DATA gcont_clipboard_textedit TYPE REF TO cl_gui_container .
+    DATA gcont_clipboard_toolbar TYPE REF TO cl_gui_container .
+    DATA gcont_clipboard_toolbar_btns TYPE REF TO cl_gui_container .
+    DATA gcont_clipboard_toolbar_img TYPE REF TO cl_gui_container .
+    DATA gcont_elementinfo TYPE REF TO cl_gui_container .
+    DATA gcont_grid_elementinfo_t TYPE /cadaxo/sqlcclguicontainer_t .
+    DATA gcont_grid_results TYPE REF TO cl_gui_container .
+    DATA gcont_grid_result_t TYPE /cadaxo/sqlcclguicontainer_t .
+    DATA gcont_grid_symbol_t TYPE /cadaxo/sqlcclguicontainer_t .
+    DATA gcont_result_bottom TYPE REF TO cl_gui_container .
+    DATA gcont_result_toolbar TYPE REF TO cl_gui_container .
+    DATA gcont_splitter_bottom TYPE REF TO cl_gui_container .
+    DATA gcont_splitter_top TYPE REF TO cl_gui_container .
+    DATA gcont_symbol TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar_btns TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar_img TYPE REF TO cl_gui_container .
+    DATA gcont_toolbar_elementinfo TYPE REF TO cl_gui_container .
+    DATA gc_abap_editor TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit .
+    DATA gc_abap_editor_text TYPE REF TO cl_gui_textedit .
+    DATA gc_abap_error TYPE REF TO cl_gui_alv_grid .
+    DATA gc_alv_queue_3000 TYPE REF TO cl_gui_alv_grid .
+    DATA gc_alv_template_2000 TYPE REF TO cl_gui_alv_grid .
+    DATA gc_clipboard_textedit TYPE REF TO cl_gui_textedit .
+    DATA gc_clipboard_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gc_clipboard_toolbar_img TYPE REF TO cl_gui_picture .
+    DATA gc_elementinfo_alv TYPE REF TO cl_gui_alv_grid .
+    DATA gc_html_viewer TYPE REF TO cl_gui_html_viewer .
+    DATA gc_result_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gc_splitter TYPE REF TO cl_gui_splitter_container .
+    DATA gc_symbol_alv TYPE REF TO cl_gui_alv_grid .
+    DATA gc_symbol_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gc_symbol_toolbar_img TYPE REF TO cl_gui_picture .
+    DATA gs_splitter_bottom TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_clipboard TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_editor TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_lvl0 TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_results TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_results_tab TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_results_tabdat TYPE REF TO cl_gui_splitter_container .
+    DATA gr_results_tab_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gs_splitter_res_button TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_symbol TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_symbol_toolbar TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_toolbar TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_top TYPE REF TO cl_gui_splitter_container .
+    DATA gt_clipboard TYPE /cadaxo/sqlcclipboard_t .
+    DATA gt_queue TYPE /cadaxo/sqlcapi_queue_t .
+    DATA gt_source_runtime_before TYPE /cadaxo/sqlccodeline_t .
+    DATA gt_sql_hist TYPE /cadaxo/sqlchistline_t .
+    DATA:
+      gt_sql_log TYPE TABLE OF /cadaxo/sqlclog .
+    DATA gt_templates TYPE /cadaxo/sqlctemp_alv_t .
+    DATA gt_toolbuttons_top TYPE ttb_button .
+    DATA gt_variant TYPE /cadaxo/sqlcvari_alv_t .
+    DATA gv_export_type TYPE /cadaxo/sqlcapi_position_typ .
+    DATA g_client_category TYPE cccategory .
+    DATA g_client_logsys TYPE logsys .
+    DATA g_cont_pers_preferences TYPE char1 .
+    DATA g_height TYPE i .
+    DATA g_history_toolbar_excluding TYPE ui_functions .
+    DATA g_jobmonitor_toolbar_ex TYPE ui_functions .
+    DATA g_result_layout TYPE lvc_s_layo .
+    DATA g_result_toolbar_excluding TYPE ui_functions .
+    DATA g_show_clipboard TYPE boolean .
+    DATA gs_sel_variant TYPE /cadaxo/sqlc_il_variants . "Cockpit-321
+    DATA:
+      BEGIN OF ms_additional_functions,                 "COCKPIT-48
         uptomenu TYPE REF TO /cadaxo/cl_sqlc_uptomenu,  "COCKPIT-48
       END OF ms_additional_functions .
-  data GT_SAVED_LIST_FIELDCAT type LVC_T_FCAT .
-  data G_SAVED_LIST_GUI_CONTAINER type ref to CL_GUI_CUSTOM_CONTAINER .
-  data G_ACTIVE_LIST_TAB type I .
+    DATA gt_saved_list_fieldcat TYPE lvc_t_fcat .
+    DATA g_saved_list_gui_container TYPE REF TO cl_gui_custom_container .
+    DATA g_active_list_tab TYPE i .
 
-  methods CHECK_DBTABLE_MODIFICATION
-    returning
-      value(R_ANSWER) type CHAR1 .
-  methods CREATE_SYMBOL_MULTIVAL_TAB_DYN
-    importing
-      !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
-    exporting
-      !E_DATA type DATA
-      !E_DATA_STRUCT type DATA .
-  methods GET_SYMBOL_DATATYPE_DESC
-    importing
-      !I_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
-    returning
-      value(R_DESC) type AS4TEXT .
-  methods GET_SYMBOL_DATATYPE_INFO
-    importing
-      !I_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
-    returning
-      value(R_INFO) type /CADAXO/SQLCSYMBOL_DATAINFO .
-  methods CHECK_SYMBOL_DATATYPE
-    importing
-      !I_VALUE type LVC_VALUE
-    raising
-      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
-  methods SHOW_SYMBOLMULTI_DIALOG
-    importing
-      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
-      !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
-    returning
-      value(R_SYMBOL_VALUE) type RSELOPTION
-    raising
-      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
-  methods ON_SYMBOL_BUTTON_CLICK
-    for event BUTTON_CLICK of CL_GUI_ALV_GRID
-    importing
-      !ES_COL_ID
-      !ES_ROW_NO .
-  methods GET_USER_SYMBOL_COUNT
-    importing
-      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
-    returning
-      value(R_COUNT) type I .
-  methods ERROR_CALC_HEIGHT
-    importing
-      !IV_ERRORS type I
-    returning
-      value(EV_HEIGHT) type I .
-  class-methods BUILD_RESULT_GRID_FOOTER
-    importing
-      !IV_SYST type SYSYSID
-      !IV_MANDANT type /CADAXO/SQLC_MANDT
-      !IV_UNAME type UNAME
-      !IV_CREATE_TIMESTAMP type TIMESTAMPL
-    returning
-      value(R_GRID_FOOTER) type /CADAXO/SQLCRESULT_FOOTER .
-  class-methods BUILD_RESULT_GRID_TITLE
-    importing
-      !I_RUNTIME type I
-      !I_LINES type I
-      !I_MESSAGE type STRING optional
-    returning
-      value(R_GRID_TITLE) type LVC_TITLE .
-  methods INSERT_SAVED_LIST
-    importing
-      !IT_SAVED_LIST type /CADAXO/SQLC_LIST_EXP_SQLX_T
-    returning
-      value(EV_UPDATE_OK) type ABAP_BOOL .
-  methods CALC_RESULT_ROWS_AND_COLS
-    importing
-      !I_LINES type I
-    exporting
-      !E_ROWS type I
-      !E_COLS type I .
-  methods CONFIRM_SYMBOL_OVERWRITE .
-  methods CREATE_CLIPBOARD_UI_CONTROL .
-  methods CREATE_CONTROLS .
-  methods CREATE_DYN_DOCUMENT
-    importing
-      !I_PARENT type ref to CL_GUI_CONTAINER
-      value(I_SQL) type STRING
-      !I_HEADER_TEXT type CHAR255 optional
-    changing
-      !IC_DOCUMENT type ref to CL_DD_DOCUMENT .
-  methods CREATE_EDITOR_UI_CONTROL .
-  methods CREATE_PRIMARY_UI_CONTROLS .
-  methods CREATE_RESULT_UI_CONTROLS .
-  methods CREATE_ELEMENTINFO_UI_CONTROL .
-  methods CREATE_SYMBOL_UI_CONTROL .
-  methods CREATE_VARIANT .
-  methods DELETE_LOG .
-  methods DELETE_SYMBOLS
-    exporting
-      !E_SUCCESS type BOOLEAN .
-  methods EXECUTE_SQL
-    importing
-      !I_PROGRESS_INDICATOR type CHAR1 optional
-    preferred parameter I_PROGRESS_INDICATOR
-    raising
-      /CADAXO/CX_SQLC_TO_MUCH_RESROW
-      /CADAXO/CX_SQLC_INVALID_VALUE
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods EXECUTE_SQL_BACKGROUND_WIZ .
-  methods FOCUS_SYMBOL_ALV_CELL
-    importing
-      !I_ROW_ID type LVC_INDEX
-      !I_FIELD_NAME type LVC_FNAME .
-  methods FREE_RESULT_CONTROLS .
-  methods GET_LINK
-    importing
-      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID
-    exporting
-      !E_URL type C
-    changing
-      !CT_CACHE type GTT_CHAR255 .
-  methods GET_SAVED_RESULTS
-    importing
-      !I_RESS_GUID type /CADAXO/SQLC_RESS_GUID_T optional
-      !I_CLEAR_OLD_ALVS type FLAG optional
-    preferred parameter I_RESS_GUID .
-  methods GET_SYMBOLS_SELECTED
-    exporting
-      value(E_SUCCESS) type BOOLEAN .
-  methods GET_SYMBOLS .
-  methods GET_USER_SYMBOL_FROM_SQL
-    importing
-      !I_VARGUID type /CADAXO/SQLC_VARIANT_GUID optional
-      !I_SQL type /CADAXO/SQLCCODELINE_T
-      !I_TYPE type CHAR1
-    exporting
-      !E_SYMBOLS type /CADAXO/SQLC_SYMBOL_T .
-  methods GET_VARIANT .
-  methods HANDLE_RESULT_COMMAND_EXP_CSV
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_COMMAND_SHOW_FULL_VALUE
-    importing
-      !I_GRID_I type I optional
-      !I_LOG type ABAP_BOOL optional .
-  methods HANDLE_COMMAND_SHOW_HTML_BROW
-    importing
-      !I_GRID_I type I optional
-      !I_LOG type ABAP_BOOL optional .
-  methods HANDLE_COMMAND_SHOW_XML_BROW
-    importing
-      !I_GRID_I type I optional
-      !I_LOG type ABAP_BOOL optional .
-  methods HANDLE_RESULT_COMMAND_CDXEXP
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_CLOSE
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_COMPARE
-    importing
-      !I_SOURCE type I
-      !I_TARGET type I .
-  methods HANDLE_RESULT_COMMAND_HOLD
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_KEYFIX
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_REFRLST
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_FULLDISP
-    importing
-      !I_GRID_I type I .
-  methods INSERT_CODEBLOCK_AT_POSITION
-    importing
-      !IV_LINE type I
-      !IV_POS type I
-      !IV_SQLSTRING type /CADAXO/SQLCSTRING
-      !I_SET_FOCUS type ABAP_BOOL default ABAP_FALSE .
-  methods INSERT_TABLE_TO_EDITOR
-    importing
-      !I_STRING type STRING .
-  methods LOAD_HOME_HTML .
-  methods MOVE_BACK_TO_SQL .
-  methods MOVE_FORW_TO_SQL .
-  methods ON_ABAP_ERROR_HOTSPOT_CLICK
-    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW_ID
-      !E_COLUMN_ID
-      !ES_ROW_NO .
-  methods ON_ALV_DRAG
-    for event ONDRAG of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO
-      !E_DRAGDROPOBJ .
-  methods ON_ALV_RESULT_DOUBLE_CLICK
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_ALV_QUEUE_DOUBLE_CLICK_3000
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_ALV_TEMPL_DOUBLE_CLICK_2000
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_CLIPBOARD_DROP
-    for event ON_DROP of CL_GUI_TEXTEDIT
-    importing
-      !INDEX
-      !LINE
-      !DRAGDROP_OBJECT .
-  methods ON_EDITOR_CONTEXT_MENU
-    for event CONTEXT_MENU of CL_GUI_ABAPEDIT
-    importing
-      !MENU
-      !MENU_TYPE .
-  methods ON_EDITOR_CONTEXT_MENU_SEL
-    for event CONTEXT_MENU_SELECTED of CL_GUI_ABAPEDIT
-    importing
-      !FCODE .
-  methods ON_EDITOR_DBLCLICK
-    for event DBLCLICK of CL_GUI_ABAPEDIT .
-  methods ON_EDITOR_DROP
-    for event ON_DROP of CL_GUI_ABAPEDIT
-    importing
-      !INDEX
-      !LINE
-      !POS
-      !DRAGDROP_OBJECT .
-  methods ON_EDITOR_TEXT_DROP
-    for event ON_DROP of CL_GUI_TEXTEDIT
-    importing
-      !INDEX
-      !LINE
-      !POS
-      !DRAGDROP_OBJECT .
-  methods ON_HANDLE_JOB_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_HANDLE_JOB_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_LOG_ALV_CONTEXT_MENU
-    for event CONTEXT_MENU_REQUEST of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT .
-  methods ON_HANDLE_RESULT_CONTEXT_MENU
-    for event CONTEXT_MENU_REQUEST of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT .
-  methods ON_HANDLE_RESULT_END_OF_PAGE
-    for event PRINT_END_OF_PAGE of CL_GUI_ALV_GRID .
-  methods ON_HANDLE_RESULT_MENU_BUTTON
-    for event MENU_BUTTON of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_UCOMM .
-  methods ON_HANDLE_RESULT_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_HANDLE_RESULT_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_HANDLE_SAVEDLISTS_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_HANDLE_SAVEDLISTS_USRCOMMND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_HANDLE_VARSYM_CLICK
-    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW_ID
-      !E_COLUMN_ID
-      !ES_ROW_NO .
-  methods ON_HOME_SAPEVENT
-    for event SAPEVENT of CL_GUI_HTML_VIEWER
-    importing
-      !ACTION
-      !FRAME
-      !GETDATA
-      !POSTDATA
-      !QUERY_TABLE .
-  methods ON_JOB_ALV_CLICK
-    for event BUTTON_CLICK of CL_GUI_ALV_GRID
-    importing
-      !ES_COL_ID
-      !ES_ROW_NO .
-  methods ON_JOB_ALV_HOTSPOT_CLICK
-    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW_ID
-      !E_COLUMN_ID
-      !ES_ROW_NO .
-  methods ON_LOG_ALV_DOUBLE_CLICK
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_LOG_ALV_DRAG
-    for event ONDRAG of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO
-      !E_DRAGDROPOBJ .
-  methods ON_LOG_ALV_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_LOG_ALV_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_RESULT_TOOLBAR_DROPDOWN
-    for event DROPDOWN_CLICKED of CL_GUI_TOOLBAR
-    importing
-      !FCODE
-      !POSX
-      !POSY .
-  methods ON_RESULT_TOOLBAR_FUNCSEL
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE .
-  methods ON_TABBAR_TOOLBAR_FUNCSEL
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE .
-  methods ON_SAVED_LIST_SELECT_LINE
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_SYMBOL_ALV_DATA_CHANGE
-    for event DATA_CHANGED of CL_GUI_ALV_GRID
-    importing
-      !ER_DATA_CHANGED
-      !E_ONF4
-      !E_ONF4_BEFORE
-      !E_ONF4_AFTER
-      !E_UCOMM .
-  methods ON_SYMBOL_ALV_DATA_CHANGED_FIN
-    for event DATA_CHANGED_FINISHED of CL_GUI_ALV_GRID
-    importing
-      !E_MODIFIED
-      !ET_GOOD_CELLS .
-  methods ON_SYMBOL_ALV_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_SYMBOL_ALV_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_ELEMENTINFO_DOUBLE_CLICK
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_SYMBOL_DOUBLE_CLICK
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_ELEMENTINFO_HOTSPOT_DE
-    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW_ID
-      !E_COLUMN_ID
-      !ES_ROW_NO .
-  methods ON_ELEMENTINFO_DRAG
-    for event ONDRAG of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO
-      !E_DRAGDROPOBJ .
-  methods ON_SYMBOL_DRAG
-    for event ONDRAG of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO
-      !E_DRAGDROPOBJ .
-  methods ON_TOOLBAR_FUNCTION_SELECTED
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE .
-  methods ON_TOP_TOOLBAR_DROPDOWN
-    for event DROPDOWN_CLICKED of CL_GUI_TOOLBAR
-    importing
-      !FCODE
-      !POSX
-      !POSY .
-  methods ON_TOP_TOOLBAR_FUNCSEL
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE
-      !SENDER .
-  methods SAVE_SYMBOLS
-    exporting
-      !E_SUCCESS type BOOLEAN .
-  methods SELECT_JOBDATA .
-  methods SEND_SQL_VIA_MAIL .
-  methods SET_INITIAL_DATE_HISTORY .
-  methods SET_INITIAL_DATE_JOBMONITOR .
-  methods SET_RESULT_TOOLBAR_ACTIVE
-    importing
-      !I_FCODE type UI_FUNC .
-  methods SET_SQL_AREA
-    importing
-      !I_CODELINES_T type /CADAXO/SQLCCODELINE_T .
-  methods SHOW_ADMHELP .
-  methods SHOW_HTML
-    importing
-      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID default 'HTML_STARTUP' .
-  methods SHOW_JOBMONITOR .
-  methods SHOW_LOG .
-  methods SHOW_RESULT .
-  methods SHOW_SAVED_LISTS .
-  methods STORE_SQL_TO_HIST
-    importing
-      !I_CODELINES_T type /CADAXO/SQLCCODELINE_T optional .
-  methods UPDATE_FIELD_CATALOG_ALV .
-  methods USR_ACTION_CLEAR_SQL_AREA .
-  methods USR_ACTION_LEAVE_SQL_COCKPIT .
-  methods USR_ACTION_PRETTY_PRINTER .
-  methods USR_ACTION_SHOW_ABAP_DOCU .
-  methods USR_ACTION_SQL_TRACE_ONOFF .
-  methods ON_EDITOR_QUICK_INFO
-    for event QUICK_INFO of CL_GUI_ABAPEDIT
-    importing
-      !CONTEXTSTRING
-      !DATATYPE
-      !XPOS
-      !YPOS
-      !SENDER .
-  methods GET_CURRENT_GRID_NUMBER
-    returning
-      value(R_GRID_NUMBER) type I .
-  methods SAVE_HOLD_LISTS .
-  methods ADD_HOLD_LISTS .
-  methods DELETE_SYMBOL_DB
-    returning
-      value(RV_SUCCESS) type BOOLEAN .
-  methods UPDATE_SYMBOL_DB
-    importing
-      value(IT_SYMBOL_UPDATE) type T_SYMBOL_DB
-    returning
-      value(RV_SUCCESS) type BOOLEAN .
-  methods CHECK_SYMBOL_VALUE_VALID
-    importing
-      !IS_SYMBOL_LINE type /CADAXO/SQLC_SYMBOL
-    raising
-      /CADAXO/CX_SQLC_INVALID_VALUE .
-  methods ON_SYMBOL_BUTTON_VARIANT
-    for event BUTTON_CLICK of CL_GUI_ALV_GRID
-    importing
-      !ES_COL_ID
-      !ES_ROW_NO .
-  methods SQL_SEARCH .
-  methods SQL_SEARCH_NEXT .
-  methods LOG_ALV_LINE_SELECTION .
-  methods HANDLE_COMMAND_CREATE_SYMBOL
-    importing
-      !I_GRID_I type I optional .
-  methods API_SAVED_LIST_IMPORT
-    importing
-      !IR_API type ref to /CADAXO/CL_SQLC_COCKPIT_API
-      !IS_ITEMS type /CADAXO/SQLCAPIP .
-  methods SHARE_SAVED_LIST
-    importing
-      !IV_RECEIVER type /CADAXO/SQLCAPI_RECEIVER optional   "+cockpit-420
-      !IV_TEXT type /CADAXO/SQLC_CHAR_1024 optional .       "+cockpit-420
-  methods POPULATE_SAVED_LIST
-    importing
-      !IV_LIST_GUID type /CADAXO/SQLC_LIST_EXP_SQLX-LIST_GUID
-      !IV_SAVED_LIST_SHARED type /CADAXO/SQLC_LIST_EXP_SQLX-TYPE
-    returning
-      value(RS_SAVED_LIST) type /CADAXO/SQLC_LIST_EXP_SQLX .
-  methods GET_SELECTED_ELEM_INF_FLDS
-    importing
-      !I_INDEX type LVC_INDEX
-    returning
-      value(R_FIELDS) type STRING .
-  methods GET_SAVED_LIST_FIELDCAT
-    returning
-      value(R_SAVED_LIST_FIELDCAT) type LVC_T_FCAT .
-  methods HANDLE_DELETE_SAVED_LISTS .
-  methods HANDLE_EXPORT_SAVED_LIST .
-  methods ON_SYMBOL_MENU_BUTTON
-    for event MENU_BUTTON of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_UCOMM .
-  methods ON_SAVED_LIST_MENU_CLICK
-    for event MENU_BUTTON of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_UCOMM .
-  methods UPDATE_VARIANT .
-  methods FILL_USED_SYMBOLS
-    returning
-      value(RT_SYMBOLS) type /CADAXO/SQLCUSEDSYMBOLS_T .
-  methods SHOW_RESULT_TAB .
-  methods SHOW_RESULT_TABLE
-    importing
-      !I_RESULT_DREF type ref to DATA
-      !I_TABIX type SY-TABIX .
+    METHODS check_dbtable_modification
+      RETURNING
+        VALUE(r_answer) TYPE char1 .
+    METHODS create_symbol_multival_tab_dyn
+      IMPORTING
+        !i_symbol_datatype TYPE /cadaxo/sqlcsymbol_datatype
+      EXPORTING
+        !e_data            TYPE data
+        !e_data_struct     TYPE data .
+    METHODS get_symbol_datatype_desc
+      IMPORTING
+        !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
+      RETURNING
+        VALUE(r_desc) TYPE as4text .
+    METHODS get_symbol_datatype_info
+      IMPORTING
+        !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
+      RETURNING
+        VALUE(r_info) TYPE /cadaxo/sqlcsymbol_datainfo .
+    METHODS check_symbol_datatype
+      IMPORTING
+        !i_value TYPE lvc_value
+      RAISING
+        /cadaxo/cx_sqlc_symb_not_found .
+    METHODS show_symbolmulti_dialog
+      IMPORTING
+        !i_symbol_multivalue  TYPE /cadaxo/sqlcsymbol_multivalue
+        !i_symbol_datatype    TYPE /cadaxo/sqlcsymbol_datatype
+      RETURNING
+        VALUE(r_symbol_value) TYPE rseloption
+      RAISING
+        /cadaxo/cx_sqlc_symb_not_found .
+    METHODS on_symbol_button_click
+          FOR EVENT button_click OF cl_gui_alv_grid
+      IMPORTING
+          !es_col_id
+          !es_row_no .
+    METHODS get_user_symbol_count
+      IMPORTING
+        !i_symbol_multivalue TYPE /cadaxo/sqlcsymbol_multivalue
+      RETURNING
+        VALUE(r_count)       TYPE i .
+    METHODS error_calc_height
+      IMPORTING
+        !iv_errors       TYPE i
+      RETURNING
+        VALUE(ev_height) TYPE i .
+    CLASS-METHODS build_result_grid_footer
+      IMPORTING
+        !iv_syst             TYPE sysysid
+        !iv_mandant          TYPE /cadaxo/sqlc_mandt
+        !iv_uname            TYPE uname
+        !iv_create_timestamp TYPE timestampl
+      RETURNING
+        VALUE(r_grid_footer) TYPE /cadaxo/sqlcresult_footer .
+    CLASS-METHODS build_result_grid_title
+      IMPORTING
+        !i_runtime          TYPE i
+        !i_lines            TYPE i
+        !i_message          TYPE string OPTIONAL
+      RETURNING
+        VALUE(r_grid_title) TYPE lvc_title .
+    METHODS insert_saved_list
+      IMPORTING
+        !it_saved_list      TYPE /cadaxo/sqlc_list_exp_sqlx_t
+      RETURNING
+        VALUE(ev_update_ok) TYPE abap_bool .
+    METHODS calc_result_rows_and_cols
+      IMPORTING
+        !i_lines TYPE i
+      EXPORTING
+        !e_rows  TYPE i
+        !e_cols  TYPE i .
+    METHODS confirm_symbol_overwrite .
+    METHODS create_clipboard_ui_control .
+    METHODS create_controls .
+    METHODS create_dyn_document
+      IMPORTING
+        !i_parent      TYPE REF TO cl_gui_container
+        VALUE(i_sql)   TYPE string
+        !i_header_text TYPE char255 OPTIONAL
+      CHANGING
+        !ic_document   TYPE REF TO cl_dd_document .
+    METHODS create_editor_ui_control .
+    METHODS create_primary_ui_controls .
+    METHODS create_result_ui_controls .
+    METHODS create_elementinfo_ui_control .
+    METHODS create_symbol_ui_control .
+    METHODS create_variant .
+    METHODS delete_log .
+    METHODS delete_symbols
+      EXPORTING
+        !e_success TYPE boolean .
+    METHODS execute_sql
+      IMPORTING
+        !i_progress_indicator TYPE char1 OPTIONAL
+          PREFERRED PARAMETER i_progress_indicator
+      RAISING
+        /cadaxo/cx_sqlc_to_much_resrow
+        /cadaxo/cx_sqlc_invalid_value
+        /cadaxo/cx_sqlc_syntax_error .
+    METHODS execute_sql_background_wiz .
+    METHODS focus_symbol_alv_cell
+      IMPORTING
+        !i_row_id     TYPE lvc_index
+        !i_field_name TYPE lvc_fname .
+    METHODS free_result_controls .
+    METHODS get_link
+      IMPORTING
+        !i_html_id TYPE /cadaxo/sqlcparameter_id
+      EXPORTING
+        !e_url     TYPE c
+      CHANGING
+        !ct_cache  TYPE gtt_char255 .
+    METHODS get_saved_results
+      IMPORTING
+        !i_ress_guid      TYPE /cadaxo/sqlc_ress_guid_t OPTIONAL
+        !i_clear_old_alvs TYPE flag OPTIONAL
+          PREFERRED PARAMETER i_ress_guid .
+    METHODS get_symbols_selected
+      EXPORTING
+        VALUE(e_success) TYPE boolean .
+    METHODS get_symbols .
+    METHODS get_user_symbol_from_sql
+      IMPORTING
+        !i_varguid TYPE /cadaxo/sqlc_variant_guid OPTIONAL
+        !i_sql     TYPE /cadaxo/sqlccodeline_t
+        !i_type    TYPE char1
+      EXPORTING
+        !e_symbols TYPE /cadaxo/sqlc_symbol_t .
+    METHODS get_variant .
+    METHODS handle_result_command_exp_csv
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_command_show_full_value
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL
+        !i_log    TYPE abap_bool OPTIONAL .
+    METHODS handle_command_show_html_brow
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL
+        !i_log    TYPE abap_bool OPTIONAL .
+    METHODS handle_command_show_xml_brow
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL
+        !i_log    TYPE abap_bool OPTIONAL .
+    METHODS handle_result_command_cdxexp
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_close
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_compare
+      IMPORTING
+        !i_source TYPE i
+        !i_target TYPE i .
+    METHODS handle_result_command_hold
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_keyfix
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_refrlst
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_fulldisp
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS insert_codeblock_at_position
+      IMPORTING
+        !iv_line      TYPE i
+        !iv_pos       TYPE i
+        !iv_sqlstring TYPE /cadaxo/sqlcstring
+        !i_set_focus  TYPE abap_bool DEFAULT abap_false .
+    METHODS insert_table_to_editor
+      IMPORTING
+        !i_string TYPE string .
+    METHODS load_home_html .
+    METHODS move_back_to_sql .
+    METHODS move_forw_to_sql .
+    METHODS on_abap_error_hotspot_click
+          FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row_id
+          !e_column_id
+          !es_row_no .
+    METHODS on_alv_drag
+          FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no
+          !e_dragdropobj .
+    METHODS on_alv_result_double_click
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS on_alv_queue_double_click_3000
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS on_alv_templ_double_click_2000
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS on_clipboard_drop
+          FOR EVENT on_drop OF cl_gui_textedit
+      IMPORTING
+          !index
+          !line
+          !dragdrop_object .
+    METHODS on_editor_context_menu
+          FOR EVENT context_menu OF cl_gui_abapedit
+      IMPORTING
+          !menu
+          !menu_type .
+    METHODS on_editor_context_menu_sel
+          FOR EVENT context_menu_selected OF cl_gui_abapedit
+      IMPORTING
+          !fcode .
+    METHODS on_editor_dblclick
+         FOR EVENT dblclick OF cl_gui_abapedit .
+    METHODS on_editor_drop
+          FOR EVENT on_drop OF cl_gui_abapedit
+      IMPORTING
+          !index
+          !line
+          !pos
+          !dragdrop_object .
+    METHODS on_editor_text_drop
+          FOR EVENT on_drop OF cl_gui_textedit
+      IMPORTING
+          !index
+          !line
+          !pos
+          !dragdrop_object .
+    METHODS on_handle_job_toolbar
+          FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+          !e_object
+          !e_interactive .
+    METHODS on_handle_job_user_command
+          FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+          !e_ucomm .
+    METHODS on_log_alv_context_menu
+          FOR EVENT context_menu_request OF cl_gui_alv_grid
+      IMPORTING
+          !e_object .
+    METHODS on_handle_result_context_menu
+          FOR EVENT context_menu_request OF cl_gui_alv_grid
+      IMPORTING
+          !e_object .
+    METHODS on_handle_result_end_of_page
+         FOR EVENT print_end_of_page OF cl_gui_alv_grid .
+    METHODS on_handle_result_menu_button
+          FOR EVENT menu_button OF cl_gui_alv_grid
+      IMPORTING
+          !e_object
+          !e_ucomm .
+    METHODS on_handle_result_toolbar
+          FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+          !e_object
+          !e_interactive .
+    METHODS on_handle_result_user_command
+          FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+          !e_ucomm .
+    METHODS on_handle_savedlists_toolbar
+          FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+          !e_object
+          !e_interactive .
+    METHODS on_handle_savedlists_usrcommnd
+          FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+          !e_ucomm .
+    METHODS on_handle_varsym_click
+          FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row_id
+          !e_column_id
+          !es_row_no .
+    METHODS on_home_sapevent
+          FOR EVENT sapevent OF cl_gui_html_viewer
+      IMPORTING
+          !action
+          !frame
+          !getdata
+          !postdata
+          !query_table .
+    METHODS on_job_alv_click
+          FOR EVENT button_click OF cl_gui_alv_grid
+      IMPORTING
+          !es_col_id
+          !es_row_no .
+    METHODS on_job_alv_hotspot_click
+          FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row_id
+          !e_column_id
+          !es_row_no .
+    METHODS on_log_alv_double_click
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS on_log_alv_drag
+          FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no
+          !e_dragdropobj .
+    METHODS on_log_alv_toolbar
+          FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+          !e_object
+          !e_interactive .
+    METHODS on_log_alv_user_command
+          FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+          !e_ucomm .
+    METHODS on_result_toolbar_dropdown
+          FOR EVENT dropdown_clicked OF cl_gui_toolbar
+      IMPORTING
+          !fcode
+          !posx
+          !posy .
+    METHODS on_result_toolbar_funcsel
+          FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+          !fcode .
+    METHODS on_tabbar_toolbar_funcsel
+          FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+          !fcode .
+    METHODS on_saved_list_select_line
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS on_symbol_alv_data_change
+          FOR EVENT data_changed OF cl_gui_alv_grid
+      IMPORTING
+          !er_data_changed
+          !e_onf4
+          !e_onf4_before
+          !e_onf4_after
+          !e_ucomm .
+    METHODS on_symbol_alv_data_changed_fin
+          FOR EVENT data_changed_finished OF cl_gui_alv_grid
+      IMPORTING
+          !e_modified
+          !et_good_cells .
+    METHODS on_symbol_alv_toolbar
+          FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+          !e_object
+          !e_interactive .
+    METHODS on_symbol_alv_user_command
+          FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+          !e_ucomm .
+    METHODS on_elementinfo_double_click
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS on_symbol_double_click
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS on_elementinfo_hotspot_de
+          FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row_id
+          !e_column_id
+          !es_row_no .
+    METHODS on_elementinfo_drag
+          FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no
+          !e_dragdropobj .
+    METHODS on_symbol_drag
+          FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no
+          !e_dragdropobj .
+    METHODS on_toolbar_function_selected
+          FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+          !fcode .
+    METHODS on_top_toolbar_dropdown
+          FOR EVENT dropdown_clicked OF cl_gui_toolbar
+      IMPORTING
+          !fcode
+          !posx
+          !posy .
+    METHODS on_top_toolbar_funcsel
+          FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+          !fcode
+          !sender .
+    METHODS save_symbols
+      EXPORTING
+        !e_success TYPE boolean .
+    METHODS select_jobdata .
+    METHODS send_sql_via_mail .
+    METHODS set_initial_date_history .
+    METHODS set_initial_date_jobmonitor .
+    METHODS set_result_toolbar_active
+      IMPORTING
+        !i_fcode TYPE ui_func .
+    METHODS set_sql_area
+      IMPORTING
+        !i_codelines_t TYPE /cadaxo/sqlccodeline_t .
+    METHODS show_admhelp .
+    METHODS show_html
+      IMPORTING
+        !i_html_id TYPE /cadaxo/sqlcparameter_id DEFAULT 'HTML_STARTUP' .
+    METHODS show_jobmonitor .
+    METHODS show_log .
+    METHODS show_result .
+    METHODS show_saved_lists .
+    METHODS store_sql_to_hist
+      IMPORTING
+        !i_codelines_t TYPE /cadaxo/sqlccodeline_t OPTIONAL .
+    METHODS update_field_catalog_alv .
+    METHODS usr_action_clear_sql_area .
+    METHODS usr_action_leave_sql_cockpit .
+    METHODS usr_action_pretty_printer .
+    METHODS usr_action_show_abap_docu .
+    METHODS usr_action_sql_trace_onoff .
+    METHODS on_editor_quick_info
+          FOR EVENT quick_info OF cl_gui_abapedit
+      IMPORTING
+          !contextstring
+          !datatype
+          !xpos
+          !ypos
+          !sender .
+    METHODS on_editor_insert_pattern
+          FOR EVENT insert_pattern OF cl_gui_abapedit
+      IMPORTING
+          !datatype
+          !flags
+          !patternkey
+          !xpos
+          !ypos
+          !sender .
+    METHODS get_current_grid_number
+      RETURNING
+        VALUE(r_grid_number) TYPE i .
+    METHODS save_hold_lists .
+    METHODS add_hold_lists .
+    METHODS delete_symbol_db
+      RETURNING
+        VALUE(rv_success) TYPE boolean .
+    METHODS update_symbol_db
+      IMPORTING
+        VALUE(it_symbol_update) TYPE t_symbol_db
+      RETURNING
+        VALUE(rv_success)       TYPE boolean .
+    METHODS check_symbol_value_valid
+      IMPORTING
+        !is_symbol_line TYPE /cadaxo/sqlc_symbol
+      RAISING
+        /cadaxo/cx_sqlc_invalid_value .
+    METHODS on_symbol_button_variant
+          FOR EVENT button_click OF cl_gui_alv_grid
+      IMPORTING
+          !es_col_id
+          !es_row_no .
+    METHODS sql_search .
+    METHODS sql_search_next .
+    METHODS log_alv_line_selection .
+    METHODS handle_command_create_symbol
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL .
+    METHODS api_saved_list_import
+      IMPORTING
+        !ir_api   TYPE REF TO /cadaxo/cl_sqlc_cockpit_api
+        !is_items TYPE /cadaxo/sqlcapip .
+    METHODS share_saved_list
+      IMPORTING
+        !iv_receiver TYPE /cadaxo/sqlcapi_receiver OPTIONAL   "+cockpit-420
+        !iv_text     TYPE /cadaxo/sqlc_char_1024 OPTIONAL .       "+cockpit-420
+    METHODS populate_saved_list
+      IMPORTING
+        !iv_list_guid         TYPE /cadaxo/sqlc_list_exp_sqlx-list_guid
+        !iv_saved_list_shared TYPE /cadaxo/sqlc_list_exp_sqlx-type
+      RETURNING
+        VALUE(rs_saved_list)  TYPE /cadaxo/sqlc_list_exp_sqlx .
+    METHODS get_selected_elem_inf_flds
+      IMPORTING
+        !i_index        TYPE lvc_index
+      RETURNING
+        VALUE(r_fields) TYPE string .
+    METHODS get_saved_list_fieldcat
+      RETURNING
+        VALUE(r_saved_list_fieldcat) TYPE lvc_t_fcat .
+    METHODS handle_delete_saved_lists .
+    METHODS handle_export_saved_list .
+    METHODS on_symbol_menu_button
+          FOR EVENT menu_button OF cl_gui_alv_grid
+      IMPORTING
+          !e_object
+          !e_ucomm .
+    METHODS on_saved_list_menu_click
+          FOR EVENT menu_button OF cl_gui_alv_grid
+      IMPORTING
+          !e_object
+          !e_ucomm .
+    METHODS update_variant .
+    METHODS fill_used_symbols
+      RETURNING
+        VALUE(rt_symbols) TYPE /cadaxo/sqlcusedsymbols_t .
+    METHODS show_result_tab .
+    METHODS show_result_table
+      IMPORTING
+        !i_result_dref TYPE REF TO data
+        !i_tabix       TYPE sy-tabix .
+    METHODS tippsandtricks .
   PRIVATE SECTION.
-
+    CONSTANTS: BEGIN OF editor_type,
+                 new TYPE char1 VALUE 'A' ##NO_TEXT,
+                 old TYPE char1 VALUE '',
+               END OF editor_type.
     CONSTANTS:
       BEGIN OF cs_symbol_type,
         user    TYPE char1 VALUE 'U' ##NO_TEXT,
@@ -852,7 +854,7 @@ protected section.
         horizontal TYPE /cadaxo/sqlcreswindorientation VALUE 'H' ##NO_TEXT,
         vertical   TYPE /cadaxo/sqlcreswindorientation VALUE 'V' ##NO_TEXT,
         matrix     TYPE /cadaxo/sqlcreswindorientation VALUE 'M' ##NO_TEXT,
-        tab        type /cadaxo/sqlcreswindorientation value 'T' ##NO_TEXT,
+        tab        TYPE /cadaxo/sqlcreswindorientation VALUE 'T' ##NO_TEXT,
       END OF cs_windowresolution .
     CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
     CONSTANTS c_program_symbols_hide TYPE flag VALUE space ##NO_TEXT.
@@ -888,7 +890,7 @@ protected section.
     DATA gt_toolbuttons_symbol TYPE ttb_button .
     DATA gv_selected_counter TYPE sy-tabix .
     DATA gv_selected_total TYPE sy-tabix .
-    DATA g_abap_editor_type TYPE char1 VALUE 'A' ##NO_TEXT.
+    DATA g_abap_editor_type TYPE char1 VALUE editor_type-new.
     DATA g_auth_sql_cockpit_actvt TYPE activ_auth .
     DATA g_curr_col TYPE lvc_fname .
     DATA g_curr_row TYPE /cadaxo/sqlcsymbol_name .
@@ -901,7 +903,12 @@ protected section.
     DATA g_sel_job_timestamp_from TYPE timestamp .
     DATA g_sel_job_timestamp_to TYPE timestamp .
     DATA g_symbol_toolbar_excluding TYPE ui_functions .
-    DATA g_version_nr TYPE string VALUE '3.4' ##NO_TEXT.
+    CLASS-DATA g_version_nr TYPE string VALUE '3.4' ##NO_TEXT.
+    CLASS-METHODS add_record_next_job
+      IMPORTING
+        is_sqlcsres TYPE /cadaxo/sqlcsres
+        i_btcjob    TYPE btcjob
+        i_btcjobcnt TYPE btcjobcnt.
 
     METHODS call_admin .
     METHODS _split_error_text
@@ -934,6 +941,48 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
             gt_lvc_t_fcat_hold,
             gt_result_details_hold.
 
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD add_record_next_job.
+
+    DATA variant TYPE btcvariant.
+    DATA tbtco   TYPE tbtco.
+
+    SELECT SINGLE variant FROM tbtcp INTO variant WHERE jobname = i_btcjob AND jobcount = i_btcjobcnt.
+    IF sy-subrc = 0.
+*   check for open periodic job -> create new initial line in sqlcsres
+      SELECT SINGLE a~jobcount
+        FROM tbtco AS a
+        INNER JOIN tbtcp AS b
+        ON a~jobname = b~jobname
+        AND a~jobcount = b~jobcount
+        INTO CORRESPONDING FIELDS OF tbtco
+          WHERE a~jobname = i_btcjob
+            AND b~variant = variant
+            AND ( strtdate = '' OR strttime = '' ).
+      IF sy-subrc = 0.
+        DATA(initial_guid) =  VALUE guid_16( ).
+        SELECT SINGLE @abap_true
+               FROM /cadaxo/sqlcsres
+               WHERE jobname        = @i_btcjob
+                 AND jobcount       = @tbtco-jobcount
+                 AND root_list_guid = @is_sqlcsres-root_list_guid
+                 AND ress_guid      = @initial_guid
+               INTO @DATA(exists).
+        IF exists = abap_false.
+          DATA(ls_sqlcsres_tmp) = is_sqlcsres.
+          CLEAR ls_sqlcsres_tmp-ress_guid.
+          CLEAR ls_sqlcsres_tmp-space_cons_zip.
+          ls_sqlcsres_tmp-jobcount       = tbtco-jobcount.
+          ls_sqlcsres_tmp-list_guid      = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
+          ls_sqlcsres_tmp-prev_list_guid = is_sqlcsres-list_guid.
+          GET TIME STAMP FIELD ls_sqlcsres_tmp-create_timestamp.
+          INSERT INTO /cadaxo/sqlcsres VALUES ls_sqlcsres_tmp.
+        ENDIF.
+      ENDIF.
     ENDIF.
 
   ENDMETHOD.
@@ -1114,10 +1163,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.06.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -1185,7 +1234,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxx                    *
@@ -1196,9 +1245,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 04.08.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Defaultvalue 'V' for Result Views           | CDX001-0002    *
+* 04.08.2010 | Fößleitner Johann    | Defaultvalue 'V' for Result Views           | CDX001-0002    *
 *------------+----------------------+---------------------------------------------+----------------*
-* 16.07.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | New calculation of rows/columns in matrix   | CDX130-011     *
+* 16.07.2012 | Fößleitner Johann    | New calculation of rows/columns in matrix   | CDX130-011     *
 *------------+----------------------+---------------------------------------------+----------------*
 * 17.04.2017 | Domi Bigl            | max row/col for splitter                    | COCKPIT-185    *
 ****************************************************************************************************
@@ -1298,7 +1347,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         tabletype->get_ddic_header( RECEIVING p_header = DATA(ddic_header)
                                     EXCEPTIONS OTHERS = 2 ).
 
-        IF sy-subrc = 0 and ddic_header-crstamp IS NOT INITIAL.
+        IF sy-subrc = 0 AND ddic_header-crstamp IS NOT INITIAL.
 
           timestamp = ddic_header-crstamp.
 
@@ -1311,8 +1360,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
             RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
               EXPORTING
-                textid        = /cadaxo/cx_sqlc_syntax_error=>/cadaxo/cx_sqlc_syntax_error
-                message       = message.
+                textid  = /cadaxo/cx_sqlc_syntax_error=>/cadaxo/cx_sqlc_syntax_error
+                message = message.
 
           ENDIF.
         ENDIF.
@@ -1330,7 +1379,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
@@ -1341,9 +1390,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 02.05.2011 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Check empty SQL string                      | FOE02052011    *
+* 02.05.2011 | Fößleitner Johann    | Check empty SQL string                      | FOE02052011    *
 *------------+----------------------+---------------------------------------------+----------------*
-* 22.10.2013 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Check Authorization after syntax check!     | RT164          *
+* 22.10.2013 | Fößleitner Johann    | Check Authorization after syntax check!     | RT164          *
 *------------+----------------------+---------------------------------------------+----------------*
 * 09.05.2014 | Domi Bigl            | Check prev message on cx_root catch         | RT229          *
 *------------+----------------------+---------------------------------------------+----------------*
@@ -1623,6 +1672,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     toolbar_row_height = calculate_height_for_button( ).
     toolbar_col_width = calculate_width_for_button( ).
 
+    /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value(
+        EXPORTING
+          i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
+       RECEIVING
+         r_parameter_value    = g_version_nr
+        EXCEPTIONS
+          OTHERS              = 2
+             ).
+
   ENDMETHOD.
 
 
@@ -1636,7 +1694,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Developer               : Domi Bigl                Company    : CADAXO GesmbH                    *
 * Date                    : 01.11.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 10.11.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -1663,10 +1721,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 03.02.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
@@ -1677,13 +1735,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 04.08.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Defaultvalue 'V' for Result Views           | CDX001-0002    *
+* 04.08.2010 | Fößleitner Johann    | Defaultvalue 'V' for Result Views           | CDX001-0002    *
 *------------+----------------------+---------------------------------------------+----------------*
-* 29.08.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Use the trace user settings                 | CDX001-0008    *
+* 29.08.2010 | Fößleitner Johann    | Use the trace user settings                 | CDX001-0008    *
 *------------+----------------------+---------------------------------------------+----------------*
-* 01.06.2011 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Defautlvalue 2 for Job and Hiostry Days     | CDX001-0023    *
+* 01.06.2011 | Fößleitner Johann    | Defautlvalue 2 for Job and Hiostry Days     | CDX001-0023    *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Editor type (new, old or like se80 setting) | CDX130-005     *
+* 27.03.2012 | Fößleitner Johann    | Editor type (new, old or like se80 setting) | CDX130-005     *
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
 *            |                      |                                             | RT235          *
@@ -1763,7 +1821,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                 me->ms_user_settings_xml-editor_type          TO me->g_user_settings-editor_type,
                 me->ms_user_settings_xml-forwnavddleclipse    TO me->g_user_settings-forwnavddleclipse,
                 me->ms_user_settings_xml-forwnavdicteclipse   TO me->g_user_settings-forwnavdicteclipse,
-                me->ms_user_settings_xml-domaintext           TO me->g_user_settings-domaintext.            "COCKPIT-458
+                me->ms_user_settings_xml-domaintext           TO me->g_user_settings-domaintext,           "COCKPIT-458
+                me->ms_user_settings_xml-release_type         TO me->g_user_settings-release_type,         "COCKPIT-98
+                me->ms_user_settings_xml-release_number       TO me->g_user_settings-release_number.       "COCKPIT-98
 
 * Column Header - Fieldname or Fieldtext
           CASE me->ms_user_settings_xml-colhd_type.
@@ -1779,7 +1839,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
               me->g_user_settings-result_window_vertical   = abap_true.
             WHEN cs_windowresolution-horizontal.
               me->g_user_settings-result_window_horizontal = abap_true.
-            when cs_windowresolution-tab.
+            WHEN cs_windowresolution-tab.
               me->g_user_settings-result_window_tab = abap_true.
             WHEN OTHERS.
               me->g_user_settings-result_window_matrix     = abap_true.
@@ -1947,21 +2007,26 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         CALL FUNCTION 'RS_WORKBENCH_CUSTOMIZING'
           EXPORTING
             choice          = 'WB'
-            suppress_dialog = 'X'
+            suppress_dialog = abap_true
           IMPORTING
             setting         = l_rseumod.
 
-        IF l_rseumod-editcntrl <> 'A'.
-          me->g_abap_editor_type = ' '.
+        IF l_rseumod-editcntrl <> editor_type-new.
+          me->g_abap_editor_type = editor_type-old.
         ENDIF.
       WHEN '01'.
-        me->g_abap_editor_type = 'A'.
+        me->g_abap_editor_type = editor_type-new.
       WHEN '02'.
-        me->g_abap_editor_type = ' '.
+        me->g_abap_editor_type = editor_type-old.
       WHEN OTHERS.
-        me->g_abap_editor_type = 'A'.
+        me->g_abap_editor_type = editor_type-new.
     ENDCASE.
-
+    CALL FUNCTION 'GUI_IS_ITS'
+      IMPORTING
+        return = g_is_its.
+    IF g_is_its = abap_true OR cl_gui_frontend_services=>activex <> gfw_true.
+      me->g_abap_editor_type = editor_type-old.
+    ENDIF.
 
     ADD 1 TO g_main_counter.
     lwa_main-nr  = g_main_counter.
@@ -1973,17 +2038,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     me->set_initial_date_history( ).
     me->set_initial_date_jobmonitor( ).
 
-* Version number
-    /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value(
-        EXPORTING
-          i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
-       RECEIVING
-         r_parameter_value    = g_version_nr
-        EXCEPTIONS
-          OTHERS              = 2
-             ).
-
-
     gr_user_log = NEW #( ).
 
     ms_additional_functions-uptomenu = NEW #( me->ms_user_settings_xml-maxsel ).
@@ -1992,7 +2046,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *   begin of COCKPIT-371
     me->g_trstart_uzeit = sy-uzeit.
     me->g_trstart_datum = sy-datum.
-    get TIME STAMP FIELD me->g_trstart_timestamp.
+    GET TIME STAMP FIELD me->g_trstart_timestamp.
 *   end   of COCKPIT-371
 
   ENDMETHOD.
@@ -2005,10 +2059,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.06.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -2265,7 +2319,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 03.02.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -2281,13 +2335,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 ****************************************************************************************************
 
     IF gc_splitter IS INITIAL.
-
-      CALL FUNCTION 'GUI_IS_ITS'
-        IMPORTING
-          return = g_is_its.
-      IF g_is_its = abap_true OR cl_gui_frontend_services=>activex <> gfw_true.
-        CLEAR me->g_abap_editor_type.
-      ENDIF.
 
       me->create_primary_ui_controls( ).
 
@@ -2314,6 +2361,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       me->show_html( ).
 
       me->set_result_toolbar_active( i_fcode = c_cmd_home ).
+
+      me->tippsandtricks( ). "COCKPIT-98
 
     ENDIF.
 
@@ -2404,10 +2453,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 03.02.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.06.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -2448,10 +2497,20 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     gs_splitter_editor->set_row_height( id = 2 height = 0 ).
     gs_splitter_editor->set_row_sash( id = 2 type = 1 value = gs_splitter_editor->false   ).
 
-    IF me->g_abap_editor_type = 'A' AND g_is_its IS INITIAL.
-      CREATE OBJECT gc_abap_editor
-        EXPORTING
-          parent = gcont_abap_editor.
+    IF me->g_abap_editor_type = editor_type-new.
+
+      /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value( EXPORTING  i_parameter_id      = 'SOURCE_CODE_GUI'
+                                                           RECEIVING  r_parameter_value   = DATA(gui_version)
+                                                           EXCEPTIONS parameter_not_found = 1
+                                                                      OTHERS              = 2 ).
+      IF sy-subrc = 0 AND gui_version IS NOT INITIAL.
+        ASSIGN ('CL_GUI_SOURCEEDIT=>L_GUI_VERSION') TO FIELD-SYMBOL(<editor_gui_version>).
+        IF sy-subrc = 0.
+          <editor_gui_version> = gui_version.
+        ENDIF.
+      ENDIF.
+
+      gc_abap_editor = NEW #( parent = gcont_abap_editor ).
 
       gc_abap_editor->upload_properties( EXCEPTIONS OTHERS = 4 ).
       gc_abap_editor->init_event_registration( EXCEPTIONS OTHERS = 2 ).
@@ -2533,6 +2592,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                                                            OTHERS     = 1 ).
           IF sy-subrc = 0.
             SET HANDLER gc_abap_parser->handle_insertion_request FOR gc_abap_editor.
+            "COCKPIT-481
+            SET HANDLER me->on_editor_insert_pattern FOR gc_abap_editor.
+            "COCKPIT-481
           ENDIF.
 
         CATCH cx_root.
@@ -2561,16 +2623,12 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * create the drag/drop object
       CREATE OBJECT dragdrop_behaviour_editor.
 
-      dragdrop_behaviour_editor->add(
-        EXPORTING
-          flavor     = 'ALV_TO_EDITOR_OLD'
-          dragsrc    = ' '
-          droptarget = 'X'
-          effect     = cl_dragdrop=>copy ).
+      dragdrop_behaviour_editor->add( flavor     = 'ALV_TO_EDITOR_OLD'
+                                      dragsrc    = abap_false
+                                      droptarget = abap_true
+                                      effect     = cl_dragdrop=>copy ).
 
-      gc_abap_editor_text->set_dragdrop(
-        EXPORTING
-          dragdrop = dragdrop_behaviour_editor ).
+      gc_abap_editor_text->set_dragdrop( dragdrop_behaviour_editor ).
 
       SET HANDLER: me->on_editor_text_drop                 FOR gc_abap_editor_text.
 
@@ -2791,10 +2849,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -2992,7 +3050,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * begin of change 321
     DATA(l_ctmenu3) = NEW cl_ctmenu( ).
     l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = conv #( text-b46 )
+    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( text-b46 )
                                                                disabled = abap_true ).
     gc_splitter_top_toolbar->set_static_ctxmenu( EXPORTING fcode = 'SQLVARSET' ctxmenu = l_ctmenu3 ).
 * end   of change 321
@@ -3058,10 +3116,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -3630,8 +3688,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * execute create variant popup
       CALL FUNCTION '/CADAXO/SQLC_CREATE_VARIANT_UI'
         EXPORTING
-          i_mode     = 'I'
-          il_variant = ls_variant
+          i_mode      = 'I'
+          il_variant  = ls_variant
         CHANGING
           c_vari_name = lv_variant_created. "COCKPIT-321 KA
 
@@ -3828,7 +3886,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2015               Release    : WAS 7.40 SP8                     *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       :                          Company    :                                  *
@@ -3839,7 +3897,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 29.08.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Use the trace user settings                 | CDX001-0008    *
+* 29.08.2010 | Fößleitner Johann    | Use the trace user settings                 | CDX001-0008    *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.04.2016 | Ana Lekic            | activate the trace later                    | $002 COCKPIT-59*
@@ -4039,6 +4097,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * 13.05.2019 | Domi Bigl            | Dump at open list when V1 and V2 SQL is used| COCKPIT-375    *
 *------------+----------------------+---------------------------------------------+----------------*
 * 01.06.2019 | Domi Bigl            | Manuell planned Jobs                        | COCKPIT-348    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 05.04.2022 | Domi Bigl            | Wrong list in job notification mail + CC    | COCKPIT-488    *
 ****************************************************************************************************
 
 *...
@@ -4050,7 +4110,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           lt_cl_sql_parse    TYPE /cadaxo/sqlc_cl_cockpit_parset,
           lr_exception       TYPE REF TO cx_static_check,
           ls_sqlcsres        TYPE /cadaxo/sqlcsres,
-          ls_sqlcsres_tmp    TYPE /cadaxo/sqlcsres,
           l_sql_string       TYPE string,
           ls_sqlcresultsave  TYPE /cadaxo/sqlcresultsave,
           lt_sqlcresultsave  TYPE TABLE OF /cadaxo/sqlcresultsave,
@@ -4070,54 +4129,45 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     FIELD-SYMBOLS: <lr_cl_sql_parse> TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
     FIELD-SYMBOLS: <ls_t>            TYPE ANY TABLE.
 
-    CLEAR l_btcjob.
-    CLEAR l_btcjobcnt.
-
     CALL FUNCTION 'GET_JOB_RUNTIME_INFO'
       IMPORTING
-        jobcount        = l_btcjobcnt
-        jobname         = l_btcjob
+        jobcount = l_btcjobcnt
+        jobname  = l_btcjob
       EXCEPTIONS
-        no_runtime_info = 1
-        OTHERS          = 2.
+        OTHERS   = 1.
 
 *# 4660 - 20140919
     IF l_btcjob IS NOT INITIAL.
-      SELECT SINGLE * FROM /cadaxo/sqlcsres INTO ls_sqlcsres WHERE jobcount = l_btcjobcnt AND jobname = l_btcjob.
+      SELECT SINGLE *
+             FROM /cadaxo/sqlcsres
+             WHERE jobcount       = @l_btcjobcnt
+               AND jobname        = @l_btcjob
+               AND root_list_guid = @i_list_guid
+             INTO @ls_sqlcsres.
     ENDIF.
-    IF sy-subrc <> 0 OR l_btcjob IS INITIAL.
-      SELECT SINGLE * FROM /cadaxo/sqlcsres INTO ls_sqlcsres WHERE list_guid = i_list_guid.
+    IF sy-subrc <> 0 OR l_btcjobcnt IS INITIAL.
+      SELECT *
+             FROM /cadaxo/sqlcsres
+             WHERE root_list_guid = @i_list_guid OR list_guid = @i_list_guid
+             ORDER BY ress_guid
+             into table @DATA(all_sqlcsres).
       IF sy-subrc <> 0.
         IF sy-batch IS NOT INITIAL.
           MESSAGE e143(/cadaxo/sqlc) WITH i_list_guid.
         ENDIF.
         MESSAGE x143(/cadaxo/sqlc) WITH i_list_guid.
       ENDIF.
-    ENDIF.
-
-* get variant
-    SELECT SINGLE variant FROM tbtcp INTO lv_variant WHERE jobname = l_btcjob AND jobcount = l_btcjobcnt.
-    IF sy-subrc = 0.
-*   check for open periodic job -> create new initial line in sqlcsres
-      SELECT SINGLE *
-        FROM tbtco AS a
-        INNER JOIN tbtcp AS b
-        ON a~jobname = b~jobname
-        AND a~jobcount = b~jobcount
-        INTO CORRESPONDING FIELDS OF ls_tbtco
-          WHERE a~jobname = l_btcjob
-            AND b~variant = lv_variant
-            AND ( strtdate = '' OR strttime = '' ).
-      IF sy-subrc = 0.
-        CLEAR ls_sqlcsres_tmp.
-        ls_sqlcsres_tmp = ls_sqlcsres.
-        CLEAR ls_sqlcsres_tmp-ress_guid.
-        ls_sqlcsres_tmp-jobcount  = ls_tbtco-jobcount.
-        ls_sqlcsres_tmp-list_guid = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
-        GET TIME STAMP FIELD ls_sqlcsres_tmp-create_timestamp.
-        INSERT INTO /cadaxo/sqlcsres VALUES ls_sqlcsres_tmp.
+      ls_sqlcsres = all_sqlcsres[ 1 ].
+      IF l_btcjobcnt IS INITIAL.
+        l_btcjobcnt = ls_sqlcsres-jobcount.
+        l_btcjob    = ls_sqlcsres-jobname.
       ENDIF.
     ENDIF.
+
+    add_record_next_job( is_sqlcsres = ls_sqlcsres
+                         i_btcjob    = l_btcjob
+                         i_btcjobcnt = l_btcjobcnt ).
+    COMMIT WORK.
 *# 4660 - 20140919
 
     cl_abap_gzip=>decompress_text( EXPORTING  gzip_in  = ls_sqlcsres-sql_string
@@ -4134,12 +4184,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 * parse the sql string
         /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i(
-          EXPORTING
-            i_sql                       = l_sql_string
-            i_user_settings             = lcl_sqlc_cockpit->ms_user_settings_xml
-            i_role                      = lcl_sqlc_cockpit->g_auth
-          IMPORTING
-            e_sql_parsed                = lt_cl_sql_parse ).
+          EXPORTING i_sql           = l_sql_string
+                    i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
+                    i_role          = lcl_sqlc_cockpit->g_auth
+          IMPORTING e_sql_parsed    = lt_cl_sql_parse ).
 
 * check the sql syntax
         /cadaxo/cl_sqlc_cockpit_parse=>check_sql_syntax( lt_cl_sql_parse ).
@@ -4181,7 +4229,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         ENDLOOP.
 
         ls_sqlcress-ress_guid = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
-
         ls_sqlcsres-ress_guid = ls_sqlcress-ress_guid.
 
         LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
@@ -4240,7 +4287,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         cl_abap_gzip=>compress_text( EXPORTING text_in  = l_xml
                                      IMPORTING gzip_out = ls_sqlcress-rawdata ).
 
-        ls_sqlcress-uname = sy-uname.
+        ls_sqlcress-uname = cl_abap_syst=>get_user_name( ).
 
         ls_sqlcress-editor_sqlstring = ls_sqlcsres-editor_sqlstring.
 
@@ -4254,8 +4301,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
         IF ls_sqlcsres-jobcount <> l_btcjobcnt.
           ls_sqlcsres-list_guid = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
-
-          ls_sqlcsres-jobcount = l_btcjobcnt.
+          ls_sqlcsres-jobcount  = l_btcjobcnt.
+          GET TIME STAMP FIELD ls_sqlcsres-create_timestamp.
         ENDIF.
 
         MODIFY /cadaxo/sqlcress FROM ls_sqlcress.
@@ -4280,10 +4327,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     IF sy-subrc <> 0.
     ENDIF.
 
-    FREE: ls_sqlcress,
-          ls_sqlcsres,
-          lt_code.
-
   ENDMETHOD.
 
 
@@ -4305,11 +4348,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add nr. of selects to jobmonitor            | CDX130-004     *
+* 27.03.2012 | Fößleitner Johann    | Add nr. of selects to jobmonitor            | CDX130-004     *
 *------------+----------------------+---------------------------------------------+----------------*
 * 28.10.2016 | Domi Bigl            | Jobs with old Editor                        | COCKPIT-7      *
 *------------+----------------------+---------------------------------------------+----------------*
 * 16.05-2017 | Harald Wiesinger     | DATA LOSS Dump with periodic Jobs           | COCKPIT-205    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 15.06.2022 | Domi Bigl            | Wrong list in job notification mail + CC    | COCKPIT-488    *
 *------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
 ****************************************************************************************************
@@ -4374,7 +4419,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 * how many sql selects does the user execute
         l_lines = lines( gt_cl_sql_parse ).
-        MOVE l_lines TO ls_sqlcsres-nr_of_selects.            "CDX130-004
+        ls_sqlcsres-nr_of_selects = l_lines.            "CDX130-004
 
 * get sql string from editor control
         me->get_sql_area( IMPORTING e_code_string = l_sql_string ).
@@ -4396,8 +4441,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           IMPORTING
             e_start_conditions = ls_jobstart_conditions
           EXCEPTIONS
-            cancel_by_user     = 1
-            OTHERS             = 2.
+            OTHERS             = 1.
         IF sy-subrc = 0.
 
           CALL TRANSFORMATION id
@@ -4410,9 +4454,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           cl_abap_gzip=>compress_text( EXPORTING text_in  = l_sql_string
                                        IMPORTING gzip_out = ls_sqlcsres-sql_string ).
 
-          CALL FUNCTION 'GUID_CREATE'
-            IMPORTING
-              ev_guid_16 = ls_sqlcsres-list_guid.
+          ls_sqlcsres-list_guid = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
+          ls_sqlcsres-root_list_guid = ls_sqlcsres-list_guid.
 
           GET TIME STAMP FIELD ls_sqlcsres-create_timestamp.
 
@@ -4443,7 +4486,19 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                  WITH pjobguid = ls_sqlcsres-list_guid
                  VIA JOB ls_jobstart_conditions-jobname
                  NUMBER ls_sqlcsres-jobcount
-              AND RETURN.
+                 AND RETURN.
+          IF ls_jobstart_conditions-notification_email1 IS NOT INITIAL
+          OR ls_jobstart_conditions-notification_email2 IS NOT INITIAL
+          OR ls_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
+
+            SUBMIT /cadaxo/sqlc_batch_executemail
+                   WITH pjobguid = ls_sqlcsres-list_guid
+                   VIA JOB ls_jobstart_conditions-jobname
+                   NUMBER ls_sqlcsres-jobcount
+                   AND RETURN.
+
+          ENDIF.
+
           CASE abap_true.
             WHEN ls_jobstart_conditions-periodic_minutely.
               MOVE 1 TO ls_tbtcjob-prdmins.
@@ -4462,74 +4517,75 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
               l_event_periodic = abap_true.
           ENDCASE.
 
-          IF ls_jobstart_conditions-notification_email1 IS NOT INITIAL
-          OR ls_jobstart_conditions-notification_email2 IS NOT INITIAL
-          OR ls_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
-
-            l_btcjob_notif = '/CADAXO/MAIL_NOTIF'.
-            l_event_param  = ls_sqlcsres-list_guid.
-
-            CALL FUNCTION 'JOB_OPEN'
-              EXPORTING
-                jobname  = l_btcjob_notif
-                jobclass = 'C'
-              IMPORTING
-                jobcount = l_btcjobcnt_notif
-              EXCEPTIONS
-                OTHERS   = 1.
-
-            SUBMIT /cadaxo/sqlc_batch_executemail
-                   WITH pjobguid = ls_sqlcsres-list_guid
-                   VIA JOB l_btcjob_notif
-                   NUMBER l_btcjobcnt_notif
-                   AND RETURN.
-
-            CALL FUNCTION 'JOB_CLOSE'
-              EXPORTING
-                jobcount       = l_btcjobcnt_notif
-                jobname        = l_btcjob_notif
-                event_id       = '/CADAXO/MAIL_NOTIF'
-                event_param    = l_event_param
-                event_periodic = l_event_periodic
-              EXCEPTIONS
-                OTHERS         = 9.
-          ENDIF.
-
+* COCKPIT-488 DEL
+*          IF ls_jobstart_conditions-notification_email1 IS NOT INITIAL
+*          OR ls_jobstart_conditions-notification_email2 IS NOT INITIAL
+*          OR ls_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
+*
+*            l_btcjob_notif = '/CADAXO/MAIL_NOTIF'.
+*            l_event_param  = ls_sqlcsres-list_guid.
+*
+*            CALL FUNCTION 'JOB_OPEN'
+*              EXPORTING"
+*                jobname  = l_btcjob_notif
+*                jobclass = 'C'
+*              IMPORTING
+*                jobcount = l_btcjobcnt_notif
+*              EXCEPTIONS
+*                OTHERS   = 1.
+*
+*            SUBMIT /cadaxo/sqlc_batch_executemail
+*                   WITH pjobguid = ls_sqlcsres-list_guid
+*                   VIA JOB l_btcjob_notif
+*                   NUMBER l_btcjobcnt_notif
+*                   AND RETURN.
+*
+*            CALL FUNCTION 'JOB_CLOSE'
+*              EXPORTING
+*                jobcount       = l_btcjobcnt_notif
+*                jobname        = l_btcjob_notif
+*                event_id       = '/CADAXO/MAIL_NOTIF'
+*                event_param    = l_event_param
+*                event_periodic = l_event_periodic
+*              EXCEPTIONS
+*                OTHERS         = 9.
+*          ENDIF.
+* COCKPIT-488 DEL END
           CASE abap_true.
             WHEN ls_jobstart_conditions-immediately.
+              IF l_event_periodic = abap_true.                     "COCKPIT-488
+                DATA(start_date) = CONV btcsdate( sy-datum ).      "COCKPIT-488
+                DATA(start_time) = CONV btcstime( sy-uzeit + 5 ).  "COCKPIT-488
+                ls_jobstart_conditions-immediately = abap_false.   "COCKPIT-488
+              ELSE.                                                "COCKPIT-488
+                start_date = '        '.                           "COCKPIT-488
+                start_time = '      '.                             "COCKPIT-488
+              ENDIF.                                               "COCKPIT-488
               CALL FUNCTION 'JOB_CLOSE'
                 EXPORTING
                   jobcount  = ls_sqlcsres-jobcount
                   jobname   = ls_jobstart_conditions-jobname
                   strtimmed = ls_jobstart_conditions-immediately
+                  sdlstrtdt = start_date
+                  sdlstrttm = start_time
                   prdmins   = ls_tbtcjob-prdmins
                   prddays   = ls_tbtcjob-prddays
                   prdhours  = ls_tbtcjob-prdhours
                   prdmonths = ls_tbtcjob-prdmonths
                   prdweeks  = ls_tbtcjob-prdweeks
                 EXCEPTIONS
-                  OTHERS    = 9.
+                  OTHERS    = 1.
 
               COMMIT WORK AND WAIT.
 
-              IF l_event_periodic = abap_true.
-
-                SELECT SINGLE @abap_true FROM tbtco WHERE jobname = @ls_jobstart_conditions-jobname
-                                                      AND (    strtdate = '00000000' OR strtdate IS NULL
-                                                            OR strttime = '000000'   OR strttime IS NULL )   "COCKPIT-205
-                                                    INTO @DATA(lv_exists).
-                IF sy-subrc = 0.
-*             create initial csres line
-                  CLEAR ls_sqlcsres_tmp.
-                  ls_sqlcsres_tmp = ls_sqlcsres.
-                  CLEAR ls_sqlcsres_tmp-ress_guid.
-
-                  CALL FUNCTION 'GUID_CREATE'
-                    IMPORTING
-                      ev_guid_16 = ls_sqlcsres_tmp-list_guid.
-                  INSERT INTO /cadaxo/sqlcsres VALUES ls_sqlcsres_tmp.
-                ENDIF.
-              ENDIF.
+*  "COCKPIT-488 DEL
+*              IF l_event_periodic = abap_true.
+*                WAIT UP TO 2 SECONDS. "give Jobsystem some time to schedule next job COCKPIT-488
+*                add_record_next_job( is_sqlcsres = ls_sqlcsres
+*                                     i_btcjob    = ls_sqlcsres-jobname
+*                                     i_btcjobcnt = ls_sqlcsres-jobcount ).
+*              ENDIF.
+*  "COCKPIT-488 DEL END
 
             WHEN ls_jobstart_conditions-planned.
               CALL FUNCTION 'JOB_CLOSE'
@@ -4546,7 +4602,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                   prdmonths  = ls_tbtcjob-prdmonths
                   prdweeks   = ls_tbtcjob-prdweeks
                 EXCEPTIONS
-                  OTHERS     = 9.
+                  OTHERS     = 1.
             WHEN ls_jobstart_conditions-scheduled.
               CALL FUNCTION 'JOB_CLOSE'
                 EXPORTING
@@ -4572,11 +4628,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD FILL_USED_SYMBOLS.
+  METHOD fill_used_symbols.
 
-  DATA: lv_sql_string TYPE string.
-  DATA: lt_results    TYPE match_result_tab.
-  FIELD-SYMBOLS: <ls_result> LIKE LINE OF lt_results.
+    DATA: lv_sql_string TYPE string.
+    DATA: lt_results    TYPE match_result_tab.
+    FIELD-SYMBOLS: <ls_result> LIKE LINE OF lt_results.
 
     IF gc_abap_editor IS INITIAL AND gc_abap_editor_text IS INITIAL.
       RETURN.
@@ -4590,15 +4646,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         e_result_tab   =     lt_results
     ).
 
-      LOOP AT lt_results ASSIGNING <ls_result>.
+    LOOP AT lt_results ASSIGNING <ls_result>.
 
-        DATA(l_from) = <ls_result>-offset + 1.
-        DATA(l_length) = <ls_result>-length - 2.
+      DATA(l_from) = <ls_result>-offset + 1.
+      DATA(l_length) = <ls_result>-length - 2.
 
-        DATA(l_symbol_name) = lv_sql_string+l_from(l_length).
-        APPEND to_upper( l_symbol_name ) TO rt_symbols.
+      DATA(l_symbol_name) = lv_sql_string+l_from(l_length).
+      APPEND to_upper( l_symbol_name ) TO rt_symbols.
 
-      ENDLOOP.
+    ENDLOOP.
 
   ENDMETHOD.
 
@@ -4653,10 +4709,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -4933,136 +4989,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD get_csv_from_int_tab.
-
-    DATA lv_output_line  TYPE string.
-    DATA lv_tmp_dats     TYPE char30.
-    DATA lv_tmp_out      TYPE string.
-
-    ASSIGN gt_lvc_t_fcat[ i_grid_i ] TO FIELD-SYMBOL(<lt_fields>).
-
-    LOOP AT <lt_fields> ASSIGNING FIELD-SYMBOL(<ls_field>).
-      lv_output_line = lv_output_line && ';' && <ls_field>-fieldname.
-    ENDLOOP.
-
-    SHIFT lv_output_line BY 1 PLACES.
-    APPEND lv_output_line TO ev_output_csv.
-
-    LOOP AT it_table ASSIGNING FIELD-SYMBOL(<ls_result>).
-
-      CLEAR lv_output_line.
-
-      LOOP AT <lt_fields> ASSIGNING <ls_field>.
-        ASSIGN COMPONENT <ls_field>-fieldname OF STRUCTURE <ls_result> TO FIELD-SYMBOL(<ls_line>).
-
-        IF <ls_field>-inttype = 'D' OR <ls_field>-inttype = 'T'.
-          " Export Date and Time in user format
-          WRITE <ls_line> TO lv_tmp_dats.
-          lv_output_line = lv_output_line && ';' && lv_tmp_dats.
-        ELSEIF <ls_field>-inttype = 'C' AND ( <ls_line> CP '*;*' OR <ls_line> CP '*"*' ).
-          " If Separator or Single Quotes are in Field Then Do same behavior as Excel -> CSV
-          lv_tmp_out = <ls_line>.
-          REPLACE ALL OCCURRENCES OF '"' IN lv_tmp_out WITH '""'.
-          lv_tmp_out = '"' && lv_tmp_out && '"'.
-          lv_output_line = lv_output_line && ';' && lv_tmp_out.
-        ELSE.
-          lv_output_line = lv_output_line && ';' && <ls_line>.
-        ENDIF.
-      ENDLOOP.
-
-      SHIFT lv_output_line BY 1 PLACES.
-      APPEND lv_output_line TO ev_output_csv.
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD get_csv_from_int_tab_cust.
-
-    DATA lv_output_line  TYPE string.
-    DATA lv_tmp_dats     TYPE char30.
-    DATA lv_tmp_out      TYPE string.
-    DATA ls_csv_attr TYPE /cadaxo/sqlc_csv_cust.
-
-    DATA lv_cancel TYPE abap_bool.
-    CALL FUNCTION '/CADAXO/SQLC_CUSTOM_CSV_POPUP'
-      IMPORTING
-        ev_cancel   = lv_cancel
-      CHANGING
-        cs_csv_attr = ls_csv_attr.
-
-    IF lv_cancel = abap_true.
-      ev_cancel = abap_true.
-      RETURN.
-    ENDIF.
-
-    DATA(lv_separator) =   /cadaxo/cl_sqlc_csv_cust_util=>get_separator( EXPORTING i_separator_setting =  ls_csv_attr-field_separator
-                                                                                   i_separator_others  =  ls_csv_attr-field_separator_other ).
-
-    ASSIGN gt_lvc_t_fcat[ i_grid_i ] TO FIELD-SYMBOL(<lt_fields>).
-
-    IF ls_csv_attr-add_header = abap_true.
-      LOOP AT <lt_fields> ASSIGNING FIELD-SYMBOL(<ls_field>).
-        lv_output_line = lv_output_line && lv_separator && <ls_field>-fieldname.
-      ENDLOOP.
-
-      SHIFT lv_output_line BY 1 PLACES.
-      APPEND lv_output_line TO ev_output_csv.
-    ENDIF.
-
-    LOOP AT it_table ASSIGNING FIELD-SYMBOL(<ls_result>).
-      CLEAR lv_output_line.
-
-      LOOP AT <lt_fields> ASSIGNING <ls_field>.
-        ASSIGN COMPONENT <ls_field>-fieldname OF STRUCTURE <ls_result> TO FIELD-SYMBOL(<ls_line>).
-
-        IF  <ls_field>-inttype = 'T'.
-          " Export Date and Time in user format
-          lv_tmp_dats = /cadaxo/cl_sqlc_csv_cust_util=>convert_time(
-                            EXPORTING
-                              i_time_type       = ls_csv_attr-time_format
-                              i_time_int        = <ls_line> ).
-          lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
-        ELSEIF <ls_field>-inttype = 'D'.
-          lv_tmp_dats = /cadaxo/cl_sqlc_csv_cust_util=>convert_date(
-                            EXPORTING
-                              i_date_type       = ls_csv_attr-date_format
-                              i_date            = <ls_line> ).
-          lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
-        ELSEIF <ls_field>-inttype = 'C' AND ( <ls_line> CP |*{ lv_separator }*| OR <ls_line> CP '*"*' ).
-          " If Separator or Single Quotes are in Field Then Do same behavior as Excel -> CSV
-          lv_tmp_out = <ls_line>.
-          REPLACE ALL OCCURRENCES OF '"' IN lv_tmp_out WITH '""'.
-          lv_tmp_out = '"' && lv_tmp_out && '"'.
-          lv_output_line = lv_output_line && lv_separator && lv_tmp_out.
-        ELSE.
-          lv_output_line = lv_output_line && lv_separator && <ls_line>.
-        ENDIF.
-      ENDLOOP.
-
-      SHIFT lv_output_line BY 1 PLACES.
-      APPEND lv_output_line TO ev_output_csv.
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD get_csv_line_from_tab.
-
-    LOOP AT it_csv_tab INTO DATA(ls_tab_line).
-      IF sy-tabix = 1.
-        rv_csv_line = ls_tab_line.
-      ELSE.
-        rv_csv_line = rv_csv_line && cl_abap_char_utilities=>cr_lf && ls_tab_line.
-      ENDIF.
-      CLEAR ls_tab_line.
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
   METHOD get_current_grid_number.
 
     DATA lcl_gui_control TYPE REF TO cl_gui_control.
@@ -5229,7 +5155,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *------------+----------------------+---------------------------------------------+----------------*
 * 06.07.2014 | Dieter Schadler      | Job Aggregatsfunktion                       | 22-005,#138    *
 *------------+----------------------+---------------------------------------------+----------------*
-* 05.08.2013 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Sum Overflow                                | RT145          *
+* 05.08.2013 | Fößleitner Johann    | Sum Overflow                                | RT145          *
 *------------+----------------------+---------------------------------------------+----------------*
 * 14.11.2014 | Ana Lekic            | show result from saved list, without        | RT244          *
 *            |                      | the refresh-button                          |                *
@@ -5353,10 +5279,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.06.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -5364,10 +5290,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 09.09.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    |                                             | CDX001-0011    *
+* 09.09.2010 | Fößleitner Johann    |                                             | CDX001-0011    *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 16.07.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Support also selected areas in old editor   | CDX130-028     *
+* 16.07.2012 | Fößleitner Johann    | Support also selected areas in old editor   | CDX130-028     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.08.2014 | RenÃƒÂ© Rammer          | Set headerline in Result ALV                | CR22-034       *
@@ -5655,10 +5581,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
            symbol_datatype                                                "COCKPIT-240
            FROM /cadaxo/sqlcusym
              INTO CORRESPONDING FIELDS OF TABLE lt_user_symbol
-             WHERE username = sy-uname
-           ORDER BY symbol_name.                                          "COCKPIT-240
+             WHERE username = sy-uname.
+*             ORDER BY symbol_name.                                          "COCKPIT-240 "COCKPIT-403
     IF sy-subrc = 0.
-
+      SORT lt_user_symbol BY symbol_name."COCKPIT-403
       LOOP AT lt_user_symbol ASSIGNING <ls_user_symbol>.
 
         "     Get Multi Values Count
@@ -5748,12 +5674,12 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     IF g_user_settings-only_used_symbols = 'X'.               "CR22-002
 *      SORT gt_used_symbols.                                   "CR22-002 "*-Cockpit-431
 * begin of insert Cockpit-431
-    IF   gt_used_symbols IS NOT INITIAL.
-     DATA(lt_used_symbols) = gt_used_symbols.
-    ELSE.
-     lt_used_symbols = me->fill_used_symbols( ).
-    ENDIF.
-    SORT lt_used_symbols.
+      IF   gt_used_symbols IS NOT INITIAL.
+        DATA(lt_used_symbols) = gt_used_symbols.
+      ELSE.
+        lt_used_symbols = me->fill_used_symbols( ).
+      ENDIF.
+      SORT lt_used_symbols.
 * end of insert Cockpit-431
       LOOP AT gt_symbol INTO ls_symbol.                       "CR22-002
         lv_tabix = sy-tabix.                                  "CR22-002
@@ -5918,7 +5844,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * 09.11.2010 | Domi Bigl            | Symbols for global variant                  | CDX001-0020    *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 25.05.2012 | Johann FÃƒÂ¶ÃƒÅ¸leitner    | translate symbolname to upper case          | CDX130-009     *
+* 25.05.2012 | Johann Fößleitner    | translate symbolname to upper case          | CDX130-009     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
@@ -6077,7 +6003,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * set sql editor lines
       me->set_sql_area( i_codelines_t =  gs_sel_variant-t_sql  ).
 
-      MOVE-CORRESPONDING gs_sel_variant TO l_sqlcvari.
+      l_sqlcvari = CORRESPONDING #( gs_sel_variant ).
 
       l_sqlcvari-username = gs_sel_variant-cruser.
 
@@ -6144,42 +6070,30 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       ENDIF.
 
       me->get_symbols( ).
-
+      gc_symbol_alv->refresh_table_display( i_soft_refresh = abap_true ).
       gc_symbol_alv->get_frontend_layout( IMPORTING es_layout = ls_layout ).
       IF ls_layout-cwidth_opt <> abap_true.
         ls_layout-cwidth_opt = abap_true.
         gc_symbol_alv->set_frontend_layout( ls_layout ).
       ENDIF.
 
-    DATA(l_ctmenu3) = NEW cl_ctmenu( ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = conv #( |{ text-b46 } { gs_sel_variant-varname }| )
-                                                               disabled = abap_false ).
+      DATA(variant_menu_text) = CONV gui_text( |{ text-b46 } { gs_sel_variant-varname }| ).
+      DATA(variant_menu_disabled) =  abap_false .
 
-      gc_splitter_top_toolbar->set_static_ctxmenu(
-        EXPORTING
-          fcode                = 'SQLVARSET'
-          ctxmenu              = l_ctmenu3
-      ).
+    ELSE.
 
-    else.
-
-    l_ctmenu3 = NEW cl_ctmenu( ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = conv #( |{ text-b46 } | )
-                                                               disabled = abap_true ).
-
-      gc_splitter_top_toolbar->set_static_ctxmenu(
-        EXPORTING
-          fcode                = 'SQLVARSET'
-          ctxmenu              = l_ctmenu3
-      ).
-
+      variant_menu_text =  |{ text-b46 } |.
+      variant_menu_disabled =  abap_true .
 
     ENDIF.
 
+    DATA(l_ctmenu3) = NEW cl_ctmenu( ).
+    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
+    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text     = variant_menu_text
+                                                               disabled = variant_menu_disabled ).
 
-
+    gc_splitter_top_toolbar->set_static_ctxmenu(  fcode   = 'SQLVARSET'
+                                                  ctxmenu = l_ctmenu3 ).
 
   ENDMETHOD.
 
@@ -6830,13 +6744,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     IF <lt_result> IS NOT INITIAL.
 
 *Begin of Insert Cockpit-398
-      CALL METHOD me->get_csv_from_int_tab_cust
-        EXPORTING
-          it_table      = <lt_result>
-          i_grid_i      = i_grid_i
-        IMPORTING
-          ev_output_csv = iv_output_table
-          ev_cancel     = DATA(lv_cancel).
+      /cadaxo/cl_sqlc_csv_cust_util=>get_csv_from_itab( EXPORTING it_table      = <lt_result>
+                                                                  i_fieldcat    = <lt_fields>
+                                                        IMPORTING ev_output_csv = iv_output_table
+                                                                  ev_cancel     = DATA(lv_cancel) ).
+
       IF lv_cancel = abap_true.
         RETURN.
       ENDIF.
@@ -6891,7 +6803,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxxxxx                 *
@@ -7303,7 +7215,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxxxxx                 *
@@ -7314,12 +7226,12 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 04.08.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | After the insert, set the cursor to the     | CDX001-0006    *
+* 04.08.2010 | Fößleitner Johann    | After the insert, set the cursor to the     | CDX001-0006    *
 *            |                      | new position                                |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 09.09.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Split String at CR/LF                       | CDX001-0014    *
+* 09.09.2010 | Fößleitner Johann    | Split String at CR/LF                       | CDX001-0014    *
 *------------+----------------------+---------------------------------------------+----------------*
-* 08.03.2011 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add '~'                                     | CDX001-0022    *
+* 08.03.2011 | Fößleitner Johann    | Add '~'                                     | CDX001-0022    *
 *------------+----------------------+---------------------------------------------+----------------*
 * 24.02.2018 | Domi Bigl            | Insert after/between ' or `                 | COCKPIT-308    *
 *------------+----------------------+---------------------------------------------+----------------*
@@ -7441,10 +7353,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.06.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -7509,10 +7421,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -7943,10 +7855,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -7988,10 +7900,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -8037,7 +7949,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        *
@@ -8118,10 +8030,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.06.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -8129,7 +8041,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Bugfix Drag/Drop Dec fields with comma      | CDX130-006     *
+* 27.03.2012 | Fößleitner Johann    | Bugfix Drag/Drop Dec fields with comma      | CDX130-006     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.08.2014 | RenÃƒÂ© Rammer          | Bugfix Drag/Drop INT1 field                 | CR22-008       *
@@ -8466,7 +8378,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        *
@@ -8477,19 +8389,19 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 04.08.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Double-Click at column now possible         | CDX001-0006    *
+* 04.08.2010 | Fößleitner Johann    | Double-Click at column now possible         | CDX001-0006    *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 29.01.2011 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Send Infomessage if doubleclick at result   | FOE28012011    *
+* 29.01.2011 | Fößleitner Johann    | Send Infomessage if doubleclick at result   | FOE28012011    *
 *            |                      | list is not activated                       |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 08.03.2011 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Extrakt fieldvalue from header fieldname    | CDX001-0022    *
+* 08.03.2011 | Fößleitner Johann    | Extrakt fieldvalue from header fieldname    | CDX001-0022    *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 08.11.2011 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add Alias to fieldname                      | CDX001-0026    *
+* 08.11.2011 | Fößleitner Johann    | Add Alias to fieldname                      | CDX001-0026    *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Bugfix drag/drop dec-fields with comma      | CDX130-006     *
+* 27.03.2012 | Fößleitner Johann    | Bugfix drag/drop dec-fields with comma      | CDX130-006     *
 *------------+----------------------+---------------------------------------------+----------------*
 * 18.02.2017 | Domi Bigl            | Leading Spaces in Char Fields               | COCKPIT-125    *
 ****************************************************************************************************
@@ -8695,6 +8607,19 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         READ TABLE gt_cl_sql_parse INDEX 1 ASSIGNING <l_cl_sql_parse>.
         IF sy-subrc = 0.
 
+          IF <l_sql_template_alv>-template_name = me->c_template_name_odata.
+
+            TRY.
+                <l_cl_sql_parse>->check_sql_odata_syntax( ).
+              CATCH /cadaxo/cx_sqlc_syntax_error.
+                MESSAGE s163(/cadaxo/sqlc) DISPLAY LIKE 'E'.
+                RETURN.
+              CATCH /cadaxo/cx_sqlc_odata_gen.
+                MESSAGE s162(/cadaxo/sqlc) DISPLAY LIKE 'E'.
+                RETURN.
+            ENDTRY.
+          ENDIF.
+
           <l_cl_sql_parse>->parse_sql_ii( ).
 
           <l_cl_sql_parse>->parse_sql_where_columns( ).
@@ -8705,7 +8630,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                            i_templ_name   = <l_sql_template_alv>-template_name.
 
           lcl_template_class->execute_template_generation( ).
-
+          CLEAR: lcl_template_class. "COCKPIT-409
           "COCKPIT-274 BEGIN
           IF lines( <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen ) > 1.
             me->gt_cl_sql_parse = <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen. "me->gt_cl_sql_parse_beftempgen.
@@ -8755,10 +8680,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations : this method is called by the "right mouse" function of the abap editor *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -8766,7 +8691,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 25.01.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add SY-FIELDs to Context Menu               | CDX25012010    *
+* 25.01.2010 | Fößleitner Johann    | Add SY-FIELDs to Context Menu               | CDX25012010    *
 *------------+----------------------+---------------------------------------------+----------------*
 * 18.09.2017 | Harald Wiesinger     | Add Pretty Printer to Context Menu          | COCKPIT-260    *
 *------------+----------------------+---------------------------------------------+----------------*
@@ -8779,6 +8704,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     menu->add_function( fcode = c_cmd_insert_table      text  = text-b04 ).
     menu->add_function( fcode = c_cmd_insert_cds_entity text = text-b38 ).
     menu->add_function( fcode = c_cmd_insert_sy_field   text  = text-b05 ). "CDX25012010
+"    menu->add_function( fcode = c_cmd_insert_cc         text = text-b49 ). "COCKPIT-474 'Insert Code Completion'
+    menu->add_function( fcode = c_cmd_insert_header     text = text-b50 ). "COCKPIT-472 'Insert Header
     menu->add_function( fcode = c_cmd_pp                text = text-b34 ).  "COCKPIT-260
 
     lr_submenu_symbols = NEW #( ).
@@ -8806,7 +8733,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxx                    *
@@ -8817,7 +8744,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 25.01.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Insert SY-Fields                            | CDX25012010    *
+* 25.01.2010 | Fößleitner Johann    | Insert SY-Fields                            | CDX25012010    *
 *------------+----------------------+---------------------------------------------+----------------*
 * 18.09.2017 | Harald Wiesinger     | Add Pretty Printer to Context Menu          | COCKPIT-260    *
 *------------+----------------------+---------------------------------------------+----------------*
@@ -8860,6 +8787,16 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           MOVE l_tabname TO l_string.
           me->insert_table_to_editor( EXPORTING i_string = l_string ).
         ENDIF.
+*      WHEN c_cmd_insert_cc.     "COCKPIT-474
+*        /cadaxo/cl_sqlc_cockpit_assist=>code_completion( EXPORTING i_abap_editor = gc_abap_editor
+*                                                         IMPORTING e_string      = l_string ).
+*        IF sy-subrc = 0 AND NOT l_string IS INITIAL.
+*          me->insert_table_to_editor( EXPORTING i_string = l_string  ).
+*        ENDIF.
+      WHEN c_cmd_insert_header. "COCKPIT-472
+        /cadaxo/cl_sqlc_cockpit_assist=>insert_select_header(
+                  CHANGING co_abap_editor = gc_abap_editor ).
+
       WHEN c_cmd_insert_sy_field. "insert system fields                    "CDX25012010
         /cadaxo/cl_sqlc_cockpit_assist=>value_help_sy_fields(          "CDX25012010
                           IMPORTING e_fieldname = l_string             "CDX25012010
@@ -9023,10 +8960,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -9051,6 +8988,42 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
        iv_sqlstring = lr_drag_object->fieldvalue
        i_set_focus = abap_true
     ).
+
+  ENDMETHOD.
+
+
+  METHOD on_editor_insert_pattern.
+
+    "COCKPIT-481 Code Completion Insertation
+    DATA settings TYPE cl_abap_parser=>t_user_settings.
+
+    DATA(lr_parser) = NEW cl_abap_parser( m_max_components = 30 ).
+* get insertion text
+    lr_parser->calculate_insertion_result(
+      EXPORTING kind           = datatype
+                identifier     = patternkey
+                pattern        = abap_true
+                settings       = settings
+                dialog_allowed = abap_true " called in GUI context
+      IMPORTING compl_text     = DATA(compl_text)
+                beg_xpos       = DATA(beg_xpos)
+                success        = DATA(success) ).
+
+    IF success = abap_true.
+*   Set insertion position and mark selection
+      sender->select_range(
+        EXPORTING from_line = ypos
+                  from_pos  = xpos
+                  to_line   = ypos
+                  to_pos    = xpos
+        EXCEPTIONS OTHERS   = 1 ).
+
+*   Replace selection by new entry
+      sender->set_selected_text_as_table( EXPORTING table = compl_text ).
+
+*   Refocus editor window (req'd for 710 GUI)
+      sender->set_focus( EXPORTING control = sender ).
+    ENDIF.
 
   ENDMETHOD.
 
@@ -9165,7 +9138,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         CATCH cx_sy_invalid_regex.
       ENDTRY.
 
-      REPLACE ALL OCCURRENCES OF REGEX '[^a-zA-Z0-9_\\]' IN contextstring WITH space.
+      REPLACE ALL OCCURRENCES OF REGEX '[^a-zA-Z0-9_\\\/]' IN contextstring WITH space.
 
       IF contextstring CA '\'.
         /cadaxo/cl_sqlc_cockpit_assist=>get_cds_view_of_association(
@@ -9506,7 +9479,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2011               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : Domi Bigl                Company    : CADAXO GesmbH                    *
@@ -9517,7 +9490,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add STOP Function to cancel background jobs | CDX130-001     *
+* 27.03.2012 | Fößleitner Johann    | Add STOP Function to cancel background jobs | CDX130-001     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
@@ -9594,7 +9567,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add STOP Button to cancel Background Job    | CDX130-001     *
+* 27.03.2012 | Fößleitner Johann    | Add STOP Button to cancel Background Job    | CDX130-001     *
 *------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
 ****************************************************************************************************
@@ -9918,81 +9891,77 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     IF ls_col-fieldname IS NOT INITIAL. "cockpit-454
 
-    l_grid_name_i = l_grid_name+15.
+      l_grid_name_i = l_grid_name+15.
 
-    READ TABLE dref_result_tab_t INDEX l_grid_name_i ASSIGNING <lr_dref>.
-    ASSIGN <lr_dref>->* TO <lt_result_tab>.
-    READ TABLE <lt_result_tab> INDEX ls_row-index ASSIGNING <l_result_line>.
+      READ TABLE dref_result_tab_t INDEX l_grid_name_i ASSIGNING <lr_dref>.
+      ASSIGN <lr_dref>->* TO <lt_result_tab>.
+      READ TABLE <lt_result_tab> INDEX ls_row-index ASSIGNING <l_result_line>.
 
-    IF sy-subrc = 0.
-      ASSIGN COMPONENT ls_col-fieldname OF STRUCTURE <l_result_line> TO <l_result_field>.
-      DESCRIBE FIELD <l_result_field> TYPE DATA(l_typ).
-      IF l_typ = 'g' OR l_typ = 'C'.
-        length = strlen( <l_result_field> ).
-        IF length >= 128.
-          e_object->add_separator( ).
-          e_object->add_function( fcode = c_cmd_show_full_value text = text-q56 ).
+      IF sy-subrc = 0.
+        ASSIGN COMPONENT ls_col-fieldname OF STRUCTURE <l_result_line> TO <l_result_field>.
+        DESCRIBE FIELD <l_result_field> TYPE DATA(l_typ).
+        IF l_typ = 'g' OR l_typ = 'C'.
+          length = strlen( <l_result_field> ).
+          IF length >= 128.
+            e_object->add_separator( ).
+            e_object->add_function( fcode = c_cmd_show_full_value text = text-q56 ).
+          ENDIF.
         ENDIF.
       ENDIF.
-    ENDIF.
 
 
-    l_show_as_submenu = NEW cl_ctmenu( ).
+      l_show_as_submenu = NEW cl_ctmenu( ).
 
-    l_show_as_submenu->add_function(
-      EXPORTING
-        fcode             = c_cmd_show_value_as_html_brow
-        text              = text-q61
-    ).
-    l_show_as_submenu->add_function(
-      EXPORTING
-        fcode             = c_cmd_show_value_as_xml_brow
-        text              = text-q62
-    ).
+      l_show_as_submenu->add_function(
+        EXPORTING
+          fcode             = c_cmd_show_value_as_html_brow
+          text              = text-q61
+      ).
+      l_show_as_submenu->add_function(
+        EXPORTING
+          fcode             = c_cmd_show_value_as_xml_brow
+          text              = text-q62
+      ).
 
-    e_object->add_submenu(
-      EXPORTING
-        menu        = l_show_as_submenu
-        text        = text-q60
-    ).
+      e_object->add_submenu(
+        EXPORTING
+          menu        = l_show_as_submenu
+          text        = text-q60
+      ).
 
-    e_object->add_separator( ).
-    e_object->add_function( fcode = c_cmd_create_symbol text = 'Create Symbols'(002) ).
-    e_object->add_separator( ).
+      e_object->add_separator( ).
+      e_object->add_function( fcode = c_cmd_create_symbol text = 'Create Symbols'(002) ).
+      e_object->add_separator( ).
 
 * RT281 Begin
-    IF strlen( l_grid_name ) > 15.
-      l_grid_name_i = l_grid_name+15.
-      ASSIGN dref_result_tab_t[ l_grid_name_i ] TO <lr_dref>. "get reference of the partse
-      IF sy-subrc = 0.
-        l_index = sy-tabix.
-        READ TABLE gt_cl_sql_parse INDEX l_index ASSIGNING <lr_cl_sql_parse>.
-        IF sy-subrc = 0 AND <lr_cl_sql_parse>->g_saved_list = abap_true. "if it is a saved list, no edit function
-          RETURN.
+      IF strlen( l_grid_name ) > 15.
+        l_grid_name_i = l_grid_name+15.
+        ASSIGN dref_result_tab_t[ l_grid_name_i ] TO <lr_dref>. "get reference of the partse
+        IF sy-subrc = 0.
+          l_index = sy-tabix.
+          READ TABLE gt_cl_sql_parse INDEX l_index ASSIGNING <lr_cl_sql_parse>.
+          IF sy-subrc = 0 AND <lr_cl_sql_parse>->g_saved_list = abap_true. "if it is a saved list, no edit function
+            RETURN.
+          ENDIF.
         ENDIF.
       ENDIF.
-    ENDIF.
 * RR281 End
 
-    GET BADI lr_badi.
+      GET BADI lr_badi.
 
-    CALL BADI lr_badi->create
-      EXPORTING
-        i_object     = e_object
-        it_lvc_t_row = lt_lvc_t_row
-        i_row        = ls_row
-        i_col        = ls_col.
+      CALL BADI lr_badi->create
+        EXPORTING
+          i_object     = e_object
+          it_lvc_t_row = lt_lvc_t_row
+          i_row        = ls_row
+          i_col        = ls_col.
 
-  ENDIF. "+ cockpit-454
+    ENDIF. "+ cockpit-454
 
   ENDMETHOD.
 
 
   METHOD on_handle_result_end_of_page.
-
-    BREAK-POINT.
-*    CALL METHOD cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
-*    DATA(l_grid_name) = lcl_gui_control->get_name( ).
     WRITE: 'end of page testing"!'.
   ENDMETHOD.
 
@@ -10232,10 +10201,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -10243,7 +10212,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 26.07.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add Refresh Button                          |                *
+* 26.07.2012 | Fößleitner Johann    | Add Refresh Button                          |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 16.10.2016 | Domi Bigl            | code cleanup                                | COCKPIT-109    *
 ****************************************************************************************************
@@ -10513,10 +10482,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
           IF e_ucomm = 'EDIT'.
             SELECT SINGLE @abap_true FROM nriv INTO @DATA(lv_nr_exists) WHERE object = '/CADAXO/01'.
-              IF sy-subrc NE 0.
-               MESSAGE text-003 TYPE 'I'.
-               RETURN.
-              ENDIF.
+            IF sy-subrc NE 0.
+              MESSAGE text-003 TYPE 'I'.
+              RETURN.
+            ENDIF.
           ENDIF.
 
           READ TABLE dref_result_tab_t INTO l_dref_result_tab INDEX l_grid_name_i.
@@ -10864,7 +10833,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Developer               : Domi Bigl                Company    : CADAXO GesmbH                    *
 * Date                    : 01.09.2012               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 30.11.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -11054,10 +11023,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 03.02.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -11107,10 +11076,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -11118,7 +11087,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 18.04.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | New Buttons to select date/time and refresh | FOE18042010    *
+* 18.04.2010 | Fößleitner Johann    | New Buttons to select date/time and refresh | FOE18042010    *
 * 10.02.2018 | Pratik Patil         | Extended SQL Search  cockpit-359            |                *
 ****************************************************************************************************
 
@@ -11193,7 +11162,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
@@ -11204,7 +11173,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 12.09.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Set ICON Status                             | CDX001-0016    *
+* 12.09.2010 | Fößleitner Johann    | Set ICON Status                             | CDX001-0016    *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
@@ -11356,7 +11325,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        *
@@ -11367,7 +11336,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 17.07.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Show saved lists                            | CDX130-030     *
+* 17.07.2012 | Fößleitner Johann    | Show saved lists                            | CDX130-030     *
 *------------+----------------------+---------------------------------------------+----------------*
 * 24.02.2018 | Domi Bigl            | Show/Hide toolbar from Menu button          | COCKPIT-275    *
 *------------+----------------------+---------------------------------------------+----------------*
@@ -11457,29 +11426,29 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD ON_SAVED_LIST_MENU_CLICK.
+  METHOD on_saved_list_menu_click.
 
     IF e_ucomm = c_saved_list_share.
 
-    DATA(lr_menu) = NEW cl_ctmenu( ).
+      DATA(lr_menu) = NEW cl_ctmenu( ).
 
-    lr_menu->add_function(
-      EXPORTING
-        fcode = c_saved_list_share_oth
-        text  = text-b48
-        icon  = icon_workflow_external_event
-        insert_at_the_top = abap_true
-        checked           = abap_true "Cockpit-420 KA
-        ).
-    lr_menu->add_function(
-       EXPORTING
-        fcode = c_saved_list_share_me
-         text = text-b44
-        icon  = icon_workflow_internal_event ).
+      lr_menu->add_function(
+        EXPORTING
+          fcode = c_saved_list_share_oth
+          text  = text-b48
+          icon  = icon_workflow_external_event
+          insert_at_the_top = abap_true
+          checked           = abap_true "Cockpit-420 KA
+          ).
+      lr_menu->add_function(
+         EXPORTING
+          fcode = c_saved_list_share_me
+           text = text-b44
+          icon  = icon_workflow_internal_event ).
 
-    CALL METHOD e_object->add_menu
-      EXPORTING
-        menu = lr_menu.
+      CALL METHOD e_object->add_menu
+        EXPORTING
+          menu = lr_menu.
 
     ENDIF.
 
@@ -11493,7 +11462,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2012               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxx                Company    : CADAXO GesmbH                    *
@@ -11914,7 +11883,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
               iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-symbols
               it_symbols     = gt_symbol_selected
               iv_receiver    = CONV /cadaxo/sqlcapi_receiver( sy-uname )
-              iv_text        = TEXT-012.
+              iv_text        = text-012.
         ENDIF.
 * end   of insert cockpit-420
     ENDCASE.
@@ -12152,37 +12121,37 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     IF e_ucomm = 'SYMBOL_SHARE'.
 
-    DATA(lr_menu) = NEW cl_ctmenu( ).
+      DATA(lr_menu) = NEW cl_ctmenu( ).
 
-    lr_menu->add_function(
-      EXPORTING
-        fcode = 'SYMBOL_EXPORT'
-        text  = text-b47
-        icon  = icon_workflow_external_event
-        insert_at_the_top = abap_true
-        checked           = abap_true "Cockpit-420 KA
-        ).
-    lr_menu->add_function(
-       EXPORTING
-        fcode = 'SYMBOL_EXPORT_ME'
-         text = text-b44
-        icon  = icon_workflow_internal_event ).
+      lr_menu->add_function(
+        EXPORTING
+          fcode = 'SYMBOL_EXPORT'
+          text  = text-b47
+          icon  = icon_workflow_external_event
+          insert_at_the_top = abap_true
+          checked           = abap_true "Cockpit-420 KA
+          ).
+      lr_menu->add_function(
+         EXPORTING
+          fcode = 'SYMBOL_EXPORT_ME'
+           text = text-b44
+          icon  = icon_workflow_internal_event ).
 
-    CALL METHOD e_object->add_menu
-      EXPORTING
-        menu = lr_menu.
+      CALL METHOD e_object->add_menu
+        EXPORTING
+          menu = lr_menu.
 
     ENDIF.
 
   ENDMETHOD.
 
 
-  METHOD ON_TABBAR_TOOLBAR_FUNCSEL.
+  METHOD on_tabbar_toolbar_funcsel.
 
-    data code type string.
-    data number type n length 2.
+    DATA code TYPE string.
+    DATA number TYPE n LENGTH 2.
 
-    split fcode at '_' into code number.
+    SPLIT fcode AT '_' INTO code number.
 
     me->g_active_list_tab = number.
 
@@ -12198,10 +12167,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 03.02.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -12255,7 +12224,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : Domi Bigl                Company    : Cadaxo GmbH                      *
@@ -12328,6 +12297,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       WHEN 'EXECUTE'.
         me->store_sql_to_hist( ).
         me->execute_sql( ).
+        "        DATA: join TYPE REF TO /CADAXO/CL_SQLC_JOIN_COMPLET. "COCKPIT-474
+        "        join = NEW #( o_abapedit = me->gc_abap_editor ).
+        "        join->disassemble_sql( ). "* DUMP ~ SELECT ....AND PARTNER IN &PARTNER&
       WHEN 'SQL_BACK'.    "Go Back
         me->move_back_to_sql( ).
       WHEN 'SQL_FORW'.    "Go Next
@@ -12538,10 +12510,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -12575,10 +12547,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -12716,7 +12688,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 03.02.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        *
@@ -13391,9 +13363,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   METHOD save_clipboard.
 ****************************************************************************************************
 * Description ....... Save the content of the clipboard                                            *
-* Developer ......... Johann FÃƒÂ¶ÃƒÅ¸leitner       Date .... 03.02.2010                                 *
+* Developer ......... Johann Fößleitner       Date .... 03.02.2010                                 *
 * Status ............ xxxxxxxxx                                                                    *                                                                                                  *
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.06.2010                                                             *
 ****************************************************************************************************
 * Date       | User              | Description                                       |             *
@@ -13740,13 +13712,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 24.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add EndTime & EndDate to Jobmonitor         | CDX130-002     *
+* 24.03.2012 | Fößleitner Johann    | Add EndTime & EndDate to Jobmonitor         | CDX130-002     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Bugfix - create date/time timestampconvers. | CDX130-003     *
+* 27.03.2012 | Fößleitner Johann    | Bugfix - create date/time timestampconvers. | CDX130-003     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add nr. of selects to monitor             . | CDX130-004     *
+* 27.03.2012 | Fößleitner Johann    | Add nr. of selects to monitor             . | CDX130-004     *
 *------------+----------------------+---------------------------------------------+----------------*
 * 19.09.2014 | Harald Wiesinger     | Jobmonitor                                  |CDX22-003,CL4660*
 *            |                      |                                             |                *
@@ -13874,10 +13846,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -14043,10 +14015,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -14054,7 +14026,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 17.07.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add "Saved Lists" Area                      | CDX130-030     *
+* 17.07.2012 | Fößleitner Johann    | Add "Saved Lists" Area                      | CDX130-030     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
@@ -14101,10 +14073,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -14120,7 +14092,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 ****************************************************************************************************
 
 * set sql editor
-    IF me->g_abap_editor_type = 'A'.
+    IF me->g_abap_editor_type = editor_type-new.
       IF gc_abap_editor IS BOUND.
         gc_abap_editor->set_text(
           EXPORTING
@@ -14186,10 +14158,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
@@ -14200,9 +14172,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 29.08.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Use the trace user settings                 | CDX001-0008    *
+* 29.08.2010 | Fößleitner Johann    | Use the trace user settings                 | CDX001-0008    *
 *------------+----------------------+---------------------------------------------+----------------*
-* 17.07.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Show "Restart Message"                      | CDX130-029     *
+* 17.07.2012 | Fößleitner Johann    | Show "Restart Message"                      | CDX130-029     *
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
 *            |                      |                                             | RT235          *
@@ -14253,6 +14225,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ms_user_settings_xml-forwnavddleclipse    = i_settings-forwnavddleclipse.
     ms_user_settings_xml-forwnavdicteclipse   = i_settings-forwnavdicteclipse.
     ms_user_settings_xml-domaintext           = i_settings-domaintext.             "COCKPIT-458
+    ms_user_settings_xml-release_type         = i_settings-release_type.           "COCKPIT-98
+    ms_user_settings_xml-release_number       = i_settings-release_number.         "COCKPIT-98
 
     CASE abap_true.
       WHEN i_settings-hd_fieldname.
@@ -14266,7 +14240,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         ms_user_settings_xml-reswindoworientation = cs_windowresolution-horizontal.
       WHEN i_settings-result_window_vertical.
         ms_user_settings_xml-reswindoworientation = cs_windowresolution-vertical.
-      when i_settings-result_window_tab.
+      WHEN i_settings-result_window_tab.
         ms_user_settings_xml-reswindoworientation = cs_windowresolution-tab.
       WHEN OTHERS.
         ms_user_settings_xml-reswindoworientation = cs_windowresolution-matrix.
@@ -14332,7 +14306,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * refresh result list, if the user changed the window orientation
       IF l_settings-result_window_horizontal <> me->g_user_settings-result_window_horizontal OR
          l_settings-result_window_vertical   <> me->g_user_settings-result_window_vertical OR
-         l_settings-result_window_matrix     <> me->g_user_settings-result_window_matrix or
+         l_settings-result_window_matrix     <> me->g_user_settings-result_window_matrix OR
          l_settings-result_window_tab        <> me->g_user_settings-result_window_tab.
         me->show_result( ).
       ENDIF.
@@ -14409,7 +14383,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                                                               iv_saved_list_shared = gc_saved_list_shared ).
           CALL FUNCTION '/CADAXO/SQLC_SHARE'
             EXPORTING
-              iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-savedList
+              iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-savedlist
               is_saved_list  = saved_list_for_sharing
               iv_receiver    = iv_receiver "cockpit-420
               iv_text        = iv_text.    "cockpit-420
@@ -14465,10 +14439,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 03.02.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -14579,10 +14553,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add end date & end time to jobmonitor       | CDX130-002     *
+* 27.03.2012 | Fößleitner Johann    | Add end date & end time to jobmonitor       | CDX130-002     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Add nr. of selects to jobmonitor            | CDX130-003     *
+* 27.03.2012 | Fößleitner Johann    | Add nr. of selects to jobmonitor            | CDX130-003     *
 *            |                      |                                             |                *
 ****************************************************************************************************
 
@@ -14709,10 +14683,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -14930,7 +14904,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : Ana Lekic                Company    : CADAXO GesmbH                    *
@@ -14944,7 +14918,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * 29.05.2012 | Ana Lekic            | restricted lines info - jobs                | CDX130-017     *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 10.07.2014 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | bugfixing layout saved lists                | RT239          *
+* 10.07.2014 | Fößleitner Johann    | bugfixing layout saved lists                | RT239          *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 14.11.2014 | Ana Lekic            | no refresh button for a saved list          | RT244          *
@@ -15229,9 +15203,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       gs_splitter_results->set_grid( EXPORTING rows = 1 columns = 1 ).
     ENDIF.
 
-    if me->g_active_list_tab is initial.
+    IF me->g_active_list_tab IS INITIAL.
       me->g_active_list_tab = 1.
-    endif.
+    ENDIF.
 
     READ TABLE dref_result_tab_t ASSIGNING <lr_dref_result> INDEX me->g_active_list_tab.
     IF sy-subrc = 0.
@@ -15830,10 +15804,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.06.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -15891,6 +15865,41 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD tippsandtricks.
+    DATA lv_release_type TYPE /cadaxo/sqlcrelease_type.
+
+    /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value( EXPORTING  i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
+                                                         RECEIVING  r_parameter_value   = DATA(lv_version)
+                                                         EXCEPTIONS parameter_not_found = 1 ).
+
+    IF me->g_user_settings-release_type EQ space.
+      me->g_user_settings-release_type = /cadaxo/cl_sqlc_cockpit_main=>c_release_type_always.
+      me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
+    ENDIF.
+
+    IF me->g_user_settings-release_type   EQ /cadaxo/cl_sqlc_cockpit_main=>c_release_type_always
+    OR me->g_user_settings-release_number NE lv_version.
+
+      CALL FUNCTION '/CADAXO/SQLCTIPPSANDTRICKS'
+        IMPORTING
+          ev_release_type = lv_release_type
+        EXCEPTIONS
+          cancel_by_user  = 1
+          OTHERS          = 2.
+
+      IF sy-subrc EQ 0.
+        IF lv_release_type IS NOT INITIAL.
+          me->g_user_settings-release_type = lv_release_type.
+        ENDIF.
+        me->g_user_settings-release_number = lv_version.
+        me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
+      ENDIF.
+
+    ENDIF.
+
+  ENDMETHOD.
+
+
   METHOD trigger_html.
 ****************************************************************************************************
 * Description             : Show home screen                                                       *
@@ -15930,10 +15939,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -15941,7 +15950,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 12.09.2010 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | To improve the performance, now we use the  | CDX001-0016    *
+* 12.09.2010 | Fößleitner Johann    | To improve the performance, now we use the  | CDX001-0016    *
 *            |                      | soft refresh                                |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.04.2016 | Ana Lekic            | take layout from user settings              | $002 COCKPIT-20*
@@ -16054,7 +16063,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD UPDATE_VARIANT.
+  METHOD update_variant.
 ****************************************************************************************************
 * Description             : Save Variant Method                                              *
 *--------------------------------------------------------------------------------------------------*
@@ -16076,10 +16085,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     DATA: l_string      TYPE string.
     DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t.           "COCKPIT-288 Insert
 
- IF gs_sel_variant IS INITIAL.
-    MESSAGE text-013 TYPE 'I'.
-    RETURN.
- ENDIF.
+    IF gs_sel_variant IS INITIAL.
+      MESSAGE text-013 TYPE 'I'.
+      RETURN.
+    ENDIF.
 
     me->get_sql_area( IMPORTING e_code_string = l_string ).
 
@@ -16103,8 +16112,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * execute create variant popup
       CALL FUNCTION '/CADAXO/SQLC_CREATE_VARIANT_UI'
         EXPORTING
-          i_mode     = 'I'
-          il_variant = gs_sel_variant
+          i_mode         = 'I'
+          il_variant     = gs_sel_variant
           i_mode_variant = 'U'. "COCKPIT-321 KA
 
     ELSE.
@@ -16121,10 +16130,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -16180,7 +16189,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
 * Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxx                    *
@@ -16211,10 +16220,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 01.03.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *
@@ -16222,7 +16231,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *                                                                                                  *
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
-* 27.10.2011 | FÃƒÂ¶ÃƒÅ¸leitner Johann    | Support old frontend editor                 | CDX001-0027    *
+* 27.10.2011 | Fößleitner Johann    | Support old frontend editor                 | CDX001-0027    *
 *            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
@@ -16289,10 +16298,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * Additional informations :                                                                        *
 *                                                                                                  *
 *--------------------------------------------------------------------------------------------------*
-* Developer               : Johann FÃƒÂ¶ÃƒÅ¸leitner        Company    : CADAXO GesmbH                    *
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
 * Date                    : 01.01.2010               Release    : WAS 7.00                         *
 *--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver WahrstÃƒÂ¶tter       Company    : CADAXO GesmbH                    *
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
 * Date                    : 10.04.2010                                                             *
 *--------------------------------------------------------------------------------------------------*
 *                                                                                                  *

@@ -1,223 +1,223 @@
-class /CADAXO/CL_SQLC_VARIANTS definition
-  public
-  final
-  create public .
+CLASS /cadaxo/cl_sqlc_variants DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
 *"* public components of class /CADAXO/CL_SQLC_VARIANTS
 *"* do not include other source files here!!!
-public section.
+  PUBLIC SECTION.
 
-  data G_CC_TREE type ref to CL_GUI_CUSTOM_CONTAINER .
-  data G_COLUMN_TREE type ref to CL_GUI_COLUMN_TREE .
-  data G_CC_DESCRIPTION type ref to CL_GUI_CUSTOM_CONTAINER .
-  data G_TEXT_EDIT_DESCRIPTION type ref to CL_GUI_TEXTEDIT .
-  data G_CC_SPLITTER_ABAP_AND_VERS type ref to CL_GUI_CUSTOM_CONTAINER .
-  data G_SPLITTER_ABAP_VERS type ref to CL_GUI_SPLITTER_CONTAINER .
-  data G_CC_ABAP type ref to CL_GUI_CONTAINER .
-  data G_CC_SYMBOLS type ref to CL_GUI_CONTAINER .
-  data G_ABAP_EDITOR type ref to CL_GUI_ABAPEDIT .
-  data G_SYMBOLS type ref to CL_GUI_ALV_GRID .
-  data GS_IL_VARIANTS type /CADAXO/SQLC_IL_VARIANTS .
-  data G_MODE type CHAR1 .
-  data G_DESCRIPTION_LANGUAGE type LANGU .
-  data G_DESCRIPTION type /CADAXO/SQLCVARI_DESCR .
-  data G_DESCRIPTION_CHANGED type CHAR1 .
-  data G_MODE_VARIANT type CHAR1 .
+    DATA g_cc_tree TYPE REF TO cl_gui_custom_container .
+    DATA g_column_tree TYPE REF TO cl_gui_column_tree .
+    DATA g_cc_description TYPE REF TO cl_gui_custom_container .
+    DATA g_text_edit_description TYPE REF TO cl_gui_textedit .
+    DATA g_cc_splitter_abap_and_vers TYPE REF TO cl_gui_custom_container .
+    DATA g_splitter_abap_vers TYPE REF TO cl_gui_splitter_container .
+    DATA g_cc_abap TYPE REF TO cl_gui_container .
+    DATA g_cc_symbols TYPE REF TO cl_gui_container .
+    DATA g_abap_editor TYPE REF TO cl_gui_abapedit .
+    DATA g_abap_editor_text TYPE REF TO cl_gui_textedit .
+    DATA g_symbols TYPE REF TO cl_gui_alv_grid .
+    DATA gs_il_variants TYPE /cadaxo/sqlc_il_variants .
+    DATA g_mode TYPE char1 .
+    DATA g_description_language TYPE langu .
+    DATA g_description TYPE /cadaxo/sqlcvari_descr .
+    DATA g_description_changed TYPE char1 .
+    DATA g_mode_variant TYPE char1 .
 
-  methods FREE .
-  methods SET_MODE
-    importing
-      !I_MODE type CHAR1 .
-  methods PBO_0100 .
-  methods PBO_0200 .
-  methods SAVE_DESCRIPTION .
-  methods GET_DESCRIPTION_MODIF_STATUS
-    returning
-      value(R_MODIFIED_STATUS) type I .
-  methods SET_DESCRIPTION_MODIF_STATUS
-    importing
-      !I_MODIFIED_STATUS type I .
-  methods CONSTRUCTOR .
-  methods SET_DESCRIPTION_LANGU
-    importing
-      !I_LANGU type LANGU .
-  methods DESCRIPTION_CHANGED_DATA_LOST
-    returning
-      value(R_PROCEED) type CHAR1 .
-  methods INSERT_VARIANT
-    returning
-      value(RRC) type I .
-  methods SHOW_SEARCH_VARIANT_POPUP .
-  methods DOWNLOAD_VARIANTS
-    returning
-      value(RRC) type I .
-  methods UPLOAD_VARIANTS .
-protected section.
-
-  types:
-    BEGIN OF ty_search_variant,
+    METHODS free .
+    METHODS set_mode
+      IMPORTING
+        !i_mode TYPE char1 .
+    METHODS pbo_0100 .
+    METHODS pbo_0200 .
+    METHODS save_description .
+    METHODS get_description_modif_status
+      RETURNING
+        VALUE(r_modified_status) TYPE i .
+    METHODS set_description_modif_status
+      IMPORTING
+        !i_modified_status TYPE i .
+    METHODS constructor .
+    METHODS set_description_langu
+      IMPORTING
+        !i_langu TYPE langu .
+    METHODS description_changed_data_lost
+      RETURNING
+        VALUE(r_proceed) TYPE char1 .
+    METHODS insert_variant
+      RETURNING
+        VALUE(rrc) TYPE i .
+    METHODS show_search_variant_popup .
+    METHODS download_variants
+      RETURNING
+        VALUE(rrc) TYPE i .
+    METHODS upload_variants .
+  PROTECTED SECTION.
+    CONSTANTS: BEGIN OF editor_type,
+                 new TYPE char1 VALUE 'A' ##NO_TEXT,
+                 old TYPE char1 VALUE '',
+               END OF editor_type.
+    TYPES:
+      BEGIN OF ty_search_variant,
         uname TYPE string,
         table TYPE string,
         desc  TYPE string,
       END OF ty_search_variant .
 
-*"* protected components of class /CADAXO/CL_SQLC_VARIANTS
-*"* do not include other source files here!!!
-  class-data GT_NODE_VARI type TREEV_NTAB .
-  class-data:
-    gt_item_vari TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY .
-  data GT_IL_VNHD type /CADAXO/SQLC_IL_VN_T .
-  data GT_IL_VNGR type /CADAXO/SQLC_IL_VNGR_T .
-  data GT_IL_VNTX type /CADAXO/SQLC_IL_VNTX_T .
-  data GT_SYMBOLS type /CADAXO/SQLC_SYMBOL_T .
-  data G_BEHAVIOUR_VARIANT type ref to CL_DRAGDROP .
-  data G_BEHAVIOUR_GROUP type ref to CL_DRAGDROP .
-  data G_BEHAVIOUR_FAVORITE type ref to CL_DRAGDROP .
-  data G_HANDLE_TREE_VARIANT type I .
-  data G_HANDLE_TREE_GROUP type I .
-  data G_HANDLE_TREE_FAVORITE type I .
-  data G_DRAG_DROP_OBJECT type ref to LCL_DRAG_OBJECT .
-  data GT_IL_VNFA type /CADAXO/SQLC_IL_VNFA_T .
-  data GT_SQLCVARGRPNODE_KEYS type /CADAXO/SQLCVARGRPNODE_KEYS_T .
-  data G_NODE_KEY_POS type LVC_NKEY .
-  constants C_NODE_KEY_ROOT type LVC_NKEY value 'ROOT' ##NO_TEXT.
-  constants C_NODE_KEY_MY_FAVORITES type LVC_NKEY value 'MY_FAVORITES' ##NO_TEXT.
-  data GR_USER_LOG type ref to /CADAXO/CL_SQLC_USER_LOG .
-  data G_VARGUID_FOCUS type /CADAXO/SQLC_VARIANT_GUID .
-  data GS_VARIANT_SEARCH type TY_SEARCH_VARIANT .
-  data GC_TREE_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GC_CUSTOM_TREE_TOOLBAR type ref to CL_GUI_CUSTOM_CONTAINER .
-  data GT_TREE_TOOLBAR_BUTTONS type TTB_BUTTON .
-  data G_CURRENT_NODE_KEY type TV_NODEKEY .
+    CLASS-DATA gt_node_vari TYPE treev_ntab .
+    CLASS-DATA: gt_item_vari TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY.
+    DATA abap_editor_type LIKE /cadaxo/cl_sqlc_variants=>editor_type-old.
+    DATA gt_il_vnhd TYPE /cadaxo/sqlc_il_vn_t .
+    DATA gt_il_vngr TYPE /cadaxo/sqlc_il_vngr_t .
+    DATA gt_il_vntx TYPE /cadaxo/sqlc_il_vntx_t .
+    DATA gt_symbols TYPE /cadaxo/sqlc_symbol_t .
+    DATA g_behaviour_variant TYPE REF TO cl_dragdrop .
+    DATA g_behaviour_group TYPE REF TO cl_dragdrop .
+    DATA g_behaviour_favorite TYPE REF TO cl_dragdrop .
+    DATA g_handle_tree_variant TYPE i .
+    DATA g_handle_tree_group TYPE i .
+    DATA g_handle_tree_favorite TYPE i .
+    DATA g_drag_drop_object TYPE REF TO lcl_drag_object .
+    DATA gt_il_vnfa TYPE /cadaxo/sqlc_il_vnfa_t .
+    DATA gt_sqlcvargrpnode_keys TYPE /cadaxo/sqlcvargrpnode_keys_t .
+    DATA g_node_key_pos TYPE lvc_nkey .
+    CONSTANTS c_node_key_root TYPE lvc_nkey VALUE 'ROOT' ##NO_TEXT.
+    CONSTANTS c_node_key_my_favorites TYPE lvc_nkey VALUE 'MY_FAVORITES' ##NO_TEXT.
+    DATA gr_user_log TYPE REF TO /cadaxo/cl_sqlc_user_log .
+    DATA g_varguid_focus TYPE /cadaxo/sqlc_variant_guid .
+    DATA gs_variant_search TYPE ty_search_variant .
+    DATA gc_tree_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gc_custom_tree_toolbar TYPE REF TO cl_gui_custom_container .
+    DATA gt_tree_toolbar_buttons TYPE ttb_button .
+    DATA g_current_node_key TYPE tv_nodekey .
 
-  methods REFRESH_TREE_VARIANTS .
-  methods SEARCH_VARIANT
-    importing
-      !IV_VARIANT type /CADAXO/SQLC_IL_VN
-      !IV_PROCESSED type I
-    returning
-      value(RV_FOUND) type ABAP_BOOL .
-  methods SEARCH_FOR_DESC
-    importing
-      !I_VARGUID type /CADAXO/SQLC_VARIANT_GUID
-      !I_DESC type STRING
-    returning
-      value(RV_FOUND) type ABAP_BOOL .
-  methods SEARCH_FOR_TABLE
-    importing
-      !I_VARGUID type /CADAXO/SQLC_VARIANT_GUID
-      !I_TABLE type STRING
-    returning
-      value(RV_FOUND) type ABAP_BOOL .
-  methods SET_VARIANT_TO_GLOBAL
-    importing
-      !I_NODE_KEY type /CADAXO/SQLC_FOLDER_NODE_KEY .
-  methods SET_VARIANT_TO_LOCAL
-    importing
-      !I_NODE_KEY type /CADAXO/SQLC_FOLDER_NODE_KEY .
-  methods DELETE_VARIANT
-    importing
-      !I_NODE_KEY type /CADAXO/SQLC_FOLDER_NODE_KEY .
-  methods RENAME_VARIANT
-    importing
-      !I_NODE_KEY type /CADAXO/SQLC_FOLDER_NODE_KEY .
-  methods TREE_DOWNLOAD_VARIANT
-    importing
-      !I_NODE_KEY type /CADAXO/SQLC_FOLDER_NODE_KEY .
-  methods TRANSPORT_VARIANT
-    importing
-      !I_NODE_KEY type /CADAXO/SQLC_FOLDER_NODE_KEY .
-  methods GET_VARGROUP_OF_NODE_KEY
-    importing
-      !I_NODE_KEY type /CADAXO/SQLCNODE_KEY
-    returning
-      value(R_VARGROUP) type /CADAXO/SQLCVARI_GROUP .
-  methods REMOVE_FAVORITE
-    importing
-      !I_NODE_KEY type /CADAXO/SQLC_FOLDER_NODE_KEY .
-  methods SHARE_VARIANT
-    importing
-      !I_NODE_KEY type /CADAXO/SQLC_FOLDER_NODE_KEY .
-  methods GET_USER_FAVORITES .
-  methods CREATE_SPLITTER_ABAP_AND_SYMB .
-  methods CREATE_TEXT_EDIT_DESCRIPTION .
-  methods CREATE_TREE_DRAGDROP_BEHAVIOUR .
-  methods CREATE_TREE_GROUP .
-  methods CREATE_0100_CONTROLS .
-  methods CREATE_0200_CONTROLS .
-  methods BUILD_TREE_VARIANTS .
-  methods ON_DOUBLE_CLICK_TREE_VARI_ITEM
-    for event ITEM_DOUBLE_CLICK of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY
-      !ITEM_NAME .
-  methods ON_DOUBLE_CLICK_TREE_VARI_NODE
-    for event NODE_DOUBLE_CLICK of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY .
-  methods ON_TREE_DRAG
-    for event ON_DRAG of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY
-      !ITEM_NAME
-      !DRAG_DROP_OBJECT .
-  methods ON_TREE_DROP
-    for event ON_DROP of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY
-      !DRAG_DROP_OBJECT .
-  methods ON_NODE_CONTEXT_MENU_REQ
-    for event NODE_CONTEXT_MENU_REQUEST of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY
-      !MENU .
-  methods ON_ITEM_CONTEXT_MENU_REQ
-    for event ITEM_CONTEXT_MENU_REQUEST of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY
-      !MENU .
-  methods ON_NODE_CONTEXT_MENU_SEL
-    for event NODE_CONTEXT_MENU_SELECT of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY
-      !FCODE .
-  methods ON_ITEM_CONTEXT_MENU_SEL
-    for event ITEM_CONTEXT_MENU_SELECT of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY
-      !FCODE .
-  methods GET_VARIANTS_AND_GROUPS .
-  methods SET_DESCRIPTION .
-  methods FOLDER_TOGGLE
-    importing
-      !IV_NODE_KEY type TV_NODEKEY .
-  methods CREATE_TREE_TOOLBAR .
-  methods ON_TREE_TOOLBAR_FUNCSEL
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE .
-  methods ON_SELECTION_CHANGED
-    for event SELECTION_CHANGED of CL_GUI_COLUMN_TREE
-    importing
-      !NODE_KEY .
-  methods SET_TREE_TOOLBAR
-    importing
-      !NODE_KEY type TV_NODEKEY .
-  methods ADD_TO_FAVORITES
-    importing
-      !NODE_KEY type TV_NODEKEY .
-  methods REMOVE_FROM_FAVORITES
-    importing
-      !NODE_KEY type TV_NODEKEY .
-  methods UNDO_SEARCH_VARIANT .
-private section.
-*"* private components of class /CADAXO/CL_SQLC_VARIANTS
-*"* do not include other source files here!!!
+    METHODS refresh_tree_variants .
+    METHODS search_variant
+      IMPORTING
+        !iv_variant     TYPE /cadaxo/sqlc_il_vn
+        !iv_processed   TYPE i
+      RETURNING
+        VALUE(rv_found) TYPE abap_bool .
+    METHODS search_for_desc
+      IMPORTING
+        !i_varguid      TYPE /cadaxo/sqlc_variant_guid
+        !i_desc         TYPE string
+      RETURNING
+        VALUE(rv_found) TYPE abap_bool .
+    METHODS search_for_table
+      IMPORTING
+        !i_varguid      TYPE /cadaxo/sqlc_variant_guid
+        !i_table        TYPE string
+      RETURNING
+        VALUE(rv_found) TYPE abap_bool .
+    METHODS set_variant_to_global
+      IMPORTING
+        !i_node_key TYPE /cadaxo/sqlc_folder_node_key .
+    METHODS set_variant_to_local
+      IMPORTING
+        !i_node_key TYPE /cadaxo/sqlc_folder_node_key .
+    METHODS delete_variant
+      IMPORTING
+        !i_node_key TYPE /cadaxo/sqlc_folder_node_key .
+    METHODS rename_variant
+      IMPORTING
+        !i_node_key TYPE /cadaxo/sqlc_folder_node_key .
+    METHODS tree_download_variant
+      IMPORTING
+        !i_node_key TYPE /cadaxo/sqlc_folder_node_key .
+    METHODS transport_variant
+      IMPORTING
+        !i_node_key TYPE /cadaxo/sqlc_folder_node_key .
+    METHODS get_vargroup_of_node_key
+      IMPORTING
+        !i_node_key       TYPE /cadaxo/sqlcnode_key
+      RETURNING
+        VALUE(r_vargroup) TYPE /cadaxo/sqlcvari_group .
+    METHODS remove_favorite
+      IMPORTING
+        !i_node_key TYPE /cadaxo/sqlc_folder_node_key .
+    METHODS share_variant
+      IMPORTING
+        !i_node_key TYPE /cadaxo/sqlc_folder_node_key .
+    METHODS get_user_favorites .
+    METHODS create_splitter_abap_and_symb .
+    METHODS create_text_edit_description .
+    METHODS create_tree_dragdrop_behaviour .
+    METHODS create_tree_group .
+    METHODS create_0100_controls .
+    METHODS create_0200_controls .
+    METHODS build_tree_variants .
+    METHODS on_double_click_tree_vari_item
+          FOR EVENT item_double_click OF cl_gui_column_tree
+      IMPORTING
+          !node_key
+          !item_name .
+    METHODS on_double_click_tree_vari_node
+          FOR EVENT node_double_click OF cl_gui_column_tree
+      IMPORTING
+          !node_key .
+    METHODS on_tree_drag
+          FOR EVENT on_drag OF cl_gui_column_tree
+      IMPORTING
+          !node_key
+          !item_name
+          !drag_drop_object .
+    METHODS on_tree_drop
+          FOR EVENT on_drop OF cl_gui_column_tree
+      IMPORTING
+          !node_key
+          !drag_drop_object .
+    METHODS on_node_context_menu_req
+          FOR EVENT node_context_menu_request OF cl_gui_column_tree
+      IMPORTING
+          !node_key
+          !menu .
+    METHODS on_item_context_menu_req
+          FOR EVENT item_context_menu_request OF cl_gui_column_tree
+      IMPORTING
+          !node_key
+          !menu .
+    METHODS on_node_context_menu_sel
+          FOR EVENT node_context_menu_select OF cl_gui_column_tree
+      IMPORTING
+          !node_key
+          !fcode .
+    METHODS on_item_context_menu_sel
+          FOR EVENT item_context_menu_select OF cl_gui_column_tree
+      IMPORTING
+          !node_key
+          !fcode .
+    METHODS get_variants_and_groups .
+    METHODS set_description .
+    METHODS folder_toggle
+      IMPORTING
+        !iv_node_key TYPE tv_nodekey .
+    METHODS create_tree_toolbar .
+    METHODS on_tree_toolbar_funcsel
+          FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+          !fcode .
+    METHODS on_selection_changed
+          FOR EVENT selection_changed OF cl_gui_column_tree
+      IMPORTING
+          !node_key .
+    METHODS set_tree_toolbar
+      IMPORTING
+        !node_key TYPE tv_nodekey .
+    METHODS add_to_favorites
+      IMPORTING
+        !node_key TYPE tv_nodekey .
+    METHODS remove_from_favorites
+      IMPORTING
+        !node_key TYPE tv_nodekey .
+    METHODS undo_search_variant .
+
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_variants IMPLEMENTATION.
 
 
   METHOD add_to_favorites.
@@ -288,7 +288,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
             EXPORTING
               node_key          = node_key
               item_name         = '1'
-              t_image           = conv #( icon_system_favorites ) ).
+              t_image           = CONV #( icon_system_favorites ) ).
 
         ENDIF.
 
@@ -594,8 +594,14 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 
   METHOD constructor.
-
-    MOVE sy-langu TO me->g_description_language.
+    DATA: is_its TYPE char1.
+    CALL FUNCTION 'GUI_IS_ITS'
+      IMPORTING
+        return = is_its.
+    IF is_its = abap_true OR cl_gui_frontend_services=>activex <> gfw_true.
+      me->abap_editor_type = editor_type-old.
+    ENDIF.
+    me->g_description_language = sy-langu.
 
   ENDMETHOD.
 
@@ -720,13 +726,19 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
     g_cc_abap     = g_splitter_abap_vers->get_container( row = 1 column = 1 ).
     g_cc_symbols = g_splitter_abap_vers->get_container( row = 2 column = 1 ).
 
-* create abap editor
-    CREATE OBJECT g_abap_editor
-      EXPORTING
-        parent = g_cc_abap.
 
-    g_abap_editor->set_statusbar_mode( statusbar_mode = 0 ).
-    g_abap_editor->set_readonly_mode( readonly_mode = 1 ).
+* create abap editor
+    IF me->abap_editor_type = editor_type-new.
+      g_abap_editor = NEW #( g_cc_abap ).
+      g_abap_editor->set_statusbar_mode( 0 ).
+      g_abap_editor->set_readonly_mode( 1 ).
+    ELSE.
+      g_abap_editor_text = NEW #( g_cc_abap ).
+      g_abap_editor_text->set_statusbar_mode( 0 ).
+      g_abap_editor_text->set_readonly_mode( 1 ).
+    ENDIF.
+
+
 
     CREATE OBJECT g_symbols
       EXPORTING
@@ -1232,7 +1244,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD DOWNLOAD_VARIANTS.
+  METHOD download_variants.
 
     DATA l_mtext   TYPE mtext_d.
 
@@ -1304,11 +1316,12 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
       g_cc_splitter_abap_and_vers->free( ).
     ENDIF.
 
-    if not gc_custom_tree_toolbar is initial.
-       gc_custom_tree_toolbar->free( ).
-    endif.
+    IF NOT gc_custom_tree_toolbar IS INITIAL.
+      gc_custom_tree_toolbar->free( ).
+    ENDIF.
 
     FREE: g_abap_editor,
+          g_abap_editor_text,
           g_symbols,
           g_text_edit_description,
           g_column_tree,
@@ -1596,12 +1609,13 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 * set abap editor
       IF me->g_mode EQ 'G' OR me->g_mode EQ 'R'.
-        g_abap_editor->set_text(
-          EXPORTING
-            table           = gs_il_variants-t_sql
-          EXCEPTIONS
-            error_dp        = 1
-            OTHERS          = 2 ).
+        IF g_abap_editor IS BOUND.
+          g_abap_editor->set_text( EXPORTING  table  = gs_il_variants-t_sql
+                                   EXCEPTIONS OTHERS = 1 ).
+        ELSEIF g_abap_editor_text IS BOUND.
+          g_abap_editor_text->set_text_as_r3table( EXPORTING  table  = gs_il_variants-t_sql
+                                                   EXCEPTIONS OTHERS = 1 ).
+        ENDIF.
 
 * set symbols
         me->gt_symbols = gs_il_variants-t_symbol.
@@ -1642,13 +1656,14 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
       CLEAR me->gs_il_variants.
       CLEAR me->gt_symbols.
-      g_abap_editor->delete_text(
-        EXPORTING
-          from_line = 1
-          from_pos  = 1
-          to_line   = 999
-          to_pos    = 999
-      ).
+      IF g_abap_editor IS BOUND.
+        g_abap_editor->delete_text( from_line = 1
+                                    from_pos  = 1
+                                    to_line   = 999
+                                    to_pos    = 999 ).
+      ELSEIF g_abap_editor_text IS BOUND.
+        g_abap_editor_text->delete_text(  ).
+      ENDIF.
 
       me->g_symbols->refresh_table_display( ).
       g_text_edit_description->set_readonly_mode( 1 ).
@@ -1819,7 +1834,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method ON_SELECTION_CHANGED.
+  METHOD on_selection_changed.
 
     me->g_current_node_key = node_key.
 
@@ -1827,7 +1842,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
     me->set_tree_toolbar( node_key ).
 
-  endmethod.
+  ENDMETHOD.
 
 
   METHOD on_tree_drag.
@@ -1906,7 +1921,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
         IF node_key EQ 'MY_FAVORITES'.
 
-          me->ADD_TO_FAVORITES( lr_drag_drop_object->node_key ).
+          me->add_to_favorites( lr_drag_drop_object->node_key ).
 
         ELSE.
 
@@ -2118,7 +2133,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 ****************************************************************************************************
     DATA ls_sqlcvnfa TYPE /cadaxo/sqlcvnfa.
 
-    message x000(00). "???
+    MESSAGE x000(00). "???
 
     FIELD-SYMBOLS: <ls_variant>  LIKE LINE OF me->gt_il_vnhd.
 
@@ -2255,7 +2270,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 *            READ TABLE me->gt_il_vnhd WITH KEY varguid = <ls_variant>-varguid ASSIGNING FIELD-SYMBOL(<vnhd>)."-Cockpit-443
 *            IF sy-subrc EQ 0."-Cockpit-443
-             LOOP AT me->gt_il_vnhd ASSIGNING FIELD-SYMBOL(<vnhd>) WHERE varguid = <ls_variant>-varguid. "+Cockpit-443 "also select from favourite
+            LOOP AT me->gt_il_vnhd ASSIGNING FIELD-SYMBOL(<vnhd>) WHERE varguid = <ls_variant>-varguid. "+Cockpit-443 "also select from favourite
 
               <vnhd>-varname = CONV #( fields[ 1 ]-value ).
 
@@ -2273,7 +2288,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
               ).
 
               me->gs_il_variants-varname = <vnhd>-varname.
-             ENDLOOP.  "+Cockpit-443
+            ENDLOOP.  "+Cockpit-443
 *            ENDIF.
 
           CATCH /cadaxo/cx_sqlc_variant INTO lr_cx_sql_variant.
@@ -2652,14 +2667,14 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 *        l_button_public_state = abap_false.
 *        l_button_private_state = abap_false.
 *      ELSE.
-        IF line_exists( me->gt_il_vnhd[ varguid = <l_sqlcvari_alv>-varguid vargroup = 'MY_FAVORITES' ] ).
-          l_button_add_favorite_state = abap_false.
-          l_button_delete_favorite = abap_true.
-        ELSE.
-          l_button_add_favorite_state = abap_true.
-          l_button_delete_favorite = abap_false.
-        ENDIF.
-    "  ENDIF.
+      IF line_exists( me->gt_il_vnhd[ varguid = <l_sqlcvari_alv>-varguid vargroup = 'MY_FAVORITES' ] ).
+        l_button_add_favorite_state = abap_false.
+        l_button_delete_favorite = abap_true.
+      ELSE.
+        l_button_add_favorite_state = abap_true.
+        l_button_delete_favorite = abap_false.
+      ENDIF.
+      "  ENDIF.
 
     ELSE.
       l_button_state = abap_false.
@@ -2970,6 +2985,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
     DATA l_row_index TYPE i.
     DATA ls_il_vnfa  LIKE LINE OF me->gt_il_vnfa.
     DATA l_trkorr    TYPE trkorr.
+    DATA trtask      TYPE trkorr.
     DATA lt_e071     TYPE TABLE OF e071.
     DATA lt_e071k    TYPE TABLE OF e071k.
     DATA ls_e071     TYPE e071.
@@ -2993,24 +3009,22 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 * select the transport request
       CALL FUNCTION 'TR_ORDER_CHOICE_CORRECTION'
         EXPORTING
-          iv_category            = 'CUST'  "Customizing
-          iv_cli_dep             = 'X'
+          iv_category = 'CUST'  "Customizing
+          iv_cli_dep  = abap_true
         IMPORTING
-          ev_order               = l_trkorr
+          ev_order    = l_trkorr
+          ev_task     = trtask
         EXCEPTIONS
-          invalid_category       = 1
-          no_correction_selected = 2
-          OTHERS                 = 3.
+          OTHERS      = 3.
       IF sy-subrc EQ 0.
 
 * lock the transport request
         CALL FUNCTION 'ENQUEUE_E_TRKORR'
           EXPORTING
-            trkorr         = l_trkorr
+            trkorr       = l_trkorr
           EXCEPTIONS
-            foreign_lock   = 1
-            system_failure = 2
-            OTHERS         = 3.
+            foreign_lock = 1
+            OTHERS       = 3.
         IF sy-subrc  =    1.
           l_user = sy-msgv1.
           MESSAGE e009(/cadaxo/sqlc) WITH l_trkorr l_user.
@@ -3018,14 +3032,14 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 * fill the e071/e071k structures
           CLEAR: ls_e071, ls_e071k.
-          MOVE: l_trkorr           TO ls_e071-trkorr,
+          MOVE: trtask             TO ls_e071-trkorr,
                 'R3TR'             TO ls_e071-pgmid,
                 'TABU'             TO ls_e071-object,
                 '/CADAXO/SQLCVNHD' TO ls_e071-obj_name,
                 'K'                TO ls_e071-objfunc.
           APPEND ls_e071 TO lt_e071.
 
-          MOVE: l_trkorr           TO ls_e071k-trkorr,
+          MOVE: trtask             TO ls_e071k-trkorr,
                 'R3TR'             TO ls_e071k-pgmid,
                 'TABU'             TO ls_e071k-object,
                 '/CADAXO/SQLCVNHD' TO ls_e071k-objname,
@@ -3033,7 +3047,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
                 'TABU'             TO ls_e071k-mastertype.
 
 * build the table key
-          MOVE <ls_variant>-varguid TO l_varguid.
+          l_varguid = <ls_variant>-varguid.
           CONCATENATE sy-mandt l_varguid INTO ls_e071k-tabkey RESPECTING BLANKS.
 
           APPEND ls_e071k TO lt_e071k.
@@ -3041,7 +3055,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 * symbols
           CLEAR ls_e071.
-          MOVE: l_trkorr           TO ls_e071-trkorr,
+          MOVE: trtask             TO ls_e071-trkorr,
                 'R3TR'             TO ls_e071-pgmid,
                 'TABU'             TO ls_e071-object,
                 '/CADAXO/SQLCVNSY' TO ls_e071-obj_name,
@@ -3050,7 +3064,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
           CLEAR ls_e071k.
 
-          MOVE: l_trkorr           TO ls_e071k-trkorr,
+          MOVE: trtask             TO ls_e071k-trkorr,
                 'R3TR'             TO ls_e071k-pgmid,
                 'TABU'             TO ls_e071k-object,
                 '/CADAXO/SQLCVNSY' TO ls_e071k-objname,
@@ -3063,7 +3077,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 * texts
           CLEAR ls_e071.
-          MOVE: l_trkorr           TO ls_e071-trkorr,
+          MOVE: trtask             TO ls_e071-trkorr,
                 'R3TR'             TO ls_e071-pgmid,
                 'TABU'             TO ls_e071-object,
                 '/CADAXO/SQLCVNTX' TO ls_e071-obj_name,
@@ -3072,7 +3086,7 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
           CLEAR ls_e071k.
 
-          MOVE: l_trkorr           TO ls_e071k-trkorr,
+          MOVE: trtask             TO ls_e071k-trkorr,
                 'R3TR'             TO ls_e071k-pgmid,
                 'TABU'             TO ls_e071k-object,
                 '/CADAXO/SQLCVNTX' TO ls_e071k-objname,
@@ -3086,17 +3100,14 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 * add the objects to the transport request
           CALL FUNCTION 'TRINT_APPEND_COMM'
             EXPORTING
-              wi_sel_e071        = 'X'
-              wi_sel_e071k       = 'X'
-              wi_trkorr          = l_trkorr
+              wi_sel_e071  = abap_true
+              wi_sel_e071k = abap_true
+              wi_trkorr    = trtask
             TABLES
-              wt_e071            = lt_e071
-              wt_e071k           = lt_e071k
+              wt_e071      = lt_e071
+              wt_e071k     = lt_e071k
             EXCEPTIONS
-              e071k_append_error = 1
-              e071_append_error  = 2
-              trkorr_empty       = 3
-              OTHERS             = 4.
+              OTHERS       = 1.
           IF sy-subrc EQ 0.
 * unlock the transport request
             CALL FUNCTION 'DEQUEUE_E_TRKORR'
@@ -3187,12 +3198,13 @@ CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
       /cadaxo/cl_sqlc_variant=>get_variant( EXPORTING i_varguid      = varguid
                                             IMPORTING es_sqlcvari_il = gs_il_variants ).
 
-      g_abap_editor->set_text(
-        EXPORTING
-          table           = gs_il_variants-t_sql
-        EXCEPTIONS
-          error_dp        = 1
-          OTHERS          = 2 ).
+      IF g_abap_editor IS BOUND.
+        g_abap_editor->set_text( EXPORTING  table  = gs_il_variants-t_sql
+                                 EXCEPTIONS OTHERS = 1 ).
+      ELSEIF g_abap_editor_text IS BOUND.
+        g_abap_editor_text->set_text_as_r3table( EXPORTING  table  = gs_il_variants-t_sql
+                                                 EXCEPTIONS OTHERS = 1 ).
+      ENDIF.
 
       me->gt_symbols = gs_il_variants-t_symbol.
       me->set_description( ).

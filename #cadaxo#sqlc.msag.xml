@@ -90,43 +90,43 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>013</MSGNR>
-     <TEXT>The option &quot;CLIENT SPECIFIED&quot; must not be used.</TEXT>
+     <TEXT>The option &quot;CLIENT SPECIFIED&quot; must not be used</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>014</MSGNR>
-     <TEXT>Variant &amp;1 successfully modified.</TEXT>
+     <TEXT>Variant &amp;1 successfully modified</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>015</MSGNR>
-     <TEXT>Variant &amp;1 successfully created.</TEXT>
+     <TEXT>Variant &amp;1 successfully created</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>016</MSGNR>
-     <TEXT>The value &amp;1 of &quot;up to x rows&quot; is to high. Use a lower value.</TEXT>
+     <TEXT>The value &amp;1 of &quot;up to x rows&quot; is to high. Use a lower value</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>017</MSGNR>
-     <TEXT>Namespace /CADAXO/ is protected.</TEXT>
+     <TEXT>Namespace /CADAXO/ is protected</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>018</MSGNR>
-     <TEXT>User &amp;1 does not exist.</TEXT>
+     <TEXT>User &amp;1 does not exist</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>019</MSGNR>
-     <TEXT>Up to 16 selects can be started at same time.</TEXT>
+     <TEXT>Up to 16 selects can be started at same time</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -150,25 +150,25 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>023</MSGNR>
-     <TEXT>Role &amp;1 deleted.</TEXT>
+     <TEXT>Role &amp;1 deleted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>024</MSGNR>
-     <TEXT>This role already exists.</TEXT>
+     <TEXT>This role already exists</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>025</MSGNR>
-     <TEXT>This role is still in use.</TEXT>
+     <TEXT>This role is still in use</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>026</MSGNR>
-     <TEXT>This role is locked by &amp;1.</TEXT>
+     <TEXT>This role is locked by &amp;1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -198,67 +198,67 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>031</MSGNR>
-     <TEXT>No authorization to maintain SQL commands.</TEXT>
+     <TEXT>No authorization to maintain SQL commands</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>032</MSGNR>
-     <TEXT>No authorization to maintain global variants. (Excepted your variants)</TEXT>
+     <TEXT>No authorization to maintain global variants (Excepted your variants)</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>033</MSGNR>
-     <TEXT>No authorization to delete global variants. (Excepted your variants)</TEXT>
+     <TEXT>No authorization to delete global variants (Excepted your variants)</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>034</MSGNR>
-     <TEXT>No authorization to transport global variants.</TEXT>
+     <TEXT>No authorization to transport global variants</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>035</MSGNR>
-     <TEXT>No authorization to upload html startup document.</TEXT>
+     <TEXT>No authorization to upload html startup document</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>036</MSGNR>
-     <TEXT>You need admin authorization to use this function.</TEXT>
+     <TEXT>You need admin authorization to use this function</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>037</MSGNR>
-     <TEXT>The user &amp;1 already has the role &amp;2.</TEXT>
+     <TEXT>The user &amp;1 already has the role &amp;2</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>038</MSGNR>
-     <TEXT>Max number of subroutine pools exceeded. Please restart the SQL Cockpit.</TEXT>
+     <TEXT>Max number of subroutine pools exceeded. Please restart the SQL Cockpit</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>039</MSGNR>
-     <TEXT>The wizard template generator can only be used with one SELECT.</TEXT>
+     <TEXT>The wizard template generator can only be used with one SELECT</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>040</MSGNR>
-     <TEXT>The usage of alias &apos;&amp;1&apos; is not allowed.</TEXT>
+     <TEXT>The usage of alias &apos;&amp;1&apos; is not allowed</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>041</MSGNR>
-     <TEXT>This function is only available with the new abap editor.</TEXT>
+     <TEXT>This function is only available with the new abap editor</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -282,19 +282,19 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>045</MSGNR>
-     <TEXT>The doubleclick-feature is not active. --&gt; Personal settings.</TEXT>
+     <TEXT>The doubleclick-feature is not active. --&gt; Personal settings</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>046</MSGNR>
-     <TEXT>The variant name &apos;&amp;1&apos; is already in use.</TEXT>
+     <TEXT>The variant name &apos;&amp;1&apos; is already in use</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>047</MSGNR>
-     <TEXT>The global variant name &apos;&amp;1&apos; is already in use.</TEXT>
+     <TEXT>The global variant name &apos;&amp;1&apos; is already in use</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -360,37 +360,37 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>058</MSGNR>
-     <TEXT>You are not authorized to display the table(s) &amp;1.</TEXT>
+     <TEXT>You are not authorized to display the table(s) &amp;1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>059</MSGNR>
-     <TEXT>&amp;1 SQL Job(s) successfully deleted.</TEXT>
+     <TEXT>&amp;1 SQL Job(s) successfully deleted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>060</MSGNR>
-     <TEXT>The eMail-Address &amp;1 is not valid.</TEXT>
+     <TEXT>The eMail-Address &amp;1 is not valid</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>061</MSGNR>
-     <TEXT>Please select one or more jobs.</TEXT>
+     <TEXT>Please select one or more jobs</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>062</MSGNR>
-     <TEXT>SQL Trace switched on.</TEXT>
+     <TEXT>SQL Trace switched on</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>063</MSGNR>
-     <TEXT>SQL Trace switched off.</TEXT>
+     <TEXT>SQL Trace switched off</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -426,7 +426,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>069</MSGNR>
-     <TEXT>No authorization for background processing.</TEXT>
+     <TEXT>No authorization for background processing</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -450,13 +450,13 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>073</MSGNR>
-     <TEXT>&amp;1 SQL Job(s) successfully aborted.</TEXT>
+     <TEXT>&amp;1 SQL Job(s) successfully aborted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>074</MSGNR>
-     <TEXT>Aborting the Job(s) was not successful.</TEXT>
+     <TEXT>Aborting the Job(s) was not successful</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -474,7 +474,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>077</MSGNR>
-     <TEXT>The maximum number of SELECTS (&amp;1) exceeded.</TEXT>
+     <TEXT>The maximum number of SELECTS (&amp;1) exceeded</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -486,31 +486,31 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>079</MSGNR>
-     <TEXT>Please select one or more list(s).</TEXT>
+     <TEXT>Please select one or more list(s)</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>080</MSGNR>
-     <TEXT>List &amp;1 successfully saved.</TEXT>
+     <TEXT>List &amp;1 successfully saved</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>081</MSGNR>
-     <TEXT>Failed to save the list &amp;1.</TEXT>
+     <TEXT>Failed to save the list &amp;1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>082</MSGNR>
-     <TEXT>List(s) successfully deleted.</TEXT>
+     <TEXT>List(s) successfully deleted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>083</MSGNR>
-     <TEXT>Maximum number of space &amp;1 MByte exceeded. Further lists cannot be saved.</TEXT>
+     <TEXT>Maximum number of space &amp;1 MByte exceeded. Further lists cannot be saved</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -522,13 +522,13 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>085</MSGNR>
-     <TEXT>Not enough space to execute the job. Max number of space &amp;1(MB) exceeded.</TEXT>
+     <TEXT>Not enough space to execute the job. Max number of space &amp;1(MB) exceeded</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>086</MSGNR>
-     <TEXT>User &amp;1 has deleted list &amp;2 from user &amp;3.</TEXT>
+     <TEXT>User &amp;1 has deleted list &amp;2 from user &amp;3</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -540,31 +540,31 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>088</MSGNR>
-     <TEXT>The max number of selects be between 1 and 30.</TEXT>
+     <TEXT>The max number of selects be between 1 and 30</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>089</MSGNR>
-     <TEXT>Variant &amp;1 deleted.</TEXT>
+     <TEXT>Variant &amp;1 deleted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>090</MSGNR>
-     <TEXT>AddOn &amp;1 activated.</TEXT>
+     <TEXT>AddOn &amp;1 activated</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>091</MSGNR>
-     <TEXT>AddOn &amp;1 deactivated.</TEXT>
+     <TEXT>AddOn &amp;1 deactivated</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>092</MSGNR>
-     <TEXT>&amp;1 &quot;My History&quot; Records successfully deleted.</TEXT>
+     <TEXT>&amp;1 &quot;My History&quot; Records successfully deleted</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -576,37 +576,37 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>094</MSGNR>
-     <TEXT>Connection &amp;1 is not defined in DBCON.</TEXT>
+     <TEXT>Connection &amp;1 is not defined in DBCON</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>095</MSGNR>
-     <TEXT>SQL error &amp;1/&amp;2 for connection &amp;3 occured.</TEXT>
+     <TEXT>SQL error &amp;1/&amp;2 for connection &amp;3 occured</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>096</MSGNR>
-     <TEXT>Internal error &amp;1 for connection &amp;1 occured.</TEXT>
+     <TEXT>Internal error &amp;1 for connection &amp;1 occured</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>097</MSGNR>
-     <TEXT>The option &quot;CONNECTION&quot; must not be used.</TEXT>
+     <TEXT>The option &quot;CONNECTION&quot; must not be used</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>098</MSGNR>
-     <TEXT>Result list successfully fixed.</TEXT>
+     <TEXT>Result list successfully fixed</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>099</MSGNR>
-     <TEXT>Fixation successfully removed.</TEXT>
+     <TEXT>Fixation successfully removed</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -702,7 +702,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>115</MSGNR>
-     <TEXT>Missing authorization to create a batch job: &amp;1 &amp;2 &amp;3 &amp;4.</TEXT>
+     <TEXT>Missing authorization to create a batch job: &amp;1 &amp;2 &amp;3 &amp;4</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -714,7 +714,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>117</MSGNR>
-     <TEXT>Unable to interpret &amp;1 as a number.</TEXT>
+     <TEXT>Unable to interpret &amp;1 as a number</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -726,61 +726,61 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>119</MSGNR>
-     <TEXT>Role &amp;1 does not exist. Assignment canceled.</TEXT>
+     <TEXT>Role &amp;1 does not exist. Assignment canceled</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>120</MSGNR>
-     <TEXT>Symbol &amp;1 contains unallowed syntax or characters.</TEXT>
+     <TEXT>Symbol &amp;1 contains unallowed syntax or characters</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>121</MSGNR>
-     <TEXT>The option &quot;USING CLIENT&quot; must not be used.</TEXT>
+     <TEXT>The option &quot;USING CLIENT&quot; must not be used</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>122</MSGNR>
-     <TEXT>Dataelement for Symbol &amp;1 not defined.</TEXT>
+     <TEXT>Dataelement for Symbol &amp;1 not defined</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>123</MSGNR>
-     <TEXT>Data element is missing. Please maintain it before entering values.</TEXT>
+     <TEXT>Data element is missing. Please maintain it before entering values</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>124</MSGNR>
-     <TEXT>Multivalue can contain maximum of &amp;1 values. Input was shortened.</TEXT>
+     <TEXT>Multivalue can contain maximum of &amp;1 values. Input was shortened</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>125</MSGNR>
-     <TEXT>User &amp;1 is no valid cockpit user.</TEXT>
+     <TEXT>User &amp;1 is no valid cockpit user</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>126</MSGNR>
-     <TEXT>Awesome! Content successfully sent to &amp;1.</TEXT>
+     <TEXT>Awesome! Content successfully sent to &amp;1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>127</MSGNR>
-     <TEXT>Symbol &amp;1 does not exist.</TEXT>
+     <TEXT>Symbol &amp;1 does not exist</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>128</MSGNR>
-     <TEXT>The Multivalue Symbol &amp;1 must have at least one entry.</TEXT>
+     <TEXT>The Multivalue Symbol &amp;1 must have at least one entry</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -816,13 +816,13 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>134</MSGNR>
-     <TEXT>RFC destination &amp;1 is invalid.</TEXT>
+     <TEXT>RFC destination &amp;1 is invalid</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>135</MSGNR>
-     <TEXT>The usage of Host Expressions in SQL Cockpit is not allowed.</TEXT>
+     <TEXT>The usage of Host Expressions in SQL Cockpit is not allowed</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -948,7 +948,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>156</MSGNR>
-     <TEXT>Variant &amp;1 renamed.</TEXT>
+     <TEXT>Variant &amp;1 renamed</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -960,13 +960,37 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>158</MSGNR>
-     <TEXT>Awesome! Content shared (for reference) with yourself.</TEXT>
+     <TEXT>Awesome! Content shared (for reference) with yourself</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>159</MSGNR>
      <TEXT>Table &amp;1 was modified during runtime. Please restart the SQL Cockpit</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>160</MSGNR>
+     <TEXT>Data was successfully downloaded</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>161</MSGNR>
+     <TEXT>More than 10 filter criteria is not yet supported</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>162</MSGNR>
+     <TEXT>For OData Generation use the new ABAP OpenSQL syntax only</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>163</MSGNR>
+     <TEXT>No SELECT * are allowed for OData Generation</TEXT>
     </T100>
    </T100>
    <LONGTEXTS>
@@ -3001,6 +3025,11 @@
     </item>
     <item>
      <SPRSL>D</SPRSL>
+     <MSGNR>143</MSGNR>
+     <TEXT>Der Job für die List-GUID &amp;1 wurde nicht über der SQL Cockpit eingeplant</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
      <MSGNR>144</MSGNR>
      <TEXT>Bitte einen Queue Eintrag selektieren</TEXT>
     </item>
@@ -3046,8 +3075,23 @@
     </item>
     <item>
      <SPRSL>D</SPRSL>
+     <MSGNR>153</MSGNR>
+     <TEXT>&amp;1 Queueeinträge gelöscht</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>154</MSGNR>
+     <TEXT>Listen können nur einzeln geteilt werden</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
      <MSGNR>155</MSGNR>
      <TEXT>Job erfolgreich eingeplant. Zeit für einen Kaffee ...</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>156</MSGNR>
+     <TEXT>Variante &amp;1 umbenannt</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>
@@ -3063,6 +3107,26 @@
      <SPRSL>D</SPRSL>
      <MSGNR>159</MSGNR>
      <TEXT>Tabelle &amp;1 wurde zur Laufzeit verändert. Bitte SQL Cockpit neu starten.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>160</MSGNR>
+     <TEXT>Daten wurden erfolgreich heruntergeladen.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>161</MSGNR>
+     <TEXT>Mehr als 10 Filterkriterien werden nicht unterstützt!</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>162</MSGNR>
+     <TEXT>Für den OData Generator muß der neue ABAP SQL Syntax verwendet werden</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>163</MSGNR>
+     <TEXT>Beim OData Generator ist kein SELECT * erlaubt</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>

@@ -423,6 +423,18 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>B49</KEY>
+     <ENTRY>Insert Code Completion</ENTRY>
+     <LENGTH>39</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>B50</KEY>
+     <ENTRY>Insert Header</ENTRY>
+     <LENGTH>23</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>D01</KEY>
      <ENTRY>DEMO Version</ENTRY>
      <LENGTH>12</LENGTH>
@@ -1646,6 +1658,18 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>B49</KEY>
+       <ENTRY>Code Completion einfügen</ENTRY>
+       <LENGTH>39</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>B50</KEY>
+       <ENTRY>Header einfügen</ENTRY>
+       <LENGTH>23</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>D01</KEY>
        <ENTRY>DEMO Version</ENTRY>
        <LENGTH>12</LENGTH>
@@ -2445,11 +2469,6 @@
      </TEXTPOOL>
     </item>
    </I18N_TPOOL>
-   <I18N_LINES>
-    <item>
-     <LANGUAGE>D</LANGUAGE>
-    </item>
-   </I18N_LINES>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
@@ -2615,6 +2634,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>C_CMD_INSERT_HEADER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Function code</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>C_CMD_SHOW_FULL_VALUE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Function code</DESCRIPT>
@@ -2684,6 +2709,12 @@
      <CMPNAME>C_SYMBOL_TYPE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Type Symbol</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>C_TEMPLATE_NAME_ODATA</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Template Name</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
@@ -3104,24 +3135,6 @@
      <CMPNAME>GET_CONTENT</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>get HTML/PDF content</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
-     <CMPNAME>GET_CSV_FROM_INT_TAB</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Create CSV Data from Internal Table</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
-     <CMPNAME>GET_CSV_FROM_INT_TAB_CUST</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Create CSV Data from Internal Table with Customization</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
-     <CMPNAME>GET_CSV_LINE_FROM_TAB</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Convert CSV tabular data into line</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
@@ -4043,6 +4056,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>ON_EDITOR_INSERT_PATTERN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Handle Insert Pattern for Code Completion</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>ON_EDITOR_QUICK_INFO</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Handle QuickInfo</DESCRIPT>
@@ -4508,6 +4527,12 @@
      <CMPNAME>STORE_SQL_TO_HIST</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Store SQL</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>TIPPSANDTRICKS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Tipps and tricks</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
