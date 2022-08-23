@@ -199,8 +199,6 @@ CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
       lo_property->/iwbep/if_sbod_property~set_type( lo_edm_core_type ).
       lo_property->/iwbep/if_sbdm_node~set_position( i ).
 
-      lo_property->/iwbep/if_sbod_property~set_creatable( abap_true ).
-      lo_property->/iwbep/if_sbod_property~set_updatable( abap_true ).
       lo_property->/iwbep/if_sbod_property~set_sortable( abap_true ).
       lo_property->/iwbep/if_sbod_property~set_filterable( abap_true ).
       IF <fs_selopt>-is_key EQ abap_false.
@@ -234,27 +232,11 @@ CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
 
     lo_od_factory ?= /iwbep/cl_sbod=>get_factory( ).
 
-    lo_od_factory->create_entity_type(
-      EXPORTING
-        iv_name        = gv_entity
-      RECEIVING
-        ro_entity_type = gr_entity_type  ).
-
-    gr_model->/iwbep/if_sbdm_node~insert_child(
-      EXPORTING
-        io_child = gr_entity_type ).
-
-    lo_od_factory->create_entity_set(
-      EXPORTING
-        iv_name       = gv_entity_set
-      RECEIVING
-        ro_entity_set = gr_entity_set ).
-
+    gr_entity_type = lo_od_factory->create_entity_type( conv #( gv_entity ) ).
+    gr_model->/iwbep/if_sbdm_node~insert_child( gr_entity_type ).
+    gr_entity_set = lo_od_factory->create_entity_set( conv #( gv_entity_set ) ).
     gr_entity_set->set_entity_type( gr_entity_type ).
-
-    gr_model->/iwbep/if_sbdm_node~insert_child(
-      EXPORTING
-        io_child = gr_entity_set ).
+    gr_model->/iwbep/if_sbdm_node~insert_child( gr_entity_set ).
 
   ENDMETHOD.
 
@@ -398,6 +380,8 @@ CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
 
     APPEND `DATA lv_where     TYPE string.`                                                            TO ct_code.
     APPEND `DATA lv_where_sql TYPE string.`                                                            TO ct_code.
+    APPEND `DATA l_property type string.`                                                              TO ct_code.
+
     IF lines( gt_selopt ) GT c_filter_cnt .
       DATA(lv_count) = c_filter_cnt .
     ELSE.
@@ -405,12 +389,32 @@ CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
     ENDIF.
 
     APPEND `LOOP AT it_filter_select_options ASSIGNING FIELD-SYMBOL(<fs_filter_select_options>).`      TO ct_code.
+
+    APPEND `  CASE <fs_filter_select_options>-property.`                                               TO ct_code.
+
+    LOOP AT gr_parser->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<ddfields>).
+      IF <ddfields>-/cadaxo/alias_field <> '' AND <ddfields>-/cadaxo/alias = ''.
+        APPEND `  when '` && <ddfields>-/cadaxo/alias_field && `'.` TO ct_code.
+        APPEND `  l_property = '` && <ddfields>-fieldname && `'.` TO ct_code.
+      ELSEIF <ddfields>-/cadaxo/alias_field <> '' AND <ddfields>-/cadaxo/alias <> ''.
+        APPEND `  when '` && <ddfields>-/cadaxo/alias_field && `'.` TO ct_code.
+        APPEND `  l_property = '` && <ddfields>-/cadaxo/alias && `~` && <ddfields>-fieldname && `'.` TO ct_code.
+      ELSEIF <ddfields>-/cadaxo/alias <> ''.
+        APPEND `  when '` && <ddfields>-fieldname && `'.` TO ct_code.
+        APPEND `  l_property = '` && <ddfields>-/cadaxo/alias && `~` && <ddfields>-fieldname && `'.` TO ct_code.
+      ENDIF.
+    ENDLOOP.
+
+    APPEND `  when others.`                                                                            TO ct_code.
+    APPEND `  l_property = <fs_filter_select_options>-property.`                                       TO ct_code.
+    APPEND `  endcase.`                                                                                TO ct_code.
+
     APPEND `  CASE sy-tabix.`                                                                          TO ct_code.
     DO lv_count TIMES.
       APPEND `    WHEN ` && sy-index && `.`                                                            TO ct_code.
       APPEND `      FIELD-SYMBOLS: <fs` && sy-index && `> TYPE any .`                                  TO ct_code.
       APPEND `      ASSIGN <fs_filter_select_options>-select_options TO <fs` && sy-index && `>.`       TO ct_code.
-      APPEND `      lv_where = <fs_filter_select_options>-property && | IN @<fs` && sy-index && `>|.`  TO ct_code.
+      APPEND `      lv_where = l_property  && | IN @<fs` && sy-index && `>|.`  TO ct_code.
     ENDDO.
     APPEND `  ENDCASE.`                                              TO ct_code.
     APPEND `  IF lv_where_sql IS INITIAL.`                           TO ct_code.
@@ -468,6 +472,8 @@ CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
     ls_gen_strat_ver-plugin        = lo_gen_strategy->ms_gen_strategy-plugin.
     ls_gen_strat_ver-strat_name    = lo_gen_strategy->ms_gen_strategy-name.
     ls_gen_strat_ver-strat_version = lo_gen_strategy->mv_gen_strat_version.
+
+    lo_gen_strategy->get_validator( ).
 
     gr_project->set_gen_strategy( ls_gen_strat_ver ).
 
@@ -917,10 +923,26 @@ CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
     DATA ls_redefine_method  TYPE seo_method_source.
     DATA lv_popup            TYPE abap_bool.
     DATA lv_no_ui            TYPE abap_bool.
+    DATA lt_generated_objects  TYPE /iwbep/if_sbdm_project=>ty_t_gen_artifacts.
 
-    lv_clskey-clsname = |ZCL_{ gv_project_name }_DPC_EXT|.
+    lt_generated_objects = gr_project->get_generated_artifacts( ).
 
-    ls_redefine_method-cpdname = to_upper( gv_entity_set ) && '_GET_ENTITYSET'.
+    LOOP AT lt_generated_objects ASSIGNING FIELD-SYMBOL(<generated_object>).
+      IF <generated_object>->get_type( ) = 'DPCS'.    "MPCB, MPCS, DPCB, DPCS, MDL, SRV,
+        lv_clskey-clsname =  <generated_object>->get_tadir_data( )-trobj_name.
+      ENDIF.
+    ENDLOOP.
+
+    IF lv_clskey-clsname IS INITIAL.
+      /cadaxo/cx_sqlc_odata_gen=>raise_t100( ).
+    ENDIF.
+
+    IF strlen( gv_entity_set ) > 16.
+      ls_redefine_method-cpdname = to_upper( gv_entity_set(16) ) && '_GET_ENTITYSET'.
+    ELSE.
+      ls_redefine_method-cpdname = to_upper( gv_entity_set ) && '_GET_ENTITYSET'.
+    ENDIF.
+
     ls_redefine_method-redefine = abap_true.
 
     generate_source_code( IMPORTING ev_source = ls_redefine_method-source ).
@@ -990,9 +1012,15 @@ CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
   METHOD save_changes.
 
     gr_transaction->/iwbep/if_sbdm_transaction~save(
-  IMPORTING
-    et_messages              = DATA(lt_messages)
-    ).
+      IMPORTING
+        et_messages              = DATA(lt_messages)
+        ).
+
+    IF lt_messages IS INITIAL.
+      DATA project TYPE /iwbep/t_sbdm_projects.
+      APPEND gr_project TO project.
+      gr_transaction->/iwbep/if_sbdm_transaction~unlock_projects( project  ).
+    ENDIF.
 
   ENDMETHOD.
 

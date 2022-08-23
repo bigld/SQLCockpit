@@ -23,6 +23,8 @@
 *            |                      | in subroutine attach_results                |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 15.06.2022 | Domi Bigl            | Wrong list in job notification mail + CC    | COCKPIT-488    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 20.07.2022 | Domi Bigl            | encoding in attachment                      | COCKPIT-492    *
 ****************************************************************************************************
 REPORT  /cadaxo/sqlc_batch_executemail.
 
@@ -240,9 +242,7 @@ FORM attach_results  CHANGING pr_document TYPE REF TO cl_document_bcs.
 
   DATA lr_cockpit_main          TYPE REF TO /cadaxo/cl_sqlc_cockpit_main.
 
-  DATA: t_result_csv      TYPE TABLE OF string,
-        ls_result_csv     TYPE string,
-        ls_result_xstring TYPE xstring,
+  DATA: ls_result_xstring TYPE xstring,
         lt_result         TYPE solix_tab,
         lx_zip_file       TYPE xstring,
         lv_filename       TYPE string.
@@ -259,34 +259,41 @@ FORM attach_results  CHANGING pr_document TYPE REF TO cl_document_bcs.
       lr_cockpit_main->prepare_result_table( is_sqlcsres = gs_sqlcsres
                                              is_sqlcress = ls_sqlcress ).
 
-      data(zip) = NEW cl_abap_zip( ).
+      DATA(zip) = NEW cl_abap_zip( ).
 
       LOOP AT lr_cockpit_main->dref_result_tab_t ASSIGNING <lr_dref_result>.
-        DATA(tabix) = sy-tabix.
+        DATA(table_index) = sy-tabix.
+        ASSIGN lr_cockpit_main->gt_lvc_t_fcat[ table_index ] TO FIELD-SYMBOL(<fieldcats>).
         ASSIGN <lr_dref_result>->* TO <lt_result_table>.
 
-        CLEAR t_result_csv.
-        lr_cockpit_main->get_csv_from_int_tab( EXPORTING it_table      = <lt_result_table>
-                                                         i_grid_i      = tabix
-                                               IMPORTING ev_output_csv = t_result_csv ).
+        /cadaxo/cl_sqlc_csv_cust_util=>get_csv_from_itab( EXPORTING it_table      = <lt_result_table>
+                                                                    i_fieldcat    = <fieldcats>
+                                                                    i_csv_attr    = VALUE #( add_header      = abap_true
+                                                                                             field_separator = /cadaxo/cl_sqlc_csv_cust_util=>cseperators-semicolon
+                                                                                             date_format     = /cadaxo/cl_sqlc_csv_cust_util=>cdateformats-user
+                                                                                             time_format     = /cadaxo/cl_sqlc_csv_cust_util=>ctimeformats-user )
+                                                          IMPORTING ev_output_csv = DATA(csv_tab) ).
 
-        ls_result_csv = lr_cockpit_main->get_csv_line_from_tab( t_result_csv ).
+        DATA(csv_string) = /cadaxo/cl_sqlc_csv_cust_util=>csv_tab_2_string( csv_tab ).
 
         TRY.
-            ls_result_xstring = cl_abap_codepage=>convert_to( ls_result_csv ).
-          CATCH cx_parameter_invalid_range .
-          CATCH cx_sy_codepage_converter_init .
-          CATCH cx_sy_conversion_codepage .
-          CATCH cx_parameter_invalid_type .
+            ls_result_xstring = cl_abap_codepage=>convert_to( source = csv_string codepage = 'UTF-16LE' ).
+          CATCH cx_parameter_invalid_range
+                cx_sy_codepage_converter_init
+                cx_sy_conversion_codepage
+                cx_parameter_invalid_type.
+            TRY.
+                ls_result_xstring = cl_abap_codepage=>convert_to(  csv_string ).
+              CATCH cx_parameter_invalid_range
+                    cx_sy_codepage_converter_init
+                    cx_sy_conversion_codepage
+                    cx_parameter_invalid_type.
+            ENDTRY.
         ENDTRY.
 
-        CLEAR lv_filename.
-        lv_filename = |Result_Table_{ tabix }_{ sy-datum }_{ sy-uzeit }|.
+        lv_filename = |Result_Table_{ table_index }_{ sy-datum }_{ sy-uzeit }.csv|.
 
-
-        CONCATENATE lv_filename '.csv' INTO lv_filename.
-
-        zip->add( name = lv_filename  content = ls_result_xstring ).
+        zip->add( name = lv_filename content = ls_result_xstring ).
         ls_result_xstring = zip->save( ).
 
         CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'

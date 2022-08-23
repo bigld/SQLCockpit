@@ -4,7 +4,31 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    TYPES: ty_strings TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
 
+    CONSTANTS: BEGIN OF cseperators,
+                 tab       TYPE /cadaxo/sqlc_csv_cust_fldsep VALUE 'TAB',
+                 comma     TYPE /cadaxo/sqlc_csv_cust_fldsep VALUE 'COMMA',
+                 semicolon TYPE /cadaxo/sqlc_csv_cust_fldsep VALUE 'SEMICOLON',
+                 cspace    TYPE /cadaxo/sqlc_csv_cust_fldsep VALUE 'SPACE',
+                 others    TYPE /cadaxo/sqlc_csv_cust_fldsep VALUE  'OTHER',
+               END OF cseperators.
+    CONSTANTS: BEGIN OF cdateformats,
+                 yyyymmdd   TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '01', "YYYYMMDD
+                 yyyyhmmhdd TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '02', "YYYY-MM-DD
+                 yyyydmmddd TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '03', "YYYY.MM.DD
+                 ddmmyyyy   TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '04', "DDMMYYYY
+                 ddhmmhyyyy TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '05', "DD-MM-YYYY
+                 dddmmdyyyy TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '06', "DD.MM.YYYY
+                 user       TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '09', "User
+               END OF cdateformats.
+    CONSTANTS: BEGIN OF ctimeformats,
+                 hhmmss   TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '01', "HHMMSS
+                 hhcmmcss TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '02', "HH:MM:SS
+                 hhmm     TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '03', "HHMM
+                 hhcmm    TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '04', "HH:MM
+                 user     TYPE /cadaxo/sqlc_csvcus_dateformat  VALUE '09', "User
+               END OF ctimeformats.
     CLASS-METHODS get_separator
       IMPORTING
         !i_separator_setting TYPE /cadaxo/sqlc_csv_cust_fldsep
@@ -23,30 +47,46 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util DEFINITION
         !i_time_int              TYPE uzeit
       RETURNING
         VALUE(rv_converted_time) TYPE char8 .
+    CLASS-METHODS get_csv_from_itab
+      IMPORTING
+        !it_table      TYPE ANY TABLE
+        i_fieldcat     TYPE lvc_t_fcat
+        i_csv_attr     TYPE /cadaxo/sqlc_csv_cust OPTIONAL
+      EXPORTING
+        !ev_output_csv TYPE ty_strings
+        !ev_cancel     TYPE abap_bool.
+    CLASS-METHODS csv_tab_2_string
+      IMPORTING
+        it_csv_tab          TYPE ty_strings
+      RETURNING
+        VALUE(e_csv_string) TYPE string .
+
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_CSV_CUST_UTIL IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
 
 
   METHOD convert_date.
 
     CASE i_date_type.
-      WHEN '01'."YYYYMMDD
-        MOVE i_date TO rv_converted_date.
-      WHEN '02'."YYYY-MM-DD
+      WHEN cdateformats-yyyymmdd.
+        rv_converted_date = i_date.
+      WHEN cdateformats-yyyyhmmhdd.
         rv_converted_date = |{ i_date(4) }-{ i_date+4(2) }-{ i_date+6(2) }|.
-      WHEN '03'.""YYYY.MM.DD
+      WHEN cdateformats-yyyydmmddd.
         rv_converted_date = |{ i_date(4) }.{ i_date+4(2) }.{ i_date+6(2) }|.
-      WHEN '04'."DDMMYYYY
+      WHEN cdateformats-ddmmyyyy.
         rv_converted_date = |{ i_date+6(2) }{ i_date+4(2) }{ i_date(4) }|.
-      WHEN '05'."DD-MM-YYYY
+      WHEN cdateformats-ddhmmhyyyy.
         rv_converted_date = |{ i_date+6(2) }-{ i_date+4(2) }-{ i_date(4) }|.
-      WHEN '06'."DD.MM.YYYY
+      WHEN cdateformats-dddmmdyyyy.
         rv_converted_date = |{ i_date+6(2) }.{ i_date+4(2) }.{ i_date(4) }|.
+      WHEN cdateformats-user.
+        rv_converted_date = |{ i_date DATE = USER }|.
       WHEN OTHERS.
-        MOVE i_date TO rv_converted_date.
+        rv_converted_date = i_date.
     ENDCASE.
 
   ENDMETHOD.
@@ -55,14 +95,16 @@ CLASS /CADAXO/CL_SQLC_CSV_CUST_UTIL IMPLEMENTATION.
   METHOD convert_time.
 
     CASE i_time_type.
-      WHEN '01'.
+      WHEN ctimeformats-hhmmss.
         rv_converted_time = i_time_int.
-      WHEN '02'.
+      WHEN ctimeformats-hhcmmcss.
         rv_converted_time = |{ i_time_int(2) }:{ i_time_int+2(2) }:{ i_time_int+4(2) }|.
-      WHEN '03'.
+      WHEN ctimeformats-hhmm.
         rv_converted_time = |{ i_time_int(2) }{ i_time_int+2(2) }|.
-      WHEN '04'.
+      WHEN ctimeformats-hhcmm.
         rv_converted_time = |{ i_time_int(2) }:{ i_time_int+2(2) }|.
+      WHEN ctimeformats-user.
+        rv_converted_time = |{ i_time_int TIME = USER }|.
       WHEN OTHERS.
         rv_converted_time = i_time_int.
     ENDCASE.
@@ -73,17 +115,97 @@ CLASS /CADAXO/CL_SQLC_CSV_CUST_UTIL IMPLEMENTATION.
   METHOD get_separator.
 
     CASE i_separator_setting.
-      WHEN 'TAB'.
-        MOVE cl_abap_char_utilities=>horizontal_tab TO e_separator.
-      WHEN 'COMMA'.
-        MOVE ',' TO e_separator.
-      WHEN 'SEMICOLON'.
-        MOVE ';' TO e_separator.
-      WHEN 'SPACE'.
-        MOVE abap_false TO e_separator.
-      WHEN 'OTHER'.
-        MOVE i_separator_others TO e_separator.
+      WHEN cseperators-tab.
+        e_separator = cl_abap_char_utilities=>horizontal_tab.
+      WHEN cseperators-comma.
+        e_separator = ','.
+      WHEN cseperators-semicolon.
+        e_separator = ';'.
+      WHEN cseperators-cspace.
+        e_separator = abap_false.
+      WHEN cseperators-others.
+        e_separator = i_separator_others.
     ENDCASE.
+
+  ENDMETHOD.
+
+
+  METHOD get_csv_from_itab.
+
+    DATA lv_output_line  TYPE string.
+    DATA lv_tmp_dats     TYPE char30.
+    DATA lv_tmp_out      TYPE string.
+
+    CLEAR ev_output_csv.
+
+    IF i_csv_attr IS NOT INITIAL.
+      DATA(csv_attr) = i_csv_attr.
+    ELSE.
+      CALL FUNCTION '/CADAXO/SQLC_CUSTOM_CSV_POPUP'
+        IMPORTING
+          ev_cancel   = ev_cancel
+        CHANGING
+          cs_csv_attr = csv_attr.
+      IF ev_cancel = abap_true.
+        RETURN.
+      ENDIF.
+    ENDIF.
+
+    DATA(lv_separator) = get_separator( i_separator_setting = csv_attr-field_separator
+                                        i_separator_others  = csv_attr-field_separator_other ).
+
+    IF csv_attr-add_header = abap_true.
+      LOOP AT i_fieldcat ASSIGNING FIELD-SYMBOL(<ls_field>).
+        lv_output_line = lv_output_line && lv_separator && <ls_field>-fieldname.
+      ENDLOOP.
+
+      SHIFT lv_output_line BY 1 PLACES.
+      APPEND lv_output_line TO ev_output_csv.
+    ENDIF.
+
+    LOOP AT it_table ASSIGNING FIELD-SYMBOL(<ls_result>).
+      CLEAR lv_output_line.
+
+      LOOP AT i_fieldcat ASSIGNING <ls_field>.
+        ASSIGN COMPONENT <ls_field>-fieldname OF STRUCTURE <ls_result> TO FIELD-SYMBOL(<ls_line>).
+
+        IF  <ls_field>-inttype = 'T'.
+          " Export Date and Time in user format
+          lv_tmp_dats = convert_time( i_time_type = csv_attr-time_format
+                                      i_time_int  = <ls_line> ).
+          lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
+        ELSEIF <ls_field>-inttype = 'D'.
+          lv_tmp_dats = convert_date( i_date_type = csv_attr-date_format
+                                      i_date      = <ls_line> ).
+          lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
+        ELSEIF <ls_field>-inttype = 'C' AND ( <ls_line> CP |*{ lv_separator }*| OR <ls_line> CP '*"*' ).
+          " If Separator or Single Quotes are in Field Then Do same behavior as Excel -> CSV
+          lv_tmp_out = <ls_line>.
+          REPLACE ALL OCCURRENCES OF '"' IN lv_tmp_out WITH '""'.
+          lv_tmp_out = '"' && lv_tmp_out && '"'.
+          lv_output_line = lv_output_line && lv_separator && lv_tmp_out.
+        ELSE.
+          lv_output_line = lv_output_line && lv_separator && <ls_line>.
+        ENDIF.
+      ENDLOOP.
+
+      SHIFT lv_output_line BY 1 PLACES.
+      APPEND lv_output_line TO ev_output_csv.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD csv_tab_2_string.
+
+    LOOP AT it_csv_tab ASSIGNING FIELD-SYMBOL(<tab_line>).
+      IF sy-tabix = 1.
+        e_csv_string = <tab_line>.
+      ELSE.
+        e_csv_string = e_csv_string && cl_abap_char_utilities=>cr_lf && <tab_line>.
+      ENDIF.
+    ENDLOOP.
 
   ENDMETHOD.
 ENDCLASS.

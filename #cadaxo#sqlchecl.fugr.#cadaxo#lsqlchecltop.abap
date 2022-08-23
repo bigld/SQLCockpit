@@ -1,4 +1,3 @@
-* regenerated at 30.10.2019 23:46:31
 FUNCTION-POOL /CADAXO/SQLCHECL           MESSAGE-ID SV.
 
 * INCLUDE /CADAXO/LSQLCHECLD...              " Local class definition

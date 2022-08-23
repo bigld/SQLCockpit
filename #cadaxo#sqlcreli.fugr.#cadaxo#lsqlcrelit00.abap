@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    view related data declarations
-*   generation date: 14.04.2021 at 11:30:18
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 *...processing: /CADAXO/SQLCRELI................................*
 DATA:  BEGIN OF STATUS_/CADAXO/SQLCRELI              .   "state vector

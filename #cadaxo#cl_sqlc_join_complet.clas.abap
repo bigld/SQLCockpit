@@ -1,138 +1,135 @@
-class /CADAXO/CL_SQLC_JOIN_COMPLET definition
-  public
-  create public .
+CLASS /cadaxo/cl_sqlc_join_complet DEFINITION
+  PUBLIC
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  types:
-    BEGIN OF t_res,
+    TYPES:
+      BEGIN OF t_res,
         tabname TYPE tabname,
         ddtext  TYPE as4text,
         nr      TYPE bu_partner,
       END OF t_res .
-  types:
-    BEGIN OF t_text,
+    TYPES:
+      BEGIN OF t_text,
         text TYPE /cadaxo/sqlcsql_string,
         nr   TYPE bu_partner,
       END OF t_text .
-  types:
-    BEGIN OF t_as,
+    TYPES:
+      BEGIN OF t_as,
         tabname TYPE tabname,
         as      TYPE tabname,
       END OF t_as .
-  types:
-    tty_res  TYPE TABLE OF t_res .
-  types:
-    tty_text TYPE TABLE OF t_text .
-  types:
-    tty_as   TYPE TABLE OF t_as .
-  types:
-    tty_sqlclog TYPE TABLE OF /cadaxo/sqlclog .
-  types:
-    tty_dd02t   TYPE TABLE OF dd02t .
+    TYPES: tty_res  TYPE TABLE OF t_res .
+    TYPES: tty_text TYPE TABLE OF t_text .
+    TYPES: tty_as   TYPE TABLE OF t_as .
+    TYPES: tty_sqlclog TYPE TABLE OF /cadaxo/sqlclog .
 
-  data GT_SELTABLE type /CADAXO/SQLCJCRES_TY .
-  data GO_ABAP_EDITOR type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT .
-  data GS_SELSTRUC type /CADAXO/SQLCJCRES .
-  data GT_SQLCLOG type TTY_SQLCLOG .
-  data GT_DD02T type TTY_DD02T .
-  data GT_ASTABLE type TTY_AS .
-  data GR_TOP_ALV_GRID type ref to CL_GUI_ALV_GRID .
-  data GT_RES_FCAT type LVC_T_FCAT .
-  data GO_CONTAINER type ref to CL_GUI_CUSTOM_CONTAINER .
-  data GO_SPLITTER type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GR_BOTTOM_ALV_GRID type ref to CL_GUI_ALV_GRID .
-  data GT_TEXT_FCAT type LVC_T_FCAT .
-  data GT_RES type /CADAXO/SQLCJCRES_TY .
-  data GT_TEXT type /CADAXO/SQLCJCTEXT_TY .
-  data GV_RESULT type STRING .
-  data GV_JOIN_TABLE type STRING .
-  data GV_JOIN_TYPE type STRING .
-  data GT_SQLCJCHE type /CADAXO/SQLCJCHE_TY .
-  data GT_SQLCJCPO type /CADAXO/SQLCJCPO_TY .
-  data GT_PARSED_TABLE type /CADAXO/SQLCCODELINE_T .
-  data GV_REFRESH type ABAP_BOOL .
 
-  methods CC_JOIN
-    exporting
-      !E_RES type /CADAXO/SQLCJCRES_TY .
-  methods CC_ON
-    importing
-      !I_RES type /CADAXO/SQLCJCRES optional
-    exporting
-      !E_TEXT type /CADAXO/SQLCJCTEXT_TY .
-  methods CONSTRUCTOR
-    importing
-      !O_ABAPEDIT type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT optional .
-  methods DISASSEMBLE_SQL .
-  methods PBO_0100 .
-  methods CREATE_ALV_CONTROLS .
-  methods HANDLE_DOUBLE_CLICK_TOP
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods CC_JOIN_F4
-    exporting
-      !E_STRING type STRING .
-  methods CC_ON_F4
-    exporting
-      !E_STRING type STRING .
-  methods APPEND_TABLE_SELTABLE
-    importing
-      !I_TABNAME type TABNAME .
-  methods HANDLE_DOUBLE_CLICK_BOTTOM
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods DELETE_GLOBALS .
-  methods CC_JOIN_DB
-    exporting
-      !E_RES type /CADAXO/SQLCJCRES_TY .
-  methods CALCULATE_POSITION
-    exporting
-      !E_RES type /CADAXO/SQLCJCRES_TY .
-protected section.
+    DATA gt_seltable TYPE /cadaxo/sqlcjcres_ty .
+    DATA go_abap_editor TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit .
+    DATA gs_selstruc TYPE /cadaxo/sqlcjcres .
+    DATA gt_sqlclog TYPE tty_sqlclog .
+    DATA table_descriptions TYPE SORTED TABLE OF dd02t WITH UNIQUE DEFAULT KEY.
+    DATA gt_astable TYPE tty_as .
+    DATA gr_top_alv_grid TYPE REF TO cl_gui_alv_grid .
+    DATA gt_res_fcat TYPE lvc_t_fcat .
+    DATA go_container TYPE REF TO cl_gui_custom_container .
+    DATA go_splitter TYPE REF TO cl_gui_splitter_container .
+    DATA gr_bottom_alv_grid TYPE REF TO cl_gui_alv_grid .
+    DATA gt_text_fcat TYPE lvc_t_fcat .
+    DATA gt_res TYPE /cadaxo/sqlcjcres_ty .
+    DATA gt_text TYPE /cadaxo/sqlcjctext_ty .
+    DATA gv_result TYPE string .
+    DATA gv_join_table TYPE string .
+    DATA gv_join_type TYPE string .
+    DATA gt_sqlcjche TYPE /cadaxo/sqlcjche_ty .
+    DATA gt_sqlcjcpo TYPE /cadaxo/sqlcjcpo_ty .
+    DATA gt_parsed_table TYPE /cadaxo/sqlccodeline_t .
+    DATA gv_refresh TYPE abap_bool .
 
-  methods BUILD_FCAT .
-  methods TABLES_FROM_EDITOR .
-  methods TABLES_FROM_DB .
-  methods CC_AS .
-  methods FILL_DB_TABLES
-    importing
-      !IT_HEAD type /CADAXO/SQLCJCHE_T
-      !IT_ITEM type /CADAXO/SQLCJCPO_T .
-  methods BUILD_LAYOUT
-    returning
-      value(RS_LAYOUT) type LVC_S_LAYO .
-  methods GET_JOIN_TYPE
-    importing
-      !IV_JOIN_TYPE type RSDDBJOINTP
-    returning
-      value(RV_RES) type STRING .
-  methods SET_JOIN_TYPE
-    importing
-      !IV_RES type STRING
-    returning
-      value(RV_JOIN_TYPE) type RSDDBJOINTP .
-  methods CALCULATE_TOP
-    exporting
-      !E_EXPR1 type STRING
-      !E_EXPR2 type STRING .
-  methods CALCULATE_BOTTOM
-    exporting
-      !E_TEXT type /CADAXO/SQLCJCTEXT_TY .
-  PRIVATE SECTION.
+    METHODS cc_join
+      EXPORTING
+        !e_res TYPE /cadaxo/sqlcjcres_ty .
+    METHODS cc_on
+      IMPORTING
+        !i_res  TYPE /cadaxo/sqlcjcres OPTIONAL
+      EXPORTING
+        !e_text TYPE /cadaxo/sqlcjctext_ty .
+    METHODS constructor
+      IMPORTING
+        !o_abapedit TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit OPTIONAL .
+    METHODS disassemble_sql .
+    METHODS pbo_0100 .
+    METHODS create_alv_controls .
+    METHODS handle_double_click_top
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS cc_join_f4
+      EXPORTING
+        !e_string TYPE string .
+    METHODS cc_on_f4
+      EXPORTING
+        !e_string TYPE string .
+    METHODS append_table_seltable
+      IMPORTING
+        !i_tabname TYPE tabname .
+    METHODS handle_double_click_bottom
+          FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+          !e_row
+          !e_column
+          !es_row_no .
+    METHODS delete_globals .
+    METHODS cc_join_db
+      EXPORTING
+        !e_res TYPE /cadaxo/sqlcjcres_ty .
+    METHODS calculate_position
+      EXPORTING
+        !e_res TYPE /cadaxo/sqlcjcres_ty .
+  PROTECTED SECTION.
 
+    METHODS build_fcat .
+    METHODS tables_from_editor .
+    METHODS tables_from_db .
+    METHODS cc_as .
+    METHODS fill_db_tables
+      IMPORTING
+        !it_head TYPE /cadaxo/sqlcjche_t
+        !it_item TYPE /cadaxo/sqlcjcpo_t .
+    METHODS build_layout
+      RETURNING
+        VALUE(rs_layout) TYPE lvc_s_layo .
+    METHODS get_join_type
+      IMPORTING
+        !iv_join_type TYPE rsddbjointp
+      RETURNING
+        VALUE(rv_res) TYPE string .
+    METHODS set_join_type
+      IMPORTING
+        !iv_res             TYPE string
+      RETURNING
+        VALUE(rv_join_type) TYPE rsddbjointp .
+    METHODS calculate_top
+      EXPORTING
+        !e_expr1 TYPE string
+        !e_expr2 TYPE string .
+    METHODS calculate_bottom
+      EXPORTING
+        !e_text TYPE /cadaxo/sqlcjctext_ty .
     EVENTS double_click .
+    METHODS get_table_description IMPORTING i_table_name         TYPE tabname
+                                  RETURNING VALUE(e_description) TYPE as4text.
+  PRIVATE SECTION.
+    DATA: last_table TYPE /cadaxo/sqlccodeline.
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_join_complet IMPLEMENTATION.
 
 
   METHOD append_table_seltable.
@@ -190,9 +187,10 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
   METHOD calculate_bottom.
 
+    .
+
     IF lines( gt_parsed_table ) > 1.
-      IF line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "4
-                   ddlanguage = sy-langu ] )
+      IF last_table IS NOT INITIAL
       AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'JOIN'.
         cc_on( IMPORTING e_text = gt_text ).
       ENDIF.
@@ -213,12 +211,35 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
   ENDMETHOD.
 
+  METHOD get_table_description.
+
+    IF NOT line_exists( table_descriptions[ tabname = i_table_name ] ).
+      SELECT SINGLE tabname, ddtext
+             FROM dd02t
+             WHERE tabname    = @i_table_name
+               AND ddlanguage = @sy-langu
+             INTO @DATA(table_descr).
+      IF sy-subrc <> 0.
+        INSERT VALUE #( tabname = i_table_name ) INTO TABLE table_descriptions.
+      ELSE.
+        IF table_descr-ddtext IS INITIAL.
+          INSERT VALUE #( tabname = i_table_name ddtext = i_table_name ) INTO TABLE table_descriptions.
+        ELSE.
+          INSERT CORRESPONDING #( table_descr ) INTO TABLE table_descriptions.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+    e_description = table_descriptions[ tabname = i_table_name ]-ddtext.
+
+  ENDMETHOD.
+
+
+
 
   METHOD calculate_position.
 
     IF lines( gt_parsed_table ) > 1.
-      IF line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "1
-                   ddlanguage = sy-langu ] )
+      IF last_table IS NOT INITIAL
       AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'FROM'.
         cc_join_db( IMPORTING e_res = gt_res ).
       ENDIF.
@@ -245,9 +266,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
   METHOD calculate_top.
 
     IF lines( gt_parsed_table ) > 1.
-      IF ( line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "4
-                   ddlanguage = sy-langu ] )
-      AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'JOIN' ).
+      IF last_table IS NOT INITIAL
+      AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'JOIN'.
         e_expr1 = abap_true.
       ENDIF.
     ENDIF.
@@ -267,12 +287,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
     DATA: l_str         TYPE string.
 
     "Get SQL query text from Editor
-    go_abap_editor->get_text(
-      IMPORTING
-        table                  = lt_codetab
-      EXCEPTIONS
-        error_dp               = 1
-        error_cntl_call_method = 2 ).
+    go_abap_editor->get_text( IMPORTING table   = lt_codetab
+                              EXCEPTIONS OTHERS = 1 ).
     "Split the SQL query into an internal table
     CLEAR: l_str.
     LOOP AT lt_codetab INTO DATA(code).
@@ -287,7 +303,7 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
       AND tabix < lines( lt_table ).
         APPEND VALUE #( tabname = to_upper( lt_table[ tabix - 1 ] ) as = to_upper( lt_table[ tabix + 1 ] ) ) TO gt_astable.
       ENDIF.
-      IF  to_upper( ls_table )              EQ '('    "Tested
+      IF  to_upper( ls_table )              EQ '('
       AND to_upper( lt_table[ tabix + 1 ] ) EQ 'SELECT'
       AND tabix < lines( lt_table ).
         CLEAR gt_astable.
@@ -307,11 +323,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
     "Select the SQL querys from DB table
     LOOP AT gt_sqlclog ASSIGNING FIELD-SYMBOL(<fs_sqlclog>).
-      cl_abap_gzip=>decompress_text(
-        EXPORTING
-          gzip_in = <fs_sqlclog>-sql_log
-        IMPORTING
-          text_out = l_xml ).
+      cl_abap_gzip=>decompress_text( EXPORTING gzip_in = <fs_sqlclog>-sql_log
+                                     IMPORTING text_out = l_xml ).
       CALL TRANSFORMATION id
          SOURCE XML l_xml
          RESULT log = l_sqllog_xml.
@@ -347,7 +360,7 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
                 IF sy-subrc = 0.
                   DATA(lv_join_type) = VALUE #( me->gt_sqlcjche[ left_table = <fs_selstruc>-tabname joined_table = ls_resstruc-tabname ]-join_type DEFAULT 0 ) .
                   APPEND VALUE #( join_type = lv_join_type tabname = ls_resstruc-tabname nr = 1
-                  ddtext = CONV as4text( gt_dd02t[ tabname = ls_resstruc-tabname ddlanguage = sy-langu ]-ddtext ) ) TO lt_restable.
+                                  ddtext = get_table_description( ls_resstruc-tabname ) ) TO lt_restable.
                 ENDIF.
               ENDIF.
             ENDIF.
@@ -377,7 +390,7 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
         APPEND VALUE #( guid_header = gs_sqlcjche-guid_header join_type = gs_sqlcjche-join_type
         join_name = get_join_type( gs_sqlcjche-join_type ) tabname = gs_sqlcjche-joined_table nr = gs_sqlcjche-cnt
-        ddtext = CONV as4text( gt_dd02t[ tabname = gs_sqlcjche-joined_table ddlanguage = sy-langu ]-ddtext ) ) TO lt_restable.
+        ddtext = get_table_description( gs_sqlcjche-joined_table ) ) TO lt_restable.
 
       ENDLOOP.
     ENDLOOP.
@@ -934,8 +947,7 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
     ENDIF.
 
     IF lines( gt_parsed_table ) > 1.
-      IF line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "1
-                   ddlanguage = sy-langu ] )
+      IF last_table IS NOT INITIAL
       AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'FROM'.
         CONCATENATE gv_join_type me->gv_result INTO me->gv_result SEPARATED BY space.
       ENDIF.
@@ -973,8 +985,7 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
     CLEAR: gv_join_type.
     IF lines( gt_parsed_table ) > 1.
-      IF line_exists( gt_dd02t[ tabname    = gt_parsed_table[ lines( gt_parsed_table ) ] "1
-                   ddlanguage = sy-langu ] )
+      IF last_table IS NOT INITIAL
       AND to_upper( gt_parsed_table[ lines( gt_parsed_table ) - 1 ] ) = 'FROM'.
         gv_join_type = me->get_join_type( ls_res-join_type ).
         CONCATENATE gv_join_type me->gv_result INTO me->gv_result SEPARATED BY space.
@@ -1040,8 +1051,6 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
 
     "SQL Log Table
     SELECT * FROM /cadaxo/sqlclog INTO TABLE @gt_sqlclog.
-    "SAP Table Texts
-    SELECT * FROM dd02t INTO TABLE @gt_dd02t.
     "Join Completion Header
     SELECT * FROM /cadaxo/sqlcjche INTO TABLE @gt_sqlcjche.
     "Join Completion Item
@@ -1065,12 +1074,8 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
                                                  to_line   = DATA(l_to_line)
                                                  to_pos    = DATA(l_to_pos) ).
     "Get SQL query text from Editor
-    go_abap_editor->get_text(
-      IMPORTING
-        table                  = lt_code
-      EXCEPTIONS
-        error_dp               = 1
-        error_cntl_call_method = 2 ).
+    go_abap_editor->get_text( IMPORTING table   = lt_code
+                              EXCEPTIONS OTHERS = 2 ).
     IF l_from_line = l_to_line AND l_from_pos = l_to_pos.
       LOOP AT lt_code INTO lv_code.
         IF sy-tabix < l_from_line.
@@ -1118,6 +1123,10 @@ CLASS /CADAXO/CL_SQLC_JOIN_COMPLET IMPLEMENTATION.
         CLEAR gt_seltable.
       ENDIF.
     ENDLOOP.
+
+    IF get_table_description( CONV #( gt_parsed_table[ lines( gt_parsed_table ) ] ) ) IS NOT INITIAL.
+      last_table = gt_parsed_table[ lines( gt_parsed_table ) ].
+    ENDIF.
 
   ENDMETHOD.
 ENDCLASS.

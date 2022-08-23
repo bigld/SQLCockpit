@@ -1658,6 +1658,18 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>B49</KEY>
+       <ENTRY>Code Completion einfügen</ENTRY>
+       <LENGTH>39</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>B50</KEY>
+       <ENTRY>Header einfügen</ENTRY>
+       <LENGTH>23</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>D01</KEY>
        <ENTRY>DEMO Version</ENTRY>
        <LENGTH>12</LENGTH>
@@ -2700,6 +2712,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
+     <CMPNAME>C_TEMPLATE_NAME_ODATA</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Template Name</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
      <CMPNAME>C_WIDTH_RIGHT_CLIPBOARD</CMPNAME>
      <LANGU>D</LANGU>
      <DESCRIPT>clipboard width</DESCRIPT>
@@ -3117,24 +3135,6 @@
      <CMPNAME>GET_CONTENT</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>get HTML/PDF content</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
-     <CMPNAME>GET_CSV_FROM_INT_TAB</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Create CSV Data from Internal Table</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
-     <CMPNAME>GET_CSV_FROM_INT_TAB_CUST</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Create CSV Data from Internal Table with Customization</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>
-     <CMPNAME>GET_CSV_LINE_FROM_TAB</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Convert CSV tabular data into line</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_MAIN</CLSNAME>

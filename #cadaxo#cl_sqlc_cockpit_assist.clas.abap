@@ -310,7 +310,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_assist IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
 
   METHOD blacklist_check_table.
@@ -1833,6 +1833,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist IMPLEMENTATION.
       ENDWHILE.
       CONCATENATE lv_pre lv_post INTO DATA(lv_select).
 
+*      IF lv_select IS NOT INITIAL.
+*        INSERT c_header INTO lt_code INDEX l_from_line.
+*        co_abap_editor->set_text( EXPORTING table = lt_code ).
+*      ELSE.
+*        co_abap_editor->set_text( EXPORTING table = lt_code ).
+*      ENDIF.
       IF to_upper( lv_select ) EQ 'SELECT'.
         INSERT c_header INTO lt_code INDEX l_from_line.
         co_abap_editor->set_text( EXPORTING table = lt_code ).

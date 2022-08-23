@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    program for:   TABLEFRAME_/CADAXO/SQLCRELI
-*   generation date: 14.04.2021 at 11:30:18
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 FUNCTION TABLEFRAME_/CADAXO/SQLCRELI   .
 

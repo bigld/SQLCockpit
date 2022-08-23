@@ -33,9 +33,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     CONSTANTS c_okcode_clipboard TYPE syucomm VALUE 'CLIPBOARD' ##NO_TEXT.
     CONSTANTS c_okcode_symbols TYPE syucomm VALUE 'SYMBOL' ##NO_TEXT.
     CONSTANTS c_saved_list_share TYPE stb_button-function VALUE 'SAVED_LIST_SHARE' ##NO_TEXT.
-    CONSTANTS c_saved_list_share_oth TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_OTH' ##NO_TEXT. "+COCKPIT420
-    CONSTANTS c_saved_list_share_me TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_ME' ##NO_TEXT. "+COCKPIT420
+    CONSTANTS c_saved_list_share_oth TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_OTH' ##NO_TEXT.   "+COCKPIT420
+    CONSTANTS c_saved_list_share_me TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_ME' ##NO_TEXT.   "+COCKPIT420
     CONSTANTS c_sqleditor_name TYPE string VALUE 'CADAXO_SQL_EDITOR' ##NO_TEXT.
+    CONSTANTS c_template_name_odata TYPE /cadaxo/sqlctempl_name VALUE '/CADAXO/ODATA' ##NO_TEXT.
     CONSTANTS gc_saved_list_shared TYPE /cadaxo/sqlc_list_type VALUE 'SHR' ##NO_TEXT.
     CONSTANTS gc_saved_list_job TYPE /cadaxo/sqlc_list_type VALUE 'JOB' ##NO_TEXT.
     CONSTANTS gc_saved_list_manually TYPE /cadaxo/sqlc_list_type VALUE 'MAN' ##NO_TEXT.
@@ -193,29 +194,13 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       IMPORTING
         !is_sqlcsres TYPE /cadaxo/sqlcsres
         !is_sqlcress TYPE /cadaxo/sqlcress .
-    METHODS get_csv_from_int_tab
-      IMPORTING
-        !it_table      TYPE ANY TABLE
-        !i_grid_i      TYPE i
-      EXPORTING
-        !ev_output_csv TYPE t_string .
-    METHODS get_csv_line_from_tab
-      IMPORTING
-        !it_csv_tab        TYPE t_string
-      RETURNING
-        VALUE(rv_csv_line) TYPE string .
+
     METHODS create_symbol_db
       IMPORTING
         !it_symbol_create TYPE t_symbol_db
       RETURNING
         VALUE(rv_success) TYPE boolean .
-    METHODS get_csv_from_int_tab_cust
-      IMPORTING
-        !it_table      TYPE ANY TABLE
-        !i_grid_i      TYPE i
-      EXPORTING
-        !ev_output_csv TYPE t_string
-        !ev_cancel     TYPE abap_bool .
+
   PROTECTED SECTION.
 
     DATA g_trstart_timestamp TYPE timestamp .
@@ -853,7 +838,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !i_tabix       TYPE sy-tabix .
     METHODS tippsandtricks .
   PRIVATE SECTION.
-
+    CONSTANTS: BEGIN OF editor_type,
+                 new TYPE char1 VALUE 'A' ##NO_TEXT,
+                 old TYPE char1 VALUE '',
+               END OF editor_type.
     CONSTANTS:
       BEGIN OF cs_symbol_type,
         user    TYPE char1 VALUE 'U' ##NO_TEXT,
@@ -902,7 +890,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA gt_toolbuttons_symbol TYPE ttb_button .
     DATA gv_selected_counter TYPE sy-tabix .
     DATA gv_selected_total TYPE sy-tabix .
-    DATA g_abap_editor_type TYPE char1 VALUE 'A' ##NO_TEXT.
+    DATA g_abap_editor_type TYPE char1 VALUE editor_type-new.
     DATA g_auth_sql_cockpit_actvt TYPE activ_auth .
     DATA g_curr_col TYPE lvc_fname .
     DATA g_curr_row TYPE /cadaxo/sqlcsymbol_name .
@@ -932,7 +920,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -2019,21 +2007,26 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         CALL FUNCTION 'RS_WORKBENCH_CUSTOMIZING'
           EXPORTING
             choice          = 'WB'
-            suppress_dialog = 'X'
+            suppress_dialog = abap_true
           IMPORTING
             setting         = l_rseumod.
 
-        IF l_rseumod-editcntrl <> 'A'.
-          me->g_abap_editor_type = ' '.
+        IF l_rseumod-editcntrl <> editor_type-new.
+          me->g_abap_editor_type = editor_type-old.
         ENDIF.
       WHEN '01'.
-        me->g_abap_editor_type = 'A'.
+        me->g_abap_editor_type = editor_type-new.
       WHEN '02'.
-        me->g_abap_editor_type = ' '.
+        me->g_abap_editor_type = editor_type-old.
       WHEN OTHERS.
-        me->g_abap_editor_type = 'A'.
+        me->g_abap_editor_type = editor_type-new.
     ENDCASE.
-
+    CALL FUNCTION 'GUI_IS_ITS'
+      IMPORTING
+        return = g_is_its.
+    IF g_is_its = abap_true OR cl_gui_frontend_services=>activex <> gfw_true.
+      me->g_abap_editor_type = editor_type-old.
+    ENDIF.
 
     ADD 1 TO g_main_counter.
     lwa_main-nr  = g_main_counter.
@@ -2044,9 +2037,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 * set initial dates
     me->set_initial_date_history( ).
     me->set_initial_date_jobmonitor( ).
-
-
-
 
     gr_user_log = NEW #( ).
 
@@ -2346,13 +2336,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     IF gc_splitter IS INITIAL.
 
-      CALL FUNCTION 'GUI_IS_ITS'
-        IMPORTING
-          return = g_is_its.
-      IF g_is_its = abap_true OR cl_gui_frontend_services=>activex <> gfw_true.
-        CLEAR me->g_abap_editor_type.
-      ENDIF.
-
       me->create_primary_ui_controls( ).
 
       me->create_result_ui_controls( ).
@@ -2490,7 +2473,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     DATA: ls_lvc_s_layo TYPE lvc_s_layo,
           lt_fieldcat   TYPE lvc_t_fcat.
-    DATA: lv_param_val  TYPE /cadaxo/sqlcparameter_val. "COCKPIT-403
     DATA shellstyle TYPE i.
     shellstyle = cl_gui_container=>ws_visible + cl_gui_container=>ws_child.
 
@@ -2515,19 +2497,20 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     gs_splitter_editor->set_row_height( id = 2 height = 0 ).
     gs_splitter_editor->set_row_sash( id = 2 type = 1 value = gs_splitter_editor->false   ).
 
-    IF me->g_abap_editor_type = 'A' AND g_is_its IS INITIAL.
+    IF me->g_abap_editor_type = editor_type-new.
 
-      "COCKPIT-403
-      SELECT SINGLE parameter_value INTO lv_param_val
-      FROM /cadaxo/sqlcparv WHERE parameter_id = 'SOURCE_CODE_GUI'.
-      IF sy-subrc EQ 0.
-        cl_gui_sourceedit=>l_gui_version = lv_param_val.
+      /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value( EXPORTING  i_parameter_id      = 'SOURCE_CODE_GUI'
+                                                           RECEIVING  r_parameter_value   = DATA(gui_version)
+                                                           EXCEPTIONS parameter_not_found = 1
+                                                                      OTHERS              = 2 ).
+      IF sy-subrc = 0 AND gui_version IS NOT INITIAL.
+        ASSIGN ('CL_GUI_SOURCEEDIT=>L_GUI_VERSION') TO FIELD-SYMBOL(<editor_gui_version>).
+        IF sy-subrc = 0.
+          <editor_gui_version> = gui_version.
+        ENDIF.
       ENDIF.
-      "COCKPIT-403
 
-      CREATE OBJECT gc_abap_editor
-        EXPORTING
-          parent = gcont_abap_editor.
+      gc_abap_editor = NEW #( parent = gcont_abap_editor ).
 
       gc_abap_editor->upload_properties( EXCEPTIONS OTHERS = 4 ).
       gc_abap_editor->init_event_registration( EXCEPTIONS OTHERS = 2 ).
@@ -2640,16 +2623,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 * create the drag/drop object
       CREATE OBJECT dragdrop_behaviour_editor.
 
-      dragdrop_behaviour_editor->add(
-        EXPORTING
-          flavor     = 'ALV_TO_EDITOR_OLD'
-          dragsrc    = ' '
-          droptarget = 'X'
-          effect     = cl_dragdrop=>copy ).
+      dragdrop_behaviour_editor->add( flavor     = 'ALV_TO_EDITOR_OLD'
+                                      dragsrc    = abap_false
+                                      droptarget = abap_true
+                                      effect     = cl_dragdrop=>copy ).
 
-      gc_abap_editor_text->set_dragdrop(
-        EXPORTING
-          dragdrop = dragdrop_behaviour_editor ).
+      gc_abap_editor_text->set_dragdrop( dragdrop_behaviour_editor ).
 
       SET HANDLER: me->on_editor_text_drop                 FOR gc_abap_editor_text.
 
@@ -4578,6 +4557,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                 DATA(start_date) = CONV btcsdate( sy-datum ).      "COCKPIT-488
                 DATA(start_time) = CONV btcstime( sy-uzeit + 5 ).  "COCKPIT-488
                 ls_jobstart_conditions-immediately = abap_false.   "COCKPIT-488
+              ELSE.                                                "COCKPIT-488
+                start_date = '        '.                           "COCKPIT-488
+                start_time = '      '.                             "COCKPIT-488
               ENDIF.                                               "COCKPIT-488
               CALL FUNCTION 'JOB_CLOSE'
                 EXPORTING
@@ -5003,136 +4985,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ENDIF.
 
     et_content =  <lt_html_cache>.
-
-  ENDMETHOD.
-
-
-  METHOD get_csv_from_int_tab.
-
-    DATA lv_output_line  TYPE string.
-    DATA lv_tmp_dats     TYPE char30.
-    DATA lv_tmp_out      TYPE string.
-
-    ASSIGN gt_lvc_t_fcat[ i_grid_i ] TO FIELD-SYMBOL(<lt_fields>).
-
-    LOOP AT <lt_fields> ASSIGNING FIELD-SYMBOL(<ls_field>).
-      lv_output_line = lv_output_line && ';' && <ls_field>-fieldname.
-    ENDLOOP.
-
-    SHIFT lv_output_line BY 1 PLACES.
-    APPEND lv_output_line TO ev_output_csv.
-
-    LOOP AT it_table ASSIGNING FIELD-SYMBOL(<ls_result>).
-
-      CLEAR lv_output_line.
-
-      LOOP AT <lt_fields> ASSIGNING <ls_field>.
-        ASSIGN COMPONENT <ls_field>-fieldname OF STRUCTURE <ls_result> TO FIELD-SYMBOL(<ls_line>).
-
-        IF <ls_field>-inttype = 'D' OR <ls_field>-inttype = 'T'.
-          " Export Date and Time in user format
-          WRITE <ls_line> TO lv_tmp_dats.
-          lv_output_line = lv_output_line && ';' && lv_tmp_dats.
-        ELSEIF <ls_field>-inttype = 'C' AND ( <ls_line> CP '*;*' OR <ls_line> CP '*"*' ).
-          " If Separator or Single Quotes are in Field Then Do same behavior as Excel -> CSV
-          lv_tmp_out = <ls_line>.
-          REPLACE ALL OCCURRENCES OF '"' IN lv_tmp_out WITH '""'.
-          lv_tmp_out = '"' && lv_tmp_out && '"'.
-          lv_output_line = lv_output_line && ';' && lv_tmp_out.
-        ELSE.
-          lv_output_line = lv_output_line && ';' && <ls_line>.
-        ENDIF.
-      ENDLOOP.
-
-      SHIFT lv_output_line BY 1 PLACES.
-      APPEND lv_output_line TO ev_output_csv.
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD get_csv_from_int_tab_cust.
-
-    DATA lv_output_line  TYPE string.
-    DATA lv_tmp_dats     TYPE char30.
-    DATA lv_tmp_out      TYPE string.
-    DATA ls_csv_attr TYPE /cadaxo/sqlc_csv_cust.
-
-    DATA lv_cancel TYPE abap_bool.
-    CALL FUNCTION '/CADAXO/SQLC_CUSTOM_CSV_POPUP'
-      IMPORTING
-        ev_cancel   = lv_cancel
-      CHANGING
-        cs_csv_attr = ls_csv_attr.
-
-    IF lv_cancel = abap_true.
-      ev_cancel = abap_true.
-      RETURN.
-    ENDIF.
-
-    DATA(lv_separator) =   /cadaxo/cl_sqlc_csv_cust_util=>get_separator( EXPORTING i_separator_setting =  ls_csv_attr-field_separator
-                                                                                   i_separator_others  =  ls_csv_attr-field_separator_other ).
-
-    ASSIGN gt_lvc_t_fcat[ i_grid_i ] TO FIELD-SYMBOL(<lt_fields>).
-
-    IF ls_csv_attr-add_header = abap_true.
-      LOOP AT <lt_fields> ASSIGNING FIELD-SYMBOL(<ls_field>).
-        lv_output_line = lv_output_line && lv_separator && <ls_field>-fieldname.
-      ENDLOOP.
-
-      SHIFT lv_output_line BY 1 PLACES.
-      APPEND lv_output_line TO ev_output_csv.
-    ENDIF.
-
-    LOOP AT it_table ASSIGNING FIELD-SYMBOL(<ls_result>).
-      CLEAR lv_output_line.
-
-      LOOP AT <lt_fields> ASSIGNING <ls_field>.
-        ASSIGN COMPONENT <ls_field>-fieldname OF STRUCTURE <ls_result> TO FIELD-SYMBOL(<ls_line>).
-
-        IF  <ls_field>-inttype = 'T'.
-          " Export Date and Time in user format
-          lv_tmp_dats = /cadaxo/cl_sqlc_csv_cust_util=>convert_time(
-                            EXPORTING
-                              i_time_type       = ls_csv_attr-time_format
-                              i_time_int        = <ls_line> ).
-          lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
-        ELSEIF <ls_field>-inttype = 'D'.
-          lv_tmp_dats = /cadaxo/cl_sqlc_csv_cust_util=>convert_date(
-                            EXPORTING
-                              i_date_type       = ls_csv_attr-date_format
-                              i_date            = <ls_line> ).
-          lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
-        ELSEIF <ls_field>-inttype = 'C' AND ( <ls_line> CP |*{ lv_separator }*| OR <ls_line> CP '*"*' ).
-          " If Separator or Single Quotes are in Field Then Do same behavior as Excel -> CSV
-          lv_tmp_out = <ls_line>.
-          REPLACE ALL OCCURRENCES OF '"' IN lv_tmp_out WITH '""'.
-          lv_tmp_out = '"' && lv_tmp_out && '"'.
-          lv_output_line = lv_output_line && lv_separator && lv_tmp_out.
-        ELSE.
-          lv_output_line = lv_output_line && lv_separator && <ls_line>.
-        ENDIF.
-      ENDLOOP.
-
-      SHIFT lv_output_line BY 1 PLACES.
-      APPEND lv_output_line TO ev_output_csv.
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD get_csv_line_from_tab.
-
-    LOOP AT it_csv_tab INTO DATA(ls_tab_line).
-      IF sy-tabix = 1.
-        rv_csv_line = ls_tab_line.
-      ELSE.
-        rv_csv_line = rv_csv_line && cl_abap_char_utilities=>cr_lf && ls_tab_line.
-      ENDIF.
-      CLEAR ls_tab_line.
-    ENDLOOP.
 
   ENDMETHOD.
 
@@ -6892,13 +6744,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     IF <lt_result> IS NOT INITIAL.
 
 *Begin of Insert Cockpit-398
-      CALL METHOD me->get_csv_from_int_tab_cust
-        EXPORTING
-          it_table      = <lt_result>
-          i_grid_i      = i_grid_i
-        IMPORTING
-          ev_output_csv = iv_output_table
-          ev_cancel     = DATA(lv_cancel).
+      /cadaxo/cl_sqlc_csv_cust_util=>get_csv_from_itab( EXPORTING it_table      = <lt_result>
+                                                                  i_fieldcat    = <lt_fields>
+                                                        IMPORTING ev_output_csv = iv_output_table
+                                                                  ev_cancel     = DATA(lv_cancel) ).
+
       IF lv_cancel = abap_true.
         RETURN.
       ENDIF.
@@ -8757,6 +8607,19 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         READ TABLE gt_cl_sql_parse INDEX 1 ASSIGNING <l_cl_sql_parse>.
         IF sy-subrc = 0.
 
+          IF <l_sql_template_alv>-template_name = me->c_template_name_odata.
+
+            TRY.
+                <l_cl_sql_parse>->check_sql_odata_syntax( ).
+              CATCH /cadaxo/cx_sqlc_syntax_error.
+                MESSAGE s163(/cadaxo/sqlc) DISPLAY LIKE 'E'.
+                RETURN.
+              CATCH /cadaxo/cx_sqlc_odata_gen.
+                MESSAGE s162(/cadaxo/sqlc) DISPLAY LIKE 'E'.
+                RETURN.
+            ENDTRY.
+          ENDIF.
+
           <l_cl_sql_parse>->parse_sql_ii( ).
 
           <l_cl_sql_parse>->parse_sql_where_columns( ).
@@ -8841,7 +8704,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     menu->add_function( fcode = c_cmd_insert_table      text  = text-b04 ).
     menu->add_function( fcode = c_cmd_insert_cds_entity text = text-b38 ).
     menu->add_function( fcode = c_cmd_insert_sy_field   text  = text-b05 ). "CDX25012010
-    menu->add_function( fcode = c_cmd_insert_cc         text = text-b49 ). "COCKPIT-474 'Insert Code Completion'
+"    menu->add_function( fcode = c_cmd_insert_cc         text = text-b49 ). "COCKPIT-474 'Insert Code Completion'
     menu->add_function( fcode = c_cmd_insert_header     text = text-b50 ). "COCKPIT-472 'Insert Header
     menu->add_function( fcode = c_cmd_pp                text = text-b34 ).  "COCKPIT-260
 
@@ -8924,12 +8787,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           MOVE l_tabname TO l_string.
           me->insert_table_to_editor( EXPORTING i_string = l_string ).
         ENDIF.
-      WHEN c_cmd_insert_cc.     "COCKPIT-474
-        /cadaxo/cl_sqlc_cockpit_assist=>code_completion( EXPORTING i_abap_editor = gc_abap_editor
-                                                         IMPORTING e_string      = l_string ).
-        IF sy-subrc = 0 AND NOT l_string IS INITIAL.
-          me->insert_table_to_editor( EXPORTING i_string = l_string  ).
-        ENDIF.
+*      WHEN c_cmd_insert_cc.     "COCKPIT-474
+*        /cadaxo/cl_sqlc_cockpit_assist=>code_completion( EXPORTING i_abap_editor = gc_abap_editor
+*                                                         IMPORTING e_string      = l_string ).
+*        IF sy-subrc = 0 AND NOT l_string IS INITIAL.
+*          me->insert_table_to_editor( EXPORTING i_string = l_string  ).
+*        ENDIF.
       WHEN c_cmd_insert_header. "COCKPIT-472
         /cadaxo/cl_sqlc_cockpit_assist=>insert_select_header(
                   CHANGING co_abap_editor = gc_abap_editor ).
@@ -9131,25 +8994,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   METHOD on_editor_insert_pattern.
 
-    DATA lr_parser    TYPE REF TO cl_abap_parser.
-
     "COCKPIT-481 Code Completion Insertation
-* read workbench formatting settings
-*    lr_parser->get_settings( IMPORTING settings = DATA(settings).
-    TYPES:
-      BEGIN OF t_user_settings,
-        keywords_lower_case   TYPE abap_bool,
-        identifier_lower_case TYPE abap_bool,
-        func_default_actparam TYPE abap_bool,
-        func_without_others   TYPE abap_bool,
-        meth_default_actparam TYPE abap_bool,
-        meth_without_others   TYPE abap_bool,
-        meth_with_try         TYPE abap_bool,
-        meth_func_call        TYPE abap_bool,
-      END   OF t_user_settings .
-    DATA settings TYPE t_user_settings.
+    DATA settings TYPE cl_abap_parser=>t_user_settings.
 
-    lr_parser = NEW #( m_max_components = 30 ).
+    DATA(lr_parser) = NEW cl_abap_parser( m_max_components = 30 ).
 * get insertion text
     lr_parser->calculate_insertion_result(
       EXPORTING kind           = datatype
@@ -9290,7 +9138,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         CATCH cx_sy_invalid_regex.
       ENDTRY.
 
-      REPLACE ALL OCCURRENCES OF REGEX '[^a-zA-Z0-9_\\]' IN contextstring WITH space.
+      REPLACE ALL OCCURRENCES OF REGEX '[^a-zA-Z0-9_\\\/]' IN contextstring WITH space.
 
       IF contextstring CA '\'.
         /cadaxo/cl_sqlc_cockpit_assist=>get_cds_view_of_association(
@@ -14244,7 +14092,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 ****************************************************************************************************
 
 * set sql editor
-    IF me->g_abap_editor_type = 'A'.
+    IF me->g_abap_editor_type = editor_type-new.
       IF gc_abap_editor IS BOUND.
         gc_abap_editor->set_text(
           EXPORTING
