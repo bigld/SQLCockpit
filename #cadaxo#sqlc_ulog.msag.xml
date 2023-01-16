@@ -59,6 +59,12 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>XPRA: Set Update Version to &amp;1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
      <MSGNR>020</MSGNR>
      <TEXT>User &amp;1 was assigned to role &amp;2</TEXT>
     </T100>

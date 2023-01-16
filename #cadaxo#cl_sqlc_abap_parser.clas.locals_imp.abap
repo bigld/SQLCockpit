@@ -917,7 +917,7 @@ CLASS lcl_short_text IMPLEMENTATION.
           CLEAR l_tail.
         ENDIF.
 
-      WHEN sccmp_tag_typepool.
+      WHEN 'TP'.
         l_srch = fullname+4.
         SPLIT l_srch AT '\' INTO l_head l_tail.
         IF l_head IS INITIAL.
@@ -1214,7 +1214,7 @@ CLASS lcl_short_text IMPLEMENTATION.
             l_srch = l_tail.
           ENDIF.
 
-        WHEN sccmp_tag_typepool.
+        WHEN 'TP'.
           l_srch = l_srch+3.
           SPLIT l_srch AT '\' INTO l_head l_tail.
           IF l_head IS NOT INITIAL.
@@ -1420,30 +1420,30 @@ CLASS lcl_enhanced_quick_info IMPLEMENTATION.
         returning_parameters = data(returning_parameters)
         exceptions_list      = data(exceptions_list)
         class_exceptions     = data(class_exceptions) ).
-
-    atl = NEW #( ).
-    TRY.
-        DATA(source) = atl->ATL_BASIC_METHOD(
-            method_name          = method_name
-            role_text            = role_text
-            importing_parameters = importing_parameters
-            exporting_parameters = exporting_parameters
-            changing_parameters  = changing_parameters
-            returning_parameters = returning_parameters
-            exceptions_list      = exceptions_list
-            short_text           = shorttext
-            class_exceptions     = class_exceptions
-            abstract             = abstract
-            event_handler        = event_handler ).
-      CATCH cx_abap_template_parse_error INTO data(ref).
-        MESSAGE ref TYPE 'I'.
-    ENDTRY.
-
-    lcl_enhanced_quick_info=>convert_source_to_help_txt(
-       EXPORTING
-          source = source
-       CHANGING
-          help_text = help_text ).
+*
+*    atl = NEW #( ).
+*    TRY.
+*        DATA(source) = atl->ATL_BASIC_METHOD(
+*            method_name          = method_name
+*            role_text            = role_text
+*            importing_parameters = importing_parameters
+*            exporting_parameters = exporting_parameters
+*            changing_parameters  = changing_parameters
+*            returning_parameters = returning_parameters
+*            exceptions_list      = exceptions_list
+*            short_text           = shorttext
+*            class_exceptions     = class_exceptions
+*            abstract             = abstract
+*            event_handler        = event_handler ).
+*      CATCH cx_abap_template_parse_error INTO data(ref).
+*        MESSAGE ref TYPE 'I'.
+*    ENDTRY.
+*
+*    lcl_enhanced_quick_info=>convert_source_to_help_txt(
+*       EXPORTING
+*          source = source
+*       CHANGING
+*          help_text = help_text ).
 
   ENDMETHOD.                    "method_formatting
 
