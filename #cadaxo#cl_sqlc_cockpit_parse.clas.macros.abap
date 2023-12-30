@@ -270,6 +270,9 @@ DEFINE create_dynamic_select_subpool2.
       CHANGING ct_code = lt_abap_code
     ).
 
+*{   INSERT         A4HK9F001G                                        2
+me->get_code_dbhints( CHANGING ct_code = lt_abap_code ).
+*}   INSERT
     me->get_code_group_by( CHANGING ct_code = lt_abap_code ).
 
     me->get_code_having( CHANGING ct_code = lt_abap_code ).
@@ -291,7 +294,10 @@ DEFINE create_dynamic_select_subpool2.
 
     me->get_code_connection( CHANGING ct_code = lt_abap_code ).
 
-    me->get_code_dbhints( CHANGING ct_code = lt_abap_code ).
+*{   REPLACE        A4HK9F001G                                        1
+*\    me->get_code_dbhints( CHANGING ct_code = lt_abap_code ).
+   " me->get_code_dbhints( CHANGING ct_code = lt_abap_code ).
+*}   REPLACE
 
     APPEND '.' TO lt_abap_code.
 

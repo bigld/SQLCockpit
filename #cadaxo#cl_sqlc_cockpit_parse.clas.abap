@@ -938,6 +938,9 @@ END-ENHANCEMENT-SECTION.
     EXPORTING i_only_initval = abap_true
     CHANGING ct_code = e_abap_code
   ).
+  IF i_select_version = c_select_version_2.
+     i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
+  endif.
 
   i_cl_cockpit_parse->get_code_group_by( CHANGING ct_code = e_abap_code ).
 
@@ -976,7 +979,9 @@ END-ENHANCEMENT-SECTION.
 
   ENDIF.
 
-  i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
+  IF i_select_version = c_select_version_1.
+     i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
+  endif.
 
   APPEND '.' TO e_abap_code.
 
@@ -1868,6 +1873,13 @@ METHOD create_alv_field_catalog_v_2.
           <ls_lvc_s_fcat>-key        = <ls_ddfields>-keyflag.
           <ls_lvc_s_fcat>-datatype   = <ls_ddfields>-datatype.
           <ls_lvc_s_fcat>-no_sign    = abap_false.                             "COCKPIT-181
+
+          CASE <ls_lvc_s_fcat>-datatype.
+            WHEN 'CURR'.
+              <ls_lvc_s_fcat>-cfieldname = <ls_ddfields>-reffield.
+            WHEN 'QUAN'.
+              <ls_lvc_s_fcat>-qfieldname = <ls_ddfields>-reffield.
+          ENDCASE.
         ENDIF.
 
         IF <ls_lvc_s_fcat>-scrtext_s IS INITIAL.
@@ -2927,7 +2939,9 @@ m_execute_select_v_2.
   me->gs_client_handling
   g_user_settings.
 
-  TRANSLATE me->dbhint_syntax USING `' `.
+*{   DELETE         A4HK9F001G                                        1
+*\  TRANSLATE me->dbhint_syntax USING `' `.
+*}   DELETE
 
   TRY.
 
@@ -4855,6 +4869,11 @@ METHOD parse_sql_ii_2.
            count(1)    TYPE c,
          END OF t_tab_field.
 
+  TYPES: BEGIN OF typ_source_ddfields,
+           table    TYPE c LENGTH 30,
+           ddfields TYPE ddfields,
+         END OF typ_source_ddfields.
+
   DATA: l_skip          TYPE i,
         l_tabix_next    TYPE i,
         l_tab_field     TYPE t_tab_field,
@@ -4868,7 +4887,7 @@ METHOD parse_sql_ii_2.
         lr_ref_data     TYPE REF TO data,
         l_string        TYPE string,                       "FOE999
         l_lines         TYPE i.
-  DATA l_open_lit       TYPE c LENGTH 1.
+  "DATA l_open_lit       TYPE c LENGTH 1.
   DATA l_cols           TYPE string.
 
   FIELD-SYMBOLS: <l_source_split_next> TYPE string,
@@ -4898,14 +4917,22 @@ METHOD parse_sql_ii_2.
   ENDLOOP.
 *** $001, Lekic, 15.01.2016 END
 
+  DATA lr_struct TYPE REF TO cl_abap_structdescr.
+  DATA lt_source_ddfields TYPE TABLE OF typ_source_ddfields.
+  LOOP AT me->result_source_t ASSIGNING FIELD-SYMBOL(<source>).
+    APPEND INITIAL LINE TO lt_source_ddfields ASSIGNING FIELD-SYMBOL(<source_ddfields>).
+    <source_ddfields>-table = <source>-table.
+    lr_struct ?= cl_abap_structdescr=>describe_by_name( <source>-table ).
+    <source_ddfields>-ddfields = lr_struct->get_ddic_field_list( ).
+  ENDLOOP.
 
   CLEAR column_words_t.
 * no special columns selected, only one table (SELECT * FROM ... )
   IF me->column_syntax EQ '*' OR me->column_syntax CS '~*'.
 * create a local data, type table
 
-    DESCRIBE TABLE me->result_source_t LINES l_lines.       "FOE999
-    IF l_lines GT 1.                                        "FOE999
+    DESCRIBE TABLE me->result_source_t LINES l_lines.
+    IF l_lines GT 1.
       LOOP AT me->result_source_t
            ASSIGNING <l_result_source>.
 
@@ -4926,7 +4953,7 @@ METHOD parse_sql_ii_2.
             MOVE-CORRESPONDING <l_dfies> TO ls_result_field.
             MOVE ls_result_field-fieldname TO ls_result_field-colhd_fieldname.
 
-            MOVE <l_result_source>-alias TO ls_result_field-/cadaxo/alias.
+            ls_result_field-/cadaxo/alias = <l_result_source>-alias.
 
             APPEND ls_result_field TO me->gt_result_ddfields.
           ENDLOOP.
@@ -4934,7 +4961,7 @@ METHOD parse_sql_ii_2.
         ENDIF.
       ENDLOOP.
 
-    ELSE.                                                   "FOE999
+    ELSE.
       READ TABLE me->result_source_t INDEX 1 ASSIGNING <l_result_source>.
 
       TRY.
@@ -4965,7 +4992,6 @@ METHOD parse_sql_ii_2.
   ELSE.
 
     CLEAR: l_skip.
-*    SPLIT me->column_syntax AT space INTO TABLE lt_column_split. "SQLC30
 
     DATA l_string_check  TYPE string.
     DATA l_string_append TYPE string.
@@ -5110,8 +5136,8 @@ METHOD parse_sql_ii_2.
 
         MOVE-CORRESPONDING l_field_dfies TO ls_result_field.
 
-        MOVE <l_tab_field>-alias TO ls_result_field-/cadaxo/alias.
-        MOVE <l_tab_field>-alias_field TO ls_result_field-/cadaxo/alias_field.
+        ls_result_field-/cadaxo/alias = <l_tab_field>-alias.
+        ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
 
         MOVE 'COUNT(   * )' TO   ls_result_field-colhd_fieldname.
         MOVE 'Count( * )' TO : ls_result_field-scrtext_l,
@@ -5125,6 +5151,21 @@ METHOD parse_sql_ii_2.
       ELSE.
 
         TRY.
+
+            IF <l_tab_field>-table IS INITIAL.
+              LOOP AT lt_source_ddfields ASSIGNING <source_ddfields>.
+                READ TABLE <source_ddfields>-ddfields WITH KEY fieldname = <l_tab_field>-field ASSIGNING FIELD-SYMBOL(<ddfields_field>).
+                IF sy-subrc = 0.
+                  ls_result_field = CORRESPONDING #( <ddfields_field> ).
+                  ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
+                  ls_result_field-/cadaxo/alias = <l_tab_field>-alias.
+                  APPEND ls_result_field TO me->gt_result_ddfields.
+                  EXIT.
+                ENDIF.
+              ENDLOOP.
+              CONTINUE.
+            ENDIF.
+
             lcl_structtype ?= /cadaxo/cl_sqlc_cockpit_parse=>get_abap_typedescr( <l_tab_field>-table ). "get table type
 
             lt_fields = me->get_ddic_field_list( lcl_structtype ).            "get fields (dfies)
@@ -5186,8 +5227,8 @@ METHOD parse_sql_ii_2.
                 CLEAR ls_result_field-aggr.
               ENDIF.
 
-              MOVE <l_tab_field>-alias TO ls_result_field-/cadaxo/alias.
-              MOVE <l_tab_field>-alias_field TO ls_result_field-/cadaxo/alias_field.
+              ls_result_field-/cadaxo/alias = <l_tab_field>-alias.
+              ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
 
 * append field attributes to return table
               APPEND ls_result_field TO me->gt_result_ddfields.
@@ -5206,6 +5247,12 @@ METHOD parse_sql_ii_2.
 
   ENDIF.
 
+  LOOP AT me->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<result_ddfield_ref>) WHERE reftable IS NOT INITIAL AND reffield IS NOT INITIAL.
+    READ TABLE me->gt_result_ddfields WITH KEY tabname = <result_ddfield_ref>-reftable fieldname = <result_ddfield_ref>-reffield ASSIGNING FIELD-SYMBOL(<result_ddfield>).
+    IF sy-subrc = 0 AND <result_ddfield>-/cadaxo/alias_field IS NOT INITIAL.
+      <result_ddfield_ref>-reffield = <result_ddfield>-/cadaxo/alias_field.
+    ENDIF.
+  ENDLOOP.
 
 ENDMETHOD.
 
@@ -6088,8 +6135,8 @@ endmethod.
               ENDLOOP.
             ENDIF.
             IF <ls_ddfieldsg> IS ASSIGNED.
-              <ls_ddfields>-reffield        = <ls_ddfieldsg>-fieldname.
-              <ls_ddfields>-reftable        = <ls_ddfieldsg>-tabname.
+              <ls_ddfields>-reffield        = <ls_ddfieldsg>-reffield.
+              <ls_ddfields>-datatype        = <ls_ddfieldsg>-datatype.
               <ls_ddfields>-keyflag         = <ls_ddfieldsg>-keyflag.
               <ls_ddfields>-/cadaxo/alias   = <ls_ddfieldsg>-/cadaxo/alias.
             ENDIF.
