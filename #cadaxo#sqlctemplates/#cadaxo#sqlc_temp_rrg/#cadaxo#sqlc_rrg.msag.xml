@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>SQL Cockpit - RRG Wizard</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>000</MSGNR>
+     <TEXT>&amp;1 &amp;2 &amp;3 &amp;4</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>Please enter a new unique name for the structure. &amp;1 already exists</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>Unknown error! &amp;1 &amp;2 &amp;3 &amp;4</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>Object generation not possible in this system/client</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>Report &amp;1 already exists. Enter a different report id.</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

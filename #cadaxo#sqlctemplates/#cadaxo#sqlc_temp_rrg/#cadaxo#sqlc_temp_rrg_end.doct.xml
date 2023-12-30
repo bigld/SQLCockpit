@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DOCT" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DOC>
+    <item>
+     <DOKIL>
+      <ID>TX</ID>
+      <OBJECT>/CADAXO/SQLC_TEMP_RRG_END</OBJECT>
+      <LANGU>E</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0003</VERSION>
+      <MASTERLANG>X</MASTERLANG>
+      <TXTLINES>00013</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>/CADAXO/SQLC_TEMP_RRG_END</TDNAME>
+      <TDID>TX</TDID>
+      <TDSPRAS>E</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00003</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Template Wizard - Summary</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>The RRG Objects can be generated now with the specified input.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>T2</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Create Structure&lt;/&gt;,,,,&amp;CDXCRE_DICT&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Create Class&lt;/&gt;,,,,&amp;CDXCRE_CLASS&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;RRG Setting&lt;/&gt;,,,,&amp;CDXCRE_CLASS&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>T2</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Structure&lt;/&gt;,,,,&amp;CDXSTRUCTURE&amp; &lt;ZK&gt;&amp;CDXSTRUCTURE_DESCR&amp;&lt;/&gt;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>T2</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;ABAP Class&lt;/&gt;,,,,&amp;CDXABAP_CLASS&amp; &lt;ZK&gt;&amp;CDXABAP_CLASS_DESCR&amp;&lt;/&gt;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>T2</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Report ID/Title&lt;/&gt;,,,,&amp;CDXRRG_REPORT_ID&amp; &lt;ZK&gt;&amp;CDXRRG_TITLE&amp;&lt;/&gt;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Description&lt;/&gt;,,,,&amp;CDXRRG_DESCRIPTION&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Output Table Type&lt;/&gt;,,,,&amp;CDXRRG_OUTPUT_TABLE_TYPE&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Report Status&lt;/&gt;,,,,&amp;CDXRRG_STATUS&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Report is active&lt;/&gt;,,,,&amp;CDXRRG_ACTIVE&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+       <TDLINE>&lt;!KEYS!&gt;</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+   </DOC>
+  </asx:values>
+ </asx:abap>
+</abapGit>
