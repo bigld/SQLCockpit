@@ -5153,6 +5153,7 @@ METHOD parse_sql_ii_2.
         TRY.
 
             IF <l_tab_field>-table IS INITIAL.
+              "Neuer Code
               LOOP AT lt_source_ddfields ASSIGNING <source_ddfields>.
                 READ TABLE <source_ddfields>-ddfields WITH KEY fieldname = <l_tab_field>-field ASSIGNING FIELD-SYMBOL(<ddfields_field>).
                 IF sy-subrc = 0.
