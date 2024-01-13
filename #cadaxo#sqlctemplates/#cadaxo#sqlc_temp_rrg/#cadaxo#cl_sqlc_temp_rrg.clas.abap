@@ -512,15 +512,22 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
     get_new_line( CHANGING ct_code = ev_source ).
 
-    LOOP AT gr_parser->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<ddfield>) WHERE /cadaxo/alias IS NOT INITIAL.
-        r_redefine = abap_true.
-        IF <ddfield>-/cadaxo/alias_field IS NOT INITIAL.
-          APPEND |     when '{ <ddfield>-/cadaxo/alias_field }'.| TO ev_source.
-        ELSE.
-          APPEND |     when '{ <ddfield>-fieldname }'.| TO ev_source.
-        ENDIF.
-        APPEND |        r_fieldname = '{ <ddfield>-/cadaxo/alias }~{ <ddfield>-fieldname }'. | TO ev_source.
-        get_new_line( CHANGING ct_code = ev_source ).
+    LOOP AT gr_parser->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<ddfield>) WHERE ( /cadaxo/alias IS NOT INITIAL OR /cadaxo/alias_field IS NOT INITIAL ).
+      r_redefine = abap_true.
+
+      IF <ddfield>-/cadaxo/alias_field IS NOT INITIAL.
+        APPEND |     when '{ <ddfield>-/cadaxo/alias_field }'.| TO ev_source.
+      ELSE.
+        APPEND |     when '{ <ddfield>-fieldname }'.| TO ev_source.
+      ENDIF.
+
+      IF <ddfield>-/cadaxo/alias_value IS NOT INITIAL.
+        APPEND |        r_fieldname = `{ <ddfield>-/cadaxo/alias_value }`. | TO ev_source.
+      ELSE.
+        APPEND |        r_fieldname = `{ <ddfield>-/cadaxo/alias }~{ <ddfield>-fieldname }`. | TO ev_source.
+      ENDIF.
+
+      get_new_line( CHANGING ct_code = ev_source ).
 
     ENDLOOP.
 

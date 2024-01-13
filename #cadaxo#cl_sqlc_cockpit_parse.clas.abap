@@ -5153,7 +5153,7 @@ METHOD parse_sql_ii_2.
         TRY.
 
             IF <l_tab_field>-table IS INITIAL.
-              "Neuer Code
+
               LOOP AT lt_source_ddfields ASSIGNING <source_ddfields>.
                 READ TABLE <source_ddfields>-ddfields WITH KEY fieldname = <l_tab_field>-field ASSIGNING FIELD-SYMBOL(<ddfields_field>).
                 IF sy-subrc = 0.
@@ -5162,9 +5162,18 @@ METHOD parse_sql_ii_2.
                   ls_result_field-/cadaxo/alias = <l_tab_field>-alias.
                   APPEND ls_result_field TO me->gt_result_ddfields.
                   EXIT.
+                ELSE.
+                  CLEAR ls_result_field.
+
+                  ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
+                  ls_result_field-/cadaxo/alias_value = <l_tab_field>-field.
+                  APPEND ls_result_field TO me->gt_result_ddfields.
+
                 ENDIF.
               ENDLOOP.
+
               CONTINUE.
+
             ENDIF.
 
             lcl_structtype ?= /cadaxo/cl_sqlc_cockpit_parse=>get_abap_typedescr( <l_tab_field>-table ). "get table type
@@ -6136,10 +6145,11 @@ endmethod.
               ENDLOOP.
             ENDIF.
             IF <ls_ddfieldsg> IS ASSIGNED.
-              <ls_ddfields>-reffield        = <ls_ddfieldsg>-reffield.
-              <ls_ddfields>-datatype        = <ls_ddfieldsg>-datatype.
-              <ls_ddfields>-keyflag         = <ls_ddfieldsg>-keyflag.
-              <ls_ddfields>-/cadaxo/alias   = <ls_ddfieldsg>-/cadaxo/alias.
+              <ls_ddfields>-reffield            = <ls_ddfieldsg>-reffield.
+              <ls_ddfields>-datatype            = <ls_ddfieldsg>-datatype.
+              <ls_ddfields>-keyflag             = <ls_ddfieldsg>-keyflag.
+              <ls_ddfields>-/cadaxo/alias       = <ls_ddfieldsg>-/cadaxo/alias.
+              <ls_ddfields>-/cadaxo/alias_value = <ls_ddfieldsg>-/cadaxo/alias_value.
             ENDIF.
           ENDLOOP.
 
