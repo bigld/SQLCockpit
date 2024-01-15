@@ -322,9 +322,11 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
           WHEN 'P'. <ls_dd03p>-datatype = 'DEC'.
           WHEN 'D'. <ls_dd03p>-datatype = 'DATS'.
           WHEN 'T'. <ls_dd03p>-datatype = 'TIMS'.
-          WHEN 'X'. <ls_dd03p>-datatype = 'BOOL'.
+          WHEN 'N'. <ls_dd03p>-datatype = 'NUMC'.
+          WHEN 'X'. <ls_dd03p>-datatype = 'RAW'.
           WHEN 'STRING'. <ls_dd03p>-datatype = 'STRING'.
-          WHEN 'XSTRING'. <ls_dd03p>-datatype = 'XSTRING'.
+          WHEN 'XSTRING'. <ls_dd03p>-datatype = 'RAWSTRING'.
+
             "when others then exception
         ENDCASE.
 
