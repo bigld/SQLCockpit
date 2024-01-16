@@ -5127,6 +5127,7 @@ METHOD parse_sql_ii_2.
     LOOP AT lt_tab_field ASSIGNING <l_tab_field>.
 
       CLEAR l_field_dfies.
+      CLEAR ls_result_field.
 
       IF <l_tab_field>-field EQ '*' OR <l_tab_field>-field EQ 'COUNT(*)' OR <l_tab_field>-field EQ 'COUNT( * )'.
 
@@ -5134,7 +5135,7 @@ METHOD parse_sql_ii_2.
 
         l_field_dfies = lcl_elemdescr->get_ddic_field( ).
 
-        MOVE-CORRESPONDING l_field_dfies TO ls_result_field.
+        ls_result_field = CORRESPONDING #( l_field_dfies ).
 
         ls_result_field-/cadaxo/alias = <l_tab_field>-alias.
         ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
@@ -5168,7 +5169,7 @@ METHOD parse_sql_ii_2.
                   ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
                   ls_result_field-/cadaxo/alias_value = <l_tab_field>-field.
                   APPEND ls_result_field TO me->gt_result_ddfields.
-
+                  exit.
                 ENDIF.
               ENDLOOP.
 
@@ -5183,7 +5184,7 @@ METHOD parse_sql_ii_2.
             READ TABLE lt_fields WITH KEY fieldname = <l_tab_field>-field ASSIGNING <l_dfies>.
             IF sy-subrc EQ 0.
 
-              MOVE-CORRESPONDING <l_dfies> TO ls_result_field.
+              ls_result_field = CORRESPONDING #( <l_dfies> ).
 
 * change the column header texts
               IF NOT <l_tab_field>-aggr IS INITIAL.
