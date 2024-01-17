@@ -177,7 +177,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
 
   METHOD add_entity_attributes.
