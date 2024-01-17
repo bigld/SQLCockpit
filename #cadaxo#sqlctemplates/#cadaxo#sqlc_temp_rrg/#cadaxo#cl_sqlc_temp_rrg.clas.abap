@@ -393,6 +393,8 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
     DATA system_cliindep_edit   TYPE t000-ccnocliind.
     DATA system_client_role     TYPE t000-cccategory.
 
+" try
+
     "generation is only permitted in open customer systems.
     CALL FUNCTION 'TR_SYS_PARAMS'
       IMPORTING
@@ -412,6 +414,23 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
     ENDIF.
 
+  "  check_system_settings( ).
+
+  "  check_fields_syntax( ).
+
+   " check_select_single( ).
+
+    if me->gr_parser->fields_syntax is not initial.
+      MESSAGE s005(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
+      RETURN.
+    endif.
+
+    if me->gr_parser->g_select_single is not initial.
+      MESSAGE s006(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
+      RETURN.
+    endif.
+
+
     CALL FUNCTION '/CADAXO/SQLC_TEMP_RRG_WIZ'
       EXPORTING
         io_rrg_wiz     = me
@@ -424,6 +443,10 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
     IF sy-subrc <> 0.
       MESSAGE s042(/cadaxo/sqlc) DISPLAY LIKE 'E'.
     ENDIF.
+
+    "catch ...
+
+    "endtry
 
   ENDMETHOD.
 
@@ -526,7 +549,11 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
       IF <ddfield>-/cadaxo/alias_value IS NOT INITIAL.
         APPEND |        r_fieldname = `{ <ddfield>-/cadaxo/alias_value }`. | TO ev_source.
       ELSE.
-        APPEND |        r_fieldname = `{ <ddfield>-/cadaxo/alias }~{ <ddfield>-fieldname }`. | TO ev_source.
+        IF <ddfield>-/cadaxo/alias IS NOT INITIAL.
+          APPEND |        r_fieldname = `{ <ddfield>-/cadaxo/alias }~{ <ddfield>-fieldname }`. | TO ev_source.
+        ELSE.
+          APPEND |        r_fieldname = `{ <ddfield>-fieldname }`. | TO ev_source.
+        ENDIF.
       ENDIF.
 
       get_new_line( CHANGING ct_code = ev_source ).

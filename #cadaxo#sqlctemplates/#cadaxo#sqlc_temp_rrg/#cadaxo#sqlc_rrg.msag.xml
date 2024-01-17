@@ -38,6 +38,18 @@
      <MSGNR>004</MSGNR>
      <TEXT>Report &amp;1 already exists. Enter a different report id.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>SELECT with FIELDS is not yet supported by the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>SELECT SINGLE is not yet supported by the wizard.</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>
