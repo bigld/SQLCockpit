@@ -748,7 +748,7 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
     DATA l_line TYPE string.
 
     IF NOT gr_parser->where_syntax IS INITIAL.
-      CONCATENATE ' WHERE (' gr_parser->where_syntax ')' INTO l_line SEPARATED BY space.
+      CONCATENATE ' WHERE (' gr_parser->where_syntax ' )' INTO l_line SEPARATED BY space.
       APPEND l_line TO ct_code.
       APPEND ' AND (where)' TO ct_code.
     ELSE.
