@@ -242,10 +242,10 @@ private section.
                                 with unique key kind identifier .
 
   data M_REPL_SOURCE type SREPTAB .
-  constants C_MAXHITS_FIRST_LEVEL type I value 10 ##NO_TEXT.
-  constants C_MAXHITS_SECOND_LEVEL type I value 5 ##NO_TEXT.
-  constants C_MAX_COMPONENTS type I value 30 ##NO_TEXT.
-  constants C_STMT_TERMINATOR type CHAR1 value '.' ##NO_TEXT.
+  constants C_MAXHITS_FIRST_LEVEL type I value 10. "#EC NOTEXT
+  constants C_MAXHITS_SECOND_LEVEL type I value 5. "#EC NOTEXT
+  constants C_MAX_COMPONENTS type I value 30. "#EC NOTEXT
+  constants C_STMT_TERMINATOR type CHAR1 value '.'. "#EC NOTEXT
   data M_INCLNAME type SYREPID .
   data M_MAINPROG type SYREPID .
   data M_PROGTYPE type SUBC .
@@ -261,7 +261,7 @@ private section.
   class-data M_BASICTYPE_NAMES type BASICTYPE_NAMES .
   data M_MAX_ITEMS type TT_MAX_ITEMS .
   data M_BEG_TOKEN_XPOS type I .
-  data C_MAXGRADE_FOR_SHORTTEXT type I value 1 ##NO_TEXT.
+  data C_MAXGRADE_FOR_SHORTTEXT type I value 1. "#EC NOTEXT    .  .  .  .  . " .
   data M_CCIMP_REQUIRED type ABAP_BOOL .
 
   methods GET_DATA_INFO
