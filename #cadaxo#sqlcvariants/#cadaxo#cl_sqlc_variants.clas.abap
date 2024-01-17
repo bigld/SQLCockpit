@@ -217,7 +217,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_variants IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_VARIANTS IMPLEMENTATION.
 
 
   METHOD add_to_favorites.
