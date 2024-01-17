@@ -4835,31 +4835,6 @@ ENDMETHOD.
 
 METHOD parse_sql_ii_2.
 
-****************************************************************************************************
-* Description             : PARSE SQL II                                                           *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 15.01.2016 | Ana Lekic            | New logic for identify the tables and       | $001           *
-*            |                      | alias                                       |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 16.09.2016 | Johann Foessleitner  | Tables with / Namespace                     | $002           *
-*------------+----------------------+---------------------------------------------+----------------*
-* 28.12.2016 | Domi Bigl            | INT8                                        |$003 COCKPIT-148*
-****************************************************************************************************
-
   TYPES: BEGIN OF t_tab_field,
            table       TYPE string,
            field       TYPE string,
@@ -4882,13 +4857,14 @@ METHOD parse_sql_ii_2.
         ls_result_field TYPE /cadaxo/sqlcdfies,
         lcl_structtype  TYPE REF TO cl_abap_structdescr,
         lcl_elemdescr   TYPE REF TO cl_abap_elemdescr,
-        lt_fields       TYPE ddfields,
-        lt_column_split TYPE TABLE OF string,
-        lr_ref_data     TYPE REF TO data,
-        l_string        TYPE string,                       "FOE999
-        l_lines         TYPE i.
-  "DATA l_open_lit       TYPE c LENGTH 1.
-  DATA l_cols           TYPE string.
+        lt_fields       TYPE ddfields.
+  DATA lt_column_split TYPE TABLE OF string.
+  DATA lr_ref_data TYPE REF TO data.
+  DATA l_string TYPE string.
+  DATA l_lines TYPE i.
+  DATA l_cols TYPE string.
+  DATA lr_struct TYPE REF TO cl_abap_structdescr.
+  DATA lt_source_ddfields TYPE TABLE OF typ_source_ddfields.
 
   FIELD-SYMBOLS: <l_source_split_next> TYPE string,
                  <l_column_split>      TYPE string,
@@ -4900,12 +4876,9 @@ METHOD parse_sql_ii_2.
          me->gt_result_ddfields,
          me->result_source_t.
 
-  MOVE me->source_syntax TO l_string.                       "FOE999
+  l_string = me->source_syntax.
+  CONDENSE l_string.
 
-  CONDENSE l_string.                                        "FOE999
-
-*** $001, Lekic, 15.01.2016 BEGIN
-*** new logic for finding tables and alias
   /cadaxo/cl_sqlc_cockpit_assist=>replace_apostrophes_with_space( CHANGING c_string = l_string ).
   SPLIT l_string AT | JOIN | INTO TABLE DATA(lt_joins).
 
@@ -4915,10 +4888,7 @@ METHOD parse_sql_ii_2.
       APPEND VALUE #( table = l_table alias = l_alias ) TO me->result_source_t.
     ENDIF.
   ENDLOOP.
-*** $001, Lekic, 15.01.2016 END
 
-  DATA lr_struct TYPE REF TO cl_abap_structdescr.
-  DATA lt_source_ddfields TYPE TABLE OF typ_source_ddfields.
   LOOP AT me->result_source_t ASSIGNING FIELD-SYMBOL(<source>).
     APPEND INITIAL LINE TO lt_source_ddfields ASSIGNING FIELD-SYMBOL(<source_ddfields>).
     <source_ddfields>-table = <source>-table.
@@ -5104,7 +5074,6 @@ METHOD parse_sql_ii_2.
         ENDIF.
       ELSE.
 
-
         CLEAR l_tab_field.
 
         me->split_field_v_2(
@@ -5127,7 +5096,6 @@ METHOD parse_sql_ii_2.
     LOOP AT lt_tab_field ASSIGNING <l_tab_field>.
 
       CLEAR l_field_dfies.
-      CLEAR ls_result_field.
 
       IF <l_tab_field>-field EQ '*' OR <l_tab_field>-field EQ 'COUNT(*)' OR <l_tab_field>-field EQ 'COUNT( * )'.
 
@@ -5135,7 +5103,7 @@ METHOD parse_sql_ii_2.
 
         l_field_dfies = lcl_elemdescr->get_ddic_field( ).
 
-        ls_result_field = CORRESPONDING #( l_field_dfies ).
+        MOVE-CORRESPONDING l_field_dfies TO ls_result_field.
 
         ls_result_field-/cadaxo/alias = <l_tab_field>-alias.
         ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
@@ -5156,6 +5124,7 @@ METHOD parse_sql_ii_2.
             IF <l_tab_field>-table IS INITIAL.
 
               LOOP AT lt_source_ddfields ASSIGNING <source_ddfields>.
+
                 READ TABLE <source_ddfields>-ddfields WITH KEY fieldname = <l_tab_field>-field ASSIGNING FIELD-SYMBOL(<ddfields_field>).
                 IF sy-subrc = 0.
                   ls_result_field = CORRESPONDING #( <ddfields_field> ).
@@ -5169,7 +5138,7 @@ METHOD parse_sql_ii_2.
                   ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
                   ls_result_field-/cadaxo/alias_value = <l_tab_field>-field.
                   APPEND ls_result_field TO me->gt_result_ddfields.
-                  exit.
+
                 ENDIF.
               ENDLOOP.
 
@@ -5184,7 +5153,7 @@ METHOD parse_sql_ii_2.
             READ TABLE lt_fields WITH KEY fieldname = <l_tab_field>-field ASSIGNING <l_dfies>.
             IF sy-subrc EQ 0.
 
-              ls_result_field = CORRESPONDING #( <l_dfies> ).
+              MOVE-CORRESPONDING <l_dfies> TO ls_result_field.
 
 * change the column header texts
               IF NOT <l_tab_field>-aggr IS INITIAL.
