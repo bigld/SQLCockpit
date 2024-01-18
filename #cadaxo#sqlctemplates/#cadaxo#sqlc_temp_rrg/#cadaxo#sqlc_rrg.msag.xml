@@ -50,6 +50,30 @@
      <MSGNR>006</MSGNR>
      <TEXT>SELECT SINGLE is not yet supported by the wizard.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>SELECT * with JOIN not yet supported by the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>Rewrite your SELECT with modern Open SQL syntax to start the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>SELECT statements with parameters not yet supported by the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>010</MSGNR>
+     <TEXT>Symbols are not yet supported by the wizard.</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

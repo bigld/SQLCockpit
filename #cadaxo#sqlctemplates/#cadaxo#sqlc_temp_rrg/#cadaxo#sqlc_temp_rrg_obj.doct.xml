@@ -9,10 +9,10 @@
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_OBJ</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
-      <VERSION>0001</VERSION>
+      <VERSION>0002</VERSION>
       <MASTERLANG>X</MASTERLANG>
-      <TXTLINES>00006</TXTLINES>
-      <DOKSTATE>A</DOKSTATE>
+      <TXTLINES>00007</TXTLINES>
+      <DOKSTATE>R</DOKSTATE>
      </DOKIL>
      <HEAD>
       <TDOBJECT>DOKU</TDOBJECT>
@@ -21,32 +21,35 @@
       <TDSPRAS>E</TDSPRAS>
       <TDFORM>S_DOCU_SHOW</TDFORM>
       <TDSTYLE>S_DOCUS1</TDSTYLE>
-      <TDVERSION>00001</TDVERSION>
+      <TDVERSION>00002</TDVERSION>
       <TDLINESIZE>072</TDLINESIZE>
      </HEAD>
      <LINES>
       <TLINE>
        <TDFORMAT>U1</TDFORMAT>
-       <TDLINE>SQL Cockpit - Rapid Report Generator Template Wizard</TDLINE>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Wizard</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
-       <TDLINE>Please select the objects you want to create. You can generate the</TDLINE>
+       <TDLINE>Choose the objects you want to create. You can generate the following</TDLINE>
       </TLINE>
       <TLINE>
-       <TDLINE>following objects:</TDLINE>
+       <TDLINE>objects from your SELECT statement for integration into your</TDLINE>
       </TLINE>
       <TLINE>
-       <TDFORMAT>B1</TDFORMAT>
-       <TDLINE>Dictionary Structure</TDLINE>
-      </TLINE>
-      <TLINE>
-       <TDFORMAT>B1</TDFORMAT>
-       <TDLINE>ABAP Rapid Report Generator Class</TDLINE>
+       <TDLINE>Rapid Report Generator:</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>B1</TDFORMAT>
-       <TDLINE>Rapid Report Generator Setting</TDLINE>
+       <TDLINE>DDIC Result Structure</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>B1</TDFORMAT>
+       <TDLINE>ABAP Class</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>B1</TDFORMAT>
+       <TDLINE>RRG Settings</TDLINE>
       </TLINE>
      </LINES>
     </item>

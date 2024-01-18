@@ -168,37 +168,27 @@ FORM load_html .
 
   IF gcc_description IS INITIAL.
 
-    CREATE OBJECT gcc_description
-      EXPORTING
-        parent         = cl_gui_container=>default_screen
-        container_name = 'GCC_DESCRIPTION'
-      EXCEPTIONS
-        OTHERS         = 0.
+    gcc_description = NEW #(
+      parent         = cl_gui_container=>default_screen
+      container_name = 'GCC_DESCRIPTION'
+      lifetime       = 1 ).
 
-    CREATE OBJECT gc_description
-      EXPORTING
-        parent = gcc_description
-        uiflag = cl_gui_html_viewer=>uiflag_noiemenu
-      EXCEPTIONS
-        OTHERS = 0.
+    gc_description = NEW #(
+      parent = gcc_description
+      uiflag = cl_gui_html_viewer=>uiflag_noiemenu ).
 
   ENDIF.
 
   IF gcc_roadmap IS INITIAL.
 
-    CREATE OBJECT gcc_roadmap
-      EXPORTING
-        parent         = cl_gui_container=>default_screen
-        container_name = 'GCC_ROADMAP'
-      EXCEPTIONS
-        OTHERS         = 0.
+    gcc_roadmap = NEW #(
+      parent         = cl_gui_container=>default_screen
+      container_name = 'GCC_ROADMAP'
+      lifetime       = 1 ).
 
-    CREATE OBJECT gc_roadmap
-      EXPORTING
-        parent = gcc_roadmap
-        uiflag = cl_gui_html_viewer=>uiflag_noiemenu
-      EXCEPTIONS
-        OTHERS = 0.
+    gc_roadmap = NEW #(
+      parent = gcc_roadmap
+      uiflag = cl_gui_html_viewer=>uiflag_noiemenu ).
 
     g_event-eventid = gc_roadmap->m_id_sapevent.
     g_event-appl_event = 'x'.

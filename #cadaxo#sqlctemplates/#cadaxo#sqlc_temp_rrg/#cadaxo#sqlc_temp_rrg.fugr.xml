@@ -399,7 +399,7 @@
       <TYPE>I</TYPE>
       <NEXTSCREEN>0120</NEXTSCREEN>
       <LINES>027</LINES>
-      <COLUMNS>120</COLUMNS>
+      <COLUMNS>121</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -413,11 +413,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT001</NAME>
-       <TEXT>Create_Structure</TEXT>
+       <TEXT>Create_Result_Structure</TEXT>
        <LINE>002</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>016</LENGTH>
-       <VISLENGTH>016</VISLENGTH>
+       <LENGTH>023</LENGTH>
+       <VISLENGTH>023</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -442,11 +442,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT002</NAME>
-       <TEXT>Create_ABAP_RRG_Class</TEXT>
+       <TEXT>Create_ABAP_Class</TEXT>
        <LINE>003</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>021</LENGTH>
-       <VISLENGTH>021</VISLENGTH>
+       <LENGTH>017</LENGTH>
+       <VISLENGTH>017</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -471,11 +471,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT003</NAME>
-       <TEXT>Create_RRG_Customizing</TEXT>
+       <TEXT>Create_RRG_Settings</TEXT>
        <LINE>004</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>022</LENGTH>
-       <VISLENGTH>022</VISLENGTH>
+       <LENGTH>019</LENGTH>
+       <VISLENGTH>019</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>
@@ -535,7 +535,7 @@
       <TYPE>I</TYPE>
       <NEXTSCREEN>0130</NEXTSCREEN>
       <LINES>027</LINES>
-      <COLUMNS>120</COLUMNS>
+      <COLUMNS>121</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -549,11 +549,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT001</NAME>
-       <TEXT>Structure</TEXT>
+       <TEXT>Result_Structure</TEXT>
        <LINE>002</LINE>
        <COLUMN>002</COLUMN>
-       <LENGTH>009</LENGTH>
-       <VISLENGTH>009</VISLENGTH>
+       <LENGTH>016</LENGTH>
+       <VISLENGTH>016</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <REQU_ENTRY>N</REQU_ENTRY>

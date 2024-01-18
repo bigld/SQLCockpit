@@ -1,0 +1,17 @@
+CLASS /cadaxo/cx_sqlc_rrg_wiz DEFINITION
+  PUBLIC
+  INHERITING FROM cx_static_Check
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+  interfaces IF_T100_MESSAGE .
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS /cadaxo/cx_sqlc_rrg_wiz IMPLEMENTATION.
+ENDCLASS.

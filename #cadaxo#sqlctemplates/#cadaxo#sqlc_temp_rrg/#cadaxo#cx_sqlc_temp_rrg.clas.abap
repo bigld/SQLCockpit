@@ -1,23 +1,23 @@
-class /CADAXO/CX_SQLC_TEMP_RRG definition
-  public
-  inheriting from CX_STATIC_CHECK
-  create public .
+CLASS /cadaxo/cx_sqlc_temp_rrg DEFINITION
+  PUBLIC
+  INHERITING FROM cx_static_check
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces IF_T100_MESSAGE .
+    INTERFACES if_t100_message .
 
-  constants:
-    begin of PROCESS_CANCELED,
-      msgid type symsgid value '/CADAXO/SQLC',
-      msgno type symsgno value '042',
-      attr1 type scx_attrname value '',
-      attr2 type scx_attrname value '',
-      attr3 type scx_attrname value '',
-      attr4 type scx_attrname value '',
-    end of PROCESS_CANCELED .
-  constants:
-    BEGIN OF system_error,
+    CONSTANTS:
+      BEGIN OF process_canceled,
+        msgid TYPE symsgid VALUE '/CADAXO/SQLC',
+        msgno TYPE symsgno VALUE '042',
+        attr1 TYPE scx_attrname VALUE '',
+        attr2 TYPE scx_attrname VALUE '',
+        attr3 TYPE scx_attrname VALUE '',
+        attr4 TYPE scx_attrname VALUE '',
+      END OF process_canceled .
+    CONSTANTS:
+      BEGIN OF system_error,
         msgid TYPE symsgid VALUE '/CADAXO/SQLC_UPDATE',
         msgno TYPE symsgno VALUE '000',
         attr1 TYPE scx_attrname VALUE '',
@@ -26,44 +26,43 @@ public section.
         attr4 TYPE scx_attrname VALUE '',
       END OF system_error .
 
-  methods CONSTRUCTOR
-    importing
-      !TEXTID like IF_T100_MESSAGE=>T100KEY optional
-      !PREVIOUS like PREVIOUS optional .
-  class-methods RAISE_T100
-    importing
-      value(IV_MSGID) type SYMSGID default SY-MSGID
-      value(IV_MSGNO) type SYMSGNO default SY-MSGNO
-      value(IV_MSGV1) type SYMSGV default SY-MSGV1
-      value(IV_MSGV2) type SYMSGV default SY-MSGV2
-      value(IV_MSGV3) type SYMSGV default SY-MSGV3
-      value(IV_MSGV4) type SYMSGV default SY-MSGV4
-    raising
-      /CADAXO/CX_SQLC_ODATA_GEN .
-protected section.
-private section.
+    METHODS constructor
+      IMPORTING
+        !textid   LIKE if_t100_message=>t100key OPTIONAL
+        !previous LIKE previous OPTIONAL .
+    CLASS-METHODS raise_t100
+      IMPORTING
+        VALUE(iv_msgid) TYPE symsgid DEFAULT sy-msgid
+        VALUE(iv_msgno) TYPE symsgno DEFAULT sy-msgno
+        VALUE(iv_msgv1) TYPE symsgv DEFAULT sy-msgv1
+        VALUE(iv_msgv2) TYPE symsgv DEFAULT sy-msgv2
+        VALUE(iv_msgv3) TYPE symsgv DEFAULT sy-msgv3
+        VALUE(iv_msgv4) TYPE symsgv DEFAULT sy-msgv4
+      RAISING
+        /cadaxo/cx_sqlc_odata_gen .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CX_SQLC_TEMP_RRG IMPLEMENTATION.
+CLASS /cadaxo/cx_sqlc_temp_rrg IMPLEMENTATION.
 
 
-  method CONSTRUCTOR.
-CALL METHOD SUPER->CONSTRUCTOR
-EXPORTING
-PREVIOUS = PREVIOUS
-.
-clear me->textid.
-if textid is initial.
-  IF_T100_MESSAGE~T100KEY = IF_T100_MESSAGE=>DEFAULT_TEXTID.
-else.
-  IF_T100_MESSAGE~T100KEY = TEXTID.
-endif.
-  endmethod.
+  METHOD constructor ##ADT_SUPPRESS_GENERATION.
+    CALL METHOD super->constructor
+      EXPORTING
+        previous = previous.
+    CLEAR me->textid.
+    IF textid IS INITIAL.
+      if_t100_message~t100key = if_t100_message=>default_textid.
+    ELSE.
+      if_t100_message~t100key = textid.
+    ENDIF.
+  ENDMETHOD.
 
 
-  METHOD RAISE_T100.
+  METHOD raise_t100.
 
     DATA: ls_t100_key TYPE scx_t100key.
 

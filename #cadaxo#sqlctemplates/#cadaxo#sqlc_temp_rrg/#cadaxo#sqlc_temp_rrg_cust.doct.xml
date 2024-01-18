@@ -9,10 +9,10 @@
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_CUST</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
-      <VERSION>0001</VERSION>
+      <VERSION>0002</VERSION>
       <MASTERLANG>X</MASTERLANG>
       <TXTLINES>00007</TXTLINES>
-      <DOKSTATE>A</DOKSTATE>
+      <DOKSTATE>R</DOKSTATE>
      </DOKIL>
      <HEAD>
       <TDOBJECT>DOKU</TDOBJECT>
@@ -21,34 +21,34 @@
       <TDSPRAS>E</TDSPRAS>
       <TDFORM>S_DOCU_SHOW</TDFORM>
       <TDSTYLE>S_DOCUS1</TDSTYLE>
-      <TDVERSION>00001</TDVERSION>
+      <TDVERSION>00002</TDVERSION>
       <TDLINESIZE>072</TDLINESIZE>
      </HEAD>
      <LINES>
       <TLINE>
        <TDFORMAT>U1</TDFORMAT>
-       <TDLINE>SQL Cockpit - Rapid Report Generator Template Wizard</TDLINE>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Wizard</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
-       <TDLINE>Some information must now be entered here for the initial settings of</TDLINE>
+       <TDLINE>To complete the initialization of your Rapid Report please enter the</TDLINE>
       </TLINE>
       <TLINE>
-       <TDLINE>the report in the &lt;ZH&gt;Rapid Report Generator&lt;/&gt;.</TDLINE>
-      </TLINE>
-      <TLINE>
-       <TDFORMAT>*</TDFORMAT>
-       <TDLINE>Of course, the settings can be changed later directly in Rapid Report</TDLINE>
-      </TLINE>
-      <TLINE>
-       <TDLINE>Generator Customizing.</TDLINE>
+       <TDLINE>minimally required information below.</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
-       <TDLINE>If you set &quot;Reaport is active&quot; to true, the report is available</TDLINE>
+       <TDLINE>You can change these settings later on in the &lt;ZH&gt;Rapid Report&lt;/&gt;</TDLINE>
       </TLINE>
       <TLINE>
-       <TDLINE> immediately after the wizard.</TDLINE>
+       <TDLINE>&lt;ZH&gt;Generator&lt;/&gt;.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Check &quot;Report is active&quot; to make the report available right after</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>wizard completion.</TDLINE>
       </TLINE>
      </LINES>
     </item>
