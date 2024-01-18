@@ -9,10 +9,10 @@
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_CLASS</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
-      <VERSION>0003</VERSION>
+      <VERSION>0004</VERSION>
       <MASTERLANG>X</MASTERLANG>
       <TXTLINES>00002</TXTLINES>
-      <DOKSTATE>A</DOKSTATE>
+      <DOKSTATE>R</DOKSTATE>
      </DOKIL>
      <HEAD>
       <TDOBJECT>DOKU</TDOBJECT>
@@ -21,13 +21,13 @@
       <TDSPRAS>E</TDSPRAS>
       <TDFORM>S_DOCU_SHOW</TDFORM>
       <TDSTYLE>S_DOCUS1</TDSTYLE>
-      <TDVERSION>00003</TDVERSION>
+      <TDVERSION>00004</TDVERSION>
       <TDLINESIZE>072</TDLINESIZE>
      </HEAD>
      <LINES>
       <TLINE>
        <TDFORMAT>U1</TDFORMAT>
-       <TDLINE>SQL Cockpit - Rapid Report Generator Template Wizard</TDLINE>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Wizard</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>

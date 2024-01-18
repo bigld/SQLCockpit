@@ -9,10 +9,10 @@
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_START</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
-      <VERSION>0001</VERSION>
+      <VERSION>0002</VERSION>
       <MASTERLANG>X</MASTERLANG>
-      <TXTLINES>00007</TXTLINES>
-      <DOKSTATE>A</DOKSTATE>
+      <TXTLINES>00008</TXTLINES>
+      <DOKSTATE>R</DOKSTATE>
      </DOKIL>
      <HEAD>
       <TDOBJECT>DOKU</TDOBJECT>
@@ -21,27 +21,30 @@
       <TDSPRAS>E</TDSPRAS>
       <TDFORM>S_DOCU_SHOW</TDFORM>
       <TDSTYLE>S_DOCUS1</TDSTYLE>
-      <TDVERSION>00001</TDVERSION>
+      <TDVERSION>00002</TDVERSION>
       <TDLINESIZE>072</TDLINESIZE>
      </HEAD>
      <LINES>
       <TLINE>
        <TDFORMAT>U1</TDFORMAT>
-       <TDLINE>SQL Cockpit - Rapid Report Generator Template Wizard</TDLINE>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Wizard</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
-       <TDLINE>Using the template wizard you can generate a RRG ABAP Class  for the</TDLINE>
+       <TDLINE>Use this wizard to generate an ABAP Class and a Result Structure</TDLINE>
       </TLINE>
       <TLINE>
-       <TDLINE>current SELECT statement.</TDLINE>
+       <TDLINE>from the current SELECT statement for quick use inside your Rapid</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Report Generator.</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
-       <TDLINE>You can move between the steps by using &lt;ZH&gt;Next&lt;/&gt; and &lt;ZH&gt;Back&lt;/&gt;  or</TDLINE>
+       <TDLINE>Move between the steps with &lt;ZH&gt;Back&lt;/&gt; and &lt;ZH&gt;Continue&lt;/&gt; down below</TDLINE>
       </TLINE>
       <TLINE>
-       <TDLINE>use the explicit step link.</TDLINE>
+       <TDLINE>or via the step links to the left.</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
