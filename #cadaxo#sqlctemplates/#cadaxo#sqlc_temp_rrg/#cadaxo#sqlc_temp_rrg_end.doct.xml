@@ -9,7 +9,7 @@
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_END</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
-      <VERSION>0003</VERSION>
+      <VERSION>0005</VERSION>
       <MASTERLANG>X</MASTERLANG>
       <TXTLINES>00013</TXTLINES>
       <DOKSTATE>A</DOKSTATE>
@@ -21,13 +21,13 @@
       <TDSPRAS>E</TDSPRAS>
       <TDFORM>S_DOCU_SHOW</TDFORM>
       <TDSTYLE>S_DOCUS1</TDSTYLE>
-      <TDVERSION>00003</TDVERSION>
+      <TDVERSION>00005</TDVERSION>
       <TDLINESIZE>072</TDLINESIZE>
      </HEAD>
      <LINES>
       <TLINE>
        <TDFORMAT>U1</TDFORMAT>
-       <TDLINE>SQL Cockpit - Rapid Report Generator Template Wizard - Summary</TDLINE>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Wizard - Summary</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
@@ -46,14 +46,14 @@
       </TLINE>
       <TLINE>
        <TDFORMAT>/</TDFORMAT>
-       <TDLINE>&lt;ZH&gt;RRG Setting&lt;/&gt;,,,,&amp;CDXCRE_CLASS&amp;</TDLINE>
+       <TDLINE>&lt;ZH&gt;RRG Settings&lt;/&gt;,,,,&amp;CDXCRE_CLASS&amp;</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>/</TDFORMAT>
       </TLINE>
       <TLINE>
        <TDFORMAT>T2</TDFORMAT>
-       <TDLINE>&lt;ZH&gt;Structure&lt;/&gt;,,,,&amp;CDXSTRUCTURE&amp; &lt;ZK&gt;&amp;CDXSTRUCTURE_DESCR&amp;&lt;/&gt;</TDLINE>
+       <TDLINE>&lt;ZH&gt;Result Structure&lt;/&gt;,,,,&amp;CDXSTRUCTURE&amp; &lt;ZK&gt;&amp;CDXSTRUCTURE_DESCR&amp;&lt;/&gt;</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>/</TDFORMAT>

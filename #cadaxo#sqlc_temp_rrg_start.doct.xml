@@ -9,10 +9,10 @@
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_START</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
-      <VERSION>0002</VERSION>
+      <VERSION>0003</VERSION>
       <MASTERLANG>X</MASTERLANG>
       <TXTLINES>00008</TXTLINES>
-      <DOKSTATE>R</DOKSTATE>
+      <DOKSTATE>A</DOKSTATE>
      </DOKIL>
      <HEAD>
       <TDOBJECT>DOKU</TDOBJECT>
@@ -21,7 +21,7 @@
       <TDSPRAS>E</TDSPRAS>
       <TDFORM>S_DOCU_SHOW</TDFORM>
       <TDSTYLE>S_DOCUS1</TDSTYLE>
-      <TDVERSION>00002</TDVERSION>
+      <TDVERSION>00003</TDVERSION>
       <TDLINESIZE>072</TDLINESIZE>
      </HEAD>
      <LINES>
@@ -31,13 +31,13 @@
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
-       <TDLINE>Use this wizard to generate an ABAP Class and a Result Structure</TDLINE>
+       <TDLINE>Use this wizard to generate an ABAP Class and a Result Structure from</TDLINE>
       </TLINE>
       <TLINE>
-       <TDLINE>from the current SELECT statement for quick use inside your Rapid</TDLINE>
+       <TDLINE>the current SELECT statement for quick use inside your Rapid Report</TDLINE>
       </TLINE>
       <TLINE>
-       <TDLINE>Report Generator.</TDLINE>
+       <TDLINE>Generator.</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
@@ -51,7 +51,7 @@
        <TDLINE>On the last step you get a summary and you can start the generation with</TDLINE>
       </TLINE>
       <TLINE>
-       <TDLINE>the function &lt;ZH&gt;Complete.&lt;/&gt;</TDLINE>
+       <TDLINE>the &lt;ZH&gt;Generate Objects&lt;/&gt; button.</TDLINE>
       </TLINE>
      </LINES>
     </item>
