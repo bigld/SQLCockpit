@@ -1,14 +1,14 @@
-CLASS /cadaxo/cx_sqlc_temp_rrg DEFINITION
-  PUBLIC
-  INHERITING FROM cx_static_check
-  CREATE PUBLIC .
+class /CADAXO/CX_SQLC_TEMP_RRG definition
+  public
+  inheriting from CX_STATIC_CHECK
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
-    INTERFACES if_t100_message .
+  interfaces IF_T100_MESSAGE .
 
-    CONSTANTS:
-      BEGIN OF process_canceled,
+  constants:
+    BEGIN OF process_canceled,
         msgid TYPE symsgid VALUE '/CADAXO/SQLC',
         msgno TYPE symsgno VALUE '042',
         attr1 TYPE scx_attrname VALUE '',
@@ -16,8 +16,8 @@ CLASS /cadaxo/cx_sqlc_temp_rrg DEFINITION
         attr3 TYPE scx_attrname VALUE '',
         attr4 TYPE scx_attrname VALUE '',
       END OF process_canceled .
-    CONSTANTS:
-      BEGIN OF system_error,
+  constants:
+    BEGIN OF system_error,
         msgid TYPE symsgid VALUE '/CADAXO/SQLC_UPDATE',
         msgno TYPE symsgno VALUE '000',
         attr1 TYPE scx_attrname VALUE '',
@@ -26,27 +26,27 @@ CLASS /cadaxo/cx_sqlc_temp_rrg DEFINITION
         attr4 TYPE scx_attrname VALUE '',
       END OF system_error .
 
-    METHODS constructor
-      IMPORTING
-        !textid   LIKE if_t100_message=>t100key OPTIONAL
-        !previous LIKE previous OPTIONAL .
-    CLASS-METHODS raise_t100
-      IMPORTING
-        VALUE(iv_msgid) TYPE symsgid DEFAULT sy-msgid
-        VALUE(iv_msgno) TYPE symsgno DEFAULT sy-msgno
-        VALUE(iv_msgv1) TYPE symsgv DEFAULT sy-msgv1
-        VALUE(iv_msgv2) TYPE symsgv DEFAULT sy-msgv2
-        VALUE(iv_msgv3) TYPE symsgv DEFAULT sy-msgv3
-        VALUE(iv_msgv4) TYPE symsgv DEFAULT sy-msgv4
-      RAISING
-        /cadaxo/cx_sqlc_odata_gen .
+  methods CONSTRUCTOR
+    importing
+      !TEXTID like IF_T100_MESSAGE=>T100KEY optional
+      !PREVIOUS like PREVIOUS optional .
+  class-methods RAISE_T100
+    importing
+      value(IV_MSGID) type SYMSGID default SY-MSGID
+      value(IV_MSGNO) type SYMSGNO default SY-MSGNO
+      value(IV_MSGV1) type SYMSGV default SY-MSGV1
+      value(IV_MSGV2) type SYMSGV default SY-MSGV2
+      value(IV_MSGV3) type SYMSGV default SY-MSGV3
+      value(IV_MSGV4) type SYMSGV default SY-MSGV4
+    raising
+      /CADAXO/CX_SQLC_ODATA_GEN .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS /cadaxo/cx_sqlc_temp_rrg IMPLEMENTATION.
+CLASS /CADAXO/CX_SQLC_TEMP_RRG IMPLEMENTATION.
 
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.

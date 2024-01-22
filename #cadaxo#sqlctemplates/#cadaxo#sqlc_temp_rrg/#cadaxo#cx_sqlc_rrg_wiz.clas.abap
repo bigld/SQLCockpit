@@ -1,14 +1,14 @@
-CLASS /cadaxo/cx_sqlc_rrg_wiz DEFINITION
-  PUBLIC
-  INHERITING FROM cx_static_Check
-  CREATE PUBLIC .
+class /CADAXO/CX_SQLC_RRG_WIZ definition
+  public
+  inheriting from CX_STATIC_CHECK
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
   interfaces IF_T100_MESSAGE .
 
-  CONSTANTS:
-      BEGIN OF wiz_checks,
+  constants:
+    BEGIN OF wiz_checks,
         msgid TYPE symsgid VALUE '/CADAXO/SQLC_RRG',
         msgno TYPE symsgno VALUE '000',
         attr1 TYPE scx_attrname VALUE '',
@@ -16,30 +16,92 @@ CLASS /cadaxo/cx_sqlc_rrg_wiz DEFINITION
         attr3 TYPE scx_attrname VALUE '',
         attr4 TYPE scx_attrname VALUE '',
       END OF wiz_checks .
+  constants:
+    begin of SYMBOLS_NOT_SUPPORTED,
+      msgid type symsgid value '/CADAXO/SQLC_RRG',
+      msgno type symsgno value '010',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of SYMBOLS_NOT_SUPPORTED .
+  constants:
+    begin of PARAMETERS_NOT_SUPPORED,
+      msgid type symsgid value '/CADAXO/SQLC_RRG',
+      msgno type symsgno value '009',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of PARAMETERS_NOT_SUPPORED .
+  constants:
+    begin of OLD_SYNTAX_NOT_SUPPORTED,
+      msgid type symsgid value '/CADAXO/SQLC_RRG',
+      msgno type symsgno value '008',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of OLD_SYNTAX_NOT_SUPPORTED .
+  constants:
+    begin of SELECT_STAR_NOT_SUPPORTED,
+      msgid type symsgid value '/CADAXO/SQLC_RRG',
+      msgno type symsgno value '007',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of SELECT_STAR_NOT_SUPPORTED .
+  constants:
+    begin of SELECT_SINGLE_NOT_SUPPORTED,
+      msgid type symsgid value '/CADAXO/SQLC_RRG',
+      msgno type symsgno value '006',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of SELECT_SINGLE_NOT_SUPPORTED .
+  constants:
+    begin of FILEDS_NOT_SUPPORTED,
+      msgid type symsgid value '/CADAXO/SQLC_RRG',
+      msgno type symsgno value '005',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of FILEDS_NOT_SUPPORTED .
+  constants:
+    begin of OBJECT_GENERATION_NOT_POSSIBLE,
+      msgid type symsgid value '/CADAXO/SQLC_RRG',
+      msgno type symsgno value '003',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of OBJECT_GENERATION_NOT_POSSIBLE .
 
-  METHODS constructor
-      IMPORTING
-        !textid   LIKE if_t100_message=>t100key OPTIONAL
-        !previous LIKE previous OPTIONAL .
-
-  CLASS-METHODS raise_t100
-      IMPORTING
-        VALUE(iv_msgid) TYPE symsgid DEFAULT sy-msgid
-        VALUE(iv_msgno) TYPE symsgno DEFAULT sy-msgno
-        VALUE(iv_msgv1) TYPE symsgv DEFAULT sy-msgv1
-        VALUE(iv_msgv2) TYPE symsgv DEFAULT sy-msgv2
-        VALUE(iv_msgv3) TYPE symsgv DEFAULT sy-msgv3
-        VALUE(iv_msgv4) TYPE symsgv DEFAULT sy-msgv4
-      RAISING
-        /cadaxo/cx_sqlc_temp_rrg .
-
+  methods CONSTRUCTOR
+    importing
+      !TEXTID like IF_T100_MESSAGE=>T100KEY optional
+      !PREVIOUS like PREVIOUS optional .
+  class-methods RAISE_T100
+    importing
+      value(IV_MSGID) type SYMSGID default SY-MSGID
+      value(IV_MSGNO) type SYMSGNO default SY-MSGNO
+      value(IV_MSGV1) type SYMSGV default SY-MSGV1
+      value(IV_MSGV2) type SYMSGV default SY-MSGV2
+      value(IV_MSGV3) type SYMSGV default SY-MSGV3
+      value(IV_MSGV4) type SYMSGV default SY-MSGV4
+    raising
+      /CADAXO/CX_SQLC_TEMP_RRG .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS /cadaxo/cx_sqlc_rrg_wiz IMPLEMENTATION.
+CLASS /CADAXO/CX_SQLC_RRG_WIZ IMPLEMENTATION.
+
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.
     CALL METHOD super->constructor

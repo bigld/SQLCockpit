@@ -59,13 +59,13 @@
     <item>
      <ID>I</ID>
      <KEY>S04</KEY>
-     <ENTRY>ABAP RRG Class</ENTRY>
+     <ENTRY>ABAP Class</ENTRY>
      <LENGTH>40</LENGTH>
     </item>
     <item>
      <ID>I</ID>
      <KEY>S05</KEY>
-     <ENTRY>Initial RRG Settings</ENTRY>
+     <ENTRY>RRG Settings</ENTRY>
      <LENGTH>40</LENGTH>
     </item>
     <item>

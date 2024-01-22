@@ -19,6 +19,19 @@
      <LENGTH>29</LENGTH>
     </item>
    </TPOOL>
+   <I18N_TPOOL>
+    <item>
+     <LANGUAGE>D</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>I</ID>
+       <KEY>007</KEY>
+       <ENTRY>* SQL Cockpit query</ENTRY>
+       <LENGTH>29</LENGTH>
+      </item>
+     </TEXTPOOL>
+    </item>
+   </I18N_TPOOL>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
      <CMPNAME>ADD_FILTER_MAPPING</CMPNAME>
@@ -29,6 +42,41 @@
      <CMPNAME>ADD_STRUCTURE_TO_TRANSPORT</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>add structure to transport</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SELECT_FIELDS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check select fields</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SELECT_OLD</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check select old (v1)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SELECT_PARAMETER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check select parameter</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SELECT_SINGLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check select single</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SELECT_STAR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check select star</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SELECT_SYMBOL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check select symbols</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SYSTEM_SETTINGS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check sytstem settings</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CMPNAME>CREATE_ABAP_CLASS</CMPNAME>

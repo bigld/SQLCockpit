@@ -32,7 +32,7 @@ protected section.
       abap_language_version TYPE sy-langu,
     END OF ty_item .
 
-  data star_syntax_without_join type abap_bool value abap_false.
+  data STAR_SYNTAX_WITHOUT_JOIN type ABAP_BOOL value ABAP_FALSE ##NO_TEXT.
 
   methods CREATE_CUSTOMIZING_UI38 .
   methods ADD_FILTER_MAPPING
@@ -103,20 +103,27 @@ protected section.
     changing
       !CT_REDEFINITIONS type SEOR_REDEFINITIONS_R
       !CT_METHOD_SOURCES type SEO_METHOD_SOURCE_TABLE .
-  methods check_system_settings
-    raising /cadaxo/cx_sqlc_rrg_wiz.
-  methods check_select_fields
-    raising /cadaxo/cx_sqlc_rrg_wiz.
-  methods check_select_single
-    raising /cadaxo/cx_sqlc_rrg_wiz.
-  methods check_select_star             "soll nur ohne join funktionieren
-    raising /cadaxo/cx_sqlc_rrg_wiz.
-  methods check_select_old              "außer bei *
-    raising /cadaxo/cx_sqlc_rrg_wiz.
-  methods check_select_parameter        "wenn vorhanden, kein wiz
-    raising /cadaxo/cx_sqlc_rrg_wiz.
-  methods check_select_symbol
-    raising /cadaxo/cx_sqlc_rrg_wiz.
+  methods CHECK_SYSTEM_SETTINGS
+    raising
+      /CADAXO/CX_SQLC_RRG_WIZ .
+  methods CHECK_SELECT_FIELDS
+    raising
+      /CADAXO/CX_SQLC_RRG_WIZ .
+  methods CHECK_SELECT_SINGLE
+    raising
+      /CADAXO/CX_SQLC_RRG_WIZ .
+  methods CHECK_SELECT_STAR             "soll nur ohne join funktionieren
+    raising
+      /CADAXO/CX_SQLC_RRG_WIZ .
+  methods CHECK_SELECT_OLD              "außer bei *
+    raising
+      /CADAXO/CX_SQLC_RRG_WIZ .
+  methods CHECK_SELECT_PARAMETER        "wenn vorhanden, kein wiz
+    raising
+      /CADAXO/CX_SQLC_RRG_WIZ .
+  methods CHECK_SELECT_SYMBOL
+    raising
+      /CADAXO/CX_SQLC_RRG_WIZ .
 PRIVATE SECTION.
 ENDCLASS.
 
@@ -201,6 +208,110 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         object_class = 'DICT'
       EXCEPTIONS
         OTHERS       = 1.
+
+  ENDMETHOD.
+
+
+  METHOD check_select_fields.
+
+    IF me->gr_parser->fields_syntax IS NOT INITIAL.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+        EXPORTING
+          textid = /cadaxo/cx_sqlc_rrg_wiz=>fileds_not_supported.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD check_select_old.
+
+    IF me->gr_parser->g_select_version = 1 AND star_syntax_without_join = abap_false.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+        EXPORTING
+          textid = /cadaxo/cx_sqlc_rrg_wiz=>old_syntax_not_supported.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD check_select_parameter.
+
+    IF me->gr_parser->cds_parameter_syntax IS NOT INITIAL.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+        EXPORTING
+          textid = /cadaxo/cx_sqlc_rrg_wiz=>parameters_not_suppored.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD check_select_single.
+
+    IF me->gr_parser->g_select_single IS NOT INITIAL.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+        EXPORTING
+          textid = /cadaxo/cx_sqlc_rrg_wiz=>select_single_not_supported.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD check_select_star.
+
+    star_syntax_without_join = abap_false.
+
+    FIND REGEX '.*(\*|~\*).*' IN me->gr_parser->sql_syntax_without_where.
+    IF sy-subrc = 0.
+      IF lines( me->gr_parser->result_source_t ) > 1.
+
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+          EXPORTING
+            textid = /cadaxo/cx_sqlc_rrg_wiz=>select_star_not_supported.
+
+      ELSE.
+        star_syntax_without_join = abap_true.
+      ENDIF.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD check_select_symbol.
+
+    IF me->gr_parser->sql_syntax CP '&*&'.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+        EXPORTING
+          textid = /cadaxo/cx_sqlc_rrg_wiz=>symbols_not_supported.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD check_system_settings.
+
+    DATA system_type         TYPE sy-sysid.
+    DATA system_cliindep_edit   TYPE t000-ccnocliind.
+    DATA system_client_role     TYPE t000-cccategory.
+
+    "generation is only permitted in open customer systems.
+    CALL FUNCTION 'TR_SYS_PARAMS'
+      IMPORTING
+        systemtype         = system_type
+        sys_cliinddep_edit = system_cliindep_edit
+        system_client_role = system_client_role
+      EXCEPTIONS
+        OTHERS             = 1.
+
+    IF sy-subrc <> 0 OR
+       system_type <> 'CUSTOMER' OR
+       ( system_client_role = 'P' OR system_client_role = 'S' ) OR
+       ( system_cliindep_edit <> space AND system_cliindep_edit <> '1' ).
+
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+        EXPORTING
+          textid = /cadaxo/cx_sqlc_rrg_wiz=>OBJECT_GENERATION_NOT_POSSIBLE.
+
+    ENDIF.
 
   ENDMETHOD.
 
@@ -404,36 +515,40 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
   METHOD execute_template_generation.
 
-    check_system_settings( ).
+    TRY.
 
-    check_select_fields( ).
+        check_system_settings( ).
 
-    check_select_single( ).
+        check_select_fields( ).
 
-    check_select_star( ).
+        check_select_single( ).
 
-    check_select_old( ).
+        check_select_star( ).
 
-    check_select_parameter( ).
+        check_select_old( ).
 
-    check_select_symbol( ).
+        check_select_parameter( ).
 
-    CALL FUNCTION '/CADAXO/SQLC_TEMP_RRG_WIZ'
-      EXPORTING
-        io_rrg_wiz     = me
-      IMPORTING
-        es_temp_attr   = me->gs_temp_attr
-      EXCEPTIONS
-        cancel_by_user = 1
-        OTHERS         = 2.
+        check_select_symbol( ).
 
-    IF sy-subrc <> 0.
-      MESSAGE s042(/cadaxo/sqlc) DISPLAY LIKE 'E'.
-    ENDIF.
+        CALL FUNCTION '/CADAXO/SQLC_TEMP_RRG_WIZ'
+          EXPORTING
+            io_rrg_wiz     = me
+          IMPORTING
+            es_temp_attr   = me->gs_temp_attr
+          EXCEPTIONS
+            cancel_by_user = 1
+            OTHERS         = 2.
 
-    "catch ...
+        IF sy-subrc = 1.
+          MESSAGE s042(/cadaxo/sqlc) DISPLAY LIKE 'E'..
+        ENDIF.
 
-    "endtry
+      CATCH /CADAXO/CX_SQLC_RRG_WIZ INTO DATA(lr_exception).
+
+        message lr_exception->get_text( ) type 'S' display like 'E'.
+
+    ENDTRY.
 
   ENDMETHOD.
 
@@ -785,93 +900,4 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
     ENDIF.
   ENDMETHOD.
-
-  METHOD CHECK_SYSTEM_SETTINGS.
-
-    DATA system_type         TYPE sy-sysid.
-    DATA system_cliindep_edit   TYPE t000-ccnocliind.
-    DATA system_client_role     TYPE t000-cccategory.
-
-        "generation is only permitted in open customer systems.
-    CALL FUNCTION 'TR_SYS_PARAMS'
-      IMPORTING
-        systemtype         = system_type
-        sys_cliinddep_edit = system_cliindep_edit
-        system_client_role = system_client_role
-      EXCEPTIONS
-        OTHERS             = 1.
-
-    IF sy-subrc <> 0 OR
-       system_type <> 'CUSTOMER' OR
-       ( system_client_role = 'P' OR system_client_role = 'S' ) OR
-       ( system_cliindep_edit <> space AND system_cliindep_edit <> '1' ).
-
-      MESSAGE i003(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
-      RETURN.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-  METHOD CHECK_SELECT_FIELDS.
-
-    if me->gr_parser->fields_syntax is not initial.
-      MESSAGE s005(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
-      RETURN.
-    endif.
-
-  ENDMETHOD.
-
-  METHOD CHECK_SELECT_SINGLE.
-
-    if me->gr_parser->g_select_single is not initial.
-      MESSAGE s006(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
-      RETURN.
-    endif.
-
-  ENDMETHOD.
-
-  METHOD CHECK_SELECT_STAR.
-
-    star_syntax_without_join = abap_false.
-
-    find regex '.*(\*|~\*).*' in me->gr_parser->sql_syntax_without_where.
-    if sy-subrc = 0.
-      if lines( me->gr_parser->result_source_t ) > 1.
-        MESSAGE s007(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
-        RETURN.
-      else.
-        star_syntax_without_join = abap_true.
-      endif.
-    endif.
-
-  ENDMETHOD.
-
-  METHOD CHECK_SELECT_OLD.
-
-    if me->gr_parser->g_select_version = 1 and star_syntax_without_join = abap_false.
-      MESSAGE s008(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
-      RETURN.
-    endif.
-
-  ENDMETHOD.
-
-  METHOD CHECK_SELECT_PARAMETER.
-
-    if me->gr_parser->cds_parameter_syntax is not initial.
-      MESSAGE s009(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
-      RETURN.
-    endif.
-
-  ENDMETHOD.
-
-  METHOD CHECK_SELECT_SYMBOL.
-
-    if me->gr_parser->sql_syntax cp '&*&'.
-      MESSAGE s010(/cadaxo/sqlc_rrg) DISPLAY LIKE 'E'.
-      RETURN.
-    endif.
-
-  ENDMETHOD.
-
 ENDCLASS.

@@ -102,6 +102,7 @@ MODULE pai_0100 INPUT.
   build_symbols abap_class_descr gs_temp_attr-abap_class_descr.
 
   build_symbols rrg_report_id gs_temp_attr-rrg_report_id.
+  build_symbols rrg_description gs_temp_attr-rrg_description.
   build_symbols rrg_title gs_temp_attr-rrg_title.
   build_symbols rrg_status gs_temp_attr-rrg_status.
   build_symbols rrg_active gs_temp_attr-rrg_active.
@@ -145,6 +146,41 @@ ENDMODULE.
 MODULE structure INPUT.
 
   DATA ls_dd02v_wa TYPE dd02v.
+  DATA other_type LIKE rsdeo-objtype.
+  DATA saa_err.
+  DATA obj_exists.
+  DATA msg_flag.
+
+  CALL FUNCTION 'DD_CHECK_NAME'
+    EXPORTING
+      name            = gs_temp_attr-structure
+   "  name2           = secname
+      objtyp          = 'TABL'
+      subtyp          = 'INTTAB'
+    IMPORTING
+      typ_conflict    = other_type
+      saa_conflict    = saa_err
+      obj_exists      = obj_exists
+      msg_flag        = msg_flag
+    EXCEPTIONS
+      unknown_objtype = 01.
+
+  IF obj_exists = 'X'.                 "obj_exists
+    MESSAGE e006(e2) WITH gs_temp_attr-structure.
+  ENDIF.
+  IF saa_err = 'X'.                    "saa_conflict
+    IF msg_flag = space.
+      MESSAGE e026(e2) WITH gs_temp_attr-structure.
+    ELSE.
+      MESSAGE ID     sy-msgid
+              TYPE   'E'
+              NUMBER sy-msgno
+              WITH   sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+    CLEAR msg_flag.
+  ENDIF.
+
+  return.
 
   CALL FUNCTION 'DDIF_TABL_GET'
     EXPORTING

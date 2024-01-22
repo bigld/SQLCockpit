@@ -11,7 +11,7 @@
       <TYP>E</TYP>
       <VERSION>0005</VERSION>
       <MASTERLANG>X</MASTERLANG>
-      <TXTLINES>00013</TXTLINES>
+      <TXTLINES>00012</TXTLINES>
       <DOKSTATE>A</DOKSTATE>
      </DOKIL>
      <HEAD>
@@ -28,10 +28,6 @@
       <TLINE>
        <TDFORMAT>U1</TDFORMAT>
        <TDLINE>SQL Cockpit - Rapid Report Generator Wizard - Summary</TDLINE>
-      </TLINE>
-      <TLINE>
-       <TDFORMAT>*</TDFORMAT>
-       <TDLINE>The RRG Objects can be generated now with the specified input.</TDLINE>
       </TLINE>
       <TLINE>
        <TDFORMAT>*</TDFORMAT>
@@ -84,6 +80,12 @@
       <TLINE>
        <TDFORMAT>/</TDFORMAT>
        <TDLINE>&lt;ZH&gt;Report is active&lt;/&gt;,,,,&amp;CDXRRG_ACTIVE&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>/</TDFORMAT>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>T2</TDFORMAT>
       </TLINE>
       <TLINE>
        <TDFORMAT>/</TDFORMAT>

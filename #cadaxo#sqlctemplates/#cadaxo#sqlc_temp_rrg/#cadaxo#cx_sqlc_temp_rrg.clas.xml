@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>/CADAXO/CX_SQLC_TEMP_RRG</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>SQL Cockpit - OData generation exception class</DESCRIPT>
+    <DESCRIPT>SQL Cockpit - RRG generation exception class</DESCRIPT>
     <CATEGORY>40</CATEGORY>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
