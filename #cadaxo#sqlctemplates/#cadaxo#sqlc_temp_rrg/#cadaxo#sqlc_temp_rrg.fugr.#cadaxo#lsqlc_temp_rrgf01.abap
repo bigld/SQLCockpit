@@ -74,7 +74,8 @@ FORM init_roadmap .
   ls_roadmap-step_id            = 'LOGS'.
   ls_roadmap-step_description   = TEXT-s99.
   ls_roadmap-step_documentation = '/CADAXO/SQLC_TEMP_RRG_LOGS'.
-  ls_roadmap-step_subdynpro     = '0170'.
+  ls_roadmap-step_subdynpro     = '0101'.
+  ls_roadmap-step_prog          = 'SAPLSBAL_DISPLAY'.
   ls_roadmap-step_visible       = 'X'.
   ls_roadmap-step_type          = 'F'.
   APPEND ls_roadmap TO gt_roadmap.

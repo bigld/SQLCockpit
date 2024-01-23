@@ -18,6 +18,24 @@
      <ENTRY>* SQL Cockpit query</ENTRY>
      <LENGTH>29</LENGTH>
     </item>
+    <item>
+     <ID>I</ID>
+     <KEY>W01</KEY>
+     <ENTRY>Start generating objects</ENTRY>
+     <LENGTH>48</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>W02</KEY>
+     <ENTRY>End generating objects</ENTRY>
+     <LENGTH>44</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>W03</KEY>
+     <ENTRY>Structure sucessfully created</ENTRY>
+     <LENGTH>50</LENGTH>
+    </item>
    </TPOOL>
    <I18N_TPOOL>
     <item>
@@ -37,6 +55,16 @@
      <CMPNAME>ADD_FILTER_MAPPING</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>add filter mapping</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_LOG_MESSAGE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>add log message</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_LOG_MESSAGE_FREE_TEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>add log message free text</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CMPNAME>ADD_STRUCTURE_TO_TRANSPORT</CMPNAME>
@@ -189,9 +217,24 @@
      <DESCRIPT>SQL Cockpit - RRG Attributes</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
+     <CMPNAME>G_LOG_HANDLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Application Log: Log Handle</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>INIT_APPL_LOG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>init application log</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
      <CMPNAME>REDEFINE_MAP_PROPERTY</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>redefine map property</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SET_APPL_LOG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set application log</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
    <DESCRIPTIONS_SUB>
@@ -200,6 +243,18 @@
      <SCONAME>CT_CODE</SCONAME>
      <LANGU>E</LANGU>
      <DESCRIPT>ABAP Source</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>ADD_LOG_MESSAGE</CMPNAME>
+     <SCONAME>I_S_MSG</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Application Log: Message Data</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>ADD_LOG_MESSAGE_FREE_TEXT</CMPNAME>
+     <SCONAME>I_MSGTY</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Message Type</DESCRIPT>
     </SEOSUBCOTX>
     <SEOSUBCOTX>
      <CMPNAME>ADD_STRUCTURE_TO_TRANSPORT</CMPNAME>

@@ -33,6 +33,9 @@ protected section.
     END OF ty_item .
 
   data STAR_SYNTAX_WITHOUT_JOIN type ABAP_BOOL value ABAP_FALSE ##NO_TEXT.
+  data G_LOG_HANDLE type BALLOGHNDL .
+  data g_s_display_profile  TYPE bal_s_prof.
+  data g_t_log_handle       TYPE bal_t_logh.
 
   methods CREATE_CUSTOMIZING_UI38 .
   methods ADD_FILTER_MAPPING
@@ -124,7 +127,17 @@ protected section.
   methods CHECK_SELECT_SYMBOL
     raising
       /CADAXO/CX_SQLC_RRG_WIZ .
-PRIVATE SECTION.
+private section.
+
+  methods SET_APPL_LOG .
+  methods INIT_APPL_LOG .
+  methods ADD_LOG_MESSAGE_FREE_TEXT
+    importing
+      !I_TEXT type C
+      !I_MSGTY type MSGTY default 'I' .
+  methods ADD_LOG_MESSAGE
+    importing
+      !I_S_MSG type BAL_S_MSG .
 ENDCLASS.
 
 
@@ -143,6 +156,44 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
     APPEND '    ASSIGN search_structure->* TO FIELD-SYMBOL(<search_rang>).' TO ct_code.
     APPEND '  ENDIF.' TO ct_code.
     APPEND '  ASSIGN e_result->* TO <result>.' TO ct_code.
+
+  ENDMETHOD.
+
+
+  METHOD add_log_message.
+
+    CALL FUNCTION 'BAL_LOG_MSG_ADD'
+      EXPORTING
+        i_log_handle     = g_log_handle
+        i_s_msg          = i_s_msg
+      EXCEPTIONS
+        log_not_found    = 1
+        msg_inconsistent = 2
+        log_is_full      = 3
+        OTHERS           = 4.
+
+    IF sy-subrc <> 0.
+      "???
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD add_log_message_free_text.
+
+    CALL FUNCTION 'BAL_LOG_MSG_ADD_FREE_TEXT'
+      EXPORTING
+        i_log_handle     = g_log_handle
+        i_msgty          = i_msgty
+        i_text           = i_text
+      EXCEPTIONS
+        log_not_found    = 1                " Log not found
+        msg_inconsistent = 2                " Message inconsistent
+        log_is_full      = 3                " Message number 999999 reached. Log is full
+        OTHERS           = 4.
+   if sy-subrc <> 0.
+     "???
+   endif.
 
   ENDMETHOD.
 
@@ -172,6 +223,10 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         permission_failure       = 8
         request_language_denied  = 9
         OTHERS                   = 10.
+    IF sy-subrc <> 0.
+        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+        return.
+    endif.
 
     APPEND INITIAL LINE TO lt_ko200 ASSIGNING FIELD-SYMBOL(<lwa_ko200>).
     <lwa_ko200>-pgmid    = 'R3TR'.
@@ -186,8 +241,9 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         show_only_other_error   = 2
         OTHERS                  = 3.
     IF sy-subrc <> 0.
-
-    ENDIF.
+        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+        return.
+    endif.
 
     CALL FUNCTION 'TR_OBJECTS_INSERT'
       IMPORTING
@@ -198,8 +254,9 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
       EXCEPTIONS
         OTHERS   = 1.
     IF sy-subrc <> 0.
-
-    ENDIF.
+        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+        return.
+    endif.
 
     CALL FUNCTION 'RS_ACCESS_PERMISSION'
       EXPORTING
@@ -215,9 +272,11 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
   METHOD check_select_fields.
 
     IF me->gr_parser->fields_syntax IS NOT INITIAL.
+
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
         EXPORTING
           textid = /cadaxo/cx_sqlc_rrg_wiz=>fileds_not_supported.
+
     ENDIF.
 
   ENDMETHOD.
@@ -248,9 +307,11 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
   METHOD check_select_single.
 
     IF me->gr_parser->g_select_single IS NOT INITIAL.
+
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
         EXPORTING
           textid = /cadaxo/cx_sqlc_rrg_wiz=>select_single_not_supported.
+
     ENDIF.
 
   ENDMETHOD.
@@ -311,7 +372,7 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
         EXPORTING
-          textid = /cadaxo/cx_sqlc_rrg_wiz=>OBJECT_GENERATION_NOT_POSSIBLE.
+          textid = /cadaxo/cx_sqlc_rrg_wiz=>object_generation_not_possible.
 
     ENDIF.
 
@@ -417,7 +478,6 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
   METHOD create_structure.
 
-
     DATA l_structure_name TYPE ddobjname.
     DATA ls_dd02v         TYPE dd02v.
     DATA lt_dd03p TYPE TABLE OF dd03p.
@@ -491,7 +551,8 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         put_refused       = 5
         OTHERS            = 6.
     IF sy-subrc <> 0.
-
+        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+        return.
     ENDIF.
 
     CALL FUNCTION 'DDIF_TABL_ACTIVATE'
@@ -503,14 +564,13 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         put_failure = 2
         OTHERS      = 3.
     IF sy-subrc <> 0.
-
-    ENDIF.
+        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+        return.
+    else.
+       add_log_message( value #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '011' msgv1 = l_structure_name ) ).
+    endif.
 
     me->add_structure_to_transport( i_structure_name = l_structure_name ).
-
-
-" TR_SYS_PARAMS
-
 
   ENDMETHOD.
 
@@ -543,12 +603,12 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
             OTHERS         = 2.
 
         IF sy-subrc = 1.
-          MESSAGE s042(/cadaxo/sqlc) DISPLAY LIKE 'E'..
+          MESSAGE s042(/cadaxo/sqlc) DISPLAY LIKE 'E'.
         ENDIF.
 
-      CATCH /CADAXO/CX_SQLC_RRG_WIZ INTO DATA(lr_exception).
+      CATCH /cadaxo/cx_sqlc_rrg_wiz INTO DATA(lr_exception).
 
-        message lr_exception->get_text( ) type 'S' display like 'E'.
+        MESSAGE lr_exception->get_text( ) TYPE 'S' DISPLAY LIKE 'E'.
 
     ENDTRY.
 
@@ -557,19 +617,27 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
   METHOD generate_objects.
 
+    DATA l_s_log TYPE bal_s_log.
+
+    init_appl_log( ).
+
     TRY.
 
         IF me->gs_temp_attr-cre_dict  = abap_true.
-           create_structure( ).
+          create_structure( ).
         ENDIF.
 
         IF me->gs_temp_attr-cre_class = abap_true.
-           create_abap_class( ).
+          create_abap_class( ).
         ENDIF.
 
-        if me->gs_temp_attr-cre_rrg_cust = abap_true.
-           create_customizing_ui38( ).
-        endif.
+        IF me->gs_temp_attr-cre_rrg_cust = abap_true.
+          create_customizing_ui38( ).
+        ENDIF.
+
+        add_log_message_free_text( i_msgty = 'I' i_text = TEXT-w02 ).
+
+        set_appl_log( ).
 
       CATCH /cadaxo/cx_sqlc_temp_rrg INTO DATA(lr_exception).
 
@@ -882,6 +950,26 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD init_appl_log.
+
+    DATA l_s_log TYPE bal_s_log.
+
+    CALL FUNCTION 'BAL_LOG_CREATE'
+      EXPORTING
+        i_s_log                 = l_s_log
+      IMPORTING
+        e_log_handle            = g_log_handle
+      EXCEPTIONS
+        log_header_inconsistent = 1
+        OTHERS                  = 2.
+
+    INSERT g_log_handle INTO TABLE g_t_log_handle.
+
+    add_log_message_free_text( i_msgty = 'I' i_text = TEXT-w01 ).
+
+  ENDMETHOD.
+
+
   METHOD redefine_map_property.
 
     DATA ls_redefinition   TYPE seoredef.
@@ -902,4 +990,21 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
     ENDIF.
   ENDMETHOD.
+
+
+  method SET_APPL_LOG.
+
+      CALL FUNCTION 'BAL_DSP_OUTPUT_INIT'
+       EXPORTING
+            i_s_display_profile = g_s_display_profile
+       EXCEPTIONS
+            OTHERS              = 1.
+
+  CALL FUNCTION 'BAL_DSP_OUTPUT_SET_DATA'
+       EXPORTING
+            i_t_log_handle = g_t_log_handle
+       EXCEPTIONS
+            OTHERS         = 1.
+
+  endmethod.
 ENDCLASS.

@@ -74,6 +74,12 @@
      <MSGNR>010</MSGNR>
      <TEXT>Symbols are not yet supported by the wizard.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>Structure &amp;1 successfully generated.</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

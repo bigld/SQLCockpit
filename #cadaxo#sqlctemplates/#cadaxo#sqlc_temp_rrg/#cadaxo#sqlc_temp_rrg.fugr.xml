@@ -320,7 +320,7 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>  CALL SUBSCREEN gs_subscreen INCLUDING &apos;/CADAXO/SAPLSQLC_TEMP_RRG&apos;</LINE>
+       <LINE>  CALL SUBSCREEN gs_subscreen INCLUDING g_current_prog</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>                 g_current_subdynpro.</LINE>
@@ -387,7 +387,7 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>  CALL SUBSCREEN gs_subscreen INCLUDING &apos;/CADAXO/SAPLSQLC_TEMP_RRG&apos;</LINE>
+       <LINE>  CALL SUBSCREEN gs_subscreen INCLUDING g_current_prog</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>                 g_current_subdynpro.</LINE>

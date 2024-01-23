@@ -9,6 +9,7 @@ TYPES: BEGIN OF typ_roadmap_step,
          step_documentation      TYPE swf_docu,
          step_documentation_html TYPE htmltable,
          step_active(1),
+         step_prog TYPE sy-repid,
          step_subdynpro(4),
          step_visible(1),
          step_type(1),
@@ -42,6 +43,7 @@ DATA: gt_roadmap           TYPE TABLE OF typ_roadmap_step.
 DATA: ok_code              TYPE sy-ucomm.
 DATA: g_current_step(12).
 DATA: g_current_subdynpro(4) TYPE n.
+data: g_current_prog         TYPE sy-repid.
 DATA: g_current_step_index   TYPE i.
 DATA: g_total_steps          TYPE i.
 DATA: g_main_subscreen(4)    TYPE n.

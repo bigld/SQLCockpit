@@ -20,6 +20,10 @@ MODULE pbo_0100 OUTPUT.
 
     g_current_step_index = sy-tabix.
     g_current_subdynpro  = <gs_roadmap>-step_subdynpro.
+    g_current_prog       = <gs_roadmap>-step_prog.
+    if g_current_prog is initial.
+       g_current_prog = '/CADAXO/SAPLSQLC_TEMP_RRG'.
+    endif.
 
     IF ( NOT <gs_roadmap>-step_documentation IS INITIAL AND <gs_roadmap>-step_documentation_html IS INITIAL )
          OR <gs_roadmap>-step_id = 'GENERATE'.
