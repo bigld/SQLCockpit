@@ -278,7 +278,9 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
   METHOD check_select_symbol.
 
-    IF me->gr_parser->sql_syntax CP '&*&'.
+    FIND REGEX '&[^&]+&' IN me->gr_parser->sql_syntax.
+
+    IF sy-subrc = 0.
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
         EXPORTING
           textid = /cadaxo/cx_sqlc_rrg_wiz=>symbols_not_supported.
