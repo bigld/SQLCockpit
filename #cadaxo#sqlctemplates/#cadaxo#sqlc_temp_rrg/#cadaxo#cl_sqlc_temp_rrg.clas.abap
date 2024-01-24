@@ -438,6 +438,12 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         no_access       = 5
         other           = 6
         OTHERS          = 7.
+    IF sy-subrc <> 0.
+        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+        return.
+    else.
+        add_log_message( value #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '012' msgv1 = l_class-clsname ) ).
+    endif.
 
   ENDMETHOD.
 
@@ -472,6 +478,12 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
     INSERT /cadaxo/ui38_ret FROM l_ui38_ret.
 
     /cadaxo/cl_ui38_adm_main=>update_model_last_modified( ).
+    IF sy-subrc <> 0.
+        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+        return.
+    else.
+        add_log_message( value #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '013' msgv1 = l_ui38_rep-report_id ) ).
+    endif.
 
   ENDMETHOD.
 
@@ -567,7 +579,7 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
         return.
     else.
-       add_log_message( value #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '011' msgv1 = l_structure_name ) ).
+        add_log_message( value #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '011' msgv1 = l_structure_name ) ).
     endif.
 
     me->add_structure_to_transport( i_structure_name = l_structure_name ).

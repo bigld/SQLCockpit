@@ -78,7 +78,19 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
      <MSGNR>011</MSGNR>
-     <TEXT>Structure &amp;1 successfully generated.</TEXT>
+     <TEXT>DDIC Structure &amp;1 successfully generated</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>ABAP Class &amp;1 successfully generated</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>013</MSGNR>
+     <TEXT>RRG Settings &amp;1 successfully generated</TEXT>
     </T100>
    </T100>
   </asx:values>
