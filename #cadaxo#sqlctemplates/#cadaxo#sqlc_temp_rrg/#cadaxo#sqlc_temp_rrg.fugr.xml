@@ -819,6 +819,10 @@
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
+       <LINE>  FIELD gs_temp_attr-abap_class MODULE class ON INPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
        <LINE>  module pai_0140.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>

@@ -180,7 +180,7 @@ MODULE structure INPUT.
     CLEAR msg_flag.
   ENDIF.
 
-  return.
+  RETURN.
 
   CALL FUNCTION 'DDIF_TABL_GET'
     EXPORTING
@@ -199,6 +199,28 @@ MODULE structure INPUT.
 
   IF ls_dd02v_wa IS NOT INITIAL.
     MESSAGE e001(/cadaxo/sqlc_rrg) WITH gs_temp_attr-structure.
+  ENDIF.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  CLASS  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE class INPUT.
+
+  DATA abap_class TYPE seoclskey.
+
+  abap_class = gs_temp_attr-abap_class.
+
+  cl_oo_class_builder=>check_clifname(
+    CHANGING
+      cifkey      = abap_class
+    EXCEPTIONS
+      not_allowed = 1
+  ).
+  IF sy-subrc <> 0.
+    MESSAGE e006(e2) WITH gs_temp_attr-abap_class.
   ENDIF.
 
 ENDMODULE.
