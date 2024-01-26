@@ -5096,6 +5096,7 @@ METHOD parse_sql_ii_2.
     LOOP AT lt_tab_field ASSIGNING <l_tab_field>.
 
       CLEAR l_field_dfies.
+      clear ls_result_field.
 
       IF <l_tab_field>-field EQ '*' OR <l_tab_field>-field EQ 'COUNT(*)' OR <l_tab_field>-field EQ 'COUNT( * )'.
 
@@ -5134,11 +5135,10 @@ METHOD parse_sql_ii_2.
                   EXIT.
                 ELSE.
                   CLEAR ls_result_field.
-
                   ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
                   ls_result_field-/cadaxo/alias_value = <l_tab_field>-field.
                   APPEND ls_result_field TO me->gt_result_ddfields.
-
+                  exit.
                 ENDIF.
               ENDLOOP.
 
