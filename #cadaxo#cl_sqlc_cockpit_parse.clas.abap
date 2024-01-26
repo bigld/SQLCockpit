@@ -5103,7 +5103,7 @@ METHOD parse_sql_ii_2.
 
         l_field_dfies = lcl_elemdescr->get_ddic_field( ).
 
-        MOVE-CORRESPONDING l_field_dfies TO ls_result_field.
+        ls_result_field = CORRESPONDING #( l_field_dfies ).
 
         ls_result_field-/cadaxo/alias = <l_tab_field>-alias.
         ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
