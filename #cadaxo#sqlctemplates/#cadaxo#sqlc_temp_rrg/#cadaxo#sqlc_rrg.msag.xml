@@ -18,7 +18,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
      <MSGNR>001</MSGNR>
-     <TEXT>Please enter a new unique name for the structure. &amp;1 already exists</TEXT>
+     <TEXT>Please enter a new unique name for the structure. &amp;1 already exists.</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -30,7 +30,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
      <MSGNR>003</MSGNR>
-     <TEXT>Object generation not possible in this system/client</TEXT>
+     <TEXT>Object generation not possible in this system/client.</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -78,19 +78,55 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
      <MSGNR>011</MSGNR>
-     <TEXT>DDIC Structure &amp;1 successfully generated</TEXT>
+     <TEXT>DDIC Structure &amp;1 successfully generated.</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
      <MSGNR>012</MSGNR>
-     <TEXT>ABAP Class &amp;1 successfully generated</TEXT>
+     <TEXT>ABAP Class &amp;1 successfully generated.</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
      <MSGNR>013</MSGNR>
-     <TEXT>RRG Settings &amp;1 successfully generated</TEXT>
+     <TEXT>RRG Settings &amp;1 successfully generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>ABAP Class could not be generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>015</MSGNR>
+     <TEXT>DDIC Structure could not be generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>016</MSGNR>
+     <TEXT>RRG Settings could not be generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>017</MSGNR>
+     <TEXT>Class &amp;1 already exists. Choose a different name.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>018</MSGNR>
+     <TEXT>Interface &amp;1 already exists. Choose a different name.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>019</MSGNR>
+     <TEXT>Global Type (Stru, Tabl, ...) &amp;1 already exists. Choose a different name.</TEXT>
     </T100>
    </T100>
   </asx:values>
