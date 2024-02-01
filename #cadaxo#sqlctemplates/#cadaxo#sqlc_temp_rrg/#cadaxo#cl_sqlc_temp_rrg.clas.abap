@@ -1,148 +1,148 @@
 *todo create_structure:
 *throw exceptions
-class /CADAXO/CL_SQLC_TEMP_RRG definition
-  public
-  inheriting from /CADAXO/CL_SQLC_TEMPLATE
-  final
-  create public .
+CLASS /cadaxo/cl_sqlc_temp_rrg DEFINITION
+  PUBLIC
+  INHERITING FROM /cadaxo/cl_sqlc_template
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  data GS_TEMP_ATTR type /CADAXO/SQLC_TEMP_RRG_ATTR .
+    DATA gs_temp_attr TYPE /cadaxo/sqlc_temp_rrg_attr .
 
-  methods GENERATE_OBJECTS .
+    METHODS generate_objects .
 
-  methods EXECUTE_TEMPLATE_GENERATION
-    redefinition.
-protected section.
+    METHODS execute_template_generation
+        REDEFINITION.
+  PROTECTED SECTION.
 
-  types:
-    BEGIN OF ty_item_signature,
-      obj_type TYPE tadir-object,
-      obj_name TYPE tadir-obj_name,
-      devclass TYPE devclass,
-    END OF ty_item_signature .
-  types:
-    BEGIN OF ty_item.
-      INCLUDE TYPE ty_item_signature.
-      TYPES:
-      srcsystem             TYPE tadir-srcsystem,
-      origlang              TYPE tadir-masterlang,
-      inactive              TYPE abap_bool,
-      abap_language_version TYPE sy-langu,
-    END OF ty_item .
+    TYPES:
+      BEGIN OF ty_item_signature,
+        obj_type TYPE tadir-object,
+        obj_name TYPE tadir-obj_name,
+        devclass TYPE devclass,
+      END OF ty_item_signature .
+    TYPES:
+      BEGIN OF ty_item.
+        INCLUDE TYPE ty_item_signature.
+    TYPES:
+        srcsystem             TYPE tadir-srcsystem,
+        origlang              TYPE tadir-masterlang,
+        inactive              TYPE abap_bool,
+        abap_language_version TYPE sy-langu,
+      END OF ty_item .
 
-  data STAR_SYNTAX_WITHOUT_JOIN type ABAP_BOOL value ABAP_FALSE ##NO_TEXT.
-  data G_LOG_HANDLE type BALLOGHNDL .
-  data g_s_display_profile  TYPE bal_s_prof.
-  data g_t_log_handle       TYPE bal_t_logh.
+    DATA star_syntax_without_join TYPE abap_bool VALUE abap_false ##NO_TEXT.
+    DATA g_log_handle TYPE balloghndl .
+    DATA g_s_display_profile  TYPE bal_s_prof.
+    DATA g_t_log_handle       TYPE bal_t_logh.
 
-  methods CREATE_CUSTOMIZING_UI38 .
-  methods ADD_FILTER_MAPPING
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods ADD_STRUCTURE_TO_TRANSPORT
-    importing
-      !I_STRUCTURE_NAME type DDOBJNAME .
-  methods CREATE_STRUCTURE .
-  methods CREATE_ABAP_CLASS .
-  methods GENERATE_SOURCE_CODE
-    exporting
-      !EV_SOURCE type RSWSOURCET .
-  methods GET_HEADER
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_SELECT
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_FROM
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_INTO
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_FIELDS
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_WHERE
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_GROUP_BY
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_HAVING
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_ORDER_BY
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_BYPASSING_BUFFER
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_OFFSET
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_UP_TO_ROWS
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_CONNECTION
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_CODE_DBHINTS
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GET_NEW_LINE
-    changing
-      !CT_CODE type RSWSOURCET .
-  methods GENERATE_SOURCE_CODE_MAP_PROP
-    exporting
-      !EV_SOURCE type RSWSOURCET
-    returning
-      value(R_REDEFINE) type ABAP_BOOL .
-  methods REDEFINE_MAP_PROPERTY
-    importing
-      !I_CLASS type VSEOCLASS
-      !I_INHERITANCE type VSEOEXTEND
-    changing
-      !CT_REDEFINITIONS type SEOR_REDEFINITIONS_R
-      !CT_METHOD_SOURCES type SEO_METHOD_SOURCE_TABLE .
-  methods CHECK_SYSTEM_SETTINGS
-    raising
-      /CADAXO/CX_SQLC_RRG_WIZ .
-  methods CHECK_SELECT_FIELDS
-    raising
-      /CADAXO/CX_SQLC_RRG_WIZ .
-  methods CHECK_SELECT_SINGLE
-    raising
-      /CADAXO/CX_SQLC_RRG_WIZ .
-  methods CHECK_SELECT_STAR             "soll nur ohne join funktionieren
-    raising
-      /CADAXO/CX_SQLC_RRG_WIZ .
-  methods CHECK_SELECT_OLD              "außer bei *
-    raising
-      /CADAXO/CX_SQLC_RRG_WIZ .
-  methods CHECK_SELECT_PARAMETER        "wenn vorhanden, kein wiz
-    raising
-      /CADAXO/CX_SQLC_RRG_WIZ .
-  methods CHECK_SELECT_SYMBOL
-    raising
-      /CADAXO/CX_SQLC_RRG_WIZ .
-private section.
+    METHODS create_customizing_ui38 .
+    METHODS add_filter_mapping
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS add_structure_to_transport
+      IMPORTING
+        !i_structure_name TYPE ddobjname .
+    METHODS create_structure .
+    METHODS create_abap_class .
+    METHODS generate_source_code
+      EXPORTING
+        !ev_source TYPE rswsourcet .
+    METHODS get_header
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_select
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_from
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_into
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_fields
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_where
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_group_by
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_having
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_order_by
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_bypassing_buffer
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_offset
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_up_to_rows
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_connection
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_code_dbhints
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS get_new_line
+      CHANGING
+        !ct_code TYPE rswsourcet .
+    METHODS generate_source_code_map_prop
+      EXPORTING
+        !ev_source        TYPE rswsourcet
+      RETURNING
+        VALUE(r_redefine) TYPE abap_bool .
+    METHODS redefine_map_property
+      IMPORTING
+        !i_class           TYPE vseoclass
+        !i_inheritance     TYPE vseoextend
+      CHANGING
+        !ct_redefinitions  TYPE seor_redefinitions_r
+        !ct_method_sources TYPE seo_method_source_table .
+    METHODS check_system_settings
+      RAISING
+        /cadaxo/cx_sqlc_rrg_wiz .
+    METHODS check_select_fields
+      RAISING
+        /cadaxo/cx_sqlc_rrg_wiz .
+    METHODS check_select_single
+      RAISING
+        /cadaxo/cx_sqlc_rrg_wiz .
+    METHODS check_select_star             "soll nur ohne join funktionieren
+      RAISING
+        /cadaxo/cx_sqlc_rrg_wiz .
+    METHODS check_select_old              "außer bei *
+      RAISING
+        /cadaxo/cx_sqlc_rrg_wiz .
+    METHODS check_select_parameter        "wenn vorhanden, kein wiz
+      RAISING
+        /cadaxo/cx_sqlc_rrg_wiz .
+    METHODS check_select_symbol
+      RAISING
+        /cadaxo/cx_sqlc_rrg_wiz .
+  PRIVATE SECTION.
 
-  methods SET_APPL_LOG .
-  methods INIT_APPL_LOG .
-  methods ADD_LOG_MESSAGE_FREE_TEXT
-    importing
-      !I_TEXT type C
-      !I_MSGTY type MSGTY default 'I' .
-  methods ADD_LOG_MESSAGE
-    importing
-      !I_S_MSG type BAL_S_MSG .
+    METHODS set_appl_log .
+    METHODS init_appl_log .
+    METHODS add_log_message_free_text
+      IMPORTING
+        !i_text  TYPE c
+        !i_msgty TYPE msgty DEFAULT 'I' .
+    METHODS add_log_message
+      IMPORTING
+        !i_s_msg TYPE bal_s_msg .
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
 
   METHOD add_filter_mapping.
@@ -191,9 +191,9 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         msg_inconsistent = 2                " Message inconsistent
         log_is_full      = 3                " Message number 999999 reached. Log is full
         OTHERS           = 4.
-   if sy-subrc <> 0.
-     "???
-   endif.
+    IF sy-subrc <> 0.
+      "???
+    ENDIF.
 
   ENDMETHOD.
 
@@ -224,9 +224,9 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         request_language_denied  = 9
         OTHERS                   = 10.
     IF sy-subrc <> 0.
-        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
-        return.
-    endif.
+      add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+      RETURN.
+    ENDIF.
 
     APPEND INITIAL LINE TO lt_ko200 ASSIGNING FIELD-SYMBOL(<lwa_ko200>).
     <lwa_ko200>-pgmid    = 'R3TR'.
@@ -241,9 +241,9 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         show_only_other_error   = 2
         OTHERS                  = 3.
     IF sy-subrc <> 0.
-        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
-        return.
-    endif.
+      add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+      RETURN.
+    ENDIF.
 
     CALL FUNCTION 'TR_OBJECTS_INSERT'
       IMPORTING
@@ -254,9 +254,9 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
       EXCEPTIONS
         OTHERS   = 1.
     IF sy-subrc <> 0.
-        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
-        return.
-    endif.
+      add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+      RETURN.
+    ENDIF.
 
     CALL FUNCTION 'RS_ACCESS_PERMISSION'
       EXPORTING
@@ -319,33 +319,57 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
   METHOD check_select_star.
 
-    star_syntax_without_join = abap_false.
+    TRY.
+        star_syntax_without_join = abap_false.
 
-    FIND REGEX '.*(\*|~\*).*' IN me->gr_parser->sql_syntax_without_where.
-    IF sy-subrc = 0.
-      IF lines( me->gr_parser->result_source_t ) > 1.
+        FIND REGEX '^SELECT\W*\*' IN me->gr_parser->sql_syntax_without_where.
+        IF sy-subrc = 0.
+          IF lines( me->gr_parser->result_source_t ) > 1.
 
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
-          EXPORTING
-            textid = /cadaxo/cx_sqlc_rrg_wiz=>select_star_not_supported.
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+              EXPORTING
+                textid = /cadaxo/cx_sqlc_rrg_wiz=>select_star_not_supported.
 
-      ELSE.
-        star_syntax_without_join = abap_true.
-      ENDIF.
-    ENDIF.
+          ELSE.
+            star_syntax_without_join = abap_true.
+          ENDIF.
+        ENDIF.
+
+        FIND REGEX '^SELECT\W*\w+~\*' IN me->gr_parser->sql_syntax_without_where.
+        IF sy-subrc = 0.
+          IF lines( me->gr_parser->result_source_t ) > 1.
+
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+              EXPORTING
+                textid = /cadaxo/cx_sqlc_rrg_wiz=>select_star_not_supported.
+
+          ELSE.
+            star_syntax_without_join = abap_true.
+          ENDIF.
+        ENDIF.
+
+      CATCH cx_sy_regex_too_complex.
+        "continue running
+    ENDTRY.
 
   ENDMETHOD.
 
 
   METHOD check_select_symbol.
 
-    FIND REGEX '&[^&]+&' IN me->gr_parser->sql_syntax.
+    TRY.
 
-    IF sy-subrc = 0.
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
-        EXPORTING
-          textid = /cadaxo/cx_sqlc_rrg_wiz=>symbols_not_supported.
-    ENDIF.
+        FIND REGEX '&[^&]+&' IN me->gr_parser->sql_syntax.
+
+        IF sy-subrc = 0.
+          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_rrg_wiz
+            EXPORTING
+              textid = /cadaxo/cx_sqlc_rrg_wiz=>symbols_not_supported.
+        ENDIF.
+
+      CATCH cx_sy_regex_too_complex.
+        "continue running
+    ENDTRY.
 
   ENDMETHOD.
 
@@ -439,11 +463,12 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         other           = 6
         OTHERS          = 7.
     IF sy-subrc <> 0.
-        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
-        return.
-    else.
-        add_log_message( value #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '012' msgv1 = l_class-clsname ) ).
-    endif.
+      add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = 'E' msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+      add_log_message( VALUE #( msgty = 'E' msgid = '/CADAXO/SQLC_RRG' msgno = '014' msgv1 = l_class-clsname ) ).
+      RETURN.
+    ELSE.
+      add_log_message( VALUE #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '012' msgv1 = l_class-clsname ) ).
+    ENDIF.
 
   ENDMETHOD.
 
@@ -479,11 +504,12 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
     /cadaxo/cl_ui38_adm_main=>update_model_last_modified( ).
     IF sy-subrc <> 0.
-        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
-        return.
-    else.
-        add_log_message( value #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '013' msgv1 = l_ui38_rep-report_id ) ).
-    endif.
+      add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = 'E' msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+      add_log_message( VALUE #( msgty = 'E' msgid = '/CADAXO/SQLC_RRG' msgno = '016' msgv1 = l_ui38_rep-report_id ) ).
+      RETURN.
+    ELSE.
+      add_log_message( VALUE #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '013' msgv1 = l_ui38_rep-report_id ) ).
+    ENDIF.
 
   ENDMETHOD.
 
@@ -517,16 +543,26 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
       "take care of built-in types
       IF <ls_dd03p>-rollname = ''.
         CASE <ls_dd03p>-inttype.
-          WHEN 'C'. <ls_dd03p>-datatype = 'CHAR'.
-          WHEN 'I'. <ls_dd03p>-datatype = 'INT4'.
-          WHEN 'F'. <ls_dd03p>-datatype = 'FLTP'.
-          WHEN 'P'. <ls_dd03p>-datatype = 'DEC'.
-          WHEN 'D'. <ls_dd03p>-datatype = 'DATS'.
-          WHEN 'T'. <ls_dd03p>-datatype = 'TIMS'.
-          WHEN 'N'. <ls_dd03p>-datatype = 'NUMC'.
-          WHEN 'X'. <ls_dd03p>-datatype = 'RAW'.
-          WHEN 'STRING'. <ls_dd03p>-datatype = 'STRING'.
-          WHEN 'XSTRING'. <ls_dd03p>-datatype = 'RAWSTRING'.
+          WHEN 'C'.
+            <ls_dd03p>-datatype = 'CHAR'.
+          WHEN 'I'.
+            <ls_dd03p>-datatype = 'INT4'.
+          WHEN 'F'.
+            <ls_dd03p>-datatype = 'FLTP'.
+          WHEN 'P'.
+            <ls_dd03p>-datatype = 'DEC'.
+          WHEN 'D'.
+            <ls_dd03p>-datatype = 'DATS'.
+          WHEN 'T'.
+            <ls_dd03p>-datatype = 'TIMS'.
+          WHEN 'N'.
+            <ls_dd03p>-datatype = 'NUMC'.
+          WHEN 'X'.
+            <ls_dd03p>-datatype = 'RAW'.
+          WHEN 'STRING'.
+            <ls_dd03p>-datatype = 'STRING'.
+          WHEN 'XSTRING'.
+            <ls_dd03p>-datatype = 'RAWSTRING'.
 
             "when others then exception
         ENDCASE.
@@ -563,8 +599,8 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         put_refused       = 5
         OTHERS            = 6.
     IF sy-subrc <> 0.
-        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
-        return.
+      add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+      RETURN.
     ENDIF.
 
     CALL FUNCTION 'DDIF_TABL_ACTIVATE'
@@ -576,11 +612,12 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
         put_failure = 2
         OTHERS      = 3.
     IF sy-subrc <> 0.
-        add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
-        return.
-    else.
-        add_log_message( value #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '011' msgv1 = l_structure_name ) ).
-    endif.
+      add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
+      add_log_message( VALUE #( msgty = 'E' msgid = '/CADAXO/SQLC_RRG' msgno = '015' msgv1 = l_structure_name ) ).
+      RETURN.
+    ELSE.
+      add_log_message( VALUE #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '011' msgv1 = l_structure_name ) ).
+    ENDIF.
 
     me->add_structure_to_transport( i_structure_name = l_structure_name ).
 
@@ -664,7 +701,7 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
     get_header( CHANGING ct_code = ev_source ).
 
-    me->add_filter_mapping( changing ct_code = ev_source ).
+    me->add_filter_mapping( CHANGING ct_code = ev_source ).
 
     get_new_line( CHANGING ct_code = ev_source ).
 
@@ -703,10 +740,10 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
 
     CALL FUNCTION 'PRETTY_PRINTER'
       EXPORTING
-        inctoo   = space
+        inctoo = space
       TABLES
-        ntext    = ev_source
-        otext    = ev_source.
+        ntext  = ev_source
+        otext  = ev_source.
 
   ENDMETHOD.
 
@@ -936,7 +973,7 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
       APPEND l_line TO ct_code.
       APPEND ' AND (where)' TO ct_code.
     ELSE.
-        APPEND ' WHERE (where)' TO ct_code.
+      APPEND ' WHERE (where)' TO ct_code.
     ENDIF.
 
   ENDMETHOD.
@@ -1004,19 +1041,19 @@ CLASS /CADAXO/CL_SQLC_TEMP_RRG IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method SET_APPL_LOG.
+  METHOD set_appl_log.
 
-      CALL FUNCTION 'BAL_DSP_OUTPUT_INIT'
-       EXPORTING
-            i_s_display_profile = g_s_display_profile
-       EXCEPTIONS
-            OTHERS              = 1.
+    CALL FUNCTION 'BAL_DSP_OUTPUT_INIT'
+      EXPORTING
+        i_s_display_profile = g_s_display_profile
+      EXCEPTIONS
+        OTHERS              = 1.
 
-  CALL FUNCTION 'BAL_DSP_OUTPUT_SET_DATA'
-       EXPORTING
-            i_t_log_handle = g_t_log_handle
-       EXCEPTIONS
-            OTHERS         = 1.
+    CALL FUNCTION 'BAL_DSP_OUTPUT_SET_DATA'
+      EXPORTING
+        i_t_log_handle = g_t_log_handle
+      EXCEPTIONS
+        OTHERS         = 1.
 
-  endmethod.
+  ENDMETHOD.
 ENDCLASS.
