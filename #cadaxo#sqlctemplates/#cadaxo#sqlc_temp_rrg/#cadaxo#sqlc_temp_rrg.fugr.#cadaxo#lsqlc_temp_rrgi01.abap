@@ -166,7 +166,29 @@ MODULE structure INPUT.
       unknown_objtype = 01.
 
   IF obj_exists = 'X'.                 "obj_exists
-    MESSAGE e006(e2) WITH gs_temp_attr-structure.
+*    MESSAGE e006(e2) WITH gs_temp_attr-structure.
+
+*  IF sy-subrc <> 0.
+*    MESSAGE e006(e2) WITH gs_temp_attr-abap_class.
+
+    data h_ddtypes type ddtypes.
+
+    select single * from ddtypes
+      into h_ddtypes
+      where typename = gs_temp_attr-structure.
+
+    if sy-subrc = 0.
+      case h_ddtypes-typekind.
+        when seok_r3tr_class.
+          MESSAGE e017(/cadaxo/sqlc_rrg) WITH gs_temp_attr-structure.
+        when seok_r3tr_interface.
+          MESSAGE e018(/cadaxo/sqlc_rrg) WITH gs_temp_attr-structure.
+        when others.
+          MESSAGE e019(/cadaxo/sqlc_rrg) WITH gs_temp_attr-structure.
+      endcase.
+    endif.
+
+*  ENDIF.
   ENDIF.
   IF saa_err = 'X'.                    "saa_conflict
     IF msg_flag = space.
@@ -219,8 +241,25 @@ MODULE class INPUT.
     EXCEPTIONS
       not_allowed = 1
   ).
+
   IF sy-subrc <> 0.
-    MESSAGE e006(e2) WITH gs_temp_attr-abap_class.
+*    MESSAGE e006(e2) WITH gs_temp_attr-abap_class.
+
+    select single * from ddtypes
+      into h_ddtypes
+      where typename = abap_class.
+
+    if sy-subrc = 0.
+      case h_ddtypes-typekind.
+        when seok_r3tr_class.
+          MESSAGE e017(/cadaxo/sqlc_rrg) WITH abap_class.
+        when seok_r3tr_interface.
+          MESSAGE e018(/cadaxo/sqlc_rrg) WITH abap_class.
+        when others.
+          MESSAGE e019(/cadaxo/sqlc_rrg) WITH abap_class.
+      endcase.
+    endif.
+
   ENDIF.
 
 ENDMODULE.
