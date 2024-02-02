@@ -44,8 +44,26 @@
       <item>
        <ID>I</ID>
        <KEY>007</KEY>
-       <ENTRY>* SQL Cockpit query</ENTRY>
+       <ENTRY>* SQL Cockpit Abfrage</ENTRY>
        <LENGTH>29</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>W01</KEY>
+       <ENTRY>Starte Objektgenerierung.</ENTRY>
+       <LENGTH>48</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>W02</KEY>
+       <ENTRY>Beende Objektgenerierung.</ENTRY>
+       <LENGTH>44</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>W03</KEY>
+       <ENTRY>Struktur erfolgreich angelegt.</ENTRY>
+       <LENGTH>50</LENGTH>
       </item>
      </TEXTPOOL>
     </item>
