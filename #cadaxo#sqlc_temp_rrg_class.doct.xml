@@ -7,6 +7,40 @@
      <DOKIL>
       <ID>TX</ID>
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_CLASS</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0004</VERSION>
+      <TXTLINES>00003</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>/CADAXO/SQLC_TEMP_RRG_CLASS</TDNAME>
+      <TDID>TX</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00004</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Assistent</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Bitte geben Sie einen &lt;ZH&gt;Klassennamen&lt;/&gt; ein und eine &lt;ZH&gt;kurze</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Beschreibung.&lt;/&gt;</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+    <item>
+     <DOKIL>
+      <ID>TX</ID>
+      <OBJECT>/CADAXO/SQLC_TEMP_RRG_CLASS</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
       <VERSION>0004</VERSION>

@@ -6,20 +6,14 @@
    <TEXT>SQL Cockpit - Sidebar image Element Info</TEXT>
    <PARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_SIDEBAR_IMG_EL_INFO</OBJID>
      <NAME>fileextension</NAME>
      <VALUE>.gif</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_SIDEBAR_IMG_EL_INFO</OBJID>
      <NAME>filename</NAME>
      <VALUE>elementinfo.gif</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_SIDEBAR_IMG_EL_INFO</OBJID>
      <NAME>mimetype</NAME>
      <VALUE>image/gif</VALUE>
     </WWWPARAMS>

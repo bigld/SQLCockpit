@@ -6,20 +6,14 @@
    <TEXT>Cadaxo - Roadmap - Table</TEXT>
    <PARAMS>
     <WWWPARAMS>
-     <RELID>HT</RELID>
-     <OBJID>/CADAXO/SQLC_ROADMAP_TAB</OBJID>
      <NAME>fileextension</NAME>
      <VALUE>.html</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>HT</RELID>
-     <OBJID>/CADAXO/SQLC_ROADMAP_TAB</OBJID>
      <NAME>filename</NAME>
      <VALUE>roadmap_tab_3_7.html</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>HT</RELID>
-     <OBJID>/CADAXO/SQLC_ROADMAP_TAB</OBJID>
      <NAME>mimetype</NAME>
      <VALUE>text/html</VALUE>
     </WWWPARAMS>

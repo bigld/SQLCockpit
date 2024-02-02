@@ -6,20 +6,14 @@
    <TEXT>Report generator documentation</TEXT>
    <PARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_REPGENDOKU_D</OBJID>
      <NAME>fileextension</NAME>
      <VALUE>.pdf</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_REPGENDOKU_D</OBJID>
      <NAME>filename</NAME>
      <VALUE>Reportgenerator Deutsch.pdf</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_REPGENDOKU_D</OBJID>
      <NAME>mimetype</NAME>
      <VALUE>application/pdf</VALUE>
     </WWWPARAMS>

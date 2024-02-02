@@ -6,20 +6,14 @@
    <TEXT>SQL Cockpit - Sidebar image symbols - german</TEXT>
    <PARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_SIDEBAR_IMG_SYMBOLS_DE</OBJID>
      <NAME>fileextension</NAME>
      <VALUE>.gif</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_SIDEBAR_IMG_SYMBOLS_DE</OBJID>
      <NAME>filename</NAME>
      <VALUE>symbols_de.gif</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_SIDEBAR_IMG_SYMBOLS_DE</OBJID>
      <NAME>mimetype</NAME>
      <VALUE>image/gif</VALUE>
     </WWWPARAMS>

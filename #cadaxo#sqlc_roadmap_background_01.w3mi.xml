@@ -6,20 +6,14 @@
    <TEXT>SQL Cockpit - Roadmap Background 01</TEXT>
    <PARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_ROADMAP_BACKGROUND_01</OBJID>
      <NAME>fileextension</NAME>
      <VALUE>.png</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_ROADMAP_BACKGROUND_01</OBJID>
      <NAME>filename</NAME>
      <VALUE>background_wizard.png</VALUE>
     </WWWPARAMS>
     <WWWPARAMS>
-     <RELID>MI</RELID>
-     <OBJID>/CADAXO/SQLC_ROADMAP_BACKGROUND_01</OBJID>
      <NAME>mimetype</NAME>
      <VALUE>image/png</VALUE>
     </WWWPARAMS>

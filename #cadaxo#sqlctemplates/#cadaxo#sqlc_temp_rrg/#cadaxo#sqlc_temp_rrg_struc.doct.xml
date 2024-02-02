@@ -7,6 +7,40 @@
      <DOKIL>
       <ID>TX</ID>
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_STRUC</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0006</VERSION>
+      <TXTLINES>00003</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>/CADAXO/SQLC_TEMP_RRG_STRUC</TDNAME>
+      <TDID>TX</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00006</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Assistent</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Bitte geben Sie einen &lt;ZH&gt;Strukturnamen&lt;/&gt; ein und eine &lt;ZH&gt;kurze</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Beschreibung&lt;/&gt;.</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+    <item>
+     <DOKIL>
+      <ID>TX</ID>
+      <OBJECT>/CADAXO/SQLC_TEMP_RRG_STRUC</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
       <VERSION>0006</VERSION>

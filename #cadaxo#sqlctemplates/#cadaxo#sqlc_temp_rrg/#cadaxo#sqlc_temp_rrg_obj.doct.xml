@@ -7,6 +7,55 @@
      <DOKIL>
       <ID>TX</ID>
       <OBJECT>/CADAXO/SQLC_TEMP_RRG_OBJ</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0003</VERSION>
+      <TXTLINES>00007</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>/CADAXO/SQLC_TEMP_RRG_OBJ</TDNAME>
+      <TDID>TX</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00003</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Assistent</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Wählen Sie die Objekte aus, die Sie generieren möchten. Sie können die</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>folgenden Objekte aus Ihrer SELECT-Anweisung erzeugen, um sie schnell in</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Ihren Rapid Report Generator zu integrieren:</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>B1</TDFORMAT>
+       <TDLINE>DDIC Ergebnis Struktur</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>B1</TDFORMAT>
+       <TDLINE>ABAP Klasse</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>B1</TDFORMAT>
+       <TDLINE>RRG Einstellungen</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+    <item>
+     <DOKIL>
+      <ID>TX</ID>
+      <OBJECT>/CADAXO/SQLC_TEMP_RRG_OBJ</OBJECT>
       <LANGU>E</LANGU>
       <TYP>E</TYP>
       <VERSION>0003</VERSION>
