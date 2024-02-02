@@ -299,8 +299,8 @@ ENDMODULE.
 *       text
 *----------------------------------------------------------------------*
 MODULE check_report_id INPUT.
-  SELECT SINGLE FROM /cadaxo/ui38_rep
-         FIELDS @abap_true
+  SELECT SINGLE  @abap_true FROM /cadaxo/ui38_rep
+        " FIELDS
          WHERE report_id = @/cadaxo/sqlc_temp_rrg_attr-rrg_report_id
          INTO @DATA(found).
   IF sy-subrc = 0.
