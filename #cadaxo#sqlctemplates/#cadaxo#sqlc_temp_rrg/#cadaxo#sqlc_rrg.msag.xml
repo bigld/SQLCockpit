@@ -128,6 +128,12 @@
      <MSGNR>019</MSGNR>
      <TEXT>Global Type (Stru, Tabl, ...) &amp;1 already exists. Choose a different name.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>020</MSGNR>
+     <TEXT>Name &amp;1 already reserved for the structure. Choose a different name.</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

@@ -262,6 +262,10 @@ MODULE class INPUT.
 
   ENDIF.
 
+  If gs_temp_attr-abap_class = gs_temp_attr-structure.
+    MESSAGE e020(/cadaxo/sqlc_rrg) WITH abap_class.
+  endif.
+
 ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0150  INPUT
