@@ -12,7 +12,24 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_API_OT_SYMBOL IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_api_ot_symbol IMPLEMENTATION.
+
+
+  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
+
+    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name   = 'ICON_CONVERT'
+        info   = 'Symbols'
+      IMPORTING
+        result = e_icon_quickinfo
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+      CLEAR e_icon_quickinfo.
+    ENDIF.
+
+  ENDMETHOD.
 
 
   METHOD /cadaxo/if_api_objecttype~get_version.
@@ -26,7 +43,7 @@ CLASS /CADAXO/CL_SQLC_API_OT_SYMBOL IMPLEMENTATION.
 
 * TODO: check the type of ev_data
 
-    DATA: lt_symbol_data type /CADAXO/SQLC_SYMBOL_T.
+    DATA: lt_symbol_data TYPE /cadaxo/sqlc_symbol_t.
 
     cl_abap_gzip=>decompress_binary( EXPORTING gzip_in  = iv_data
                                      IMPORTING raw_out = DATA(lv_decompress) ).
@@ -52,21 +69,4 @@ CLASS /CADAXO/CL_SQLC_API_OT_SYMBOL IMPLEMENTATION.
                                    IMPORTING gzip_out = ev_data ).
 
   ENDMETHOD.
-
-  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
-
-    CALL FUNCTION 'ICON_CREATE'
-      EXPORTING
-        name   = 'ICON_CONVERT'
-        info   = 'Symbols'
-      IMPORTING
-        result = e_icon_quickinfo
-      EXCEPTIONS
-        OTHERS = 1.
-    IF sy-subrc <> 0.
-      CLEAR e_icon_quickinfo.
-    ENDIF.
-
-  ENDMETHOD.
-
 ENDCLASS.

@@ -27,41 +27,6 @@ ENDCLASS.
 
 
 CLASS /cadaxo/cl_tpda_script_class IMPLEMENTATION.
-  METHOD prologue.
-    super->prologue( ).
-  ENDMETHOD.
-  METHOD init.
-    super->init( ).
-  ENDMETHOD.
-  METHOD script.
-    DATA scan_object TYPE REF TO /cadaxo/cl_tpda_scriptscan_sel.
-
-    FREE scan_object.
-
-    scan_object ?= /cadaxo/cl_tpda_script_scan=>scan( p_program     = abap_source->program( )
-                                                      p_include     = abap_source->include( )
-                                                      p_line        = abap_source->line( ) ).
-
-    scan_object->get_select_tokens( IMPORTING e_tokens = DATA(select_tokens) ).
-
-    DATA(symbols) = me->get_field_symbols( EXPORTING i_select_tokens = select_tokens
-                                                     i_trace         = trace ).
-
-    DATA(cockpit_api) = /cadaxo/cl_sqlc_cockpit_api=>create_share_factory(
-      EXPORTING iv_description  = abap_source->program( ) && | { sy-datum DATE = USER } { sy-uzeit TIME = USER }|
-                iv_sender       = CONV #( cl_abap_syst=>get_user_name( ) )
-                iv_sender_typ   = /cadaxo/cl_sqlc_cockpit_api=>sender_typ-user
-                iv_receiver     = CONV #( cl_abap_syst=>get_user_name( ) )
-                iv_receiver_typ = /cadaxo/cl_sqlc_cockpit_api=>sender_typ-user ).
-
-    me->get_cockpit_sql( EXPORTING i_select_tokens = select_tokens
-                         IMPORTING e_cockpit_sql = DATA(sql_string)
-                                   e_into_clause = DATA(into_string) ).
-    cockpit_api->add_item( EXPORTING iv_typ = cockpit_api->cs_api_types-sql iv_data = VALUE /cadaxo/sqlccodeline_t( ( sql_string && |. "<{ into_string }>| ) ) ).
-    cockpit_api->add_item( EXPORTING iv_typ = cockpit_api->cs_api_types-symbols iv_data = symbols ).
-    MESSAGE 'SELECT statement exported to SQL Cockpit' TYPE 'S'.
-
-  ENDMETHOD.
 
 
   METHOD get_cockpit_sql.
@@ -88,7 +53,7 @@ CLASS /cadaxo/cl_tpda_script_class IMPLEMENTATION.
 
       ELSE.
 
-        IF <token>-type = token_type-field and <token>-str+0(1) cn '''`´'.
+        IF <token>-type = token_type-field AND <token>-str+0(1) CN '''`´'.
           e_cockpit_sql = e_cockpit_sql && | | && '&DGB_' && <token>-str && '&'.
         ELSE.
           e_cockpit_sql = e_cockpit_sql && | | && <token>-str.
@@ -98,6 +63,7 @@ CLASS /cadaxo/cl_tpda_script_class IMPLEMENTATION.
       previous_token = <token>-str.
     ENDLOOP.
   ENDMETHOD.
+
 
   METHOD get_field_symbols.
 
@@ -151,7 +117,50 @@ CLASS /cadaxo/cl_tpda_script_class IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
+
+
   METHOD end.
     super->end( ).
+  ENDMETHOD.
+
+
+  METHOD init.
+    super->init( ).
+  ENDMETHOD.
+
+
+  METHOD prologue.
+    super->prologue( ).
+  ENDMETHOD.
+
+
+  METHOD script.
+    DATA scan_object TYPE REF TO /cadaxo/cl_tpda_scriptscan_sel.
+
+    FREE scan_object.
+
+    scan_object ?= /cadaxo/cl_tpda_script_scan=>scan( p_program     = abap_source->program( )
+                                                      p_include     = abap_source->include( )
+                                                      p_line        = abap_source->line( ) ).
+
+    scan_object->get_select_tokens( IMPORTING e_tokens = DATA(select_tokens) ).
+
+    DATA(symbols) = me->get_field_symbols( EXPORTING i_select_tokens = select_tokens
+                                                     i_trace         = trace ).
+
+    DATA(cockpit_api) = /cadaxo/cl_sqlc_cockpit_api=>create_share_factory(
+      EXPORTING iv_description  = abap_source->program( ) && | { sy-datum DATE = USER } { sy-uzeit TIME = USER }|
+                iv_sender       = CONV #( cl_abap_syst=>get_user_name( ) )
+                iv_sender_typ   = /cadaxo/cl_sqlc_cockpit_api=>sender_typ-user
+                iv_receiver     = CONV #( cl_abap_syst=>get_user_name( ) )
+                iv_receiver_typ = /cadaxo/cl_sqlc_cockpit_api=>sender_typ-user ).
+
+    me->get_cockpit_sql( EXPORTING i_select_tokens = select_tokens
+                         IMPORTING e_cockpit_sql = DATA(sql_string)
+                                   e_into_clause = DATA(into_string) ).
+    cockpit_api->add_item( EXPORTING iv_typ = cockpit_api->cs_api_types-sql iv_data = VALUE /cadaxo/sqlccodeline_t( ( sql_string && |. "<{ into_string }>| ) ) ).
+    cockpit_api->add_item( EXPORTING iv_typ = cockpit_api->cs_api_types-symbols iv_data = symbols ).
+    MESSAGE 'SELECT statement exported to SQL Cockpit' TYPE 'S'.
+
   ENDMETHOD.
 ENDCLASS.

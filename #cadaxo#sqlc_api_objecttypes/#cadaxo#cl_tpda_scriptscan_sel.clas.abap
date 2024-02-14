@@ -20,7 +20,7 @@ CLASS /cadaxo/cl_tpda_scriptscan_sel DEFINITION
         VALUE(e_tokens) TYPE sana_stokesx_tab .
 
     METHODS db_tables
-         REDEFINITION .
+        REDEFINITION .
   PROTECTED SECTION.
     DATA: m_select_codeline TYPE string.
   PRIVATE SECTION.
@@ -106,7 +106,6 @@ CLASS /cadaxo/cl_tpda_scriptscan_sel IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
 
 
   METHOD get_select_tokens.

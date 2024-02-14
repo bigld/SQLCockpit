@@ -50,46 +50,46 @@ CLASS /cadaxo/cl_sqlc_join_complet DEFINITION
 
     METHODS cc_join
       EXPORTING
-        !e_res TYPE /cadaxo/sqlcjcres_ty .
+        e_res TYPE /cadaxo/sqlcjcres_ty .
     METHODS cc_on
       IMPORTING
-        !i_res  TYPE /cadaxo/sqlcjcres OPTIONAL
+        i_res  TYPE /cadaxo/sqlcjcres OPTIONAL
       EXPORTING
-        !e_text TYPE /cadaxo/sqlcjctext_ty .
+        e_text TYPE /cadaxo/sqlcjctext_ty .
     METHODS constructor
       IMPORTING
-        !o_abapedit TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit OPTIONAL .
+        o_abapedit TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit OPTIONAL .
     METHODS disassemble_sql .
     METHODS pbo_0100 .
     METHODS create_alv_controls .
     METHODS handle_double_click_top
-          FOR EVENT double_click OF cl_gui_alv_grid
+      FOR EVENT double_click OF cl_gui_alv_grid
       IMPORTING
-          !e_row
-          !e_column
-          !es_row_no .
+        e_row
+        e_column
+        es_row_no .
     METHODS cc_join_f4
       EXPORTING
-        !e_string TYPE string .
+        e_string TYPE string .
     METHODS cc_on_f4
       EXPORTING
-        !e_string TYPE string .
+        e_string TYPE string .
     METHODS append_table_seltable
       IMPORTING
-        !i_tabname TYPE tabname .
+        i_tabname TYPE tabname .
     METHODS handle_double_click_bottom
-          FOR EVENT double_click OF cl_gui_alv_grid
+      FOR EVENT double_click OF cl_gui_alv_grid
       IMPORTING
-          !e_row
-          !e_column
-          !es_row_no .
+        e_row
+        e_column
+        es_row_no .
     METHODS delete_globals .
     METHODS cc_join_db
       EXPORTING
-        !e_res TYPE /cadaxo/sqlcjcres_ty .
+        e_res TYPE /cadaxo/sqlcjcres_ty .
     METHODS calculate_position
       EXPORTING
-        !e_res TYPE /cadaxo/sqlcjcres_ty .
+        e_res TYPE /cadaxo/sqlcjcres_ty .
   PROTECTED SECTION.
 
     METHODS build_fcat .
@@ -98,28 +98,28 @@ CLASS /cadaxo/cl_sqlc_join_complet DEFINITION
     METHODS cc_as .
     METHODS fill_db_tables
       IMPORTING
-        !it_head TYPE /cadaxo/sqlcjche_t
-        !it_item TYPE /cadaxo/sqlcjcpo_t .
+        it_head TYPE /cadaxo/sqlcjche_t
+        it_item TYPE /cadaxo/sqlcjcpo_t .
     METHODS build_layout
       RETURNING
         VALUE(rs_layout) TYPE lvc_s_layo .
     METHODS get_join_type
       IMPORTING
-        !iv_join_type TYPE rsddbjointp
+        iv_join_type  TYPE rsddbjointp
       RETURNING
         VALUE(rv_res) TYPE string .
     METHODS set_join_type
       IMPORTING
-        !iv_res             TYPE string
+        iv_res              TYPE string
       RETURNING
         VALUE(rv_join_type) TYPE rsddbjointp .
     METHODS calculate_top
       EXPORTING
-        !e_expr1 TYPE string
-        !e_expr2 TYPE string .
+        e_expr1 TYPE string
+        e_expr2 TYPE string .
     METHODS calculate_bottom
       EXPORTING
-        !e_text TYPE /cadaxo/sqlcjctext_ty .
+        e_text TYPE /cadaxo/sqlcjctext_ty .
     EVENTS double_click .
     METHODS get_table_description IMPORTING i_table_name         TYPE tabname
                                   RETURNING VALUE(e_description) TYPE as4text.
@@ -210,30 +210,6 @@ CLASS /cadaxo/cl_sqlc_join_complet IMPLEMENTATION.
     e_text = gt_text.
 
   ENDMETHOD.
-
-  METHOD get_table_description.
-
-    IF NOT line_exists( table_descriptions[ tabname = i_table_name ] ).
-      SELECT SINGLE tabname, ddtext
-             FROM dd02t
-             WHERE tabname    = @i_table_name
-               AND ddlanguage = @sy-langu
-             INTO @DATA(table_descr).
-      IF sy-subrc <> 0.
-        INSERT VALUE #( tabname = i_table_name ) INTO TABLE table_descriptions.
-      ELSE.
-        IF table_descr-ddtext IS INITIAL.
-          INSERT VALUE #( tabname = i_table_name ddtext = i_table_name ) INTO TABLE table_descriptions.
-        ELSE.
-          INSERT CORRESPONDING #( table_descr ) INTO TABLE table_descriptions.
-        ENDIF.
-      ENDIF.
-    ENDIF.
-    e_description = table_descriptions[ tabname = i_table_name ]-ddtext.
-
-  ENDMETHOD.
-
-
 
 
   METHOD calculate_position.
@@ -928,6 +904,29 @@ CLASS /cadaxo/cl_sqlc_join_complet IMPLEMENTATION.
         rv_res = 'FULL OUTER JOIN'.
       WHEN OTHERS.
     ENDCASE.
+
+  ENDMETHOD.
+
+
+  METHOD get_table_description.
+
+    IF NOT line_exists( table_descriptions[ tabname = i_table_name ] ).
+      SELECT SINGLE tabname, ddtext
+             FROM dd02t
+             WHERE tabname    = @i_table_name
+               AND ddlanguage = @sy-langu
+             INTO @DATA(table_descr).
+      IF sy-subrc <> 0.
+        INSERT VALUE #( tabname = i_table_name ) INTO TABLE table_descriptions.
+      ELSE.
+        IF table_descr-ddtext IS INITIAL.
+          INSERT VALUE #( tabname = i_table_name ddtext = i_table_name ) INTO TABLE table_descriptions.
+        ELSE.
+          INSERT CORRESPONDING #( table_descr ) INTO TABLE table_descriptions.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+    e_description = table_descriptions[ tabname = i_table_name ]-ddtext.
 
   ENDMETHOD.
 

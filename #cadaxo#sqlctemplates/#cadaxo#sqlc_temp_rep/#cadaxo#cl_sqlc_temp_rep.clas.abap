@@ -19,7 +19,7 @@ CLASS /cadaxo/cl_sqlc_temp_rep DEFINITION
         /cadaxo/cx_sqlc_temp_rep .
 
     METHODS execute_template_generation
-         REDEFINITION .
+        REDEFINITION .
   PROTECTED SECTION.
 *"* protected components of class /CADAXO/CL_SQLC_TEMP_REP
 *"* do not include other source files here!!!
@@ -67,14 +67,14 @@ CLASS /cadaxo/cl_sqlc_temp_rep IMPLEMENTATION.
     SYNTAX-CHECK FOR gt_source_code MESSAGE l_mess LINE l_lin WORD l_wrd DIRECTORY ENTRY l_dir.
 
     IF NOT l_mess IS INITIAL.
-      CONCATENATE text-p03 text-p04 INTO l_text SEPARATED BY space.
+      CONCATENATE TEXT-p03 TEXT-p04 INTO l_text SEPARATED BY space.
       CALL FUNCTION 'POPUP_TO_CONFIRM'
         EXPORTING
-          titlebar              = text-p00
+          titlebar              = TEXT-p00
           text_question         = l_text
-          text_button_1         = text-p01
+          text_button_1         = TEXT-p01
           icon_button_1         = 'ICON_GENERATE'
-          text_button_2         = text-p02
+          text_button_2         = TEXT-p02
           icon_button_2         = 'ICON_INCOMPLETE'
           default_button        = '1'
           display_cancel_button = ''
@@ -224,7 +224,7 @@ CLASS /cadaxo/cl_sqlc_temp_rep IMPLEMENTATION.
       CLEAR ls_textpool.
       ls_textpool-id = 'I'.
       ls_textpool-key = 'T01'.
-      ls_textpool-entry = text-t01.
+      ls_textpool-entry = TEXT-t01.
       ls_textpool-length = strlen( ls_textpool-entry ) + 5.
       APPEND ls_textpool TO gt_textpool.
 

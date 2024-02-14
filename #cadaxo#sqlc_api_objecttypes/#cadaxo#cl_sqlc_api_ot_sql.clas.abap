@@ -15,6 +15,23 @@ ENDCLASS.
 CLASS /cadaxo/cl_sqlc_api_ot_sql IMPLEMENTATION.
 
 
+  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
+
+    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name   = 'ICON_SPOOL_REQUEST'
+        info   = 'SQL'
+      IMPORTING
+        result = e_icon_quickinfo
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+      CLEAR e_icon_quickinfo.
+    ENDIF.
+
+  ENDMETHOD.
+
+
   METHOD /cadaxo/if_api_objecttype~get_version.
 
     rv_version = '1.0'.
@@ -54,21 +71,4 @@ CLASS /cadaxo/cl_sqlc_api_ot_sql IMPLEMENTATION.
                                    IMPORTING gzip_out = ev_data ).
 
   ENDMETHOD.
-
-  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
-
-    CALL FUNCTION 'ICON_CREATE'
-      EXPORTING
-        name   = 'ICON_SPOOL_REQUEST'
-        info   = 'SQL'
-      IMPORTING
-        result = e_icon_quickinfo
-      EXCEPTIONS
-        OTHERS = 1.
-    IF sy-subrc <> 0.
-      CLEAR e_icon_quickinfo.
-    ENDIF.
-
-  ENDMETHOD.
-
 ENDCLASS.

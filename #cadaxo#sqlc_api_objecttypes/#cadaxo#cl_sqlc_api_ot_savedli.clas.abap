@@ -1,25 +1,42 @@
-class /CADAXO/CL_SQLC_API_OT_SAVEDLI definition
-  public
-  final
-  create public .
+CLASS /cadaxo/cl_sqlc_api_ot_savedli DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces /CADAXO/IF_API_OBJECTTYPE .
-protected section.
-private section.
+    INTERFACES /cadaxo/if_api_objecttype .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_API_OT_SAVEDLI IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_api_ot_savedli IMPLEMENTATION.
 
 
-  method /CADAXO/IF_API_OBJECTTYPE~GET_VERSION.
+  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
 
-    RV_VERSION = '1.0'.
+    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name   = 'ICON_TABLE_SETTINGS'
+        info   = 'Saved List'
+      IMPORTING
+        result = e_icon_quickinfo
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+      CLEAR e_icon_quickinfo.
+    ENDIF.
 
-  endmethod.
+  ENDMETHOD.
+
+
+  METHOD /cadaxo/if_api_objecttype~get_version.
+
+    rv_version = '1.0'.
+
+  ENDMETHOD.
 
 
   METHOD /cadaxo/if_api_objecttype~prepare_export.
@@ -50,7 +67,7 @@ CLASS /CADAXO/CL_SQLC_API_OT_SAVEDLI IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method /CADAXO/IF_API_OBJECTTYPE~PREPARE_IMPORT.
+  METHOD /cadaxo/if_api_objecttype~prepare_import.
 
     DATA(json_writer) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
     CALL TRANSFORMATION id SOURCE data = iv_data RESULT XML json_writer.
@@ -59,22 +76,5 @@ CLASS /CADAXO/CL_SQLC_API_OT_SAVEDLI IMPLEMENTATION.
     cl_abap_gzip=>compress_binary( EXPORTING raw_in   = lv_json
                                    IMPORTING gzip_out = ev_data ).
 
-  endmethod.
-
-  METHOD /cadaxo/if_api_objecttype~get_ui_icon.
-
-    CALL FUNCTION 'ICON_CREATE'
-      EXPORTING
-        name   = 'ICON_TABLE_SETTINGS'
-        info   = 'Saved List'
-      IMPORTING
-        result = e_icon_quickinfo
-      EXCEPTIONS
-        OTHERS = 1.
-    IF sy-subrc <> 0.
-      CLEAR e_icon_quickinfo.
-    ENDIF.
-
   ENDMETHOD.
-
 ENDCLASS.
