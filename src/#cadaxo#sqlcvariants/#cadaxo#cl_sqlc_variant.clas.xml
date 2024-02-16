@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/CADAXO/CL_SQLC_VARIANT</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>SQL Cockpit - Variant</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>CHANGE_GROUP_OF_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Change Group of Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>DELETE_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Delete Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>DOWNLOAD_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Insert Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_GROUPS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Variant Groups</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_VARIANTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Variants</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GLOBALIZE_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Globalize Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GR_USER_LOG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Userlog</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>INSERT_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Insert Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>LOCALIZE_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Localize Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>LOCK_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Lock Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MODIFY_DESCRIPTION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Modify Description</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>RENAME_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Rename Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>UNLOCK_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Unlock Variant</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>UPLOAD_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Upload Variant</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

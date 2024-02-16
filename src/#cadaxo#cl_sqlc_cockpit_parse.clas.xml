@@ -1,0 +1,722 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_PARSE</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>SQL Cockpit - SQL Parser</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+    <RSTAT>K</RSTAT>
+    <WITH_UNIT_TESTS>X</WITH_UNIT_TESTS>
+   </VSEOCLASS>
+   <TPOOL>
+    <item>
+     <ID>I</ID>
+     <KEY>001</KEY>
+     <ENTRY>OK</ENTRY>
+     <LENGTH>2</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>002</KEY>
+     <ENTRY>Cancel</ENTRY>
+     <LENGTH>6</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>D01</KEY>
+     <ENTRY>DEMO Version</ENTRY>
+     <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>D02</KEY>
+     <ENTRY>In DEMO version only two concurrent SELECTs are supported!</ENTRY>
+     <LENGTH>75</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>D03</KEY>
+     <ENTRY>Info</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>D04</KEY>
+     <ENTRY>In DEMO version subqueries are not supported!</ENTRY>
+     <LENGTH>65</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>D05</KEY>
+     <ENTRY>After 60 days in DEMO version only one SELECT is supported!</ENTRY>
+     <LENGTH>80</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>D06</KEY>
+     <ENTRY>DEMO version is used for more than 60 days!</ENTRY>
+     <LENGTH>60</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>E01</KEY>
+     <ENTRY>The value of &quot;up to rows&quot; is to high. Please use a lower value.</ENTRY>
+     <LENGTH>63</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>E02</KEY>
+     <ENTRY>SQL Version Error - Please contact Cadaxo Support!</ENTRY>
+     <LENGTH>100</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>E03</KEY>
+     <ENTRY> (With ST22 Dump!)</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>E04</KEY>
+     <ENTRY>This usually happens if there are too many values used in the WHERE clause</ENTRY>
+     <LENGTH>132</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>T01</KEY>
+     <ENTRY>Syntax Error</ENTRY>
+     <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>X00</KEY>
+     <ENTRY>Please check transaction ST22 for Runtime Error &apos;&amp;1&apos; for more details</ENTRY>
+     <LENGTH>132</LENGTH>
+    </item>
+   </TPOOL>
+   <I18N_TPOOL>
+    <item>
+     <LANGUAGE>D</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>I</ID>
+       <KEY>001</KEY>
+       <ENTRY>OK</ENTRY>
+       <LENGTH>2</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>002</KEY>
+       <ENTRY>Abbr.</ENTRY>
+       <LENGTH>6</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>D01</KEY>
+       <ENTRY>DEMO Version</ENTRY>
+       <LENGTH>12</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>D02</KEY>
+       <ENTRY>In der DEMO Version dürfen nur 2 SELECTs gleichzeitig ausgeführt werden!</ENTRY>
+       <LENGTH>75</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>D03</KEY>
+       <ENTRY>Info</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>D04</KEY>
+       <ENTRY>In der DEMO Version können keine Subselects ausgeführt werden!</ENTRY>
+       <LENGTH>65</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>D05</KEY>
+       <ENTRY>Nach 60 Tagen kann in der DEMO Version nur noch ein SELECT ausgeführt werden!</ENTRY>
+       <LENGTH>80</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>D06</KEY>
+       <ENTRY>Die DEMO Version wird seit mehr als 60 Tagen benutzt!</ENTRY>
+       <LENGTH>60</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>E01</KEY>
+       <ENTRY>Der Wert für &quot;up to rows&quot; ist zu groß. Bitte kleiner wählen.</ENTRY>
+       <LENGTH>63</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>E02</KEY>
+       <ENTRY>SQL Version Error - Bitte kontaktieren Sie den Cadaxo Support!</ENTRY>
+       <LENGTH>100</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>E03</KEY>
+       <ENTRY> (Mit ST22 Dump!)</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>E04</KEY>
+       <ENTRY>Das tritt häufig auf, wenn zu viele Werte in der WHERE-Klausel verwendet werden</ENTRY>
+       <LENGTH>132</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>T01</KEY>
+       <ENTRY>Syntax Error</ENTRY>
+       <LENGTH>12</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>X00</KEY>
+       <ENTRY>Die genaue Fehlermeldung finden Sie in der Transaktion ST22 beim Laufzeitfehler &apos;&amp;1&apos;</ENTRY>
+       <LENGTH>132</LENGTH>
+      </item>
+     </TEXTPOOL>
+    </item>
+   </I18N_TPOOL>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_DOMAIN_VALUE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Add domain value</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_DOMAIN_VALUE_ELM</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Add domain value element</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_DOMAIN_VALUE_SUB</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Add domain value subcomponent</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>BLACKLIST_CHECK_TABLES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check against blacklist tables</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>BUILD_ABAP_CODE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Build abap code for syntax check and sub-pool</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CDS_PARAMETER_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - CDS Parameter Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_FOR_HOST_EXPRESSIONS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check for host expressions</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_FOR_HOST_EXPR_METH</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check for host expressions methods</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_RUNTIME_ERROR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check Runtime Error</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SQL_ODATA_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check ODATA SQL syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SQL_STRING_INCLUDES_SUBQ</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check sql string including subquery</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_SQL_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check sql syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>COLUMN_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Column Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>COLUMN_WORDS_T</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Column Words</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>COMP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Component Descriptor</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>COMPONENTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>abap composer</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONCATENATE_AGGR_PREFIX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Concatenate aggregate prefix</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONNECTION_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - DB Hint Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>CONSTRUCTOR</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_ALV_FIELD_CATALOG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create alv field cadalog</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_ALV_FIELD_CATALOG_V_1</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create alv field cadalog - Version 1</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_ALV_FIELD_CATALOG_V_2</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create alv field cadalog - Version 2</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_RESULT_STRUCTURES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create/get result structures</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_APOSTROPHE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Einstelliges Kennzeichen</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_SELECT_VERSION_0</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Select version</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_SELECT_VERSION_1</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Select version</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_SELECT_VERSION_2</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Select version</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>DBHINT_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - DB Hint Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>EXECUTE_SELECT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Execute select via dyn. select</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>EXECUTE_SELECT_VIA_SUBPOOL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Execute select via sub pool</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>EXECUTE_SELECT_VIA_SUBPOOL_V_2</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Execute select via sub pool - Version 2</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>EXECUTE_SELECT_V_1</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Execute select via dyn. select - Version 1</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>EXECUTE_SELECT_V_2</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Execute select via dyn. select - Version 2</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FIELDS_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Fields Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FORMAT_ABAP_CODE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Format ABAP Code</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FORMAT_VALUE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>bring value into right format</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FORMAT_VALUE_WO_DDIC</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>bring value into right format</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_ABAP_TYPEDESCR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get type description</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_BYPASSING_BUFFER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Bypassing Buffer</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_CONNECTION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Connection</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_DBHINTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code DBHints</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_FIELDS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Fields</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_GROUP_BY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Group By</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_HAVING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Having</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_INTO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Into</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_OFFSET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Offset</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_ORDER_BY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Order By</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_TRACE_OFF</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code trace off</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_TRACE_ON</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code trace on</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_UP_TO_ROWS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Up To Rows</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_WHERE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Where</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_DDIC_FIELD_LIST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get fields in dfies format</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_MULTISYMBOL_DATA_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Multisymbol Data Table from SQL Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GROUP_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Group Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GS_CLIENT_HANDLING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Client Handling Options</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GTS_CLIENT_HANDLING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Client Handling Opitons</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_ABAP_TYPEDESCR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of /CADAXO/SQLCTABTYPEDESCR</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_COMPONENTS_DOMVAL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of v/CADAXO/SQLCPARSECOMPONENT</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_DOMVAL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Domain Values</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_LVC_T_FCAT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Field Catalog for List Viewer Control</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_RESULT_DDFIELDS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Result Table Stucture</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_RESULT_DDFIELDS_ALL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Tall Result fields</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_SQL_WHERE_COL_TAB_T</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of /CADAXO/SQLCWHERECOL_STR</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_SYMBOL_VARIABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Symbol variable with range table data</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_ASYNC_CALLS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>nummber of RFC Calls</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_BYPASSING_BUFFER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Indicator</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_COUNT_SUBROUTINENPOOL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Count Subroutinenpool</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_HOLD_RESULT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Indicator</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_MAIN_REF</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Main Class</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_MAIN_REF_ID</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Main Class Ref ID</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_NO_UPTO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>no UP TO Clause</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_ROLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Role</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_SELECT_DISTINCT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Indicator</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_SELECT_SINGLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Indicator</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_SELECT_VERSION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Select version</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_TMP_RESULT_DETAILS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Result Details</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_UP_TO_X_ROWS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Natural Number</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>G_USER_SETTINGS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Usersettings XML</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HAVING_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Having Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>INSERT_SQL_TO_LOG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Insert sql command to log</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>IS_COUNT_STAR_ONLY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>is fieldlist only count(*) ?</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MR_ARFC_EXCEPTION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Exception from ARFC return</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>OFFSET_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - OFFSET Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>ORDER_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Order by Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PARSE_SQL_I</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Parse sql - part I</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PARSE_SQL_II</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Parse sql - part II</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PARSE_SQL_II_1</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Parse sql - part II - Version 1</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PARSE_SQL_II_2</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Parse sql - part II - Version 2</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PARSE_SQL_WHERE_COLUMNS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get where columns</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>RESULT_COMPONENT_T</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of v/CADAXO/SQLCPARSECOMPONENT</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>RESULT_LINES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Natural Number</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>RESULT_RUNTIME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Natural Number</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>RESULT_SOURCE_T</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of /CADAXO/SQLCSELECTSOURCE</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SERIALIZE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Serialization</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SOURCE_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Source Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SPLIT_FIELD</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Split field into field/table/alias</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SPLIT_FIELD_V_2</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Split field</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SQL_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - SQL Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SQL_SYNTAX_WITHOUT_WHERE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - SQL Syntax without WHERE</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SUBPOOL_RESULT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>aRFC Return</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SUBQUERY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Indicator</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>UPDATE_ALV_FIELD_CATALOG_SL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Update alv field cadalog - saved lists</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>UPDATE_SQL_TO_LOG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Insert sql command to log</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>WHERE_SYNTAX</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Where Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>WHERE_SYNTAX_WILDCARD</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Where Syntax</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

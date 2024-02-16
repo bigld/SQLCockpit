@@ -1,0 +1,36 @@
+*"* components of interface /CADAXO/IF_SQLC_BADI_RES_CTXM
+interface /CADAXO/IF_SQLC_BADI_RES_CTXM
+  public .
+
+
+  interfaces IF_BADI_INTERFACE .
+
+  methods CREATE
+    importing
+      !I_OBJECT type ref to CL_CTMENU
+      !IT_LVC_T_ROW type LVC_T_ROW
+      !I_ROW type LVC_S_ROW
+      !I_COL type LVC_S_COL .
+  methods EXECUTE
+    importing
+      !I_UCOMM type SY-UCOMM
+      !I_DREF_RESULT_TAB type ref to DATA
+      !IS_CURRENT_ROW type LVC_S_ROW
+      !IS_CURRENT_COL type LVC_S_COL
+      !IS_RESULT_LINE type ANY
+      !IT_RESULT_COMPONENTS type /CADAXO/SQLCPARSECOMPONENT_T
+      !IT_RESULT_DDFIELDS type /CADAXO/SQLCDFIES_T
+      !I_COLUMN_SYNTAX type /CADAXO/SQLCSELECTCOLUMNSYNTAX
+      !I_CONNECTION_SYNTAX type /CADAXO/SQLCSELECTDBHINTSYNTAX
+      !IT_RESULT_SOURCE type /CADAXO/SQLCSELECTSOURCE_T
+      !IR_RESULT_STRUCTURE type ref to DATA
+      !IT_LVC_T_FCAT type LVC_T_FCAT
+      !IT_LVC_T_ROW type LVC_T_ROW
+      !IV_CLIENT_HANDLING type /CADAXO/CL_SQLC_COCKPIT_PARSE=>GTS_CLIENT_HANDLING
+      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION
+    changing
+      !C_REFRESH_LIST type CHAR1 .
+  methods ADD_RESULT_TOOLBAR
+    changing
+      !CT_BUTTONS type TTB_BUTTON .
+endinterface.

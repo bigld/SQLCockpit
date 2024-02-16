@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>SQL Cockpit - RRG Wizard</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>000</MSGNR>
+     <TEXT>&amp;1 &amp;2 &amp;3 &amp;4</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>Please enter a new unique name for the structure. &amp;1 already exists.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>Unknown error! &amp;1 &amp;2 &amp;3 &amp;4</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>Object generation not possible in this system/client.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>Report &amp;1 already exists. Enter a different report id.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>SELECT with FIELDS is not yet supported by the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>SELECT SINGLE is not yet supported by the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>SELECT * with JOIN not yet supported by the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>Rewrite your SELECT with modern Open SQL syntax to start the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>SELECT statements with parameters not yet supported by the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>010</MSGNR>
+     <TEXT>Symbols are not yet supported by the wizard.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>DDIC Structure &amp;1 successfully generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>ABAP Class &amp;1 successfully generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>013</MSGNR>
+     <TEXT>RRG Settings &amp;1 successfully generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>ABAP Class could not be generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>015</MSGNR>
+     <TEXT>DDIC Structure could not be generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>016</MSGNR>
+     <TEXT>RRG Settings could not be generated.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>017</MSGNR>
+     <TEXT>Class &amp;1 already exists. Choose a different name.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>018</MSGNR>
+     <TEXT>Interface &amp;1 already exists. Choose a different name.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>019</MSGNR>
+     <TEXT>Global Type (Stru, Tabl, ...) &amp;1 already exists. Choose a different name.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>020</MSGNR>
+     <TEXT>Name &amp;1 already reserved for the structure. Choose a different name.</TEXT>
+    </T100>
+   </T100>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <T100T>
+    <T100T>
+     <SPRSL>D</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <STEXT>SQL Cockpit - RRG Wizard</STEXT>
+    </T100T>
+   </T100T>
+   <T100_TEXTS>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>&amp;1 &amp;2 &amp;3 &amp;4</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Bitte geben Sie eine eindeutige Struktur an. &amp;1 existiert bereits.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Unknown error! &amp;1 &amp;2 &amp;3 &amp;4</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Objektgenerierung in diesem System nicht möglich.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Report &amp;1 existiert bereits.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>SELECT mit FIELDS wird derzeit nicht unterstützt.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>SELECT SINGLE wird derzeit noch nicht unterstützt.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>007</MSGNR>
+     <TEXT>SELECT * mit JOINs wird derzeit noch nicht unterstützt.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>008</MSGNR>
+     <TEXT>Wizard kann nur für SELECTs in moderner ABAP SQL Syntax gestartet werden.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>009</MSGNR>
+     <TEXT>SELECT mit Parametern wird derzeit nocht nicht unterstützt.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>010</MSGNR>
+     <TEXT>Symbole werden derzeit noch nicht unterstützt.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>011</MSGNR>
+     <TEXT>DDIC Struktur &amp;1 erfolgreich angelegt.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>012</MSGNR>
+     <TEXT>ABAP Klasse &amp;1 erfolgreich angelegt.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>013</MSGNR>
+     <TEXT>RRG Einstellungen &amp;1 erfolgreich angelegt.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>014</MSGNR>
+     <TEXT>ABAP Klasse konnte nicht generiert werden.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>015</MSGNR>
+     <TEXT>DDIC Struktur konnte nicht generiert werden.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>016</MSGNR>
+     <TEXT>RRG Einstellungen konnten nicht gesichert werden.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>017</MSGNR>
+     <TEXT>Klasse &amp;1 existiert bereits. Bitte einen anderen Namen wählen.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>018</MSGNR>
+     <TEXT>Interface &amp;1 existiert bereits. Bitte einen anderen Namen wählen.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>019</MSGNR>
+     <TEXT>Globaler Typ (Stru, Tabl, ... ) &amp;1 existiert bereits.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>020</MSGNR>
+     <TEXT>Name &amp;1 bereits für die Struktur reserviert. Bitte anderen Namen wählen.</TEXT>
+    </item>
+   </T100_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

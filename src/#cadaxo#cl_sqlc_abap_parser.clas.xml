@@ -1,0 +1,1277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/CADAXO/CL_SQLC_ABAP_PARSER</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>ABAP code completion</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+    <RSTAT>P</RSTAT>
+    <WITH_UNIT_TESTS>X</WITH_UNIT_TESTS>
+   </VSEOCLASS>
+   <TPOOL>
+    <item>
+     <ID>I</ID>
+     <KEY>100</KEY>
+     <ENTRY>Variable</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>110</KEY>
+     <ENTRY>Constant</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>125</KEY>
+     <ENTRY>Structure</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>130</KEY>
+     <ENTRY>Fieldsymbol</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>135</KEY>
+     <ENTRY>Data reference variable</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>140</KEY>
+     <ENTRY>Object reference variable</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>145</KEY>
+     <ENTRY>Exception object variable</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>150</KEY>
+     <ENTRY>Internal Table</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>155</KEY>
+     <ENTRY>Selection Parameter</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>160</KEY>
+     <ENTRY>Selectoption</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>161</KEY>
+     <ENTRY>Structure component</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>165</KEY>
+     <ENTRY>Ranges table</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>166</KEY>
+     <ENTRY>Attribute alias</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>167</KEY>
+     <ENTRY>Static variable</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>169</KEY>
+     <ENTRY>Formal parameter</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>200</KEY>
+     <ENTRY>Type</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>203</KEY>
+     <ENTRY>Reference to type</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>205</KEY>
+     <ENTRY>Structure Type</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>210</KEY>
+     <ENTRY>Table Type</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>215</KEY>
+     <ENTRY>Data reference type</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>218</KEY>
+     <ENTRY>Object type</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>220</KEY>
+     <ENTRY>Class</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>221</KEY>
+     <ENTRY>Test Class</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>225</KEY>
+     <ENTRY>Interface</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>230</KEY>
+     <ENTRY>Class-based exception</ENTRY>
+     <LENGTH>25</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>231</KEY>
+     <ENTRY>Type alias</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>232</KEY>
+     <ENTRY>Implemented interface</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>233</KEY>
+     <ENTRY>Database structure</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>234</KEY>
+     <ENTRY>Database table</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>235</KEY>
+     <ENTRY>Database view</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>236</KEY>
+     <ENTRY>Instance method</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>237</KEY>
+     <ENTRY>BAdI method</ENTRY>
+     <LENGTH>16</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>238</KEY>
+     <ENTRY>Class eventhandler method</ENTRY>
+     <LENGTH>34</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>239</KEY>
+     <ENTRY>Test method</ENTRY>
+     <LENGTH>16</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>240</KEY>
+     <ENTRY>Class method</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>241</KEY>
+     <ENTRY>Constructor</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>242</KEY>
+     <ENTRY>Class constructor</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>243</KEY>
+     <ENTRY>Eventhandler method</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>244</KEY>
+     <ENTRY>Method alias</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>245</KEY>
+     <ENTRY>Instance event</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>246</KEY>
+     <ENTRY>for event</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>250</KEY>
+     <ENTRY>Class event</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>251</KEY>
+     <ENTRY>Event alias</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>255</KEY>
+     <ENTRY>Form routine</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>260</KEY>
+     <ENTRY>Function module</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>265</KEY>
+     <ENTRY>Classic Exception</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>270</KEY>
+     <ENTRY>Program</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>290</KEY>
+     <ENTRY>Database Procedure</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>300</KEY>
+     <ENTRY>Repository Info System</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>301</KEY>
+     <ENTRY>Search for</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>302</KEY>
+     <ENTRY>&lt;Unknown&gt;</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>305</KEY>
+     <ENTRY>Database Table</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>310</KEY>
+     <ENTRY>Data Element</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>320</KEY>
+     <ENTRY>View</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>325</KEY>
+     <ENTRY>Class/Interface</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>330</KEY>
+     <ENTRY>Structure</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>335</KEY>
+     <ENTRY>Function Module</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>340</KEY>
+     <ENTRY>Table Type</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>350</KEY>
+     <ENTRY>Database Procedure</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>400</KEY>
+     <ENTRY>Predefined Type</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>401</KEY>
+     <ENTRY>Predefined Data Object</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>402</KEY>
+     <ENTRY>Value</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>403</KEY>
+     <ENTRY>Abstract</ENTRY>
+     <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>404</KEY>
+     <ENTRY>More components available ...</ENTRY>
+     <LENGTH>132</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>500</KEY>
+     <ENTRY>TYPE</ENTRY>
+     <LENGTH>10</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>501</KEY>
+     <ENTRY>ALIAS FOR</ENTRY>
+     <LENGTH>10</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>502</KEY>
+     <ENTRY>SUBTYPE OF</ENTRY>
+     <LENGTH>10</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>600</KEY>
+     <ENTRY>Insert Pattern for</ENTRY>
+     <LENGTH>24</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>T02</KEY>
+     <ENTRY>ABAP Keyword:</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+   </TPOOL>
+   <I18N_TPOOL>
+    <item>
+     <LANGUAGE>D</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>I</ID>
+       <KEY>100</KEY>
+       <ENTRY>Variable</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>110</KEY>
+       <ENTRY>Konstante</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>125</KEY>
+       <ENTRY>Struktur</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>130</KEY>
+       <ENTRY>Feldsymbol</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>135</KEY>
+       <ENTRY>Datenreferenzvariable</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>140</KEY>
+       <ENTRY>Objektreferenzvariable</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>145</KEY>
+       <ENTRY>Ausnahme-Objektvariable</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>150</KEY>
+       <ENTRY>Interne Tabelle</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>155</KEY>
+       <ENTRY>Auswahlparameter</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>160</KEY>
+       <ENTRY>Auswahloption</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>161</KEY>
+       <ENTRY>Strukturkomponente</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>165</KEY>
+       <ENTRY>Ranges-Tabelle</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>166</KEY>
+       <ENTRY>Attribut-Alias</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>167</KEY>
+       <ENTRY>Statische Variable</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>169</KEY>
+       <ENTRY>Formalparameter</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>200</KEY>
+       <ENTRY>Typ</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>203</KEY>
+       <ENTRY>Referenz zu Typ</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>205</KEY>
+       <ENTRY>Strukturtyp</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>210</KEY>
+       <ENTRY>Tabellentyp</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>215</KEY>
+       <ENTRY>Datenreferenztyp</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>218</KEY>
+       <ENTRY>Objekttyp</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>220</KEY>
+       <ENTRY>Klasse</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>221</KEY>
+       <ENTRY>Testklasse</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>225</KEY>
+       <ENTRY>Interface</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>230</KEY>
+       <ENTRY>Klassenbasierte Ausnahme</ENTRY>
+       <LENGTH>25</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>231</KEY>
+       <ENTRY>Typ-Alias</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>232</KEY>
+       <ENTRY>Implementiertes Interface</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>233</KEY>
+       <ENTRY>Datenbankstruktur</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>234</KEY>
+       <ENTRY>Datenbanktabelle</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>235</KEY>
+       <ENTRY>Datenbank-View</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>236</KEY>
+       <ENTRY>Instanzmethode</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>237</KEY>
+       <ENTRY>BAdI-Methode</ENTRY>
+       <LENGTH>16</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>238</KEY>
+       <ENTRY>Klassenereignisbehandlermethode</ENTRY>
+       <LENGTH>34</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>239</KEY>
+       <ENTRY>Testmethode</ENTRY>
+       <LENGTH>16</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>240</KEY>
+       <ENTRY>Klassenmethode</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>241</KEY>
+       <ENTRY>Konstruktor</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>242</KEY>
+       <ENTRY>Klassenkonstruktor</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>243</KEY>
+       <ENTRY>EreignBehandlerMeth.</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>244</KEY>
+       <ENTRY>Methoden-Alias</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>245</KEY>
+       <ENTRY>Instanzereignis</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>246</KEY>
+       <ENTRY>für Ereignis</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>250</KEY>
+       <ENTRY>Klassenereignis</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>251</KEY>
+       <ENTRY>Ereignis-Alias</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>255</KEY>
+       <ENTRY>FORM-Routine</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>260</KEY>
+       <ENTRY>Funktionsbaustein</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>265</KEY>
+       <ENTRY>Klassische Ausnahme</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>270</KEY>
+       <ENTRY>Programm</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>290</KEY>
+       <ENTRY>Datenbankprozedur</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>300</KEY>
+       <ENTRY>Repository-Info-System</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>301</KEY>
+       <ENTRY>Suche nach</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>302</KEY>
+       <ENTRY>&lt;Unbekannt&gt;</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>305</KEY>
+       <ENTRY>Datenbanktabelle</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>310</KEY>
+       <ENTRY>Datenelement</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>320</KEY>
+       <ENTRY>View</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>325</KEY>
+       <ENTRY>Klasse/Interface</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>330</KEY>
+       <ENTRY>Struktur</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>335</KEY>
+       <ENTRY>Funktionsbaustein</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>340</KEY>
+       <ENTRY>Tabellentyp</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>350</KEY>
+       <ENTRY>Datenbankprozedur</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>400</KEY>
+       <ENTRY>Vordefinierter Typ</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>401</KEY>
+       <ENTRY>Vordefiniertes Datenobjekt</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>402</KEY>
+       <ENTRY>Wert</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>403</KEY>
+       <ENTRY>Abstrakt</ENTRY>
+       <LENGTH>12</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>404</KEY>
+       <ENTRY>Weitere verfügbare Komponente ...</ENTRY>
+       <LENGTH>132</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>500</KEY>
+       <ENTRY>Typ</ENTRY>
+       <LENGTH>10</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>501</KEY>
+       <ENTRY>ALIAS FÜR</ENTRY>
+       <LENGTH>10</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>502</KEY>
+       <ENTRY>SUBTYP VON</ENTRY>
+       <LENGTH>10</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>600</KEY>
+       <ENTRY>Muster einfügen für</ENTRY>
+       <LENGTH>24</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>T02</KEY>
+       <ENTRY>ABAP-Schlüsselwort:</ENTRY>
+       <LENGTH>20</LENGTH>
+      </item>
+     </TEXTPOOL>
+    </item>
+   </I18N_TPOOL>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>BASICTYPE_NAME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Name of built-in type</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>BASICTYPE_NAMES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>All names of built-in types</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CALCULATE_COMPLETION_RESULTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Calculate completion results</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CALCULATE_INSERTION_RESULT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Calculate source code fragments</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CALCULATE_QUICKINFO_RESULT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Calculate quick info texts</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CLASS_CONSTRUCTOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Initialize keyword filter</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>COMPLETION_RESULTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Completion result table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>COMPOSE_INCLUDES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Compose includes to scan</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>CONSTRUCTOR</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_ALL_COMPONENTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>All components</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_MAXGRADE_FOR_SHORTTEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Maximal grade to read shorttext</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_MAXHITS_FIRST_LEVEL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Maximal number of selected repository entries</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_MAXHITS_SECOND_LEVEL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Maximal number of selected repository entries</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_MAX_COMPONENTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Maximal number of components</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_STMT_TERMINATOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Flag</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_BASICTYPE_TEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get name of basic type according to basic type index</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_COMPLETION_DETAILS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Retrieve details of completion entry</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_COMPLETION_RESULT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Calculate ABAP code completion suggestions</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CONTEXT_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Evaluate context information string</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_DATA_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of data object definition</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_DB_PROCEDURE_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of database procedure definition</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_ELEMENT_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of program object (element)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_EVENT_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of event definition</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_EXCEPTION_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of exception definition</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_FORM_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of form definition</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_FUNCTION_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of function module definition</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_IMPLEMENTATION_START</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get start line of implementation part</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_METHOD_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of method definition</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_NORMED_SOURCE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Preprocess source code and compose normed source</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_ROLE_TEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Maps number of role to textelement</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_SETTINGS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get User Settings for Insert Pattern</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_TOKENS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Tokenize ABAP Source</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_TYPE_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of type definition</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_TYPE_INFO_AS_TEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get element info of type addition as text</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_TYPING_TEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get text of type usage</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_VALUE_INFO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get detailed properties of value property</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_VALUE_INFO_AS_TEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get element info of value addition as text</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HANDLE_COMPLETION_REQUEST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Calculate completion results and display them</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HANDLE_INSERTION_REQUEST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Calculate source code fragments and insert them</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HANDLE_QUICKINFO_REQUEST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Calculate quick info texts and display them</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>INSERT_AS_PATTERN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Delivers ABAP_TRUE if Pattern Insertion is activated</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>INTERNAL_RESET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Reset instance to initial state</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MAP_COMPLETION_RESULTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Map results to structure for edit control</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_BASICTYPE_NAMES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>All names of built-in types</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_BEG_TOKEN_XPOS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Column of completion token beginning</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_BEG_XPOS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Column of completion context beginning</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_CCIMP_REQUIRED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Including CCIMP required?</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_COMPL_RESULT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Results of ABAP code completion</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_CONTEXT_PROVIDER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Context provider for webDynpro, etc.</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_ICON_MAPPING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Tabletype for role to icon mapping</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_INCLNAME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ABAP Program: Name of current Include</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_MAINPROG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ABAP Program: Name of current Main Program</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_MAINSRC</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Composed sourcecode of main program</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_MAX_ITEMS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Table of Maximal Number of Items</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_PROGTYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program type</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_REPL_SOURCE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Replacing source code (reduced due to performance)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_REPOS_REQUESTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ABAP Code Completion: Repository requests</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_SRCDATE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Overall timestamp: Date</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_SRCTIME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Overall timestamp: Time</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_XPOS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Column of completion position</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_YPOS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Line of completion position</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PARSE_FORM_PARAMETERS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Parse the completion details into Form parameters</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PARSE_FUNCTION_PARAMETERS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Parse the completion details into Function Module parameters</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PARSE_METHOD_PARAMETERS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Parse the completion details into Method parameters</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROCESS_CLASS_INCLUDES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Remove implementation of local classes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROCESS_FORM_INCLUDE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Remove the operative coding of form implementations</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROGTYPE_CLASS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program type: Classpool</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROGTYPE_EXEC</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program type: Executable Program</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROGTYPE_FUGR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program type: Function Group</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROGTYPE_INCLUDE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program type: Include</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROGTYPE_MODPOOL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program type: Module Pool</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROGTYPE_SUBPOOL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program type: Subroutine Pool</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>PROGTYPE_TYPEPOOL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program type: Type Pool</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>QUALIFY_TOKENS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Qualify token stream received from SCAN ABAP-SOURCE</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>RESET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Re-initialize ABAP parser instance</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SCAN_ABAP_DOC</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Scan and associate ABAP Doc comments</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>TOKEN_CAT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Token category</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>TS_ABAPDOC_SUBENTRY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ABAP Doc for a single sub entitiy</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>TS_MAX_ITEMS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Maximal Number of Items (depending on prefix length)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>TT_ABAPDOC_SUBENTITIES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ABAP Doc for sub entities</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>TT_MAX_ITEMS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Table of Maximal Number of Items</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>T_USER_SETTINGS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Current user settings (pretty printer, pattern)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>X_TABLE_TO_STRING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Unpack table of X into a string</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>X_TABLE_TO_S_TABLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Unpack table of X into a table of string</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/CADAXO/SQLCHD_FIELDTEXT_S</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>/CADAXO/SQLCHD_FIELDTEXT_S</DOMNAME>
+    <HEADLEN>15</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>15</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>SQL Cockpit - use fieldtext short</DDTEXT>
+    <REPTEXT>short fieldtext</REPTEXT>
+    <SCRTEXT_S>short text</SCRTEXT_S>
+    <SCRTEXT_M>short fieldtext</SCRTEXT_M>
+    <SCRTEXT_L>short fieldtext</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>SQL Cockpit - Kurze Spaltenüberschrift</DDTEXT>
+     <REPTEXT>Kurz</REPTEXT>
+     <SCRTEXT_S>Kurz</SCRTEXT_S>
+     <SCRTEXT_M>Kurz</SCRTEXT_M>
+     <SCRTEXT_L>Kurz</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

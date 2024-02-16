@@ -1,0 +1,441 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/CADAXO/CL_SQLC_ODATA_GEN</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>SQL Cockpit - OData generation</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <TPOOL>
+    <item>
+     <ID>I</ID>
+     <KEY>001</KEY>
+     <ENTRY>* Filter System Query Option ($filter)</ENTRY>
+     <LENGTH>76</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>002</KEY>
+     <ENTRY>* Entity Set transformation</ENTRY>
+     <LENGTH>54</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>003</KEY>
+     <ENTRY>* Orderby System Query Option ($orderby)</ENTRY>
+     <LENGTH>80</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>004</KEY>
+     <ENTRY>* Count System Query Option ($count)</ENTRY>
+     <LENGTH>76</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>005</KEY>
+     <ENTRY>* Skip System Query Option ($skip)</ENTRY>
+     <LENGTH>68</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>006</KEY>
+     <ENTRY>* Top System Query Option ($top)</ENTRY>
+     <LENGTH>68</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>007</KEY>
+     <ENTRY>* SQL Cockpit query</ENTRY>
+     <LENGTH>29</LENGTH>
+    </item>
+   </TPOOL>
+   <I18N_TPOOL>
+    <item>
+     <LANGUAGE>D</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>I</ID>
+       <KEY>001</KEY>
+       <ENTRY>* Filter System Query Option ($filter)</ENTRY>
+       <LENGTH>76</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>002</KEY>
+       <ENTRY>* Entity Set transformation</ENTRY>
+       <LENGTH>54</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>003</KEY>
+       <ENTRY>* Orderby System Query Option ($orderby)</ENTRY>
+       <LENGTH>80</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>004</KEY>
+       <ENTRY>* Count System Query Option ($count)</ENTRY>
+       <LENGTH>76</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>005</KEY>
+       <ENTRY>* Skip System Query Option ($skip)</ENTRY>
+       <LENGTH>68</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>006</KEY>
+       <ENTRY>* Top System Query Option ($top)</ENTRY>
+       <LENGTH>68</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>007</KEY>
+       <ENTRY>* SQL Cockpit query</ENTRY>
+       <LENGTH>29</LENGTH>
+      </item>
+     </TEXTPOOL>
+    </item>
+   </I18N_TPOOL>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_ENTITY_ATTRIBUTES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Add entity attributes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>COUNT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>OData - Count</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_ENTITY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create Entity</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_MODEL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create Model</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_PROJECT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create Project</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_SERVICE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create Service</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_TABLE_FROM_STRUCTURE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Create Table from Select Single structure</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_OBJECT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Object Type</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_OBJECT_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Object Type</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_PGMID</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Program ID in Requests and Tasks</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_PLUGIN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Service Builder: Domain Model Plug-In</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_STRAT_NAME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Service Builder: Generation Strategy Name</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FILL_SELOPT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Fill Selopt Table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FILTER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>OData - Filter</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GENERATE_OBJECTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Generate Objects</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GENERATE_ODATA</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Generate OData Service</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GENERATE_SOURCE_CODE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Generate Source Code</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_BYPASSING_BUFFER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Bypassing Buffer</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_CONNECTION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Connection</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_DBHINTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code DBHints</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_FIELDS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Fields</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_FROM</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code From</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_GROUP_BY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Group By</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_HAVING</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Having</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_INTO</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code INTO</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_OFFSET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Offset</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_ORDER_BY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Order By</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_SELECT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Select</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_UP_TO_ROWS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Up To Rows</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CODE_WHERE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Code Where</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CORE_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Edm Core Type</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_ENTITY_SET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get EntitySet</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_HEADER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Generated Header for Method</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_NEW_LINE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Generate New Line</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_PRIMARY_KEY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Primary Key</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GR_ENTITY_SET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SB - OData - Entity Set</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GR_ENTITY_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SB - OData - Entity Type</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GR_FACTORY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SB - Domain Model - Factory</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GR_MODEL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SB - Domain Model - Model</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GR_PROJECT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SB - Domain Model - Project</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GR_TRANSACTION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SB - Domain Model - Transaction Handler</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_SELOPT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of /CADAXO/SQLC_TEMP_REP_SEL_STR</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_TAB_FIELDS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>DD: Field List</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_COUNT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>General Flag</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_ENTITY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>external name of a meta model element</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_ENTITY_SET</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Service Builder: Node Name</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_FILTER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>General Flag</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_ORDER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>General Flag</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_PACKAGE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Package</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_PROJECT_NAME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>30 Characters</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_REGSER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>General Flag</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_SKIP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>General Flag</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_TOP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>General Flag</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GWA_EVT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of TEXT255</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GWA_REPORT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - OData Attributes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>KEY_PROPERTY_CHECK</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Key Property Check</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>ORDER_BY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>OData - Order By</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>REDEFINE_METHOD</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Redefine Method</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>REGISTER_SERVICE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Register Service</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SAVE_CHANGES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Save Changes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SET_INPUT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Set Input Variables OData attributes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SKIP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>OData - Skip</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SPECIAL_CHARACTER_CHECK</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Special Character check</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>TOP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>OData - Top</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>VALIDATE_PACKAGE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Validate Package Name</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>VALIDATE_PROJECT_NAME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Validate Project Name</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

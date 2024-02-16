@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/CADAXO/SQLC_RESS_DESCRIPTION</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>/CADAXO/SQLC_RESS_DESCRIPTION</DOMNAME>
+    <HEADLEN>11</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>15</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>SQL Cockpit - Result List Description</DDTEXT>
+    <REPTEXT>Description</REPTEXT>
+    <SCRTEXT_S>Descr.</SCRTEXT_S>
+    <SCRTEXT_M>Description</SCRTEXT_M>
+    <SCRTEXT_L>Description</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>SQL Cockpit - Result List Bezeichnung</DDTEXT>
+     <REPTEXT>Bezeichnung</REPTEXT>
+     <SCRTEXT_S>Bezeichn.</SCRTEXT_S>
+     <SCRTEXT_M>Bezeichnung</SCRTEXT_M>
+     <SCRTEXT_L>Bezeichnung</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

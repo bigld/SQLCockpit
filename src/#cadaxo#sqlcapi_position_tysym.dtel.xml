@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/CADAXO/SQLCAPI_POSITION_TYSYM</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <HEADLEN>13</HEADLEN>
+    <SCRLEN1>09</SCRLEN1>
+    <SCRLEN2>13</SCRLEN2>
+    <SCRLEN3>13</SCRLEN3>
+    <DDTEXT>SQL Cockpit - API Position Typ Icon Symbols</DDTEXT>
+    <REPTEXT>Symbols</REPTEXT>
+    <SCRTEXT_S>Symbols</SCRTEXT_S>
+    <SCRTEXT_M>Symbols</SCRTEXT_M>
+    <SCRTEXT_L>Symbols</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <DATATYPE>CHAR</DATATYPE>
+    <LENG>000060</LENG>
+    <OUTPUTLEN>000060</OUTPUTLEN>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>SQL Cockpit - API Position Typ Icon Symbole</DDTEXT>
+     <REPTEXT>Symbole</REPTEXT>
+     <SCRTEXT_S>Symbole</SCRTEXT_S>
+     <SCRTEXT_M>Symbole</SCRTEXT_M>
+     <SCRTEXT_L>Symbole</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

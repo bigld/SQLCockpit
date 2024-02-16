@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/CADAXO/CL_SQLC_COCKPIT_EXPCSV</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>SQL Cockpit - Export BCS</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_COLUMN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>add column</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_HEADER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>add header</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_ENCLOSURE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check enclosure</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>constructor</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONVERT_DATA</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>convert data</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONVERT_DATE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>convert date</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONVERT_INT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>convert int</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONVERT_P</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>convert p</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONVERT_TIME</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>convert time</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONVERT_X</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>convert x</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GS_ATTRIBUTES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - CSV Export Attributes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_COLUMNS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - CSV Export Columns ALV</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SET_ATTRIBUTES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set attributes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SET_COLUMNS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>set columns</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

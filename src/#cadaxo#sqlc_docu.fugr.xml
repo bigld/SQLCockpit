@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_FUGR" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <AREAT>SQL Cockpit - Docu</AREAT>
+   <INCLUDES>
+    <SOBJ_NAME>/CADAXO/LSQLC_DOCUTOP</SOBJ_NAME>
+    <SOBJ_NAME>/CADAXO/SAPLSQLC_DOCU</SOBJ_NAME>
+   </INCLUDES>
+   <FUNCTIONS>
+    <item>
+     <FUNCNAME>/CADAXO/SQLC_DOCU_AS_HTML</FUNCNAME>
+     <SHORT_TEXT>WF: Lesen, formatieren und Textersetzung bei DokuObj&apos;s (erstellt mit SE61)</SHORT_TEXT>
+     <IMPORT>
+      <RSIMP>
+       <PARAMETER>I_DOCU_ID</PARAMETER>
+       <DEFAULT>&apos;DT&apos;</DEFAULT>
+       <OPTIONAL>X</OPTIONAL>
+       <TYP>DOKHL-ID</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>I_DOCU_OBJECT</PARAMETER>
+       <TYP>DOKHL-OBJECT</TYP>
+      </RSIMP>
+     </IMPORT>
+     <TABLES>
+      <RSTBL>
+       <PARAMETER>CONTAINER</PARAMETER>
+       <DBSTRUCT>SWCONT</DBSTRUCT>
+       <OPTIONAL>X</OPTIONAL>
+      </RSTBL>
+      <RSTBL>
+       <PARAMETER>HTML_LINES</PARAMETER>
+       <DBSTRUCT>HTMLLINE</DBSTRUCT>
+       <OPTIONAL>X</OPTIONAL>
+      </RSTBL>
+     </TABLES>
+     <EXCEPTION>
+      <RSEXC>
+       <EXCEPTION>DOCUMENTATION_NOT_FOUND</EXCEPTION>
+      </RSEXC>
+     </EXCEPTION>
+     <DOCUMENTATION>
+      <RSFDO>
+       <PARAMETER>I_DOCU_ID</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Document class</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>I_DOCU_OBJECT</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Documentation Object</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>CONTAINER</PARAMETER>
+       <KIND>P</KIND>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>HTML_LINES</PARAMETER>
+       <KIND>P</KIND>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>DOCUMENTATION_NOT_FOUND</PARAMETER>
+       <KIND>X</KIND>
+      </RSFDO>
+     </DOCUMENTATION>
+    </item>
+   </FUNCTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

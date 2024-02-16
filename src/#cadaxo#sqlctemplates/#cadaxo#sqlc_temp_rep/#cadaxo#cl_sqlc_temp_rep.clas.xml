@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/CADAXO/CL_SQLC_TEMP_REP</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>SQL Cockpit - Report Template Simple</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <TPOOL>
+    <item>
+     <ID>I</ID>
+     <KEY>P00</KEY>
+     <ENTRY>Syntax error</ENTRY>
+     <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>P01</KEY>
+     <ENTRY>generate</ENTRY>
+     <LENGTH>12</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>P02</KEY>
+     <ENTRY>cancel</ENTRY>
+     <LENGTH>10</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>P03</KEY>
+     <ENTRY>Report contains syntax errors - Please get in contact with cadaxo via Feedback Mail.</ENTRY>
+     <LENGTH>130</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>P04</KEY>
+     <ENTRY>You may create the report and fix the error within transaction SE38 or cancel the generation.</ENTRY>
+     <LENGTH>130</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>T01</KEY>
+     <ENTRY>Selection</ENTRY>
+     <LENGTH>9</LENGTH>
+    </item>
+   </TPOOL>
+   <I18N_TPOOL>
+    <item>
+     <LANGUAGE>D</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>I</ID>
+       <KEY>P00</KEY>
+       <ENTRY>Syntaxfehler</ENTRY>
+       <LENGTH>12</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>P01</KEY>
+       <ENTRY>generieren</ENTRY>
+       <LENGTH>12</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>P02</KEY>
+       <ENTRY>abbrechen</ENTRY>
+       <LENGTH>10</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>P03</KEY>
+       <ENTRY>Der Report enthält Syntaxfehler - Bitte setzten Sie sich mittels Feedback Mail mit cadaxo in Verbindung!</ENTRY>
+       <LENGTH>130</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>P04</KEY>
+       <ENTRY>Sie können den Report dennoch generieren und mit der Transaktion SE38 richtigstellen oder Sie brechen die Generierung ab.</ENTRY>
+       <LENGTH>130</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>T01</KEY>
+       <ENTRY>Selektion</ENTRY>
+       <LENGTH>9</LENGTH>
+      </item>
+     </TEXTPOOL>
+    </item>
+   </I18N_TPOOL>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>CHECK_REPORT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Check Report</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CREATE_REPORT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Report erstellen</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_FALSE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>FALSE</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>C_TRUE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>TRUE</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GENERATE_SOURCE_CODE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Generate Source Code</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_SELOPT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of /CADAXO/SQLC_TEMP_REP_SEL_STR</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_SOURCE_CODE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of TEXT255</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_SOURCE_CODE_ENH</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Table of TEXT255</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GT_TEXTPOOL</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>TEXTPOOL</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GWA_EVT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Report SALV events</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GWA_REPORT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Report Attributes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>REBUILD_OBJECT_LIST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Rebuild Object List</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SAVE_SETTINGS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Save Report Settings</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>UPDATE_TRDIR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Update Report Attributes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>UPDATE_TRDIR_INCLUDE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Update Include Attributes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>WA_SOURCE_CODE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Sourcecodeline</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

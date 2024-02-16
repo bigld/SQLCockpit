@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/CADAXO/SQLC_SELOPT_HARDCODED</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>ICON</DOMNAME>
+    <HEADLEN>09</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>15</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>SQL Cockpit - Constant</DDTEXT>
+    <REPTEXT>Constant</REPTEXT>
+    <SCRTEXT_S>Constant</SCRTEXT_S>
+    <SCRTEXT_M>Constant</SCRTEXT_M>
+    <SCRTEXT_L>Constant</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>SQL Cockpit - Fixwert</DDTEXT>
+     <REPTEXT>Fixwert</REPTEXT>
+     <SCRTEXT_S>Fixwert</SCRTEXT_S>
+     <SCRTEXT_M>Fixwert</SCRTEXT_M>
+     <SCRTEXT_L>Fixwert</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

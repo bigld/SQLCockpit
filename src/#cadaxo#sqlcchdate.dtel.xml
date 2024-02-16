@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/CADAXO/SQLCCHDATE</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>DATUM</DOMNAME>
+    <HEADLEN>10</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>15</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>SQL Cockpit - Changed on</DDTEXT>
+    <REPTEXT>Changed on</REPTEXT>
+    <SCRTEXT_S>Changed on</SCRTEXT_S>
+    <SCRTEXT_M>Changed on</SCRTEXT_M>
+    <SCRTEXT_L>Changed on</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>SQL Cockpit - Geändert am</DDTEXT>
+     <REPTEXT>Geändertam</REPTEXT>
+     <SCRTEXT_S>Geändertam</SCRTEXT_S>
+     <SCRTEXT_M>Geändert am</SCRTEXT_M>
+     <SCRTEXT_L>Geändert am</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

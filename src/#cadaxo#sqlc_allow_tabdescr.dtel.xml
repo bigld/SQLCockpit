@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/CADAXO/SQLC_ALLOW_TABDESCR</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <HEADLEN>16</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>16</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>SQL Cockpit - Tabledescription active</DDTEXT>
+    <REPTEXT>TabDescr active</REPTEXT>
+    <SCRTEXT_S>TabDescr</SCRTEXT_S>
+    <SCRTEXT_M>TabDescr active</SCRTEXT_M>
+    <SCRTEXT_L>Tabledescr active</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <DATATYPE>CHAR</DATATYPE>
+    <LENG>000001</LENG>
+    <OUTPUTLEN>000001</OUTPUTLEN>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>SQL Cockpit - Tabellendeschreibung aktiv</DDTEXT>
+     <REPTEXT>TabBeschr aktiv</REPTEXT>
+     <SCRTEXT_S>TabBeschr</SCRTEXT_S>
+     <SCRTEXT_M>TabBeschr aktiv</SCRTEXT_M>
+     <SCRTEXT_L>Tabbeschr aktive</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

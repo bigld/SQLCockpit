@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DOCT" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DOC>
+    <item>
+     <DOKIL>
+      <ID>TX</ID>
+      <OBJECT>/CADAXO/SQLC_TEMP_RRG_START</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0005</VERSION>
+      <TXTLINES>00008</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>/CADAXO/SQLC_TEMP_RRG_START</TDNAME>
+      <TDID>TX</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00005</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Assistent</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Verwenden Sie diesen Assistenten, um eine ABAP Klasse und eine</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Ergebnisstruktur aus Ihrer aktuellen SELECT-Anweisung zu generieren und</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>diese sofort im Rapid Report Generator einzubinden.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Navigieren Sie zur Erzeugung mit den Schaltflächen &lt;ZH&gt;Zurück&lt;/&gt; und</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>&lt;ZH&gt;Weiter&lt;/&gt; unten oder mit der Übersicht links.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Am Ende erhalten Sie eine Zusammenfassung und können die Erzeugung mit</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>der Schaltfläche &lt;ZH&gt;Objekte generieren&lt;/&gt; starten.</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+    <item>
+     <DOKIL>
+      <ID>TX</ID>
+      <OBJECT>/CADAXO/SQLC_TEMP_RRG_START</OBJECT>
+      <LANGU>E</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0005</VERSION>
+      <MASTERLANG>X</MASTERLANG>
+      <TXTLINES>00008</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>/CADAXO/SQLC_TEMP_RRG_START</TDNAME>
+      <TDID>TX</TDID>
+      <TDSPRAS>E</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00005</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>SQL Cockpit - Rapid Report Generator Wizard</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Use this wizard to generate an ABAP Class and a Result Structure from</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>the current SELECT statement for quick use inside your Rapid Report</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Generator.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>Move between the steps with &lt;ZH&gt;Back&lt;/&gt; and &lt;ZH&gt;Continue&lt;/&gt; down below</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>or via the step links to the left.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>*</TDFORMAT>
+       <TDLINE>On the last step you get a summary and you can start the generation with</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>the &lt;ZH&gt;Generate Objects&lt;/&gt; button.</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+   </DOC>
+  </asx:values>
+ </asx:abap>
+</abapGit>
