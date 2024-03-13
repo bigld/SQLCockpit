@@ -917,6 +917,14 @@ CLASS lcl_short_text IMPLEMENTATION.
           CLEAR l_tail.
         ENDIF.
 
+      WHEN 'TP'.
+        l_srch = fullname+4.
+        SPLIT l_srch AT '\' INTO l_head l_tail.
+        IF l_head IS INITIAL.
+          l_head = l_tail.
+          CLEAR l_tail.
+        ENDIF.
+
       WHEN OTHERS.
         CLEAR shorttext.
 
@@ -1206,6 +1214,18 @@ CLASS lcl_short_text IMPLEMENTATION.
             l_srch = l_tail.
           ENDIF.
 
+        WHEN 'TP'.
+          l_srch = l_srch+3.
+          SPLIT l_srch AT '\' INTO l_head l_tail.
+          IF l_head IS NOT INITIAL.
+            IF l_tail IS NOT INITIAL.
+              CONCATENATE sourcetext l_head c_sel_default INTO sourcetext.
+            ELSE.
+              CONCATENATE sourcetext l_head INTO sourcetext.
+            ENDIF.
+            l_srch = l_tail.
+          ENDIF.
+
         WHEN sccmp_tag_class OR sccmp_tag_interface.
           l_srch = l_srch+3.
           SPLIT l_srch AT '\' INTO l_head l_tail.
@@ -1400,8 +1420,8 @@ CLASS lcl_enhanced_quick_info IMPLEMENTATION.
         returning_parameters = data(returning_parameters)
         exceptions_list      = data(exceptions_list)
         class_exceptions     = data(class_exceptions) ).
-
-    atl = NEW #( ).
+*
+*    atl = NEW #( ).
 *    TRY.
 *        DATA(source) = atl->ATL_BASIC_METHOD(
 *            method_name          = method_name
@@ -1418,7 +1438,7 @@ CLASS lcl_enhanced_quick_info IMPLEMENTATION.
 *      CATCH cx_abap_template_parse_error INTO data(ref).
 *        MESSAGE ref TYPE 'I'.
 *    ENDTRY.
-
+*
 *    lcl_enhanced_quick_info=>convert_source_to_help_txt(
 *       EXPORTING
 *          source = source

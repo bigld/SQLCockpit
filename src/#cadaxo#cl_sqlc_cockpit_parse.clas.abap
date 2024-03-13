@@ -1239,7 +1239,7 @@ METHOD check_sql_syntax.
 ****************************************************************************************************
 * Date       | User              | Description                                       |             *
 *------------+-------------------+---------------------------------------------------+-------------*
-* <date>     | <developer name>  | <short description>                               |             *
+* 23.05.2023 | Domi Bigl         | class interface changed by SAP                    | COCKPIT-502 *
 *------------+-------------------+---------------------------------------------------+-------------*
 *            |                   |                                                   |             *
 *------------+-------------------+---------------------------------------------------+-------------*
@@ -1312,16 +1312,16 @@ METHOD check_sql_syntax.
 
     APPEND 'ENDFORM.' TO lt_line.
 
-    l_dir-uccheck = 'X'.
-    l_dir-fixpt   = 'X'.
+    l_dir-uccheck = abap_true.
+    l_dir-fixpt   = abap_true.
 
 * do the check syntax
     SYNTAX-CHECK FOR lt_line MESSAGE l_mess LINE l_lin WORD l_wrd DIRECTORY ENTRY l_dir MESSAGE-ID lwa_key.
 
     IF lwa_key-keyword = 'SELECT' AND (   lv_select_version = c_select_version_1 AND (    lwa_key-msgnumber = '484'
-                                                                                      OR lwa_key-msgnumber = '487'
-                                                                                      OR lwa_key-msgnumber = '541'
-                                                                                      OR lwa_key-msgnumber = '544' )
+                                                                                       OR lwa_key-msgnumber = '487'
+                                                                                       OR lwa_key-msgnumber = '541'
+                                                                                       OR lwa_key-msgnumber = '544' )
                                        OR lv_select_version = c_select_version_2 AND (    lwa_key-msgnumber = '547' ) )
        OR lwa_key-keyword = 'MESSAGE'  AND (   lv_select_version = c_select_version_1 AND lwa_key-msgnumber = 'G2F' ).
 
@@ -1336,11 +1336,11 @@ METHOD check_sql_syntax.
       IF lv_loop IS INITIAL.
         /cadaxo/cl_sqlc_cockpit_parse=>check_sql_syntax(
           EXPORTING
-            i_sql_parsed                 = VALUE #( ( <l_cl_sql_parse> ) ) "i_sql_parsed
-            i_select_version             = c_select_version_2
+            i_sql_parsed     = VALUE #( ( <l_cl_sql_parse> ) )
+            i_select_version = c_select_version_2
           IMPORTING
-            et_rest                      = et_rest
-            e_select_version               = <l_cl_sql_parse>->g_select_version ).
+            et_rest          = et_rest
+            e_select_version = <l_cl_sql_parse>->g_select_version ).
         CLEAR l_mess.
         CLEAR lwa_key.
       ENDIF.
@@ -1365,9 +1365,7 @@ METHOD check_sql_syntax.
 
       CLEAR lt_rest.
 
-      CALL METHOD /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing
-        IMPORTING
-          e_customizing = ls_adm_cust.
+      /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing( IMPORTING e_customizing = ls_adm_cust ).
       IF ls_adm_cust-sci_chkv NE space.
 
         CALL FUNCTION 'PRETTY_PRINTER'
@@ -1378,27 +1376,82 @@ METHOD check_sql_syntax.
             otext  = lt_line.
 
         TRY.
+* COCKPIT-502 replace
+*            CALL METHOD cl_ci_check=>source_code
+*              EXPORTING
+*                p_variant = ls_adm_cust-sci_chkv
+*                p_code    = lt_line
+*              IMPORTING
+*                p_result  = lr_cl_ci_check_result.
+            TRY.
 
-            CALL METHOD cl_ci_check=>source_code
-              EXPORTING
-                p_variant = ls_adm_cust-sci_chkv
-                p_code    = lt_line
-              IMPORTING
-                p_result  = lr_cl_ci_check_result.
+                DATA(parmas_old) = VALUE abap_parmbind_tab( ( name  = 'P_VARIANT'
+                                                              kind  = cl_abap_objectdescr=>exporting
+                                                              value = REF #( ls_adm_cust-sci_chkv ) )
+                                                            ( name  = 'P_CODE'
+                                                              kind  = cl_abap_objectdescr=>exporting
+                                                              value = REF #( lt_line ) )
+                                                            ( name  = 'P_RESULT'
+                                                              kind  = cl_abap_objectdescr=>importing
+                                                              value = REF #( lr_cl_ci_check_result ) )
+                                                          ).
+
+                CALL METHOD cl_ci_check=>('SOURCE_CODE') PARAMETER-TABLE parmas_old.
+              CATCH cx_sy_dyn_call_error.
+                TRY.
+                    DATA(program_guid) = cl_system_uuid=>create_uuid_c22_static( ).
+                    TRANSLATE program_guid USING '{_}_'.
+                  CATCH cx_uuid_error.    "
+                ENDTRY.
+                DATA(program_name) = CONV program( 'ZCDXCI' && to_upper( program_guid ) ).
+                INSERT REPORT program_name FROM lt_line.
+                DATA(parmas_new) = VALUE abap_parmbind_tab( ( name  = 'P_VARIANT'
+                                                              kind  = cl_abap_objectdescr=>exporting
+                                                              value = REF #( ls_adm_cust-sci_chkv ) )
+                                                            ( name  = 'P_PROGRAM'
+                                                              kind  = cl_abap_objectdescr=>exporting
+                                                              value = REF #( program_name ) )
+                                                            ( name  = 'P_RESULT'
+                                                              kind  = cl_abap_objectdescr=>importing
+                                                              value = REF #( lr_cl_ci_check_result ) )
+                                                          ).
+
+                CALL METHOD cl_ci_check=>('SOURCE_CODE') PARAMETER-TABLE parmas_new.
+
+
+                CALL FUNCTION 'RS_DELETE_PROGRAM'
+                  EXPORTING
+                    program         = program_name
+                    suppress_checks = abap_true
+                    suppress_popup  = abap_true
+                  EXCEPTIONS
+                    OTHERS          = 1.
+
+            ENDTRY.
+* COCKPIT-502 replace end
 
             lr_cl_ci_inspection = lr_cl_ci_check_result->get_inspection( ).
-
             lt_rest = lr_cl_ci_inspection->scirestps.
 
             DELETE lt_rest WHERE kind NE 'E' AND kind NE 'W'.
-
             DELETE lt_rest WHERE test EQ 'CL_CI_TEST_EXTENDED_CHECK'.
 
             et_rest = lt_rest.
 
-          CATCH cx_ci_invalid_variant ##NO_HANDLER.
-          CATCH cx_ci_check_error ##NO_HANDLER.
-          CATCH cx_ci_invalid_object ##NO_HANDLER.
+          CATCH: cx_ci_invalid_variant
+                 cx_ci_check_error
+                 cx_ci_invalid_object
+*          CATCH cx_ci_missing_authority
+                 cx_root ##NO_HANLDER.
+            IF program_name IS NOT INITIAL.
+              CALL FUNCTION 'RS_DELETE_PROGRAM'
+                EXPORTING
+                  program         = program_name
+                  suppress_checks = abap_true
+                  suppress_popup  = abap_true
+                EXCEPTIONS
+                  OTHERS          = 1.
+            ENDIF.
         ENDTRY.
       ENDIF.
     ENDIF.
