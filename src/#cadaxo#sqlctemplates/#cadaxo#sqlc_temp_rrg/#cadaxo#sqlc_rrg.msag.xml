@@ -134,6 +134,12 @@
      <MSGNR>020</MSGNR>
      <TEXT>Name &amp;1 already reserved for the structure. Choose a different name.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>021</MSGNR>
+     <TEXT>The Cadaxo Rapid Report Generator for SAP Fiori is not installed</TEXT>
+    </T100>
    </T100>
    <I18N_LANGS>
     <LANGU>D</LANGU>
@@ -249,7 +255,12 @@
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>020</MSGNR>
-     <TEXT>Name &amp;1 bereits für die Struktur reserviert. Bitte anderen Namen wählen.</TEXT>
+     <TEXT>Name &amp;1 bereits für eine Struktur reserviert. Bitte anderen Namen wählen.</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>021</MSGNR>
+     <TEXT>Der Cadaxo Rapid Report Generator for SAP Fiori ist nicht installiert</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>

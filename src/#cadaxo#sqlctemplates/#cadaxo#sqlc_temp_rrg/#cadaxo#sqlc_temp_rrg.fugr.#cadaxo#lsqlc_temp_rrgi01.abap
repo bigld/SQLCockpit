@@ -4,8 +4,6 @@
 *&---------------------------------------------------------------------*
 *&      Module  USER_COMMAND_0100  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE user_command_0100 INPUT.
 
   DATA: l_index  TYPE i.
@@ -85,8 +83,6 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0100  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pai_0100 INPUT.
 
   FIELD-SYMBOLS: <fs_swcont> TYPE swcont.
@@ -112,8 +108,6 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0120  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pai_0120 INPUT.
 
   IF gs_temp_attr-cre_dict <> abap_true OR
@@ -141,8 +135,6 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  STRUCTURE  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE structure INPUT.
 
   DATA ls_dd02v_wa TYPE dd02v.
@@ -154,7 +146,6 @@ MODULE structure INPUT.
   CALL FUNCTION 'DD_CHECK_NAME'
     EXPORTING
       name            = gs_temp_attr-structure
-   "  name2           = secname
       objtyp          = 'TABL'
       subtyp          = 'INTTAB'
     IMPORTING
@@ -165,32 +156,27 @@ MODULE structure INPUT.
     EXCEPTIONS
       unknown_objtype = 01.
 
-  IF obj_exists = 'X'.                 "obj_exists
-*    MESSAGE e006(e2) WITH gs_temp_attr-structure.
+  IF obj_exists = abap_true.
+    DATA h_ddtypes TYPE ddtypes.
 
-*  IF sy-subrc <> 0.
-*    MESSAGE e006(e2) WITH gs_temp_attr-abap_class.
+    SELECT SINGLE * FROM ddtypes
+      INTO h_ddtypes
+      WHERE typename = gs_temp_attr-structure.
 
-    data h_ddtypes type ddtypes.
-
-    select single * from ddtypes
-      into h_ddtypes
-      where typename = gs_temp_attr-structure.
-
-    if sy-subrc = 0.
-      case h_ddtypes-typekind.
-        when seok_r3tr_class.
+    IF sy-subrc = 0.
+      CASE h_ddtypes-typekind.
+        WHEN seok_r3tr_class.
           MESSAGE e017(/cadaxo/sqlc_rrg) WITH gs_temp_attr-structure.
-        when seok_r3tr_interface.
+        WHEN seok_r3tr_interface.
           MESSAGE e018(/cadaxo/sqlc_rrg) WITH gs_temp_attr-structure.
-        when others.
+        WHEN OTHERS.
           MESSAGE e019(/cadaxo/sqlc_rrg) WITH gs_temp_attr-structure.
-      endcase.
-    endif.
+      ENDCASE.
+    ENDIF.
 
 *  ENDIF.
   ENDIF.
-  IF saa_err = 'X'.                    "saa_conflict
+  IF saa_err = abap_true.
     IF msg_flag = space.
       MESSAGE e026(e2) WITH gs_temp_attr-structure.
     ELSE.
@@ -227,51 +213,41 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  CLASS  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE class INPUT.
 
   DATA abap_class TYPE seoclskey.
 
   abap_class = gs_temp_attr-abap_class.
 
-  cl_oo_class_builder=>check_clifname(
-    CHANGING
-      cifkey      = abap_class
-    EXCEPTIONS
-      not_allowed = 1
-  ).
+  cl_oo_class_builder=>check_clifname( CHANGING cifkey        = abap_class
+                                       EXCEPTIONS not_allowed = 1 ).
 
   IF sy-subrc <> 0.
-*    MESSAGE e006(e2) WITH gs_temp_attr-abap_class.
+    SELECT SINGLE * FROM ddtypes
+      INTO h_ddtypes
+      WHERE typename = abap_class.
 
-    select single * from ddtypes
-      into h_ddtypes
-      where typename = abap_class.
-
-    if sy-subrc = 0.
-      case h_ddtypes-typekind.
-        when seok_r3tr_class.
+    IF sy-subrc = 0.
+      CASE h_ddtypes-typekind.
+        WHEN seok_r3tr_class.
           MESSAGE e017(/cadaxo/sqlc_rrg) WITH abap_class.
-        when seok_r3tr_interface.
+        WHEN seok_r3tr_interface.
           MESSAGE e018(/cadaxo/sqlc_rrg) WITH abap_class.
-        when others.
+        WHEN OTHERS.
           MESSAGE e019(/cadaxo/sqlc_rrg) WITH abap_class.
-      endcase.
-    endif.
+      ENDCASE.
+    ENDIF.
 
   ENDIF.
 
-  If gs_temp_attr-abap_class = gs_temp_attr-structure.
+  IF gs_temp_attr-abap_class = gs_temp_attr-structure.
     MESSAGE e020(/cadaxo/sqlc_rrg) WITH abap_class.
-  endif.
+  ENDIF.
 
 ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0150  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pai_0150 INPUT.
 
   gs_temp_attr = CORRESPONDING #( /cadaxo/sqlc_temp_rrg_attr ).
@@ -280,8 +256,6 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0130  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pai_0130 INPUT.
 
   gs_temp_attr-rrg_structure = gs_temp_attr-structure.
@@ -290,8 +264,6 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0140  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pai_0140 INPUT.
 
   gs_temp_attr-rrg_class = gs_temp_attr-abap_class.
@@ -300,14 +272,20 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  CHECK_REPORT_ID  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE check_report_id INPUT.
-  SELECT SINGLE  @abap_true FROM /cadaxo/ui38_rep
-        " FIELDS
-         WHERE report_id = @/cadaxo/sqlc_temp_rrg_attr-rrg_report_id
-         INTO @DATA(found).
-  IF sy-subrc = 0.
-    MESSAGE e004(/cadaxo/sqlc_rrg) WITH /cadaxo/sqlc_temp_rrg_attr-rrg_report_id.
-  ENDIF.
+
+  DATA: report_exists TYPE abap_boolean.
+
+  TRY.
+      SELECT SINGLE FROM ('/CADAXO/UI38_REP')
+             FIELDS @abap_true AS exists
+             WHERE report_id = @/cadaxo/sqlc_temp_rrg_attr-rrg_report_id
+             INTO @report_exists.
+      IF sy-subrc = 0.
+        MESSAGE e004(/cadaxo/sqlc_rrg) WITH /cadaxo/sqlc_temp_rrg_attr-rrg_report_id.
+      ENDIF.
+    CATCH cx_root.
+    MESSAGE e021(/cadaxo/sqlc_rrg).
+  ENDTRY.
+
 ENDMODULE.
