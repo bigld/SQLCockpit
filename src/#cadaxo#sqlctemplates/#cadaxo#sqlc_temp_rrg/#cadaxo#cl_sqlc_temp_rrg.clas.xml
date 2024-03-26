@@ -230,11 +230,6 @@
      <DESCRIPT>new line</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CMPNAME>GS_TEMP_ATTR</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>SQL Cockpit - RRG Attributes</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
      <CMPNAME>G_LOG_HANDLE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Application Log: Log Handle</DESCRIPT>

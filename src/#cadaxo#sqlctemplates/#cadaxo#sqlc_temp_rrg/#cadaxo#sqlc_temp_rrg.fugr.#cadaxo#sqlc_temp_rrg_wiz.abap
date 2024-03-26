@@ -14,19 +14,18 @@ FUNCTION /cadaxo/sqlc_temp_rrg_wiz.
   IF gcc_description IS BOUND.
     gcc_description->finalize( ).
     CLEAR gcc_description.
-    clear gc_description.
+    CLEAR gc_description.
   ENDIF.
 
   IF gcc_roadmap IS BOUND.
     gcc_roadmap->finalize( ).
     CLEAR: gcc_roadmap.
-    clear gc_roadmap.
+    CLEAR: gc_roadmap.
   ENDIF.
 
   go_rrg_wiz = io_rrg_wiz.
 
   PERFORM init_selopt.
-
   PERFORM init_roadmap.
 
   CALL SCREEN 0100 STARTING AT 20 2 ENDING AT 140 23.

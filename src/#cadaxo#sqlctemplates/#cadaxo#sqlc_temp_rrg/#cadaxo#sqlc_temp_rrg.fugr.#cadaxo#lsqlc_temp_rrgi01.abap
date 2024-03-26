@@ -25,7 +25,6 @@ MODULE user_command_0100 INPUT.
         IMPORTING
           answer                = l_answer.
       IF l_answer = 1.
-        "   PERFORM delete_cc.
         RAISE cancel_by_user.
       ENDIF.
     WHEN 'LEAVE'.
@@ -33,7 +32,7 @@ MODULE user_command_0100 INPUT.
       LEAVE SCREEN.
     WHEN 'COMPLETE'.
 
-      go_rrg_wiz->gs_temp_attr = gs_temp_attr.
+      go_rrg_wiz->template_attributes = gs_temp_attr.
       go_rrg_wiz->generate_objects( ).
 
       LOOP AT gt_roadmap ASSIGNING <gs_roadmap>.
@@ -52,12 +51,12 @@ MODULE user_command_0100 INPUT.
         l_index = l_index + 1.
         READ TABLE gt_roadmap INDEX l_index ASSIGNING <gs_roadmap>.
         IF sy-subrc EQ 0 AND NOT <gs_roadmap>-step_visible IS INITIAL.
-          <gs_roadmap>-step_active = 'X'.
+          <gs_roadmap>-step_active = ABAP_True.
           g_current_step = <gs_roadmap>-step_id.
 
           IF g_current_step = 'RRGCUST'.
-            gs_temp_attr-rrg_status = 'RELEASED'.
-            gs_temp_attr-rrg_output_table_type = 'GRID'.
+            gs_temp_attr-status = 'RELEASED'.
+            gs_temp_attr-output_table_type = 'GRID'.
           ENDIF.
 
           EXIT.
@@ -94,15 +93,15 @@ MODULE pai_0100 INPUT.
   build_symbols structure gs_temp_attr-structure.
   build_symbols structure_descr gs_temp_attr-structure_descr.
 
-  build_symbols abap_class gs_temp_attr-abap_class.
-  build_symbols abap_class_descr gs_temp_attr-abap_class_descr.
+  build_symbols abap_class gs_temp_attr-class.
+  build_symbols abap_class_descr gs_temp_attr-class_descr.
 
-  build_symbols rrg_report_id gs_temp_attr-rrg_report_id.
-  build_symbols rrg_description gs_temp_attr-rrg_description.
-  build_symbols rrg_title gs_temp_attr-rrg_title.
-  build_symbols rrg_status gs_temp_attr-rrg_status.
-  build_symbols rrg_active gs_temp_attr-rrg_active.
-  build_symbols rrg_output_table_type gs_temp_attr-rrg_output_table_type.
+  build_symbols rrg_report_id gs_temp_attr-report_id.
+  build_symbols rrg_description gs_temp_attr-description.
+  build_symbols rrg_title gs_temp_attr-title.
+  build_symbols rrg_status gs_temp_attr-status.
+  build_symbols rrg_active gs_temp_attr-active.
+  build_symbols rrg_output_table_type gs_temp_attr-output_table_type.
 
 ENDMODULE.
 *&---------------------------------------------------------------------*
@@ -217,7 +216,7 @@ MODULE class INPUT.
 
   DATA abap_class TYPE seoclskey.
 
-  abap_class = gs_temp_attr-abap_class.
+  abap_class = gs_temp_attr-class.
 
   cl_oo_class_builder=>check_clifname( CHANGING cifkey        = abap_class
                                        EXCEPTIONS not_allowed = 1 ).
@@ -240,7 +239,7 @@ MODULE class INPUT.
 
   ENDIF.
 
-  IF gs_temp_attr-abap_class = gs_temp_attr-structure.
+  IF gs_temp_attr-class = gs_temp_attr-structure.
     MESSAGE e020(/cadaxo/sqlc_rrg) WITH abap_class.
   ENDIF.
 
@@ -253,22 +252,9 @@ MODULE pai_0150 INPUT.
   gs_temp_attr = CORRESPONDING #( /cadaxo/sqlc_temp_rrg_attr ).
 
 ENDMODULE.
-*&---------------------------------------------------------------------*
-*&      Module  PAI_0130  INPUT
-*&---------------------------------------------------------------------*
-MODULE pai_0130 INPUT.
 
-  gs_temp_attr-rrg_structure = gs_temp_attr-structure.
 
-ENDMODULE.
-*&---------------------------------------------------------------------*
-*&      Module  PAI_0140  INPUT
-*&---------------------------------------------------------------------*
-MODULE pai_0140 INPUT.
 
-  gs_temp_attr-rrg_class = gs_temp_attr-abap_class.
-
-ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  CHECK_REPORT_ID  INPUT
 *&---------------------------------------------------------------------*
@@ -279,13 +265,13 @@ MODULE check_report_id INPUT.
   TRY.
       SELECT SINGLE FROM ('/CADAXO/UI38_REP')
              FIELDS @abap_true AS exists
-             WHERE report_id = @/cadaxo/sqlc_temp_rrg_attr-rrg_report_id
+             WHERE report_id = @/cadaxo/sqlc_temp_rrg_attr-report_id
              INTO @report_exists.
       IF sy-subrc = 0.
-        MESSAGE e004(/cadaxo/sqlc_rrg) WITH /cadaxo/sqlc_temp_rrg_attr-rrg_report_id.
+        MESSAGE e004(/cadaxo/sqlc_rrg) WITH /cadaxo/sqlc_temp_rrg_attr-report_id.
       ENDIF.
     CATCH cx_root.
-    MESSAGE e021(/cadaxo/sqlc_rrg).
+    " OK -> is checked later again!
   ENDTRY.
 
 ENDMODULE.

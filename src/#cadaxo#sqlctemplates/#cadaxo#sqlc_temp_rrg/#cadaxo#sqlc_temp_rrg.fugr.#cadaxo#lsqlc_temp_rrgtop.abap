@@ -1,6 +1,6 @@
 FUNCTION-POOL /cadaxo/sqlc_temp_rrg.        "MESSAGE-ID ..
 
-tables: /CADAXO/SQLC_TEMP_RRG_ATTR.
+TABLES: /cadaxo/sqlc_temp_rrg_attr.
 
 * Types
 TYPES: BEGIN OF typ_roadmap_step,
@@ -9,13 +9,12 @@ TYPES: BEGIN OF typ_roadmap_step,
          step_documentation      TYPE swf_docu,
          step_documentation_html TYPE htmltable,
          step_active(1),
-         step_prog TYPE sy-repid,
+         step_prog               TYPE sy-repid,
          step_subdynpro(4),
          step_visible(1),
          step_type(1),
        END OF typ_roadmap_step.
 
-* Workareas
 DATA: gs_temp_attr        TYPE /cadaxo/sqlc_temp_rrg_attr.
 
 * References
@@ -43,7 +42,7 @@ DATA: gt_roadmap           TYPE TABLE OF typ_roadmap_step.
 DATA: ok_code              TYPE sy-ucomm.
 DATA: g_current_step(12).
 DATA: g_current_subdynpro(4) TYPE n.
-data: g_current_prog         TYPE sy-repid.
+DATA: g_current_prog         TYPE sy-repid.
 DATA: g_current_step_index   TYPE i.
 DATA: g_total_steps          TYPE i.
 DATA: g_main_subscreen(4)    TYPE n.

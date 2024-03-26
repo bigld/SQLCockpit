@@ -1,5 +1,3 @@
-*todo create_structure:
-*throw exceptions
 CLASS /cadaxo/cl_sqlc_temp_rrg DEFINITION
   PUBLIC
   INHERITING FROM /cadaxo/cl_sqlc_template
@@ -8,7 +6,7 @@ CLASS /cadaxo/cl_sqlc_temp_rrg DEFINITION
 
   PUBLIC SECTION.
 
-    DATA gs_temp_attr TYPE /cadaxo/sqlc_temp_rrg_attr .
+    DATA template_attributes TYPE /cadaxo/sqlc_temp_rrg_attr .
 
     METHODS generate_objects .
 
@@ -38,6 +36,9 @@ CLASS /cadaxo/cl_sqlc_temp_rrg DEFINITION
     DATA g_t_log_handle       TYPE bal_t_logh.
 
     METHODS create_customizing_ui38 .
+    METHODS is_rrg_installed
+      RAISING
+        /cadaxo/cx_sqlc_temp_rrg.
     METHODS add_filter_mapping
       CHANGING
         !ct_code TYPE rswsourcet .
@@ -164,16 +165,13 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
     CALL FUNCTION 'BAL_LOG_MSG_ADD'
       EXPORTING
-        i_log_handle     = g_log_handle
-        i_s_msg          = i_s_msg
+        i_log_handle = g_log_handle
+        i_s_msg      = i_s_msg
       EXCEPTIONS
-        log_not_found    = 1
-        msg_inconsistent = 2
-        log_is_full      = 3
-        OTHERS           = 4.
+        OTHERS       = 1.
 
     IF sy-subrc <> 0.
-      "???
+      "OK
     ENDIF.
 
   ENDMETHOD.
@@ -183,16 +181,13 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
     CALL FUNCTION 'BAL_LOG_MSG_ADD_FREE_TEXT'
       EXPORTING
-        i_log_handle     = g_log_handle
-        i_msgty          = i_msgty
-        i_text           = i_text
+        i_log_handle = g_log_handle
+        i_msgty      = i_msgty
+        i_text       = i_text
       EXCEPTIONS
-        log_not_found    = 1                " Log not found
-        msg_inconsistent = 2                " Message inconsistent
-        log_is_full      = 3                " Message number 999999 reached. Log is full
-        OTHERS           = 4.
+        OTHERS       = 1.
     IF sy-subrc <> 0.
-      "???
+      "OK
     ENDIF.
 
   ENDMETHOD.
@@ -206,23 +201,14 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
     CALL FUNCTION 'RS_ACCESS_PERMISSION'
       EXPORTING
-        authority_check          = 'X'
-        global_lock              = 'X'
-        master_language          = sy-langu
-        mode                     = 'MODIFY'
-        object                   = 'TABL' && i_structure_name
-        object_class             = 'DICT'
+        authority_check = 'X'
+        global_lock     = 'X'
+        master_language = sy-langu
+        mode            = 'MODIFY'
+        object          = 'TABL' && i_structure_name
+        object_class    = 'DICT'
       EXCEPTIONS
-        canceled_in_corr         = 1
-        enqueued_by_user         = 2
-        enqueue_system_failure   = 3
-        illegal_parameter_values = 4
-        locked_by_author         = 5
-        no_modify_permission     = 6
-        no_show_permission       = 7
-        permission_failure       = 8
-        request_language_denied  = 9
-        OTHERS                   = 10.
+        OTHERS          = 1.
     IF sy-subrc <> 0.
       add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
       RETURN.
@@ -235,11 +221,9 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
     CALL FUNCTION 'TR_OBJECTS_CHECK'
       TABLES
-        wt_ko200                = lt_ko200
+        wt_ko200 = lt_ko200
       EXCEPTIONS
-        cancel_edit_other_error = 1
-        show_only_other_error   = 2
-        OTHERS                  = 3.
+        OTHERS   = 1.
     IF sy-subrc <> 0.
       add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = sy-msgty msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
       RETURN.
@@ -265,7 +249,8 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
         object_class = 'DICT'
       EXCEPTIONS
         OTHERS       = 1.
-
+    IF sy-subrc <> 0.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -405,20 +390,20 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
   METHOD create_abap_class.
 
-    DATA l_class TYPE vseoclass.
-    DATA l_inheritance TYPE vseoextend.
-    DATA lt_implementings TYPE seo_implementings.
-    DATA ls_redefinition   TYPE seoredef.
+    DATA l_class            TYPE vseoclass.
+    DATA l_inheritance      TYPE vseoextend.
+    DATA lt_implementings   TYPE seo_implementings.
+    DATA ls_redefinition    TYPE seoredef.
     DATA lt_redefinitions   TYPE seor_redefinitions_r.
-    DATA lt_method_sources TYPE seo_method_source_table.
-    DATA source_of_method TYPE seo_method_source.
-    DATA l_corr TYPE trkorr.
+    DATA lt_method_sources  TYPE seo_method_source_table.
+    DATA source_of_method   TYPE seo_method_source.
+    DATA l_corr             TYPE trkorr.
 
-    l_class-clsname = gs_temp_attr-abap_class.
-    l_class-descript = gs_temp_attr-abap_class_descr.
-    l_class-state = seoc_state_implemented.
+    l_class-clsname  = template_attributes-class.
+    l_class-descript = template_attributes-class_descr.
+    l_class-state    = seoc_state_implemented.
     l_class-exposure = seoc_exposure_public.
-    l_class-fixpt = abap_true.
+    l_class-fixpt    = abap_true.
 
     l_inheritance-clsname = l_class-clsname.
     l_inheritance-refclsname = '/CADAXO/CL_UI38_TYPE_ABAPCLASS'.
@@ -436,10 +421,10 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
     APPEND source_of_method TO lt_method_sources.
 
-    redefine_map_property( EXPORTING i_class = l_class
-                                     i_inheritance = l_inheritance
-                           CHANGING ct_redefinitions = lt_redefinitions
-                                    ct_method_sources = lt_method_sources ).
+    redefine_map_property( EXPORTING i_class           = l_class
+                                     i_inheritance     = l_inheritance
+                           CHANGING  ct_redefinitions  = lt_redefinitions
+                                     ct_method_sources = lt_method_sources ).
 
     CALL FUNCTION 'SEO_CLASS_CREATE_COMPLETE'
       EXPORTING
@@ -455,13 +440,7 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
         redefinitions   = lt_redefinitions
         implementings   = lt_implementings
       EXCEPTIONS
-        existing        = 1
-        is_interface    = 2
-        db_error        = 3
-        component_error = 4
-        no_access       = 5
-        other           = 6
-        OTHERS          = 7.
+        OTHERS          = 1.
     IF sy-subrc <> 0.
       add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = 'E' msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
       add_log_message( VALUE #( msgty = 'E' msgid = '/CADAXO/SQLC_RRG' msgno = '014' msgv1 = l_class-clsname ) ).
@@ -475,41 +454,16 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
   METHOD create_customizing_ui38.
 
-    DATA l_ui38_rep TYPE /cadaxo/ui38_rep.
-    DATA l_ui38_ret TYPE /cadaxo/ui38_ret.
+    TRY.
+        CALL METHOD ('/CADAXO/CL_UI38_ASSIST')=>('ADD_CLASS_REPORT_FROM_COCKPIT').
+        add_log_message( VALUE #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '013' msgv1 = template_attributes-report_id ) ).
 
-    l_ui38_rep-report_id = gs_temp_attr-rrg_report_id.
+      CATCH cx_sy_dyn_call_error.
+        add_log_message( VALUE #( msgty = 'E' msgid = '/CADAXO/SQLC_RRG' msgno = '016' msgv1 = template_attributes-report_id ) ).
+      CATCH cx_root.
 
-    l_ui38_ret-report_id = gs_temp_attr-rrg_report_id.
-    l_ui38_ret-language = sy-langu.
-    l_ui38_ret-title = gs_temp_attr-rrg_title.
-    l_ui38_ret-description = gs_temp_attr-rrg_description.
-    l_ui38_ret-active = abap_true.
 
-    l_ui38_rep-type      = 'ABAPCLASS'.
-    l_ui38_rep-class     = gs_temp_attr-rrg_class.
-    l_ui38_rep-structure = gs_temp_attr-rrg_structure.
-
-    l_ui38_rep-output_table = abap_true.
-    l_ui38_rep-output_table_type = gs_temp_attr-rrg_output_table_type.
-    l_ui38_rep-status = gs_temp_attr-rrg_status.
-
-    l_ui38_rep-created_by = sy-uname.
-    GET TIME STAMP FIELD l_ui38_rep-created_at.
-
-    l_ui38_rep-active = gs_temp_attr-rrg_active.
-
-    INSERT /cadaxo/ui38_rep FROM l_ui38_rep.
-    INSERT /cadaxo/ui38_ret FROM l_ui38_ret.
-
-    /cadaxo/cl_ui38_adm_main=>update_model_last_modified( ).
-    IF sy-subrc <> 0.
-      add_log_message( VALUE #( msgid = sy-msgid msgno = sy-msgno msgty = 'E' msgv1 = sy-msgv1 msgv2 = sy-msgv2 msgv3 = sy-msgv3 msgv4 = sy-msgv4  ) ).
-      add_log_message( VALUE #( msgty = 'E' msgid = '/CADAXO/SQLC_RRG' msgno = '016' msgv1 = l_ui38_rep-report_id ) ).
-      RETURN.
-    ELSE.
-      add_log_message( VALUE #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '013' msgv1 = l_ui38_rep-report_id ) ).
-    ENDIF.
+    ENDTRY.
 
   ENDMETHOD.
 
@@ -518,17 +472,17 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
     DATA l_structure_name TYPE ddobjname.
     DATA ls_dd02v         TYPE dd02v.
-    DATA lt_dd03p TYPE TABLE OF dd03p.
-    DATA ls_dd04v TYPE dd04v.
-    DATA l_rc TYPE syst_subrc.
+    DATA lt_dd03p         TYPE TABLE OF dd03p.
+    DATA ls_dd04v         TYPE dd04v.
+    DATA l_rc             TYPE syst_subrc.
 
-    l_structure_name = gs_temp_attr-structure.
+    l_structure_name = template_attributes-structure.
 
-    ls_dd02v = VALUE #( tabname = l_structure_name
+    ls_dd02v = VALUE #( tabname    = l_structure_name
                         ddlanguage = sy-langu
-                        tabclass = 'INTTAB'
-                        ddtext = gs_temp_attr-structure_descr
-                        exclass = 1 ).
+                        tabclass   = 'INTTAB'
+                        ddtext     = template_attributes-structure_descr
+                        exclass    = 1 ).
 
     lt_dd03p = CORRESPONDING #( me->gr_parser->gt_lvc_t_fcat ).
 
@@ -646,7 +600,7 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
           EXPORTING
             io_rrg_wiz     = me
           IMPORTING
-            es_temp_attr   = me->gs_temp_attr
+            es_temp_attr   = me->template_attributes
           EXCEPTIONS
             cancel_by_user = 1
             OTHERS         = 2.
@@ -665,22 +619,26 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
 
   METHOD generate_objects.
-
+    TRY.
+        is_rrg_installed( ).
+      CATCH /cadaxo/cx_sqlc_temp_rrg.
+        MESSAGE e021(/cadaxo/sqlc_rrg).
+    ENDTRY.
     DATA l_s_log TYPE bal_s_log.
 
     init_appl_log( ).
 
     TRY.
 
-        IF me->gs_temp_attr-cre_dict  = abap_true.
+        IF me->template_attributes-cre_dict  = abap_true.
           create_structure( ).
         ENDIF.
 
-        IF me->gs_temp_attr-cre_class = abap_true.
+        IF me->template_attributes-cre_class = abap_true.
           create_abap_class( ).
         ENDIF.
 
-        IF me->gs_temp_attr-cre_rrg_cust = abap_true.
+        IF me->template_attributes-cre_rrg_cust = abap_true.
           create_customizing_ui38( ).
         ENDIF.
 
@@ -1056,4 +1014,21 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
         OTHERS         = 1.
 
   ENDMETHOD.
+  METHOD is_rrg_installed.
+    DATA: rrg_exists TYPE abap_boolean.
+
+    TRY.
+        SELECT SINGLE FROM ('/CADAXO/UI38_REP')
+               FIELDS @abap_true AS exists
+               INTO @rrg_exists.
+        IF sy-subrc <> 0.
+          "ok
+        ENDIF.
+      CATCH cx_root INTO DATA(root).
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_temp_rrg
+          EXPORTING
+            previous = root.
+    ENDTRY.
+  ENDMETHOD.
+
 ENDCLASS.
