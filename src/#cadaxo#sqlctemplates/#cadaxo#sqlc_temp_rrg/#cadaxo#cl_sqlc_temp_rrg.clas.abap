@@ -455,7 +455,9 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
   METHOD create_customizing_ui38.
 
     TRY.
-        CALL METHOD ('/CADAXO/CL_UI38_ASSIST')=>('ADD_CLASS_REPORT_FROM_COCKPIT').
+        CALL METHOD ('/CADAXO/CL_UI38_ASSIST')=>('ADD_CLASS_REPORT_FROM_COCKPIT')
+          EXPORTING
+            i_customizing = template_attributes.
         add_log_message( VALUE #( msgty = 'S' msgid = '/CADAXO/SQLC_RRG' msgno = '013' msgv1 = template_attributes-report_id ) ).
 
       CATCH cx_sy_dyn_call_error.
