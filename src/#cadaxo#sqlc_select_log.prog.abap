@@ -22,9 +22,67 @@
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-REPORT  /cadaxo/sqlc_select_log.
+REPORT /cadaxo/sqlc_select_log.
 
-TYPE-POOLS: slis.
+CLASS lcl_worker DEFINITION CREATE PRIVATE.
+
+  PUBLIC SECTION.
+    TYPES: ty_sqlclogs    TYPE STANDARD TABLE OF /cadaxo/sqlclog WITH DEFAULT KEY.
+    TYPES: ty_sqlclogalvs TYPE STANDARD TABLE OF /cadaxo/sqlclogalv WITH DEFAULT KEY.
+    CLASS-METHODS: convert_to_alv IMPORTING i_sqllogs        TYPE ty_sqlclogs
+                                  RETURNING VALUE(r_sqlalvs) TYPE ty_sqlclogalvs.
+ENDCLASS.
+
+CLASS lcl_worker IMPLEMENTATION.
+
+  METHOD convert_to_alv.
+    DATA: xml_string TYPE string.
+    DATA: sqllog_xml TYPE /cadaxo/sqlc_sqllog.
+    DATA: sqllogalv  TYPE /cadaxo/sqlclogalv.
+
+    LOOP AT i_sqllogs ASSIGNING FIELD-SYMBOL(<sqlclog>).
+
+      TRY.
+          cl_abap_gzip=>decompress_text( EXPORTING gzip_in = <sqlclog>-sql_log
+                                         IMPORTING text_out = xml_string ).
+
+      CALL TRANSFORMATION id
+           SOURCE XML xml_string
+           RESULT log = sqllog_xml.
+
+      sqllogalv = VALUE #( uname              = <sqlclog>-uname
+                           sql_string         = sqllog_xml-sql_string
+                           result_rows        = sqllog_xml-result_rows
+                           result_runtime     = sqllog_xml-result_runtime
+                           result_status_icon = SWITCH #( sqllog_xml-result_status
+                                                          WHEN '00' THEN icon_green_light
+                                                          WHEN '01' THEN icon_yellow_light
+                                                          WHEN '02' THEN icon_red_light
+                                                          ELSE icon_green_light
+                                                        )
+                         ).
+        CATCH  cx_parameter_invalid_range
+          cx_sy_buffer_overflow
+          cx_sy_conversion_codepage
+          cx_sy_compression_error.
+      sqllogalv = VALUE #( uname              = <sqlclog>-uname
+                           sql_string         = '<corrupt XML - no details available>'
+                           result_rows        = 0
+                           result_runtime     = 0
+                           result_status_icon = icon_red_light
+                         ).
+                         message e028(/CADAXO/SQLC_ULOG) into sqllogalv-sql_string.
+      ENDTRY.
+      CONVERT TIME STAMP <sqlclog>-timestamp TIME ZONE sy-zonlo
+              INTO DATE sqllogalv-execute_date TIME sqllogalv-execute_time.
+
+      APPEND sqllogalv TO r_sqlalvs.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+ENDCLASS.
 
 INCLUDE: icons.
 
@@ -47,11 +105,11 @@ DATA lv_dec(11)           TYPE p DECIMALS 7.
 *END TODO
 
 * select options
-SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE text-t01.
-SELECT-OPTIONS: so_uname FOR  gs_sqlclog-uname DEFAULT sy-uname,
-                so_date  FOR  ls_sqlclogalv-execute_date,
-                so_runt  FOR  ls_sqlclogalv-result_runtime,
-                so_rrows FOR  ls_sqlclogalv-result_rows.
+SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-t01.
+  SELECT-OPTIONS: so_uname FOR  gs_sqlclog-uname DEFAULT sy-uname,
+                  so_date  FOR  ls_sqlclogalv-execute_date,
+                  so_runt  FOR  ls_sqlclogalv-result_runtime,
+                  so_rrows FOR  ls_sqlclogalv-result_rows.
 SELECTION-SCREEN END OF BLOCK sel.
 
 START-OF-SELECTION.
@@ -133,43 +191,7 @@ START-OF-SELECTION.
                                AND timestamp      NOT BETWEEN gt_sel_timestamp-low AND gt_sel_timestamp-high
                                AND result_runtime IN so_runt
                                AND result_rows    IN so_rrows.
-      LOOP AT gt_sqlclog ASSIGNING <fs_sqlclog>.
-
-        cl_abap_gzip=>decompress_text(
-          EXPORTING
-            gzip_in = <fs_sqlclog>-sql_log
-          IMPORTING
-            text_out = l_xml ).
-
-        CALL TRANSFORMATION id
-           SOURCE XML l_xml
-           RESULT log = l_sqllog_xml.
-
-
-        MOVE: <fs_sqlclog>-uname          TO ls_sqlclogalv-uname,
-              l_sqllog_xml-sql_string     TO ls_sqlclogalv-sql_string,
-              l_sqllog_xml-result_rows    TO ls_sqlclogalv-result_rows,
-              l_sqllog_xml-result_runtime TO ls_sqlclogalv-result_runtime.
-
-        CASE <fs_sqlclog>-result_status.
-          WHEN '00'.
-            MOVE icon_green_light TO ls_sqlclogalv-result_status_icon.
-          WHEN '01'.
-            MOVE icon_yellow_light TO ls_sqlclogalv-result_status_icon.
-          WHEN '02'.
-            MOVE icon_red_light TO ls_sqlclogalv-result_status_icon.
-          WHEN OTHERS.
-            MOVE icon_green_light TO ls_sqlclogalv-result_status_icon.
-        ENDCASE.
-
-* convert the timestamp into date/time
-        CONVERT TIME STAMP <fs_sqlclog>-timestamp TIME ZONE sy-zonlo
-                INTO DATE ls_sqlclogalv-execute_date TIME ls_sqlclogalv-execute_time.
-
-* append the row into the alv table
-        APPEND ls_sqlclogalv TO gt_sqlclogalv.
-
-      ENDLOOP.
+      APPEND LINES OF lcl_worker=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
     ENDSELECT.
 
   ELSEIF gt_sel_timestamp-option IS INITIAL.
@@ -177,43 +199,7 @@ START-OF-SELECTION.
        INTO TABLE gt_sqlclog WHERE uname IN so_uname
                                AND result_runtime IN so_runt
                                AND result_rows    IN so_rrows.
-      LOOP AT gt_sqlclog ASSIGNING <fs_sqlclog>.
-
-        cl_abap_gzip=>decompress_text(
-          EXPORTING
-            gzip_in = <fs_sqlclog>-sql_log
-          IMPORTING
-            text_out = l_xml ).
-
-        CALL TRANSFORMATION id
-           SOURCE XML l_xml
-           RESULT log = l_sqllog_xml.
-
-
-        MOVE: <fs_sqlclog>-uname          TO ls_sqlclogalv-uname,
-              l_sqllog_xml-sql_string     TO ls_sqlclogalv-sql_string,
-              l_sqllog_xml-result_rows    TO ls_sqlclogalv-result_rows,
-              l_sqllog_xml-result_runtime TO ls_sqlclogalv-result_runtime.
-
-        CASE <fs_sqlclog>-result_status.
-          WHEN '00'.
-            MOVE icon_green_light TO ls_sqlclogalv-result_status_icon.
-          WHEN '01'.
-            MOVE icon_yellow_light TO ls_sqlclogalv-result_status_icon.
-          WHEN '02'.
-            MOVE icon_red_light TO ls_sqlclogalv-result_status_icon.
-          WHEN OTHERS.
-            MOVE icon_green_light TO ls_sqlclogalv-result_status_icon.
-        ENDCASE.
-
-* convert the timestamp into date/time
-        CONVERT TIME STAMP <fs_sqlclog>-timestamp TIME ZONE sy-zonlo
-                INTO DATE ls_sqlclogalv-execute_date TIME ls_sqlclogalv-execute_time.
-
-* append the row into the alv table
-        APPEND ls_sqlclogalv TO gt_sqlclogalv.
-
-      ENDLOOP.
+      APPEND LINES OF lcl_worker=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
     ENDSELECT.
 
   ELSE.
@@ -223,57 +209,19 @@ START-OF-SELECTION.
                                AND timestamp      BETWEEN gt_sel_timestamp-low AND gt_sel_timestamp-high
                                AND result_runtime IN so_runt
                                AND result_rows    IN so_rrows.
-      LOOP AT gt_sqlclog ASSIGNING <fs_sqlclog>.
-
-        cl_abap_gzip=>decompress_text(
-          EXPORTING
-            gzip_in = <fs_sqlclog>-sql_log
-          IMPORTING
-            text_out = l_xml ).
-
-        CALL TRANSFORMATION id
-           SOURCE XML l_xml
-           RESULT log = l_sqllog_xml.
-
-
-        MOVE: <fs_sqlclog>-uname          TO ls_sqlclogalv-uname,
-              l_sqllog_xml-sql_string     TO ls_sqlclogalv-sql_string,
-              l_sqllog_xml-result_rows    TO ls_sqlclogalv-result_rows,
-              l_sqllog_xml-result_runtime TO ls_sqlclogalv-result_runtime.
-
-        CASE <fs_sqlclog>-result_status.
-          WHEN '00'.
-            MOVE icon_green_light TO ls_sqlclogalv-result_status_icon.
-          WHEN '01'.
-            MOVE icon_yellow_light TO ls_sqlclogalv-result_status_icon.
-          WHEN '02'.
-            MOVE icon_red_light TO ls_sqlclogalv-result_status_icon.
-          WHEN OTHERS.
-            MOVE icon_green_light TO ls_sqlclogalv-result_status_icon.
-        ENDCASE.
-
-* convert the timestamp into date/time
-        CONVERT TIME STAMP <fs_sqlclog>-timestamp TIME ZONE sy-zonlo
-                INTO DATE ls_sqlclogalv-execute_date TIME ls_sqlclogalv-execute_time.
-
-* append the row into the alv table
-        APPEND ls_sqlclogalv TO gt_sqlclogalv.
-
-      ENDLOOP.
+      APPEND LINES OF lcl_worker=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
     ENDSELECT.
   ENDIF.
 
-END-OF-SELECTION.
 
-* sort the table by date/time descending
+
   SORT gt_sqlclogalv BY execute_date DESCENDING execute_time DESCENDING.
 
-* set layout
-  ls_slis_layout_alv-zebra   = 'X'.
-  ls_slis_layout_alv-colwidth_optimize = 'X'.
+  ls_slis_layout_alv-zebra   = abap_true.
+  ls_slis_layout_alv-colwidth_optimize = abap_true.
 
   gv_repid = sy-repid. "+COCKPIT-257
-* show the data
+
   CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
     EXPORTING
       i_callback_program      = gv_repid    "+COCKPIT-257
@@ -283,9 +231,9 @@ END-OF-SELECTION.
     TABLES
       t_outtab                = gt_sqlclogalv
     EXCEPTIONS
-      program_error           = 1
-      OTHERS                  = 2.
+      OTHERS                  = 1.
 
+END-OF-SELECTION.
 * begin of insert cockpit257
 FORM user_command USING command LIKE sy-ucomm
                        selfield TYPE slis_selfield.
