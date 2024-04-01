@@ -46,33 +46,35 @@ CLASS lcl_worker IMPLEMENTATION.
           cl_abap_gzip=>decompress_text( EXPORTING gzip_in = <sqlclog>-sql_log
                                          IMPORTING text_out = xml_string ).
 
-      CALL TRANSFORMATION id
-           SOURCE XML xml_string
-           RESULT log = sqllog_xml.
+          CALL TRANSFORMATION id
+               SOURCE XML xml_string
+               RESULT log = sqllog_xml.
 
-      sqllogalv = VALUE #( uname              = <sqlclog>-uname
-                           sql_string         = sqllog_xml-sql_string
-                           result_rows        = sqllog_xml-result_rows
-                           result_runtime     = sqllog_xml-result_runtime
-                           result_status_icon = SWITCH #( sqllog_xml-result_status
-                                                          WHEN '00' THEN icon_green_light
-                                                          WHEN '01' THEN icon_yellow_light
-                                                          WHEN '02' THEN icon_red_light
-                                                          ELSE icon_green_light
-                                                        )
-                         ).
-        CATCH  cx_parameter_invalid_range
-          cx_sy_buffer_overflow
-          cx_sy_conversion_codepage
-          cx_sy_compression_error.
-      sqllogalv = VALUE #( uname              = <sqlclog>-uname
-                           sql_string         = '<corrupt XML - no details available>'
-                           result_rows        = 0
-                           result_runtime     = 0
-                           result_status_icon = icon_red_light
-                         ).
-                         message e028(/CADAXO/SQLC_ULOG) into sqllogalv-sql_string.
+          sqllogalv = VALUE #( uname              = <sqlclog>-uname
+                               sql_string         = sqllog_xml-sql_string
+                               result_rows        = sqllog_xml-result_rows
+                               result_runtime     = sqllog_xml-result_runtime
+                               result_status_icon = SWITCH #( sqllog_xml-result_status
+                                                              WHEN '00' THEN icon_green_light
+                                                              WHEN '01' THEN icon_yellow_light
+                                                              WHEN '02' THEN icon_red_light
+                                                              ELSE icon_green_light
+                                                            )
+                             ).
+        CATCH cx_parameter_invalid_range
+              cx_sy_buffer_overflow
+              cx_sy_conversion_codepage
+              cx_sy_compression_error.
+
+          sqllogalv = VALUE #( uname              = <sqlclog>-uname
+                               result_rows        = 0
+                               result_runtime     = 0
+                               result_status_icon = icon_red_light
+                             ).
+          MESSAGE e028(/cadaxo/sqlc_ulog) INTO sqllogalv-sql_string.
+
       ENDTRY.
+
       CONVERT TIME STAMP <sqlclog>-timestamp TIME ZONE sy-zonlo
               INTO DATE sqllogalv-execute_date TIME sqllogalv-execute_time.
 
@@ -122,7 +124,7 @@ START-OF-SELECTION.
   CLEAR: gt_sel_timestamp[].
 
   LOOP AT so_date.
-    MOVE-CORRESPONDING so_date TO gt_sel_timestamp.
+    gt_sel_timestamp = CORRESPONDING #( so_date ).
 *TODO
     IF gt_sel_timestamp-option = 'LT'.
       CONCATENATE '19000101' '000000' '.' '0000001' INTO lv_string.
