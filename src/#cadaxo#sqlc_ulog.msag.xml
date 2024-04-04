@@ -110,6 +110,12 @@
      <MSGNR>027</MSGNR>
      <TEXT>Table &amp;1 was added to role &amp;2</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_ULOG</ARBGB>
+     <MSGNR>028</MSGNR>
+     <TEXT>corrupt XML - no details available</TEXT>
+    </T100>
    </T100>
    <I18N_LANGS>
     <LANGU>D</LANGU>
@@ -201,6 +207,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>027</MSGNR>
      <TEXT>Tabelle &amp;1 wurde zur Rolle &amp;2 hinzugefügt</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>028</MSGNR>
+     <TEXT>beschädigtes XML - keine Details verfügbar</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>
