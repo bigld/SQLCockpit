@@ -1017,11 +1017,11 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
   ENDMETHOD.
   METHOD is_rrg_installed.
-    DATA: rrg_exists TYPE abap_boolean.
+    DATA: rrg_exists TYPE flag.
 
     TRY.
-        SELECT SINGLE FROM ('/CADAXO/UI38_REP')
-               FIELDS @abap_true AS exists
+        SELECT SINGLE @abap_true AS exists
+               FROM ('/CADAXO/UI38_REP')
                INTO @rrg_exists.
         IF sy-subrc <> 0.
           "ok

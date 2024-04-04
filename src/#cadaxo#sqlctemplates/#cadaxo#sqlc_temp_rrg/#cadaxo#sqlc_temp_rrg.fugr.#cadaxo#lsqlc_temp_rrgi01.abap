@@ -260,18 +260,18 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 MODULE check_report_id INPUT.
 
-  DATA: report_exists TYPE abap_boolean.
+  DATA: report_exists TYPE flag.
 
   TRY.
-      SELECT SINGLE FROM ('/CADAXO/UI38_REP')
-             FIELDS @abap_true AS exists
+      SELECT SINGLE @abap_true AS exists
+             FROM ('/CADAXO/UI38_REP')
              WHERE report_id = @/cadaxo/sqlc_temp_rrg_attr-report_id
              INTO @report_exists.
       IF sy-subrc = 0.
         MESSAGE e004(/cadaxo/sqlc_rrg) WITH /cadaxo/sqlc_temp_rrg_attr-report_id.
       ENDIF.
     CATCH cx_root.
-    " OK -> is checked later again!
+      " OK -> is checked later again!
   ENDTRY.
 
 ENDMODULE.
