@@ -21,7 +21,6 @@
 *            |                      |                                             |                *
 *            |                      |                                             |                *
 ****************************************************************************************************
-
 REPORT /cadaxo/sqlc_select_log.
 
 CLASS lcl_worker DEFINITION CREATE PRIVATE.
@@ -98,6 +97,8 @@ DATA l_xml        TYPE string.
 DATA l_sqllog_xml TYPE /cadaxo/sqlc_sqllog.
 
 RANGES: gt_sel_timestamp FOR gs_sqlclog-timestamp.
+DATA: rg_sel_timestamps LIKE RANGE OF gs_sqlclog-timestamp.
+DATA: rg_sel_timestamp  LIKE LINE OF rg_sel_timestamps.
 
 FIELD-SYMBOLS: <fs_sqlclog> TYPE /cadaxo/sqlclog.
 
@@ -184,6 +185,10 @@ START-OF-SELECTION.
 
       APPEND gt_sel_timestamp.
     ENDIF.
+
+*rg_sel_timestamp = CORRESPONDING #( so_date ).
+*case rg_sel_timestamp-option.
+*when 'EQ'.
   ENDLOOP.
 
 * select the data

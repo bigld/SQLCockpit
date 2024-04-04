@@ -1,4 +1,3 @@
-REPORT  /cadaxo/sqlc_select_user_log.
 ****************************************************************************************************
 * Description             : show the user log                                                      *
 *--------------------------------------------------------------------------------------------------*
@@ -22,6 +21,7 @@ REPORT  /cadaxo/sqlc_select_user_log.
 * 17.06.2016 | Dieter Schadler      | Bugfix Zeitraumsuche/Selektion neu          | Jira COCKPIT-44*
 *            |                      |                                             |                *
 ****************************************************************************************************
+REPORT  /cadaxo/sqlc_select_user_log.
 
 DATA: gs_sqlculog        TYPE /cadaxo/sqlculog.
 DATA: gt_sqlculog        TYPE TABLE OF /cadaxo/sqlculog.
