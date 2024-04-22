@@ -57,6 +57,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>008</KEY>
+     <ENTRY>Seconds</ENTRY>
+     <LENGTH>17</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>009</KEY>
      <ENTRY>User</ENTRY>
      <LENGTH>12</LENGTH>
@@ -624,6 +630,12 @@
      <KEY>I02</KEY>
      <ENTRY>No records found</ENTRY>
      <LENGTH>16</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>I03</KEY>
+     <ENTRY>Record</ENTRY>
+     <LENGTH>10</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -1292,6 +1304,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>008</KEY>
+       <ENTRY>Sekunden</ENTRY>
+       <LENGTH>17</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>009</KEY>
        <ENTRY>Benutzer</ENTRY>
        <LENGTH>12</LENGTH>
@@ -1862,6 +1880,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>I03</KEY>
+       <ENTRY>Treffer</ENTRY>
+       <LENGTH>10</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>M01</KEY>
        <ENTRY>Cadaxo Export Wizard</ENTRY>
        <LENGTH>30</LENGTH>
@@ -2312,6 +2336,18 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>Q64</KEY>
+       <ENTRY>Die Tabelle wurde zur Laufzeit geändert</ENTRY>
+       <LENGTH>102</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>Q65</KEY>
+       <ENTRY>Die Tabelle wurde zur Laufzeit geändert - startten Sie die Transaktion neu</ENTRY>
+       <LENGTH>132</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>S01</KEY>
        <ENTRY>Jobs werden gelöscht ...</ENTRY>
        <LENGTH>30</LENGTH>
@@ -2704,11 +2740,6 @@
      <CMPNAME>C_WIDTH_RIGHT_WINDOW</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>right window width</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CMPNAME>DELETE_LOG</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Delete &quot;My History&quot;</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CMPNAME>DELETE_SYMBOLS</CMPNAME>
@@ -4086,16 +4117,6 @@
      <DESCRIPT>Set gt_used_symbols</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CMPNAME>SET_INITIAL_DATE_HISTORY</CMPNAME>
-     <LANGU>D</LANGU>
-     <DESCRIPT>Set initial date history</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CMPNAME>SET_INITIAL_DATE_HISTORY</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Set initial date history</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
      <CMPNAME>SET_INITIAL_DATE_JOBMONITOR</CMPNAME>
      <LANGU>D</LANGU>
      <DESCRIPT>Set initial date jobmonitor</DESCRIPT>
@@ -4247,6 +4268,12 @@
     </SEOCOMPOTX>
    </DESCRIPTIONS>
    <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>BUILD_RESULT_GRID_TITLE</CMPNAME>
+     <SCONAME>I_RUNTIME</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Runtime</DESCRIPT>
+    </SEOSUBCOTX>
     <SEOSUBCOTX>
      <CMPNAME>CHECK_DBTABLE_MODIFICATION</CMPNAME>
      <SCONAME>R_ANSWER</SCONAME>

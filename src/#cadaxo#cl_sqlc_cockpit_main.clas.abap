@@ -201,641 +201,639 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       RETURNING
         VALUE(rv_success) TYPE boolean .
 
-protected section.
+  PROTECTED SECTION.
 
-  data G_TRSTART_TIMESTAMP type TIMESTAMP .
-  class-data GCONT_SPLITTER_TOP_TOOLBAR type ref to CL_GUI_CONTAINER .
-  class-data:
-    gt_item_vari               TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY .
-  class-data GT_NODE_VARI type TREEV_NTAB .
-  data DRAGDROP_BEHAVIOUR_ALV type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_CLIPBOARD type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_EDITOR type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_ELEMENTINFO type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_LOG type ref to CL_DRAGDROP .
-  data DRAGDROP_BEHAVIOUR_SYMBOL type ref to CL_DRAGDROP .
-  data DRAGDROP_HANDLE_ELEMENTINFO type I .
-  data DRAGDROP_HANDLE_LOG type I .
-  data DRAGDROP_HANDLE_SYMBOL type I .
-  data GCONT_ABAP_EDITOR type ref to CL_GUI_CONTAINER .
-  data GCONT_ABAP_ERROR type ref to CL_GUI_CONTAINER .
-  data GCONT_ABAP_SPLITTER type ref to CL_GUI_CONTAINER .
-  data GCONT_ALV_QUEUE type ref to CL_GUI_CUSTOM_CONTAINER .
-  data GCONT_ALV_TEMPLATE type ref to CL_GUI_CUSTOM_CONTAINER .
-  data GCONT_CLIPBOARD type ref to CL_GUI_CONTAINER .
-  data GCONT_CLIPBOARD_TEXTEDIT type ref to CL_GUI_CONTAINER .
-  data GCONT_CLIPBOARD_TOOLBAR type ref to CL_GUI_CONTAINER .
-  data GCONT_CLIPBOARD_TOOLBAR_BTNS type ref to CL_GUI_CONTAINER .
-  data GCONT_CLIPBOARD_TOOLBAR_IMG type ref to CL_GUI_CONTAINER .
-  data GCONT_ELEMENTINFO type ref to CL_GUI_CONTAINER .
-  data GCONT_GRID_ELEMENTINFO_T type /CADAXO/SQLCCLGUICONTAINER_T .
-  data GCONT_GRID_RESULTS type ref to CL_GUI_CONTAINER .
-  data GCONT_GRID_RESULT_T type /CADAXO/SQLCCLGUICONTAINER_T .
-  data GCONT_GRID_SYMBOL_T type /CADAXO/SQLCCLGUICONTAINER_T .
-  data GCONT_RESULT_BOTTOM type ref to CL_GUI_CONTAINER .
-  data GCONT_RESULT_TOOLBAR type ref to CL_GUI_CONTAINER .
-  data GCONT_SPLITTER_BOTTOM type ref to CL_GUI_CONTAINER .
-  data GCONT_SPLITTER_TOP type ref to CL_GUI_CONTAINER .
-  data GCONT_SYMBOL type ref to CL_GUI_CONTAINER .
-  data GCONT_SYMBOL_TOOLBAR type ref to CL_GUI_CONTAINER .
-  data GCONT_SYMBOL_TOOLBAR_BTNS type ref to CL_GUI_CONTAINER .
-  data GCONT_SYMBOL_TOOLBAR_IMG type ref to CL_GUI_CONTAINER .
-  data GCONT_TOOLBAR_ELEMENTINFO type ref to CL_GUI_CONTAINER .
-  data GC_ABAP_EDITOR type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT .
-  data GC_ABAP_EDITOR_TEXT type ref to CL_GUI_TEXTEDIT .
-  data GC_ABAP_ERROR type ref to CL_GUI_ALV_GRID .
-  data GC_ALV_QUEUE_3000 type ref to CL_GUI_ALV_GRID .
-  data GC_ALV_TEMPLATE_2000 type ref to CL_GUI_ALV_GRID .
-  data GC_CLIPBOARD_TEXTEDIT type ref to CL_GUI_TEXTEDIT .
-  data GC_CLIPBOARD_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GC_CLIPBOARD_TOOLBAR_IMG type ref to CL_GUI_PICTURE .
-  data GC_ELEMENTINFO_ALV type ref to CL_GUI_ALV_GRID .
-  data GC_HTML_VIEWER type ref to CL_GUI_HTML_VIEWER .
-  data GC_RESULT_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GC_SPLITTER type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GC_SYMBOL_ALV type ref to CL_GUI_ALV_GRID .
-  data GC_SYMBOL_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GC_SYMBOL_TOOLBAR_IMG type ref to CL_GUI_PICTURE .
-  data GS_SPLITTER_BOTTOM type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_CLIPBOARD type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_EDITOR type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_LVL0 type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_RESULTS type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_RESULTS_TAB type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_RESULTS_TABDAT type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GR_RESULTS_TAB_TOOLBAR type ref to CL_GUI_TOOLBAR .
-  data GS_SPLITTER_RES_BUTTON type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_SYMBOL type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_SYMBOL_TOOLBAR type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_TOOLBAR type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GS_SPLITTER_TOP type ref to CL_GUI_SPLITTER_CONTAINER .
-  data GT_CLIPBOARD type /CADAXO/SQLCCLIPBOARD_T .
-  data GT_QUEUE type /CADAXO/SQLCAPI_QUEUE_T .
-  data GT_SOURCE_RUNTIME_BEFORE type /CADAXO/SQLCCODELINE_T .
-  data GT_SQL_HIST type /CADAXO/SQLCHISTLINE_T .
-  data:
-    gt_sql_log TYPE TABLE OF /cadaxo/sqlclog .
-  data GT_TEMPLATES type /CADAXO/SQLCTEMP_ALV_T .
-  data GT_TOOLBUTTONS_TOP type TTB_BUTTON .
-  data GT_VARIANT type /CADAXO/SQLCVARI_ALV_T .
-  data GV_EXPORT_TYPE type /CADAXO/SQLCAPI_POSITION_TYP .
-  data G_CLIENT_CATEGORY type CCCATEGORY .
-  data G_CLIENT_LOGSYS type LOGSYS .
-  data G_CONT_PERS_PREFERENCES type CHAR1 .
-  data G_HEIGHT type I .
-  data G_HISTORY_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
-  data G_JOBMONITOR_TOOLBAR_EX type UI_FUNCTIONS .
-  data G_RESULT_LAYOUT type LVC_S_LAYO .
-  data G_RESULT_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
-  data G_SHOW_CLIPBOARD type BOOLEAN .
-  data GS_SEL_VARIANT type /CADAXO/SQLC_IL_VARIANTS .   "Cockpit-321
-  data:
-    BEGIN OF ms_additional_functions,                 "COCKPIT-48
+    DATA g_trstart_timestamp TYPE timestamp .
+    CLASS-DATA gcont_splitter_top_toolbar TYPE REF TO cl_gui_container .
+    CLASS-DATA:
+      gt_item_vari               TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY .
+    CLASS-DATA gt_node_vari TYPE treev_ntab .
+    DATA dragdrop_behaviour_alv TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_clipboard TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_editor TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_elementinfo TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_log TYPE REF TO cl_dragdrop .
+    DATA dragdrop_behaviour_symbol TYPE REF TO cl_dragdrop .
+    DATA dragdrop_handle_elementinfo TYPE i .
+    DATA dragdrop_handle_log TYPE i .
+    DATA dragdrop_handle_symbol TYPE i .
+    DATA gcont_abap_editor TYPE REF TO cl_gui_container .
+    DATA gcont_abap_error TYPE REF TO cl_gui_container .
+    DATA gcont_abap_splitter TYPE REF TO cl_gui_container .
+    DATA gcont_alv_queue TYPE REF TO cl_gui_custom_container .
+    DATA gcont_alv_template TYPE REF TO cl_gui_custom_container .
+    DATA gcont_clipboard TYPE REF TO cl_gui_container .
+    DATA gcont_clipboard_textedit TYPE REF TO cl_gui_container .
+    DATA gcont_clipboard_toolbar TYPE REF TO cl_gui_container .
+    DATA gcont_clipboard_toolbar_btns TYPE REF TO cl_gui_container .
+    DATA gcont_clipboard_toolbar_img TYPE REF TO cl_gui_container .
+    DATA gcont_elementinfo TYPE REF TO cl_gui_container .
+    DATA gcont_grid_elementinfo_t TYPE /cadaxo/sqlcclguicontainer_t .
+    DATA gcont_grid_results TYPE REF TO cl_gui_container .
+    DATA gcont_grid_result_t TYPE /cadaxo/sqlcclguicontainer_t .
+    DATA gcont_grid_symbol_t TYPE /cadaxo/sqlcclguicontainer_t .
+    DATA gcont_result_bottom TYPE REF TO cl_gui_container .
+    DATA gcont_result_toolbar TYPE REF TO cl_gui_container .
+    DATA gcont_splitter_bottom TYPE REF TO cl_gui_container .
+    DATA gcont_splitter_top TYPE REF TO cl_gui_container .
+    DATA gcont_symbol TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar_btns TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar_img TYPE REF TO cl_gui_container .
+    DATA gcont_toolbar_elementinfo TYPE REF TO cl_gui_container .
+    DATA gc_abap_editor TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit .
+    DATA gc_abap_editor_text TYPE REF TO cl_gui_textedit .
+    DATA gc_abap_error TYPE REF TO cl_gui_alv_grid .
+    DATA gc_alv_queue_3000 TYPE REF TO cl_gui_alv_grid .
+    DATA gc_alv_template_2000 TYPE REF TO cl_gui_alv_grid .
+    DATA gc_clipboard_textedit TYPE REF TO cl_gui_textedit .
+    DATA gc_clipboard_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gc_clipboard_toolbar_img TYPE REF TO cl_gui_picture .
+    DATA gc_elementinfo_alv TYPE REF TO cl_gui_alv_grid .
+    DATA gc_html_viewer TYPE REF TO cl_gui_html_viewer .
+    DATA gc_result_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gc_splitter TYPE REF TO cl_gui_splitter_container .
+    DATA gc_symbol_alv TYPE REF TO cl_gui_alv_grid .
+    DATA gc_symbol_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gc_symbol_toolbar_img TYPE REF TO cl_gui_picture .
+    DATA gs_splitter_bottom TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_clipboard TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_editor TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_lvl0 TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_results TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_results_tab TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_results_tabdat TYPE REF TO cl_gui_splitter_container .
+    DATA gr_results_tab_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gs_splitter_res_button TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_symbol TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_symbol_toolbar TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_toolbar TYPE REF TO cl_gui_splitter_container .
+    DATA gs_splitter_top TYPE REF TO cl_gui_splitter_container .
+    DATA gt_clipboard TYPE /cadaxo/sqlcclipboard_t .
+    DATA gt_queue TYPE /cadaxo/sqlcapi_queue_t .
+    DATA gt_source_runtime_before TYPE /cadaxo/sqlccodeline_t .
+    DATA gt_sql_hist TYPE /cadaxo/sqlchistline_t .
+    DATA:
+      gt_sql_log TYPE TABLE OF /cadaxo/sqlclog .
+    DATA gt_templates TYPE /cadaxo/sqlctemp_alv_t .
+    DATA gt_toolbuttons_top TYPE ttb_button .
+    DATA gt_variant TYPE /cadaxo/sqlcvari_alv_t .
+    DATA gv_export_type TYPE /cadaxo/sqlcapi_position_typ .
+    DATA g_client_category TYPE cccategory .
+    DATA g_client_logsys TYPE logsys .
+    DATA g_cont_pers_preferences TYPE char1 .
+    DATA g_height TYPE i .
+    DATA g_history_toolbar_excluding TYPE ui_functions .
+    DATA g_jobmonitor_toolbar_ex TYPE ui_functions .
+    DATA g_result_layout TYPE lvc_s_layo .
+    DATA g_result_toolbar_excluding TYPE ui_functions .
+    DATA g_show_clipboard TYPE boolean .
+    DATA gs_sel_variant TYPE /cadaxo/sqlc_il_variants .   "Cockpit-321
+    DATA:
+      BEGIN OF ms_additional_functions,                 "COCKPIT-48
         uptomenu TYPE REF TO /cadaxo/cl_sqlc_uptomenu,  "COCKPIT-48
       END OF ms_additional_functions .
-  data GT_SAVED_LIST_FIELDCAT type LVC_T_FCAT .
-  data G_SAVED_LIST_GUI_CONTAINER type ref to CL_GUI_CUSTOM_CONTAINER .
-  data G_ACTIVE_LIST_TAB type I .
+    DATA gt_saved_list_fieldcat TYPE lvc_t_fcat .
+    DATA g_saved_list_gui_container TYPE REF TO cl_gui_custom_container .
+    DATA g_active_list_tab TYPE i .
 
-  methods CHECK_DBTABLE_MODIFICATION
-    returning
-      value(R_ANSWER) type CHAR1 .
-  methods CREATE_SYMBOL_MULTIVAL_TAB_DYN
-    importing
-      !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
-    exporting
-      !E_DATA type DATA
-      !E_DATA_STRUCT type DATA .
-  methods GET_SYMBOL_DATATYPE_DESC
-    importing
-      !I_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
-    returning
-      value(R_DESC) type AS4TEXT .
-  methods GET_SYMBOL_DATATYPE_INFO
-    importing
-      !I_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
-    returning
-      value(R_INFO) type /CADAXO/SQLCSYMBOL_DATAINFO .
-  methods CHECK_SYMBOL_DATATYPE
-    importing
-      !I_VALUE type LVC_VALUE
-    raising
-      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
-  methods SHOW_SYMBOLMULTI_DIALOG
-    importing
-      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
-      !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
-    returning
-      value(R_SYMBOL_VALUE) type RSELOPTION
-    raising
-      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
-  methods ON_SYMBOL_BUTTON_CLICK
-    for event BUTTON_CLICK of CL_GUI_ALV_GRID
-    importing
-      !ES_COL_ID
-      !ES_ROW_NO .
-  methods GET_USER_SYMBOL_COUNT
-    importing
-      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
-    returning
-      value(R_COUNT) type I .
-  methods ERROR_CALC_HEIGHT
-    importing
-      !IV_ERRORS type I
-    returning
-      value(EV_HEIGHT) type I .
-  class-methods BUILD_RESULT_GRID_FOOTER
-    importing
-      !IV_SYST type SYSYSID
-      !IV_MANDANT type /CADAXO/SQLC_MANDT
-      !IV_UNAME type UNAME
-      !IV_CREATE_TIMESTAMP type TIMESTAMPL
-    returning
-      value(R_GRID_FOOTER) type /CADAXO/SQLCRESULT_FOOTER .
-  class-methods BUILD_RESULT_GRID_TITLE
-    importing
-      !I_RUNTIME type I
-      !I_LINES type I
-      !I_MESSAGE type STRING optional
-    returning
-      value(R_GRID_TITLE) type LVC_TITLE .
-  methods INSERT_SAVED_LIST
-    importing
-      !IT_SAVED_LIST type /CADAXO/SQLC_LIST_EXP_SQLX_T
-    returning
-      value(EV_UPDATE_OK) type ABAP_BOOL .
-  methods CALC_RESULT_ROWS_AND_COLS
-    importing
-      !I_LINES type I
-    exporting
-      !E_ROWS type I
-      !E_COLS type I .
-  methods CONFIRM_SYMBOL_OVERWRITE .
-  methods CREATE_CLIPBOARD_UI_CONTROL .
-  methods CREATE_CONTROLS .
-  methods CREATE_DYN_DOCUMENT
-    importing
-      !I_PARENT type ref to CL_GUI_CONTAINER
-      value(I_SQL) type STRING
-      !I_HEADER_TEXT type CHAR255 optional
-    changing
-      !IC_DOCUMENT type ref to CL_DD_DOCUMENT .
-  methods CREATE_EDITOR_UI_CONTROL .
-  methods CREATE_PRIMARY_UI_CONTROLS .
-  methods CREATE_RESULT_UI_CONTROLS .
-  methods CREATE_ELEMENTINFO_UI_CONTROL .
-  methods CREATE_SYMBOL_UI_CONTROL .
-  methods CREATE_VARIANT .
-  methods DELETE_LOG .
-  methods DELETE_SYMBOLS
-    exporting
-      !E_SUCCESS type BOOLEAN .
-  methods EXECUTE_SQL
-    importing
-      !I_PROGRESS_INDICATOR type CHAR1 optional
-    preferred parameter I_PROGRESS_INDICATOR
-    raising
-      /CADAXO/CX_SQLC_TO_MUCH_RESROW
-      /CADAXO/CX_SQLC_INVALID_VALUE
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods EXECUTE_SQL_BACKGROUND_WIZ .
-  methods FOCUS_SYMBOL_ALV_CELL
-    importing
-      !I_ROW_ID type LVC_INDEX
-      !I_FIELD_NAME type LVC_FNAME .
-  methods FREE_RESULT_CONTROLS .
-  methods GET_LINK
-    importing
-      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID
-    exporting
-      !E_URL type C
-    changing
-      !CT_CACHE type GTT_CHAR255 .
-  methods GET_SAVED_RESULTS
-    importing
-      !I_RESS_GUID type /CADAXO/SQLC_RESS_GUID_T optional
-      !I_CLEAR_OLD_ALVS type FLAG optional
-    preferred parameter I_RESS_GUID .
-  methods GET_SYMBOLS_SELECTED
-    exporting
-      value(E_SUCCESS) type BOOLEAN .
-  methods GET_SYMBOLS .
-  methods GET_USER_SYMBOL_FROM_SQL
-    importing
-      !I_VARGUID type /CADAXO/SQLC_VARIANT_GUID optional
-      !I_SQL type /CADAXO/SQLCCODELINE_T
-      !I_TYPE type CHAR1
-    exporting
-      !E_SYMBOLS type /CADAXO/SQLC_SYMBOL_T .
-  methods GET_VARIANT .
-  methods HANDLE_RESULT_COMMAND_EXP_CSV
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_COMMAND_SHOW_FULL_VALUE
-    importing
-      !I_GRID_I type I optional
-      !I_LOG type ABAP_BOOL optional .
-  methods HANDLE_COMMAND_SHOW_HTML_BROW
-    importing
-      !I_GRID_I type I optional
-      !I_LOG type ABAP_BOOL optional .
-  methods HANDLE_COMMAND_SHOW_XML_BROW
-    importing
-      !I_GRID_I type I optional
-      !I_LOG type ABAP_BOOL optional .
-  methods HANDLE_RESULT_COMMAND_CDXEXP
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_CLOSE
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_COMPARE
-    importing
-      !I_SOURCE type I
-      !I_TARGET type I .
-  methods HANDLE_RESULT_COMMAND_HOLD
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_KEYFIX
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_REFRLST
-    importing
-      !I_GRID_I type I .
-  methods HANDLE_RESULT_COMMAND_FULLDISP
-    importing
-      !I_GRID_I type I .
-  methods INSERT_CODEBLOCK_AT_POSITION
-    importing
-      !IV_LINE type I
-      !IV_POS type I
-      !IV_SQLSTRING type /CADAXO/SQLCSTRING
-      !I_SET_FOCUS type ABAP_BOOL default ABAP_FALSE .
-  methods INSERT_TABLE_TO_EDITOR
-    importing
-      !I_STRING type STRING .
-  methods LOAD_HOME_HTML .
-  methods MOVE_BACK_TO_SQL .
-  methods MOVE_FORW_TO_SQL .
-  methods ON_ABAP_ERROR_HOTSPOT_CLICK
-    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW_ID
-      !E_COLUMN_ID
-      !ES_ROW_NO .
-  methods ON_ALV_DRAG
-    for event ONDRAG of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO
-      !E_DRAGDROPOBJ .
-  methods ON_ALV_RESULT_DOUBLE_CLICK
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_ALV_QUEUE_DOUBLE_CLICK_3000
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_ALV_TEMPL_DOUBLE_CLICK_2000
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_CLIPBOARD_DROP
-    for event ON_DROP of CL_GUI_TEXTEDIT
-    importing
-      !INDEX
-      !LINE
-      !DRAGDROP_OBJECT .
-  methods ON_EDITOR_CONTEXT_MENU
-    for event CONTEXT_MENU of CL_GUI_ABAPEDIT
-    importing
-      !MENU
-      !MENU_TYPE .
-  methods ON_EDITOR_CONTEXT_MENU_SEL
-    for event CONTEXT_MENU_SELECTED of CL_GUI_ABAPEDIT
-    importing
-      !FCODE .
-  methods ON_EDITOR_DBLCLICK
-    for event DBLCLICK of CL_GUI_ABAPEDIT .
-  methods ON_EDITOR_DROP
-    for event ON_DROP of CL_GUI_ABAPEDIT
-    importing
-      !INDEX
-      !LINE
-      !POS
-      !DRAGDROP_OBJECT .
-  methods ON_EDITOR_TEXT_DROP
-    for event ON_DROP of CL_GUI_TEXTEDIT
-    importing
-      !INDEX
-      !LINE
-      !POS
-      !DRAGDROP_OBJECT .
-  methods ON_HANDLE_JOB_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_HANDLE_JOB_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_LOG_ALV_CONTEXT_MENU
-    for event CONTEXT_MENU_REQUEST of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT .
-  methods ON_HANDLE_RESULT_CONTEXT_MENU
-    for event CONTEXT_MENU_REQUEST of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT .
-  methods ON_HANDLE_RESULT_END_OF_PAGE
-    for event PRINT_END_OF_PAGE of CL_GUI_ALV_GRID .
-  methods ON_HANDLE_RESULT_MENU_BUTTON
-    for event MENU_BUTTON of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_UCOMM .
-  methods ON_HANDLE_RESULT_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_HANDLE_RESULT_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_HANDLE_SAVEDLISTS_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_HANDLE_SAVEDLISTS_USRCOMMND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_HANDLE_VARSYM_CLICK
-    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW_ID
-      !E_COLUMN_ID
-      !ES_ROW_NO .
-  methods ON_HOME_SAPEVENT
-    for event SAPEVENT of CL_GUI_HTML_VIEWER
-    importing
-      !ACTION
-      !FRAME
-      !GETDATA
-      !POSTDATA
-      !QUERY_TABLE .
-  methods ON_JOB_ALV_CLICK
-    for event BUTTON_CLICK of CL_GUI_ALV_GRID
-    importing
-      !ES_COL_ID
-      !ES_ROW_NO .
-  methods ON_JOB_ALV_HOTSPOT_CLICK
-    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW_ID
-      !E_COLUMN_ID
-      !ES_ROW_NO .
-  methods ON_LOG_ALV_DOUBLE_CLICK
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_LOG_ALV_DRAG
-    for event ONDRAG of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO
-      !E_DRAGDROPOBJ .
-  methods ON_LOG_ALV_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_LOG_ALV_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_RESULT_TOOLBAR_DROPDOWN
-    for event DROPDOWN_CLICKED of CL_GUI_TOOLBAR
-    importing
-      !FCODE
-      !POSX
-      !POSY .
-  methods ON_RESULT_TOOLBAR_FUNCSEL
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE .
-  methods ON_TABBAR_TOOLBAR_FUNCSEL
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE .
-  methods ON_SAVED_LIST_SELECT_LINE
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_SYMBOL_ALV_DATA_CHANGE
-    for event DATA_CHANGED of CL_GUI_ALV_GRID
-    importing
-      !ER_DATA_CHANGED
-      !E_ONF4
-      !E_ONF4_BEFORE
-      !E_ONF4_AFTER
-      !E_UCOMM .
-  methods ON_SYMBOL_ALV_DATA_CHANGED_FIN
-    for event DATA_CHANGED_FINISHED of CL_GUI_ALV_GRID
-    importing
-      !E_MODIFIED
-      !ET_GOOD_CELLS .
-  methods ON_SYMBOL_ALV_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
-  methods ON_SYMBOL_ALV_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods ON_ELEMENTINFO_DOUBLE_CLICK
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_SYMBOL_DOUBLE_CLICK
-    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO .
-  methods ON_ELEMENTINFO_HOTSPOT_DE
-    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
-    importing
-      !E_ROW_ID
-      !E_COLUMN_ID
-      !ES_ROW_NO .
-  methods ON_ELEMENTINFO_DRAG
-    for event ONDRAG of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO
-      !E_DRAGDROPOBJ .
-  methods ON_SYMBOL_DRAG
-    for event ONDRAG of CL_GUI_ALV_GRID
-    importing
-      !E_ROW
-      !E_COLUMN
-      !ES_ROW_NO
-      !E_DRAGDROPOBJ .
-  methods ON_TOOLBAR_FUNCTION_SELECTED
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE .
-  methods ON_TOP_TOOLBAR_DROPDOWN
-    for event DROPDOWN_CLICKED of CL_GUI_TOOLBAR
-    importing
-      !FCODE
-      !POSX
-      !POSY .
-  methods ON_TOP_TOOLBAR_FUNCSEL
-    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
-    importing
-      !FCODE
-      !SENDER .
-  methods SAVE_SYMBOLS
-    exporting
-      !E_SUCCESS type BOOLEAN .
-  methods SELECT_JOBDATA .
-  methods SEND_SQL_VIA_MAIL .
-  methods SET_INITIAL_DATE_HISTORY .
-  methods SET_INITIAL_DATE_JOBMONITOR .
-  methods SET_RESULT_TOOLBAR_ACTIVE
-    importing
-      !I_FCODE type UI_FUNC .
-  methods SET_SQL_AREA
-    importing
-      !I_CODELINES_T type /CADAXO/SQLCCODELINE_T .
-  methods SHOW_ADMHELP .
-  methods SHOW_HTML
-    importing
-      !I_HTML_ID type /CADAXO/SQLCPARAMETER_ID default 'HTML_STARTUP' .
-  methods SHOW_JOBMONITOR .
-  methods SHOW_LOG .
-  methods SHOW_RESULT .
-  methods SHOW_SAVED_LISTS .
-  methods STORE_SQL_TO_HIST
-    importing
-      !I_CODELINES_T type /CADAXO/SQLCCODELINE_T optional .
-  methods UPDATE_FIELD_CATALOG_ALV .
-  methods USR_ACTION_CLEAR_SQL_AREA .
-  methods USR_ACTION_LEAVE_SQL_COCKPIT .
-  methods USR_ACTION_PRETTY_PRINTER .
-  methods USR_ACTION_SHOW_ABAP_DOCU .
-  methods USR_ACTION_SQL_TRACE_ONOFF .
-  methods ON_EDITOR_QUICK_INFO
-    for event QUICK_INFO of CL_GUI_ABAPEDIT
-    importing
-      !CONTEXTSTRING
-      !DATATYPE
-      !XPOS
-      !YPOS .
-  methods ON_EDITOR_INSERT_PATTERN
-    for event INSERT_PATTERN of CL_GUI_ABAPEDIT
-    importing
-      !DATATYPE
-      !FLAGS
-      !PATTERNKEY
-      !XPOS
-      !YPOS
-      !SENDER .
-  methods GET_CURRENT_GRID_NUMBER
-    returning
-      value(R_GRID_NUMBER) type I .
-  methods SAVE_HOLD_LISTS .
-  methods ADD_HOLD_LISTS .
-  methods DELETE_SYMBOL_DB
-    returning
-      value(RV_SUCCESS) type BOOLEAN .
-  methods UPDATE_SYMBOL_DB
-    importing
-      value(IT_SYMBOL_UPDATE) type T_SYMBOL_DB
-    returning
-      value(RV_SUCCESS) type BOOLEAN .
-  methods CHECK_SYMBOL_VALUE_VALID
-    importing
-      !IS_SYMBOL_LINE type /CADAXO/SQLC_SYMBOL
-    raising
-      /CADAXO/CX_SQLC_INVALID_VALUE .
-  methods ON_SYMBOL_BUTTON_VARIANT
-    for event BUTTON_CLICK of CL_GUI_ALV_GRID
-    importing
-      !ES_COL_ID
-      !ES_ROW_NO .
-  methods SQL_SEARCH .
-  methods SQL_SEARCH_NEXT .
-  methods LOG_ALV_LINE_SELECTION .
-  methods HANDLE_COMMAND_CREATE_SYMBOL
-    importing
-      !I_GRID_I type I optional .
-  methods API_SAVED_LIST_IMPORT
-    importing
-      !IR_API type ref to /CADAXO/CL_SQLC_COCKPIT_API
-      !IS_ITEMS type /CADAXO/SQLCAPIP .
-  methods SHARE_SAVED_LIST
-    importing
-      !IV_RECEIVER type /CADAXO/SQLCAPI_RECEIVER optional     "+cockpit-420
-      !IV_TEXT type /CADAXO/SQLC_CHAR_1024 optional .             "+cockpit-420
-  methods POPULATE_SAVED_LIST
-    importing
-      !IV_LIST_GUID type /CADAXO/SQLC_LIST_EXP_SQLX-LIST_GUID
-      !IV_SAVED_LIST_SHARED type /CADAXO/SQLC_LIST_EXP_SQLX-TYPE
-    returning
-      value(RS_SAVED_LIST) type /CADAXO/SQLC_LIST_EXP_SQLX .
-  methods GET_SELECTED_ELEM_INF_FLDS
-    importing
-      !I_INDEX type LVC_INDEX
-    returning
-      value(R_FIELDS) type STRING .
-  methods GET_SAVED_LIST_FIELDCAT
-    returning
-      value(R_SAVED_LIST_FIELDCAT) type LVC_T_FCAT .
-  methods HANDLE_DELETE_SAVED_LISTS .
-  methods HANDLE_EXPORT_SAVED_LIST .
-  methods ON_SYMBOL_MENU_BUTTON
-    for event MENU_BUTTON of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_UCOMM .
-  methods ON_SAVED_LIST_MENU_CLICK
-    for event MENU_BUTTON of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_UCOMM .
-  methods UPDATE_VARIANT .
-  methods FILL_USED_SYMBOLS
-    returning
-      value(RT_SYMBOLS) type /CADAXO/SQLCUSEDSYMBOLS_T .
-  methods SHOW_RESULT_TAB .
-  methods SHOW_RESULT_TABLE
-    importing
-      !I_RESULT_DREF type ref to DATA
-      !I_TABIX type SY-TABIX .
-  methods TIPPSANDTRICKS .
+    METHODS check_dbtable_modification
+      RETURNING
+        VALUE(r_answer) TYPE char1 .
+    METHODS create_symbol_multival_tab_dyn
+      IMPORTING
+        !i_symbol_datatype TYPE /cadaxo/sqlcsymbol_datatype
+      EXPORTING
+        !e_data            TYPE data
+        !e_data_struct     TYPE data .
+    METHODS get_symbol_datatype_desc
+      IMPORTING
+        !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
+      RETURNING
+        VALUE(r_desc) TYPE as4text .
+    METHODS get_symbol_datatype_info
+      IMPORTING
+        !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
+      RETURNING
+        VALUE(r_info) TYPE /cadaxo/sqlcsymbol_datainfo .
+    METHODS check_symbol_datatype
+      IMPORTING
+        !i_value TYPE lvc_value
+      RAISING
+        /cadaxo/cx_sqlc_symb_not_found .
+    METHODS show_symbolmulti_dialog
+      IMPORTING
+        !i_symbol_multivalue  TYPE /cadaxo/sqlcsymbol_multivalue
+        !i_symbol_datatype    TYPE /cadaxo/sqlcsymbol_datatype
+      RETURNING
+        VALUE(r_symbol_value) TYPE rseloption
+      RAISING
+        /cadaxo/cx_sqlc_symb_not_found .
+    METHODS on_symbol_button_click
+      FOR EVENT button_click OF cl_gui_alv_grid
+      IMPORTING
+        !es_col_id
+        !es_row_no .
+    METHODS get_user_symbol_count
+      IMPORTING
+        !i_symbol_multivalue TYPE /cadaxo/sqlcsymbol_multivalue
+      RETURNING
+        VALUE(r_count)       TYPE i .
+    METHODS error_calc_height
+      IMPORTING
+        !iv_errors       TYPE i
+      RETURNING
+        VALUE(ev_height) TYPE i .
+    CLASS-METHODS build_result_grid_footer
+      IMPORTING
+        !iv_syst             TYPE sysysid
+        !iv_mandant          TYPE /cadaxo/sqlc_mandt
+        !iv_uname            TYPE uname
+        !iv_create_timestamp TYPE timestampl
+      RETURNING
+        VALUE(r_grid_footer) TYPE /cadaxo/sqlcresult_footer .
+    CLASS-METHODS build_result_grid_title
+      IMPORTING
+        !i_runtime          TYPE /cadaxo/sqlcruntime
+        !i_lines            TYPE i
+        !i_message          TYPE string OPTIONAL
+      RETURNING
+        VALUE(r_grid_title) TYPE lvc_title .
+    METHODS insert_saved_list
+      IMPORTING
+        !it_saved_list      TYPE /cadaxo/sqlc_list_exp_sqlx_t
+      RETURNING
+        VALUE(ev_update_ok) TYPE abap_bool .
+    METHODS calc_result_rows_and_cols
+      IMPORTING
+        !i_lines TYPE i
+      EXPORTING
+        !e_rows  TYPE i
+        !e_cols  TYPE i .
+    METHODS confirm_symbol_overwrite .
+    METHODS create_clipboard_ui_control .
+    METHODS create_controls .
+    METHODS create_dyn_document
+      IMPORTING
+        !i_parent      TYPE REF TO cl_gui_container
+        VALUE(i_sql)   TYPE string
+        !i_header_text TYPE char255 OPTIONAL
+      CHANGING
+        !ic_document   TYPE REF TO cl_dd_document .
+    METHODS create_editor_ui_control .
+    METHODS create_primary_ui_controls .
+    METHODS create_result_ui_controls .
+    METHODS create_elementinfo_ui_control .
+    METHODS create_symbol_ui_control .
+    METHODS create_variant .
+    METHODS delete_symbols
+      EXPORTING
+        !e_success TYPE boolean .
+    METHODS execute_sql
+      IMPORTING
+        !i_progress_indicator TYPE char1 OPTIONAL
+          PREFERRED PARAMETER i_progress_indicator
+      RAISING
+        /cadaxo/cx_sqlc_to_much_resrow
+        /cadaxo/cx_sqlc_invalid_value
+        /cadaxo/cx_sqlc_syntax_error .
+    METHODS execute_sql_background_wiz .
+    METHODS focus_symbol_alv_cell
+      IMPORTING
+        !i_row_id     TYPE lvc_index
+        !i_field_name TYPE lvc_fname .
+    METHODS free_result_controls .
+    METHODS get_link
+      IMPORTING
+        !i_html_id TYPE /cadaxo/sqlcparameter_id
+      EXPORTING
+        !e_url     TYPE c
+      CHANGING
+        !ct_cache  TYPE gtt_char255 .
+    METHODS get_saved_results
+      IMPORTING
+        !i_ress_guid      TYPE /cadaxo/sqlc_ress_guid_t OPTIONAL
+        !i_clear_old_alvs TYPE flag OPTIONAL
+          PREFERRED PARAMETER i_ress_guid .
+    METHODS get_symbols_selected
+      EXPORTING
+        VALUE(e_success) TYPE boolean .
+    METHODS get_symbols .
+    METHODS get_user_symbol_from_sql
+      IMPORTING
+        !i_varguid TYPE /cadaxo/sqlc_variant_guid OPTIONAL
+        !i_sql     TYPE /cadaxo/sqlccodeline_t
+        !i_type    TYPE char1
+      EXPORTING
+        !e_symbols TYPE /cadaxo/sqlc_symbol_t .
+    METHODS get_variant .
+    METHODS handle_result_command_exp_csv
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_command_show_full_value
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL
+        !i_log    TYPE abap_bool OPTIONAL .
+    METHODS handle_command_show_html_brow
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL
+        !i_log    TYPE abap_bool OPTIONAL .
+    METHODS handle_command_show_xml_brow
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL
+        !i_log    TYPE abap_bool OPTIONAL .
+    METHODS handle_result_command_cdxexp
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_close
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_compare
+      IMPORTING
+        !i_source TYPE i
+        !i_target TYPE i .
+    METHODS handle_result_command_hold
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_keyfix
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_refrlst
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS handle_result_command_fulldisp
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS insert_codeblock_at_position
+      IMPORTING
+        !iv_line      TYPE i
+        !iv_pos       TYPE i
+        !iv_sqlstring TYPE /cadaxo/sqlcstring
+        !i_set_focus  TYPE abap_bool DEFAULT abap_false .
+    METHODS insert_table_to_editor
+      IMPORTING
+        !i_string TYPE string .
+    METHODS load_home_html .
+    METHODS move_back_to_sql .
+    METHODS move_forw_to_sql .
+    METHODS on_abap_error_hotspot_click
+      FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row_id
+        !e_column_id
+        !es_row_no .
+    METHODS on_alv_drag
+      FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no
+        !e_dragdropobj .
+    METHODS on_alv_result_double_click
+      FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no .
+    METHODS on_alv_queue_double_click_3000
+      FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no .
+    METHODS on_alv_templ_double_click_2000
+      FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no .
+    METHODS on_clipboard_drop
+      FOR EVENT on_drop OF cl_gui_textedit
+      IMPORTING
+        !index
+        !line
+        !dragdrop_object .
+    METHODS on_editor_context_menu
+      FOR EVENT context_menu OF cl_gui_abapedit
+      IMPORTING
+        !menu
+        !menu_type .
+    METHODS on_editor_context_menu_sel
+      FOR EVENT context_menu_selected OF cl_gui_abapedit
+      IMPORTING
+        !fcode .
+    METHODS on_editor_dblclick
+        FOR EVENT dblclick OF cl_gui_abapedit .
+    METHODS on_editor_drop
+      FOR EVENT on_drop OF cl_gui_abapedit
+      IMPORTING
+        !index
+        !line
+        !pos
+        !dragdrop_object .
+    METHODS on_editor_text_drop
+      FOR EVENT on_drop OF cl_gui_textedit
+      IMPORTING
+        !index
+        !line
+        !pos
+        !dragdrop_object .
+    METHODS on_handle_job_toolbar
+      FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_interactive .
+    METHODS on_handle_job_user_command
+      FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+        !e_ucomm .
+    METHODS on_log_alv_context_menu
+      FOR EVENT context_menu_request OF cl_gui_alv_grid
+      IMPORTING
+        !e_object .
+    METHODS on_handle_result_context_menu
+      FOR EVENT context_menu_request OF cl_gui_alv_grid
+      IMPORTING
+        !e_object .
+    METHODS on_handle_result_end_of_page
+        FOR EVENT print_end_of_page OF cl_gui_alv_grid .
+    METHODS on_handle_result_menu_button
+      FOR EVENT menu_button OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_ucomm .
+    METHODS on_handle_result_toolbar
+      FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_interactive .
+    METHODS on_handle_result_user_command
+      FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+        !e_ucomm .
+    METHODS on_handle_savedlists_toolbar
+      FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_interactive .
+    METHODS on_handle_savedlists_usrcommnd
+      FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+        !e_ucomm .
+    METHODS on_handle_varsym_click
+      FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row_id
+        !e_column_id
+        !es_row_no .
+    METHODS on_home_sapevent
+      FOR EVENT sapevent OF cl_gui_html_viewer
+      IMPORTING
+        !action
+        !frame
+        !getdata
+        !postdata
+        !query_table .
+    METHODS on_job_alv_click
+      FOR EVENT button_click OF cl_gui_alv_grid
+      IMPORTING
+        !es_col_id
+        !es_row_no .
+    METHODS on_job_alv_hotspot_click
+      FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row_id
+        !e_column_id
+        !es_row_no .
+    METHODS on_log_alv_double_click
+      FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no .
+    METHODS on_log_alv_drag
+      FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no
+        !e_dragdropobj .
+    METHODS on_log_alv_toolbar
+      FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_interactive .
+    METHODS on_log_alv_user_command
+      FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+        !e_ucomm .
+    METHODS on_result_toolbar_dropdown
+      FOR EVENT dropdown_clicked OF cl_gui_toolbar
+      IMPORTING
+        !fcode
+        !posx
+        !posy .
+    METHODS on_result_toolbar_funcsel
+      FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+        !fcode .
+    METHODS on_tabbar_toolbar_funcsel
+      FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+        !fcode .
+    METHODS on_saved_list_select_line
+      FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no .
+    METHODS on_symbol_alv_data_change
+      FOR EVENT data_changed OF cl_gui_alv_grid
+      IMPORTING
+        !er_data_changed
+        !e_onf4
+        !e_onf4_before
+        !e_onf4_after
+        !e_ucomm .
+    METHODS on_symbol_alv_data_changed_fin
+      FOR EVENT data_changed_finished OF cl_gui_alv_grid
+      IMPORTING
+        !e_modified
+        !et_good_cells .
+    METHODS on_symbol_alv_toolbar
+      FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_interactive .
+    METHODS on_symbol_alv_user_command
+      FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+        !e_ucomm .
+    METHODS on_elementinfo_double_click
+      FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no .
+    METHODS on_symbol_double_click
+      FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no .
+    METHODS on_elementinfo_hotspot_de
+      FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row_id
+        !e_column_id
+        !es_row_no .
+    METHODS on_elementinfo_drag
+      FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no
+        !e_dragdropobj .
+    METHODS on_symbol_drag
+      FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no
+        !e_dragdropobj .
+    METHODS on_toolbar_function_selected
+      FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+        !fcode .
+    METHODS on_top_toolbar_dropdown
+      FOR EVENT dropdown_clicked OF cl_gui_toolbar
+      IMPORTING
+        !fcode
+        !posx
+        !posy .
+    METHODS on_top_toolbar_funcsel
+      FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING
+        !fcode
+        !sender .
+    METHODS save_symbols
+      EXPORTING
+        !e_success TYPE boolean .
+    METHODS select_jobdata .
+    METHODS send_sql_via_mail .
+    METHODS set_initial_date_jobmonitor .
+    METHODS set_result_toolbar_active
+      IMPORTING
+        !i_fcode TYPE ui_func .
+    METHODS set_sql_area
+      IMPORTING
+        !i_codelines_t TYPE /cadaxo/sqlccodeline_t .
+    METHODS show_admhelp .
+    METHODS show_html
+      IMPORTING
+        !i_html_id TYPE /cadaxo/sqlcparameter_id DEFAULT 'HTML_STARTUP' .
+    METHODS show_jobmonitor .
+    METHODS show_log .
+    METHODS show_result .
+    METHODS show_saved_lists .
+    METHODS store_sql_to_hist
+      IMPORTING
+        !i_codelines_t TYPE /cadaxo/sqlccodeline_t OPTIONAL .
+    METHODS update_field_catalog_alv .
+    METHODS usr_action_clear_sql_area .
+    METHODS usr_action_leave_sql_cockpit .
+    METHODS usr_action_pretty_printer .
+    METHODS usr_action_show_abap_docu .
+    METHODS usr_action_sql_trace_onoff .
+    METHODS on_editor_quick_info
+      FOR EVENT quick_info OF cl_gui_abapedit
+      IMPORTING
+        !contextstring
+        !datatype
+        !xpos
+        !ypos .
+    METHODS on_editor_insert_pattern
+      FOR EVENT insert_pattern OF cl_gui_abapedit
+      IMPORTING
+        !datatype
+        !flags
+        !patternkey
+        !xpos
+        !ypos
+        !sender .
+    METHODS get_current_grid_number
+      RETURNING
+        VALUE(r_grid_number) TYPE i .
+    METHODS save_hold_lists .
+    METHODS add_hold_lists .
+    METHODS delete_symbol_db
+      RETURNING
+        VALUE(rv_success) TYPE boolean .
+    METHODS update_symbol_db
+      IMPORTING
+        VALUE(it_symbol_update) TYPE t_symbol_db
+      RETURNING
+        VALUE(rv_success)       TYPE boolean .
+    METHODS check_symbol_value_valid
+      IMPORTING
+        !is_symbol_line TYPE /cadaxo/sqlc_symbol
+      RAISING
+        /cadaxo/cx_sqlc_invalid_value .
+    METHODS on_symbol_button_variant
+      FOR EVENT button_click OF cl_gui_alv_grid
+      IMPORTING
+        !es_col_id
+        !es_row_no .
+    METHODS sql_search .
+    METHODS sql_search_next .
+    METHODS log_alv_line_selection .
+    METHODS handle_command_create_symbol
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL .
+    METHODS api_saved_list_import
+      IMPORTING
+        !ir_api   TYPE REF TO /cadaxo/cl_sqlc_cockpit_api
+        !is_items TYPE /cadaxo/sqlcapip .
+    METHODS share_saved_list
+      IMPORTING
+        !iv_receiver TYPE /cadaxo/sqlcapi_receiver OPTIONAL     "+cockpit-420
+        !iv_text     TYPE /cadaxo/sqlc_char_1024 OPTIONAL .             "+cockpit-420
+    METHODS populate_saved_list
+      IMPORTING
+        !iv_list_guid         TYPE /cadaxo/sqlc_list_exp_sqlx-list_guid
+        !iv_saved_list_shared TYPE /cadaxo/sqlc_list_exp_sqlx-type
+      RETURNING
+        VALUE(rs_saved_list)  TYPE /cadaxo/sqlc_list_exp_sqlx .
+    METHODS get_selected_elem_inf_flds
+      IMPORTING
+        !i_index        TYPE lvc_index
+      RETURNING
+        VALUE(r_fields) TYPE string .
+    METHODS get_saved_list_fieldcat
+      RETURNING
+        VALUE(r_saved_list_fieldcat) TYPE lvc_t_fcat .
+    METHODS handle_delete_saved_lists .
+    METHODS handle_export_saved_list .
+    METHODS on_symbol_menu_button
+      FOR EVENT menu_button OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_ucomm .
+    METHODS on_saved_list_menu_click
+      FOR EVENT menu_button OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_ucomm .
+    METHODS update_variant .
+    METHODS fill_used_symbols
+      RETURNING
+        VALUE(rt_symbols) TYPE /cadaxo/sqlcusedsymbols_t .
+    METHODS show_result_tab .
+    METHODS show_result_table
+      IMPORTING
+        !i_result_dref TYPE REF TO data
+        !i_tabix       TYPE sy-tabix .
+    METHODS tippsandtricks .
   PRIVATE SECTION.
     CONSTANTS: BEGIN OF editor_type,
                  new TYPE char1 VALUE 'A' ##NO_TEXT,
@@ -919,7 +917,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -1180,23 +1178,22 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-* some data definitions
-    DATA: l_runtime_str(20).
-
 * build the header: x records ( y microseconds )
-    IF i_lines GT 0.
-      WRITE i_lines TO r_grid_title.
-      SHIFT r_grid_title LEFT DELETING LEADING space.
-      CONCATENATE r_grid_title text-i01  INTO r_grid_title SEPARATED BY space.
+    IF i_lines = 1.
+      r_grid_title = |{ i_lines NUMBER = USER } { TEXT-i03 }|.
+    ELSEIF i_lines > 1.
+      r_grid_title = |{ i_lines NUMBER = USER } { TEXT-i01 }|.
     ELSE.
-      MOVE text-i02 TO r_grid_title. "No records found
+      r_grid_title = TEXT-i02.
     ENDIF.
 
-    WRITE i_runtime TO l_runtime_str.
-    CONCATENATE r_grid_title '(' l_runtime_str text-001 ')' INTO r_grid_title SEPARATED BY space.
+    IF i_runtime-unit = /cadaxo/cl_sqlc_rt_measurement=>c_unit-second.
+      r_grid_title = |{ r_grid_title } ( { i_runtime-runtime NUMBER = USER } { TEXT-008 } )|.
+    ELSE.
+      r_grid_title = |{ r_grid_title } ( { i_runtime-runtime NUMBER = USER } { TEXT-001 } )|.
+    ENDIF.
 
-* add a message to the header
-    IF i_message IS SUPPLIED AND NOT i_message IS INITIAL.
+    IF i_message IS NOT INITIAL.
       CONCATENATE r_grid_title '-' i_message INTO r_grid_title RESPECTING BLANKS.
     ENDIF.
 
@@ -1486,7 +1483,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         l_message_long = lr_exception_t100->get_longtext( ). "CDX
         l_scx_t100key = lr_exception_t100->if_t100_message~t100key.
         IF l_message IS INITIAL.
-          l_message = text-e01.
+          l_message = TEXT-e01.
         ENDIF.
       CATCH /cadaxo/cx_sqlc_syntax_error INTO lr_exception_syntax_error.
         l_message = lr_exception_syntax_error->get_text( ).
@@ -1494,7 +1491,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         l_scx_t100key-msgno = lr_exception_syntax_error->/cadaxo/msgnr.
         l_scx_t100key-msgid = lr_exception_syntax_error->/cadaxo/msgid.
         IF l_message IS INITIAL.
-          l_message = text-e01.
+          l_message = TEXT-e01.
         ENDIF.
       CATCH cx_root INTO lr_exception.
         IF lr_exception->previous IS BOUND.                   "RT229
@@ -1505,7 +1502,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           l_message = lr_exception->get_text( ).
           l_message_long = lr_exception->get_longtext( ). "CDX
           IF l_message IS INITIAL.
-            l_message = text-e01.
+            l_message = TEXT-e01.
           ENDIF.
         ENDIF.
     ENDTRY.
@@ -2034,7 +2031,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     APPEND lwa_main TO gt_main_classes.
 
 * set initial dates
-    me->set_initial_date_history( ).
+    me->g_sel_hist_timestamp_from = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_from( me->g_user_settings-history_last_x_days ).
+    me->g_sel_hist_timestamp_to   = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_to( ).
     me->set_initial_date_jobmonitor( ).
 
     gr_user_log = NEW #( ).
@@ -2216,7 +2214,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * add button clipboard show/hide
     l_button_data-function  = c_okcode_clipboard.
     l_button_data-icon      = '@K1@'.
-    l_button_data-quickinfo = text-q03.
+    l_button_data-quickinfo = TEXT-q03.
     l_button_data-butn_type = cntb_btype_button.
     APPEND l_button_data TO gt_toolbuttons_clipboard.
 
@@ -2228,7 +2226,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * add button clipboard clear
     l_button_data-function  = 'CLEAR_CLIPBOARD'.
     l_button_data-icon      = icon_delete.
-    l_button_data-quickinfo = text-q04.
+    l_button_data-quickinfo = TEXT-q04.
     l_button_data-butn_type = cntb_btype_button.
     APPEND l_button_data TO gt_toolbuttons_clipboard.
 
@@ -2829,8 +2827,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     TRY.
         gc_abap_editor->register_event_quick_info( EXPORTING appl_event = space
                                                    EXCEPTIONS OTHERS = 1 ).
-      "  gc_abap_editor->register_event_f4( EXPORTING appl_event = space
-      "                                             EXCEPTIONS OTHERS = 1 ).
+        "  gc_abap_editor->register_event_f4( EXPORTING appl_event = space
+        "                                             EXCEPTIONS OTHERS = 1 ).
         IF sy-subrc = 0.
           SET HANDLER me->on_editor_quick_info FOR gc_abap_editor.
           gc_abap_editor->create_document( EXPORTING name     = 'CADAXO_SQL_EDITOR'
@@ -2900,13 +2898,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'SQL_BACK'.
     ls_stb_button-icon      = icon_arrow_left.
-    ls_stb_button-quickinfo = text-q35.
+    ls_stb_button-quickinfo = TEXT-q35.
     ls_stb_button-butn_type = cntb_btype_button.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'SQL_FORW'.
     ls_stb_button-icon      = icon_arrow_right.
-    ls_stb_button-quickinfo = text-q36.
+    ls_stb_button-quickinfo = TEXT-q36.
     ls_stb_button-butn_type = cntb_btype_button.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
@@ -2915,7 +2913,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'SYNTCHECK'.
     ls_stb_button-icon      = icon_check.
-    ls_stb_button-quickinfo = text-q37.
+    ls_stb_button-quickinfo = TEXT-q37.
     ls_stb_button-butn_type = cntb_btype_button.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
@@ -2924,7 +2922,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'EXECUTE'.
     ls_stb_button-icon      = icon_execute_object.
-    ls_stb_button-quickinfo = text-q38.
+    ls_stb_button-quickinfo = TEXT-q38.
     ls_stb_button-butn_type = cntb_btype_dropdown.
     APPEND ls_stb_button TO gt_toolbuttons_top.
 
@@ -2937,13 +2935,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'SAVE_LISTS'.
     ls_stb_button-icon      = icon_system_save.
-    ls_stb_button-quickinfo = text-q39.
-    ls_stb_button-text      = text-b32.
+    ls_stb_button-quickinfo = TEXT-q39.
+    ls_stb_button-text      = TEXT-b32.
     ls_stb_button-butn_type = cntb_btype_button.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'TRACETOGGL'.
-    ls_stb_button-text      = text-b33.
+    ls_stb_button-text      = TEXT-b33.
     ls_stb_button-butn_type = cntb_btype_check.
     ls_stb_button-icon      = icon_dummy.
     APPEND ls_stb_button TO gt_toolbuttons_top.
@@ -2953,13 +2951,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'SQLVARGET'.
     ls_stb_button-icon      = icon_alv_variant_choose.
-    ls_stb_button-quickinfo = text-q41.
+    ls_stb_button-quickinfo = TEXT-q41.
     ls_stb_button-butn_type = cntb_btype_button.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'SQLVARSET'.
     ls_stb_button-icon      = icon_alv_variant_save.
-    ls_stb_button-quickinfo = text-q40.
+    ls_stb_button-quickinfo = TEXT-q40.
 *    ls_stb_button-butn_type = cntb_btype_button.   "-Cockpit-321
     ls_stb_button-butn_type = cntb_btype_dropdown.  "+Cockpit-321
     APPEND ls_stb_button TO gt_toolbuttons_top.
@@ -2969,7 +2967,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.                                            "COCKPIT-233
     ls_stb_button-function  = 'SQL_SHARE'.                          "COCKPIT-233
     ls_stb_button-icon      = icon_workflow_external_event.         "COCKPIT-233
-    ls_stb_button-quickinfo = text-b41.                             "COCKPIT-233
+    ls_stb_button-quickinfo = TEXT-b41.                             "COCKPIT-233
 *    ls_stb_button-butn_type = cntb_btype_button.                    "COCKPIT-233 +Cockpit420
     ls_stb_button-butn_type = cntb_btype_dropdown.                    "+Cockpit420
     APPEND ls_stb_button TO gt_toolbuttons_top.                     "COCKPIT-233
@@ -2985,7 +2983,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ELSE.                                                           "COCKPIT-233
       ls_stb_button-icon      = icon_eml.                           "COCKPIT-233
     ENDIF.                                                          "COCKPIT-233
-    ls_stb_button-quickinfo = text-b40.                             "COCKPIT-233
+    ls_stb_button-quickinfo = TEXT-b40.                             "COCKPIT-233
     ls_stb_button-butn_type = cntb_btype_button.                    "COCKPIT-233
     APPEND ls_stb_button TO gt_toolbuttons_top.                     "COCKPIT-233
     CLEAR ls_stb_button.                                            "COCKPIT-233
@@ -2994,7 +2992,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'GENERATE'.
     ls_stb_button-icon      = icon_wizard.
-    ls_stb_button-quickinfo = text-q42.
+    ls_stb_button-quickinfo = TEXT-q42.
     ls_stb_button-butn_type = cntb_btype_button.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
@@ -3003,13 +3001,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'PERSPREF'.
     ls_stb_button-icon      = icon_personal_settings.
-    ls_stb_button-quickinfo = text-q43.
+    ls_stb_button-quickinfo = TEXT-q43.
     ls_stb_button-butn_type = cntb_btype_button.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'ADMIN'.
     ls_stb_button-icon      = icon_system_administrator.
-    ls_stb_button-quickinfo = text-q44.
+    ls_stb_button-quickinfo = TEXT-q44.
     ls_stb_button-butn_type = cntb_btype_button.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
@@ -3018,13 +3016,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'MAIL'.
     ls_stb_button-icon      = icon_mail.
-    ls_stb_button-quickinfo = text-q45.
+    ls_stb_button-quickinfo = TEXT-q45.
     ls_stb_button-butn_type = cntb_btype_outlookbutton.
     APPEND ls_stb_button TO gt_toolbuttons_top.
     CLEAR ls_stb_button.
     ls_stb_button-function  = 'HELP'.
     ls_stb_button-icon      = icon_system_help.
-    ls_stb_button-quickinfo = text-q46.
+    ls_stb_button-quickinfo = TEXT-q46.
     ls_stb_button-butn_type = cntb_btype_outlookbutton.
     APPEND ls_stb_button TO gt_toolbuttons_top.
 *  CLEAR ls_stb_button.                                                  "COCKPIT-233
@@ -3037,21 +3035,21 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     DATA(l_ctmenu) = NEW cl_ctmenu( ).
 
 * add submenues
-    l_ctmenu->add_function( EXPORTING fcode = 'EXECUTE'     text = text-b35 checked = abap_true icon = icon_execute_object ).
-    l_ctmenu->add_function( EXPORTING fcode = 'EXECUTEJOB'  text = text-b37 ).
+    l_ctmenu->add_function( EXPORTING fcode = 'EXECUTE'     text = TEXT-b35 checked = abap_true icon = icon_execute_object ).
+    l_ctmenu->add_function( EXPORTING fcode = 'EXECUTEJOB'  text = TEXT-b37 ).
     gc_splitter_top_toolbar->set_static_ctxmenu( EXPORTING fcode = 'EXECUTE' ctxmenu = l_ctmenu ).
 
 * begin of change 420
     DATA(l_ctmenu2) = NEW cl_ctmenu( ).
-    l_ctmenu2->add_function( EXPORTING fcode = 'SQL_SHARE'   text = text-b41 checked = abap_true icon = icon_workflow_external_event ).
-    l_ctmenu2->add_function( EXPORTING fcode = 'SQL_SHR_ME'  text = text-b44 ).
+    l_ctmenu2->add_function( EXPORTING fcode = 'SQL_SHARE'   text = TEXT-b41 checked = abap_true icon = icon_workflow_external_event ).
+    l_ctmenu2->add_function( EXPORTING fcode = 'SQL_SHR_ME'  text = TEXT-b44 ).
     gc_splitter_top_toolbar->set_static_ctxmenu( EXPORTING fcode = 'SQL_SHARE' ctxmenu = l_ctmenu2 ).
 * end   of change 420
 
 * begin of change 321
     DATA(l_ctmenu3) = NEW cl_ctmenu( ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( text-b46 )
+    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = TEXT-q40 checked = abap_true icon = icon_alv_variant_save ).
+    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( TEXT-b46 )
                                                                disabled = abap_true ).
     gc_splitter_top_toolbar->set_static_ctxmenu( EXPORTING fcode = 'SQLVARSET' ctxmenu = l_ctmenu3 ).
 * end   of change 321
@@ -3174,40 +3172,40 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     CLEAR: ls_stb_button.
     ls_stb_button-function = c_cmd_home.
     ls_stb_button-icon = icon_connection_object.
-    ls_stb_button-quickinfo = text-q08.
-    ls_stb_button-text      = text-b03.
+    ls_stb_button-quickinfo = TEXT-q08.
+    ls_stb_button-text      = TEXT-b03.
     ls_stb_button-butn_type = cntb_btype_check.
     APPEND ls_stb_button TO gt_toolbuttons_result.
 
     CLEAR: ls_stb_button.
     ls_stb_button-function = c_cmd_show_result_table.
     ls_stb_button-icon = icon_list.
-    ls_stb_button-quickinfo = text-q06.
-    ls_stb_button-text      = text-b01.
+    ls_stb_button-quickinfo = TEXT-q06.
+    ls_stb_button-text      = TEXT-b01.
     ls_stb_button-butn_type = cntb_btype_dropdown.
     APPEND ls_stb_button TO gt_toolbuttons_result.
 
     CLEAR: ls_stb_button.
     ls_stb_button-function = 'SHOW_LOG'.
     ls_stb_button-icon = icon_history.
-    ls_stb_button-quickinfo = text-q07.
-    ls_stb_button-text      = text-b02.
+    ls_stb_button-quickinfo = TEXT-q07.
+    ls_stb_button-text      = TEXT-b02.
     ls_stb_button-butn_type = cntb_btype_check.
     APPEND ls_stb_button TO gt_toolbuttons_result.
 
     CLEAR: ls_stb_button.
     ls_stb_button-function = c_cmd_jobmonitor.
     ls_stb_button-icon = icon_background_job.
-    ls_stb_button-quickinfo = text-q20.
-    ls_stb_button-text      = text-b15.
+    ls_stb_button-quickinfo = TEXT-q20.
+    ls_stb_button-text      = TEXT-b15.
     ls_stb_button-butn_type = cntb_btype_check.
     APPEND ls_stb_button TO gt_toolbuttons_result.
 
     CLEAR: ls_stb_button.
     ls_stb_button-function = c_cmd_show_saved_lists.
     ls_stb_button-icon = icon_read_file.
-    ls_stb_button-quickinfo = text-q22.
-    ls_stb_button-text      = text-b21.
+    ls_stb_button-quickinfo = TEXT-q22.
+    ls_stb_button-text      = TEXT-b21.
     ls_stb_button-butn_type = cntb_btype_check.
     APPEND ls_stb_button TO gt_toolbuttons_result.
 
@@ -3274,7 +3272,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       ELSE.
 
         ROLLBACK WORK.
-        MESSAGE s055(/cadaxo/sqlc) WITH text-dec.                      "CDX001-0020
+        MESSAGE s055(/cadaxo/sqlc) WITH TEXT-dec.                      "CDX001-0020
         RETURN.
 
       ENDIF.
@@ -3495,10 +3493,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ls_button_data-function = c_okcode_symbols.
     IF me->g_user_settings-symbols_show = abap_true.                             "CDX001-0020
       ls_button_data-icon = '@K2@'.                                              "CDX001-0020
-      ls_button_data-quickinfo = text-q11.                                       "CDX001-0020
+      ls_button_data-quickinfo = TEXT-q11.                                       "CDX001-0020
     ELSE.                                                                        "CDX001-0020
       ls_button_data-icon = '@K1@'.
-      ls_button_data-quickinfo = text-q10.
+      ls_button_data-quickinfo = TEXT-q10.
     ENDIF.                                                                       "CDX001-0020
 
     ls_button_data-butn_type = cntb_btype_button.
@@ -3698,8 +3696,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       IF lv_variant_created IS NOT INITIAL.
         gs_sel_variant-varname = lv_variant_created.
         DATA(l_ctmenu3) = NEW cl_ctmenu( ).
-        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
-        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( |{ text-b46 } { lv_variant_created }| )
+        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = TEXT-q40 checked = abap_true icon = icon_alv_variant_save ).
+        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( |{ TEXT-b46 } { lv_variant_created }| )
                                                                    disabled = abap_false ).
 
         gc_splitter_top_toolbar->set_static_ctxmenu(
@@ -3718,37 +3716,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD delete_log.
-
-    DATA l_rc(1).
-
-    CALL FUNCTION 'POPUP_TO_CONFIRM'
-      EXPORTING
-        titlebar              = text-t13
-        text_question         = text-q25
-        text_button_1         = text-x03
-        icon_button_1         = 'ICON_OKAY'
-        text_button_2         = text-x04
-        icon_button_2         = 'ICON_CANCEL'
-        default_button        = '2'
-        display_cancel_button = abap_false
-      IMPORTING
-        answer                = l_rc.
-    IF l_rc = '1'.
-      DELETE FROM /cadaxo/sqlclog WHERE uname = sy-uname.
-      IF sy-subrc = 0.
-        COMMIT WORK.
-        MESSAGE s092(/cadaxo/sqlc) WITH sy-dbcnt.
-
-        me->show_log( ).
-
-      ELSE.
-        ROLLBACK WORK.
-        MESSAGE s001(/cadaxo/sqlc) DISPLAY LIKE 'E'.
-      ENDIF.
-    ENDIF.
-
-  ENDMETHOD.
 
 
   METHOD delete_symbols.
@@ -3859,7 +3826,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       ELSE.
 
         ROLLBACK WORK.
-        MESSAGE s055(/cadaxo/sqlc) WITH text-ded DISPLAY LIKE 'E'."CDX001-0020
+        MESSAGE s055(/cadaxo/sqlc) WITH TEXT-ded DISPLAY LIKE 'E'."CDX001-0020
         RETURN.
 
       ENDIF.
@@ -3966,7 +3933,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
           CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
             EXPORTING
-              text = text-p01.
+              text = TEXT-p01.
 
           DATA: l_timestamp TYPE timestampl.
 
@@ -3995,7 +3962,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
           CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
             EXPORTING
-              text = text-p02. "The data are formatted for output
+              text = TEXT-p02. "The data are formatted for output
 
           IF l_error_message IS INITIAL.
             me->g_result_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = l_result_details-runtime
@@ -4030,7 +3997,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       CATCH /cadaxo/cx_sqlc_syntax_error INTO lr_exception.
         l_message = lr_exception->get_text( ).
         IF l_message IS INITIAL.
-          l_message = text-e02.     "+Cockpit-374
+          l_message = TEXT-e02.     "+Cockpit-374
 *          l_message = 'EXC!'.      "-Cockpit-374
         ENDIF.
       CATCH cx_sy_no_handler INTO lr_exception.
@@ -4151,7 +4118,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
              FROM /cadaxo/sqlcsres
              WHERE root_list_guid = @i_list_guid OR list_guid = @i_list_guid
              ORDER BY ress_guid
-             into table @DATA(all_sqlcsres).
+             INTO TABLE @DATA(all_sqlcsres).
       IF sy-subrc <> 0.
         IF sy-batch IS NOT INITIAL.
           MESSAGE e143(/cadaxo/sqlc) WITH i_list_guid.
@@ -6078,18 +6045,18 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         gc_symbol_alv->set_frontend_layout( ls_layout ).
       ENDIF.
 
-      DATA(variant_menu_text) = CONV gui_text( |{ text-b46 } { gs_sel_variant-varname }| ).
+      DATA(variant_menu_text) = CONV gui_text( |{ TEXT-b46 } { gs_sel_variant-varname }| ).
       DATA(variant_menu_disabled) =  abap_false .
 
     ELSE.
 
-      variant_menu_text =  |{ text-b46 } |.
+      variant_menu_text =  |{ TEXT-b46 } |.
       variant_menu_disabled =  abap_true .
 
     ENDIF.
 
     DATA(l_ctmenu3) = NEW cl_ctmenu( ).
-    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = text-q40 checked = abap_true icon = icon_alv_variant_save ).
+    l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = TEXT-q40 checked = abap_true icon = icon_alv_variant_save ).
     l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text     = variant_menu_text
                                                                disabled = variant_menu_disabled ).
 
@@ -6274,7 +6241,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
         cl_abap_browser=>show_html(
           EXPORTING
-            title        = text-t15
+            title        = TEXT-t15
             size         = cl_abap_browser=>large
             modal        = abap_true
             html_string  = CONV #( <result_field> )
@@ -6344,7 +6311,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         cl_abap_browser=>show_xml(
            EXPORTING
               xml_string   = CONV #( <result_field> )
-              title        = text-t16
+              title        = TEXT-t16
               size         = cl_abap_browser=>large
               modal        = abap_true
               printing     = abap_true
@@ -6375,18 +6342,18 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       IF NOT lt_lvc_t_roid[] IS INITIAL.
 
         IF lines( lt_lvc_t_roid ) > 1.
-          l_message = text-q23.
+          l_message = TEXT-q23.
         ELSE.
-          l_message = text-q59.
+          l_message = TEXT-q59.
         ENDIF.
 
         CALL FUNCTION 'POPUP_TO_CONFIRM'                 "Cockpit-203 Popup harmonized
           EXPORTING
-            titlebar              = text-t12
+            titlebar              = TEXT-t12
             text_question         = l_message
-            text_button_1         = text-x03
+            text_button_1         = TEXT-x03
             icon_button_1         = 'ICON_OKAY'
-            text_button_2         = text-x04
+            text_button_2         = TEXT-x04
             icon_button_2         = 'ICON_CANCEL'
             default_button        = '2'
             display_cancel_button = abap_false
@@ -7452,7 +7419,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     FIELD-SYMBOLS: <l_file_name> TYPE file_table,
                    <l_file>      TYPE string.
 
-    MOVE text-t04 TO l_title.
+    MOVE TEXT-t04 TO l_title.
 
 * call file open dialog
     cl_gui_frontend_services=>file_open_dialog(
@@ -8339,11 +8306,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         AND lt_sql_area IS NOT INITIAL.
           CALL FUNCTION 'POPUP_TO_CONFIRM'
             EXPORTING
-              titlebar              = text-t17
-              text_question         = text-q63
-              text_button_1         = text-x05
+              titlebar              = TEXT-t17
+              text_question         = TEXT-q63
+              text_button_1         = TEXT-x05
               icon_button_1         = 'ICON_OKAY'
-              text_button_2         = text-x06
+              text_button_2         = TEXT-x06
               icon_button_2         = 'ICON_CHANGE'
               default_button        = 'A'
               display_cancel_button = abap_true
@@ -8702,27 +8669,27 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     DATA: lr_submenu         TYPE REF TO cl_ctmenu,
           lr_submenu_symbols TYPE REF TO cl_ctmenu.
 
-    menu->add_function( fcode = c_cmd_insert_table      text  = text-b04 ).
-    menu->add_function( fcode = c_cmd_insert_cds_entity text = text-b38 ).
-    menu->add_function( fcode = c_cmd_insert_sy_field   text  = text-b05 ). "CDX25012010
-"    menu->add_function( fcode = c_cmd_insert_cc         text = text-b49 ). "COCKPIT-474 'Insert Code Completion'
-    menu->add_function( fcode = c_cmd_insert_header     text = text-b50 ). "COCKPIT-472 'Insert Header
-    menu->add_function( fcode = c_cmd_pp                text = text-b34 ).  "COCKPIT-260
+    menu->add_function( fcode = c_cmd_insert_table      text  = TEXT-b04 ).
+    menu->add_function( fcode = c_cmd_insert_cds_entity text = TEXT-b38 ).
+    menu->add_function( fcode = c_cmd_insert_sy_field   text  = TEXT-b05 ). "CDX25012010
+    "    menu->add_function( fcode = c_cmd_insert_cc         text = text-b49 ). "COCKPIT-474 'Insert Code Completion'
+    menu->add_function( fcode = c_cmd_insert_header     text = TEXT-b50 ). "COCKPIT-472 'Insert Header
+    menu->add_function( fcode = c_cmd_pp                text = TEXT-b34 ).  "COCKPIT-260
 
     lr_submenu_symbols = NEW #( ).
 
-    menu->add_submenu( menu = lr_submenu_symbols text = text-b11 ).
+    menu->add_submenu( menu = lr_submenu_symbols text = TEXT-b11 ).
 
-    lr_submenu_symbols->add_function( fcode = 'INSERT_DYN_SYMB' text = text-b12 ).
-    lr_submenu_symbols->add_function( fcode = 'INSERT_USR_SYMB' text = text-b13 disabled = 'X' ).
+    lr_submenu_symbols->add_function( fcode = 'INSERT_DYN_SYMB' text = TEXT-b12 ).
+    lr_submenu_symbols->add_function( fcode = 'INSERT_USR_SYMB' text = TEXT-b13 disabled = 'X' ).
 
     lr_submenu = NEW #( ).
 
-    menu->add_submenu( menu = lr_submenu text        = text-b10 ).
+    menu->add_submenu( menu = lr_submenu text        = TEXT-b10 ).
 
-    lr_submenu->add_function( fcode = 'COPY_TO_X_BUFFER' text = text-b07 ).
-    lr_submenu->add_function( fcode = 'COPY_TO_Y_BUFFER' text = text-b08 ).
-    lr_submenu->add_function( fcode = 'COPY_TO_Z_BUFFER' text = text-b09 ).
+    lr_submenu->add_function( fcode = 'COPY_TO_X_BUFFER' text = TEXT-b07 ).
+    lr_submenu->add_function( fcode = 'COPY_TO_Y_BUFFER' text = TEXT-b08 ).
+    lr_submenu->add_function( fcode = 'COPY_TO_Z_BUFFER' text = TEXT-b09 ).
 
   ENDMETHOD.
 
@@ -9212,7 +9179,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
         ENDLOOP.
 
-        gc_elementinfo_alv->set_gridtitle( i_gridtitle = |Element Info: { text-tab } { contextstring }| ).
+        gc_elementinfo_alv->set_gridtitle( i_gridtitle = |Element Info: { TEXT-tab } { contextstring }| ).
 
 *begin of change+cockpit415
         IF me->g_user_settings-show_footer = abap_true AND gcont_grid_elementinfo_t[] IS NOT INITIAL.
@@ -9288,9 +9255,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *\              dd03ndv_tab    = lt_dd03ndvtab ).
 
 
-data DD08BV_TAB	TYPE DD08BVTAB.
-data DD05BV_TAB	TYPE DD05BVTAB.
-data DD05FV_TAB	TYPE DD05FVTAB.
+          DATA dd08bv_tab	TYPE dd08bvtab.
+          DATA dd05bv_tab	TYPE dd05bvtab.
+          DATA dd05fv_tab	TYPE dd05fvtab.
 
 
 
@@ -9303,9 +9270,9 @@ data DD05FV_TAB	TYPE DD05FVTAB.
               sobjnames      = lt_sobjnames
             IMPORTING
               dd03ndv_tab    = lt_dd03ndvtab
-              DD08BV_TAB   = DD08BV_TAB
-              DD05BV_TAB = DD05BV_TAB
-              DD05FV_TAB = DD05FV_TAB ).
+              dd08bv_tab   = dd08bv_tab
+              dd05bv_tab = dd05bv_tab
+              dd05fv_tab = dd05fv_tab ).
 *}   REPLACE
 
           CLEAR gt_elementinfo.
@@ -9342,7 +9309,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
             CONCATENATE 'C' ld_color '00' INTO <ls_elemet_info>-line_color.
           ENDLOOP.
 
-          gc_elementinfo_alv->set_gridtitle( i_gridtitle = |Element Info: { text-ddl } { contextstring }| ).
+          gc_elementinfo_alv->set_gridtitle( i_gridtitle = |Element Info: { TEXT-ddl } { contextstring }| ).
 
           gc_elementinfo_alv->refresh_table_display( ).
           lv_ucomm =  CONV syucomm( '&OPT' ).
@@ -9528,7 +9495,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR ls_button.
     ls_button-function = 'REFRESH'.
     ls_button-icon = icon_refresh.
-    ls_button-quickinfo = text-b16.
+    ls_button-quickinfo = TEXT-b16.
     ls_button-butn_type = 0.
     ls_button-disabled = space.
     INSERT ls_button INTO e_object->mt_toolbar INDEX 1.
@@ -9536,7 +9503,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR ls_button.
     ls_button-function = 'SELDATE'.
     ls_button-icon = icon_date.
-    ls_button-quickinfo = text-b18.
+    ls_button-quickinfo = TEXT-b18.
     ls_button-butn_type = 0.
     ls_button-disabled = space.
     INSERT ls_button INTO e_object->mt_toolbar INDEX 2.
@@ -9549,7 +9516,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR ls_button.
     MOVE: 'RELEASE'     TO ls_button-function,
           icon_release  TO ls_button-icon,
-          text-b27      TO ls_button-quickinfo,
+          TEXT-b27      TO ls_button-quickinfo,
           0             TO ls_button-butn_type,
           space         TO ls_button-disabled.
     APPEND ls_button TO e_object->mt_toolbar.
@@ -9559,7 +9526,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     MOVE: 'DELETE'      TO ls_button-function,
           icon_delete   TO ls_button-icon,
           0             TO ls_button-butn_type,
-          text-b17      TO ls_button-quickinfo,
+          TEXT-b17      TO ls_button-quickinfo,
           space         TO ls_button-disabled.
     APPEND ls_button TO e_object->mt_toolbar.
 
@@ -9568,7 +9535,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     MOVE: 'ABORT'         TO ls_button-function,
           icon_breakpoint TO ls_button-icon,
           0               TO ls_button-butn_type,
-          text-b20        TO ls_button-quickinfo,
+          TEXT-b20        TO ls_button-quickinfo,
           space           TO ls_button-disabled.
     APPEND ls_button TO e_object->mt_toolbar.
 
@@ -9689,11 +9656,11 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
             CALL FUNCTION 'POPUP_TO_CONFIRM'            "Cockpit-203 Popup harmonized
               EXPORTING
-                titlebar              = text-t11
-                text_question         = text-q21
-                text_button_1         = text-x03
+                titlebar              = TEXT-t11
+                text_question         = TEXT-q21
+                text_button_1         = TEXT-x03
                 icon_button_1         = 'ICON_OKAY'
-                text_button_2         = text-x04
+                text_button_2         = TEXT-x04
                 icon_button_2         = 'ICON_CANCEL'
                 default_button        = '2'
                 display_cancel_button = abap_false
@@ -9764,7 +9731,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
                   CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
                     EXPORTING
                       percentage = l_perc
-                      text       = text-s01.
+                      text       = TEXT-s01.
                 ENDIF.
 
               ENDLOOP.
@@ -9930,7 +9897,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
           length = strlen( <l_result_field> ).
           IF length >= 128.
             e_object->add_separator( ).
-            e_object->add_function( fcode = c_cmd_show_full_value text = text-q56 ).
+            e_object->add_function( fcode = c_cmd_show_full_value text = TEXT-q56 ).
           ENDIF.
         ENDIF.
       ENDIF.
@@ -9941,18 +9908,18 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       l_show_as_submenu->add_function(
         EXPORTING
           fcode             = c_cmd_show_value_as_html_brow
-          text              = text-q61
+          text              = TEXT-q61
       ).
       l_show_as_submenu->add_function(
         EXPORTING
           fcode             = c_cmd_show_value_as_xml_brow
-          text              = text-q62
+          text              = TEXT-q62
       ).
 
       e_object->add_submenu(
         EXPORTING
           menu        = l_show_as_submenu
-          text        = text-q60
+          text        = TEXT-q60
       ).
 
       e_object->add_separator( ).
@@ -10057,37 +10024,37 @@ data DD05FV_TAB	TYPE DD05FVTAB.
         lr_menu_export->add_function(
           EXPORTING
             fcode = cl_gui_alv_grid=>mc_fc_call_xxl
-            text  = text-f07 ).
+            text  = TEXT-f07 ).
 
         lr_menu_export->add_function(
           EXPORTING
             fcode = cl_gui_alv_grid=>mc_fc_word_processor
-            text  = text-f08 ).
+            text  = TEXT-f08 ).
 
         lr_menu_export->add_function(
           EXPORTING
             fcode = cl_gui_alv_grid=>mc_fc_pc_file
-            text  = text-f09 ).
+            text  = TEXT-f09 ).
 
         lr_menu_export->add_function(
           EXPORTING
             fcode = cl_gui_alv_grid=>mc_fc_send
-            text  = text-f10 ).
+            text  = TEXT-f10 ).
 
         lr_menu_export->add_function(
           EXPORTING
             fcode = cl_gui_alv_grid=>mc_fc_to_office
-            text  = text-f11 ).
+            text  = TEXT-f11 ).
 
         lr_menu_export->add_function(
           EXPORTING
             fcode = cl_gui_alv_grid=>mc_fc_html
-            text  = text-f12 ).
+            text  = TEXT-f12 ).
 
         lr_menu_export->add_function(        "COCKPIT-271
           EXPORTING                          "COCKPIT-271
             fcode = gc_fcode_csv             "COCKPIT-271
-            text  = text-f15 ).              "COCKPIT-271
+            text  = TEXT-f15 ).              "COCKPIT-271
 
 *      lr_menu->add_function(
 *        EXPORTING
@@ -10099,14 +10066,14 @@ data DD05FV_TAB	TYPE DD05FVTAB.
         lr_menu->add_submenu(
           EXPORTING
             menu = lr_menu_export
-            text = text-f06 ).
+            text = TEXT-f06 ).
 
         lr_menu->add_separator( ).
 
         lr_menu->add_function(
           EXPORTING
             fcode = cl_gui_alv_grid=>mc_fc_graph
-            text  = text-f13 ).
+            text  = TEXT-f13 ).
 
         CALL METHOD e_object->add_menu
           EXPORTING
@@ -10183,7 +10150,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
           READ TEXTPOOL l_progname INTO lt_table LANGUAGE sy-langu.
         ENDIF.
 
-        READ TABLE lt_table ASSIGNING <ls_table> WITH TABLE KEY id = 'I' key = text-032.
+        READ TABLE lt_table ASSIGNING <ls_table> WITH TABLE KEY id = 'I' key = TEXT-032.
 * to be implemented
 
         e_object->add_function(
@@ -10288,7 +10255,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     MOVE: 'KEYFIX'           TO ls_button-function,
           l_icon             TO ls_button-icon,
           0                  TO ls_button-butn_type,
-          text-q31           TO ls_button-quickinfo,
+          TEXT-q31           TO ls_button-quickinfo,
           space              TO ls_button-disabled,
           l_checked          TO ls_button-checked.
     APPEND ls_button TO e_object->mt_toolbar.
@@ -10300,7 +10267,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
     MOVE: 'RESFULLDISP'      TO ls_button-function,
           icon_view_maximize TO ls_button-icon,
-          text-q27           TO ls_button-quickinfo,
+          TEXT-q27           TO ls_button-quickinfo,
           0                  TO ls_button-butn_type,
           space              TO ls_button-disabled.
 
@@ -10310,14 +10277,14 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR ls_button.
 *  IF lr_sql_parse->g_select_version = lr_sql_parse->c_select_version_1.
     ls_button-disabled = abap_false.
-    ls_button-quickinfo = text-q34.
+    ls_button-quickinfo = TEXT-q34.
 *  ELSE.
 *    ls_button-disabled  = abap_true.
 *    ls_button-quickinfo = text-q47.
 *  ENDIF.
     ls_button-function  = 'COMPARE_RESULT'.
     ls_button-icon      = icon_compare.
-    ls_button-quickinfo = text-q34.
+    ls_button-quickinfo = TEXT-q34.
     ls_button-butn_type = 2.
     APPEND ls_button TO e_object->mt_toolbar.
 
@@ -10327,7 +10294,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
     ls_button-text = '#' && l_grid_name_i.
     MOVE: 'DUMMY_LIST_NR'    TO ls_button-function,
-          text-q34           TO ls_button-quickinfo,
+          TEXT-q34           TO ls_button-quickinfo,
           0                  TO ls_button-butn_type,
           abap_true          TO ls_button-disabled.
     INSERT ls_button INTO e_object->mt_toolbar INDEX 1.
@@ -10382,21 +10349,21 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       INSERT VALUE #( function  = 'REFRESHLIST'
                       icon      = icon_refresh
                       butn_type = 0
-                      quickinfo = text-q24
+                      quickinfo = TEXT-q24
                       disabled  = space ) INTO e_object->mt_toolbar INDEX 4.
     ENDIF.
 
     INSERT VALUE #( function  = 'HOLD'
                     icon      = l_iconname
                     butn_type = 5
-                    quickinfo = text-q30
+                    quickinfo = TEXT-q30
                     disabled  = space
                     checked   = l_checked ) INTO e_object->mt_toolbar INDEX 2.
 
     INSERT VALUE #( function  = 'ADD_FUNCTIONS'
                     icon      = icon_previous_value "ON_ADD_ROW
                     butn_type = 2
-                    quickinfo = text-q53
+                    quickinfo = TEXT-q53
                     disabled = space ) INTO TABLE e_object->mt_toolbar.
 
     INSERT VALUE #( butn_type = 3 ) INTO TABLE e_object->mt_toolbar.
@@ -10404,7 +10371,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     INSERT VALUE #( function  = 'CLOSE'
                     icon      = icon_close
                     butn_type = 0
-                    quickinfo = text-q52
+                    quickinfo = TEXT-q52
                     disabled  = space ) INTO TABLE e_object->mt_toolbar.
   ENDMETHOD.
 
@@ -10509,7 +10476,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
           IF e_ucomm = 'EDIT'.
             SELECT SINGLE @abap_true FROM nriv INTO @DATA(lv_nr_exists) WHERE object = '/CADAXO/01'.
             IF sy-subrc NE 0.
-              MESSAGE text-003 TYPE 'I'.
+              MESSAGE TEXT-003 TYPE 'I'.
               RETURN.
             ENDIF.
           ENDIF.
@@ -10644,17 +10611,17 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
     INSERT VALUE #( function = 'REFRESH'
                     icon = icon_refresh
-                    quickinfo = text-b23 ) INTO e_object->mt_toolbar INDEX 1.
+                    quickinfo = TEXT-b23 ) INTO e_object->mt_toolbar INDEX 1.
 
     INSERT VALUE #( function = 'SELECT'
                     icon = icon_unassign
-                    quickinfo = text-b26 ) INTO e_object->mt_toolbar INDEX 2.
+                    quickinfo = TEXT-b26 ) INTO e_object->mt_toolbar INDEX 2.
 
 * refresh button
     CLEAR ls_button.
     MOVE: 'RENAME'      TO ls_button-function,
           icon_rename   TO ls_button-icon,
-          text-b30      TO ls_button-quickinfo,
+          TEXT-b30      TO ls_button-quickinfo,
           0             TO ls_button-butn_type,
           space         TO ls_button-disabled.
     APPEND ls_button TO e_object->mt_toolbar.
@@ -10664,7 +10631,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     MOVE: 'DELETE'      TO ls_button-function,
           icon_delete   TO ls_button-icon,
           0             TO ls_button-butn_type,
-          text-b24      TO ls_button-quickinfo,
+          TEXT-b24      TO ls_button-quickinfo,
           space         TO ls_button-disabled.
     APPEND ls_button TO e_object->mt_toolbar.
 
@@ -10674,7 +10641,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
           icon_import   TO ls_button-icon,
           0             TO ls_button-butn_type,
           space         TO ls_button-disabled,
-          text-b29      TO ls_button-quickinfo.
+          TEXT-b29      TO ls_button-quickinfo.
     APPEND ls_button TO e_object->mt_toolbar.
 
 * export button
@@ -10683,7 +10650,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
           icon_export   TO ls_button-icon,
           0             TO ls_button-butn_type,
           space         TO ls_button-disabled,
-          text-b28      TO ls_button-quickinfo.
+          TEXT-b28      TO ls_button-quickinfo.
     APPEND ls_button TO e_object->mt_toolbar.
 
     INSERT VALUE #( butn_type = 3 ) INTO TABLE e_object->mt_toolbar.
@@ -10692,7 +10659,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 *                   butn_type = 0 "-Cockpit-420
 *                   butn_type = 2 "-Cockpit-420
                     butn_type = 1 "+Cockpit-420 KA
-                    quickinfo = text-q58
+                    quickinfo = TEXT-q58
                     disabled  = space ) INTO TABLE e_object->mt_toolbar.
 
   ENDMETHOD.
@@ -10844,7 +10811,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 *begin of insert +cockpit-420
       WHEN c_saved_list_share_me.
 
-        share_saved_list( EXPORTING iv_receiver = CONV /cadaxo/sqlcapi_receiver( sy-uname ) iv_text = text-012 ).
+        share_saved_list( EXPORTING iv_receiver = CONV /cadaxo/sqlcapi_receiver( sy-uname ) iv_text = TEXT-012 ).
 *end   of insert +cockpit-420
 
     ENDCASE.
@@ -10989,7 +10956,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     length = strlen( <history_log>-sql_string ).
     IF length >= 128 AND col-fieldname = 'SQL_STRING'.
       e_object->add_separator( ).
-      e_object->add_function( fcode = c_cmd_show_full_value text = text-q56 ).
+      e_object->add_function( fcode = c_cmd_show_full_value text = TEXT-q56 ).
     ENDIF.
 
   ENDMETHOD.
@@ -11128,7 +11095,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR ls_button.
     ls_button-function = 'REFRESH'.
     ls_button-icon = icon_refresh.
-    ls_button-quickinfo = text-b19.
+    ls_button-quickinfo = TEXT-b19.
     ls_button-butn_type = 0.
     ls_button-disabled = space.
     INSERT ls_button INTO e_object->mt_toolbar INDEX 1.
@@ -11136,7 +11103,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR ls_button.
     ls_button-function = 'SELDATE'.
     ls_button-icon = icon_date.
-    ls_button-quickinfo = text-b18.
+    ls_button-quickinfo = TEXT-b18.
     ls_button-butn_type = 0.
     ls_button-disabled = space.
     INSERT ls_button INTO e_object->mt_toolbar INDEX 2.
@@ -11145,7 +11112,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR ls_button.
     MOVE: 'DELHIST'     TO ls_button-function,
           icon_delete   TO ls_button-icon,
-          text-b25      TO ls_button-quickinfo,
+          TEXT-b25      TO ls_button-quickinfo,
           0             TO ls_button-butn_type,
           space         TO ls_button-disabled.
     APPEND ls_button TO e_object->mt_toolbar.
@@ -11157,23 +11124,23 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR ls_button.
     ls_button-function = 'SQL_SEARCH'.
     ls_button-icon = icon_search.
-    ls_button-quickinfo = text-b43.
+    ls_button-quickinfo = TEXT-b43.
     ls_button-butn_type = 0.
     ls_button-disabled = space.
-    ls_button-text = text-b43.
+    ls_button-text = TEXT-b43.
     APPEND ls_button TO e_object->mt_toolbar.
 
     CLEAR ls_button.
     ls_button-function = 'SQL_SEARCH_NEXT'.
     ls_button-icon = icon_search_next.
-    ls_button-quickinfo = text-b43.
+    ls_button-quickinfo = TEXT-b43.
     ls_button-butn_type = 0.
     IF gt_selected_rows IS INITIAL.
       ls_button-disabled = abap_true.
     ELSE.
       ls_button-disabled = space.
     ENDIF.
-    ls_button-text = text-b43.
+    ls_button-text = TEXT-b43.
     APPEND ls_button TO e_object->mt_toolbar.
 
 
@@ -11228,7 +11195,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
         me->show_log( ).
 
       WHEN 'DELHIST'.
-        me->delete_log( ).
+        /cadaxo/cl_sqlc_user_hist_log=>delete_log( ).
 
       WHEN 'SQL_SEARCH'.
         me->sql_search( ).
@@ -11261,22 +11228,22 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     IF me->g_result_layout-no_toolbar = abap_true.
       lr_alv_options->add_function(  EXPORTING fcode    = c_cmd_result_toolbar_show
                                                disabled = lv_no_toolbar
-                                               text     = text-m04 ).
+                                               text     = TEXT-m04 ).
     ELSE.
       lr_alv_options->add_function(  EXPORTING fcode    = c_cmd_result_toolbar_hide
                                                disabled = lv_no_toolbar
-                                               text     = text-m03 ).
+                                               text     = TEXT-m03 ).
     ENDIF.
 
 
     IF me->g_user_settings-show_footer = abap_true.
       lr_alv_options->add_function(  EXPORTING fcode    = c_cmd_result_footer_hide
                                                disabled = lv_no_toolbar
-                                               text     = text-m05 ).
+                                               text     = TEXT-m05 ).
     ELSE.
       lr_alv_options->add_function(  EXPORTING fcode    = c_cmd_result_footer_show
                                                disabled = lv_no_toolbar
-                                               text     = text-m06 ).
+                                               text     = TEXT-m06 ).
     ENDIF.
 
     lr_alv_options_window = NEW #( ).
@@ -11293,7 +11260,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
     lr_alv_options_window->add_function(  EXPORTING fcode    = 'WINDOW_VERTICAL'
                                                     disabled = l_disabled
-                                                    text     = text-m08 ).
+                                                    text     = TEXT-m08 ).
     IF lv_no_toolbar = abap_false.
       IF me->g_user_settings-result_window_horizontal <> space.
         l_disabled = abap_true.
@@ -11305,7 +11272,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     ENDIF.
     lr_alv_options_window->add_function(  EXPORTING fcode = 'WINDOW_HORIZONTAL'
                                   disabled = l_disabled
-                                   text  = text-m09 ).
+                                   text  = TEXT-m09 ).
     IF lv_no_toolbar = abap_false.
       IF me->g_user_settings-result_window_matrix <> space.
         l_disabled = abap_true.
@@ -11317,7 +11284,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     ENDIF.
     lr_alv_options_window->add_function(  EXPORTING fcode = 'WINDOW_MATRIX'
                                   disabled = l_disabled
-                                   text  = text-m10 ).
+                                   text  = TEXT-m10 ).
 
     IF lv_no_toolbar = abap_false.
       IF me->g_user_settings-result_window_tab <> space.
@@ -11330,12 +11297,12 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     ENDIF.
     lr_alv_options_window->add_function(  EXPORTING fcode = 'WINDOW_TAB'
                                   disabled = l_disabled
-                                   text  = text-m11 ).
+                                   text  = TEXT-m11 ).
 
 
     lr_alv_options->add_submenu(  EXPORTING menu = lr_alv_options_window
                                    disabled = lv_no_toolbar
-                                   text  = text-m07 ).
+                                   text  = TEXT-m07 ).
 
     gc_result_toolbar->track_context_menu(  EXPORTING context_menu = lr_alv_options
                                                       posx         = posx
@@ -11461,7 +11428,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       lr_menu->add_function(
         EXPORTING
           fcode = c_saved_list_share_oth
-          text  = text-b48
+          text  = TEXT-b48
           icon  = icon_workflow_external_event
           insert_at_the_top = abap_true
           checked           = abap_true "Cockpit-420 KA
@@ -11469,7 +11436,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       lr_menu->add_function(
          EXPORTING
           fcode = c_saved_list_share_me
-           text = text-b44
+           text = TEXT-b44
           icon  = icon_workflow_internal_event ).
 
       CALL METHOD e_object->add_menu
@@ -11685,7 +11652,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       CLEAR l_button.                                                    "CDX001-0020
       MOVE: 'SYMBOL_P_SHOW'  TO l_button-function,                       "CDX001-0020
           icon_expand        TO l_button-icon,                           "CDX001-0020
-          text-q18           TO l_button-quickinfo,                      "CDX001-0020
+          TEXT-q18           TO l_button-quickinfo,                      "CDX001-0020
           0                  TO l_button-butn_type,                      "CDX001-0020
           l_sh_disabled      TO l_button-disabled.                       "CDX001-0020
       APPEND l_button TO e_object->mt_toolbar.                           "CDX001-0020
@@ -11694,7 +11661,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       CLEAR l_button.                                                    "CDX001-0020
       MOVE: 'SYMBOL_P_HIDE'  TO l_button-function,                       "CDX001-0020
           icon_collapse      TO l_button-icon,                           "CDX001-0020
-          text-q19           TO l_button-quickinfo,                      "CDX001-0020
+          TEXT-q19           TO l_button-quickinfo,                      "CDX001-0020
           0                  TO l_button-butn_type,                      "CDX001-0020
           l_sh_disabled      TO l_button-disabled.                       "CDX001-0020
       APPEND l_button TO e_object->mt_toolbar.                           "CDX001-0020
@@ -11711,7 +11678,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       CLEAR l_button.
       MOVE: 'SYMBOLS_EDITOR_ONLY'    TO l_button-function,
           icon_filter                TO l_button-icon,
-          text-q32                   TO l_button-quickinfo,
+          TEXT-q32                   TO l_button-quickinfo,
           0                          TO l_button-butn_type,
           space                      TO l_button-disabled.
       APPEND l_button TO e_object->mt_toolbar.
@@ -11720,7 +11687,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       l_button-checked = abap_true.
       MOVE: 'SYMBOLS_ALL'            TO l_button-function,
           icon_filter                TO l_button-icon,
-          text-q33                   TO l_button-quickinfo,
+          TEXT-q33                   TO l_button-quickinfo,
           0                          TO l_button-butn_type,
           space                      TO l_button-disabled.
       APPEND l_button TO e_object->mt_toolbar.
@@ -11736,7 +11703,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR l_button.
     MOVE: 'SYMBOL_CREATE'    TO l_button-function,
         icon_create        TO l_button-icon,
-        text-q15           TO l_button-quickinfo,
+        TEXT-q15           TO l_button-quickinfo,
         0                  TO l_button-butn_type,
         space              TO l_button-disabled.
     APPEND l_button TO e_object->mt_toolbar.
@@ -11752,7 +11719,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     CLEAR l_button.
     MOVE: 'SYMBOL_SHARE'    TO l_button-function,
         icon_workflow_external_event TO l_button-icon,
-        text-b42           TO l_button-quickinfo,
+        TEXT-b42           TO l_button-quickinfo,
 *        cntb_btype_button  TO l_button-butn_type, "-Cockpit-420
 *        cntb_btype_menu TO l_button-butn_type, "-Cockpit-420
         cntb_btype_dropdown TO l_button-butn_type, "+Cockpit-420 KA
@@ -11769,7 +11736,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 * delete
     MOVE: 'SYMBOL_DELETE'    TO l_button-function,
         icon_delete        TO l_button-icon,
-        text-q16           TO l_button-quickinfo,
+        TEXT-q16           TO l_button-quickinfo,
         0                  TO l_button-butn_type,
         space              TO l_button-disabled.
     APPEND l_button TO e_object->mt_toolbar.
@@ -11909,7 +11876,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
               iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-symbols
               it_symbols     = gt_symbol_selected
               iv_receiver    = CONV /cadaxo/sqlcapi_receiver( sy-uname )
-              iv_text        = text-012.
+              iv_text        = TEXT-012.
         ENDIF.
 * end   of insert cockpit-420
     ENDCASE.
@@ -12152,7 +12119,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       lr_menu->add_function(
         EXPORTING
           fcode = 'SYMBOL_EXPORT'
-          text  = text-b47
+          text  = TEXT-b47
           icon  = icon_workflow_external_event
           insert_at_the_top = abap_true
           checked           = abap_true "Cockpit-420 KA
@@ -12160,7 +12127,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       lr_menu->add_function(
          EXPORTING
           fcode = 'SYMBOL_EXPORT_ME'
-           text = text-b44
+           text = TEXT-b44
           icon  = icon_workflow_internal_event ).
 
       CALL METHOD e_object->add_menu
@@ -12310,7 +12277,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
         IF NOT lt_table[] IS INITIAL.
           CALL FUNCTION 'POPUP_TO_CONFIRM'
             EXPORTING
-              text_question = text-q26
+              text_question = TEXT-q26
             IMPORTING
               answer        = lv_rc.
           IF lv_rc = '1'.
@@ -12629,11 +12596,11 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
           CALL FUNCTION 'POPUP_TO_CONFIRM'
             EXPORTING
-              titlebar              = text-x02
-              text_question         = text-x01
-              text_button_1         = text-x03
+              titlebar              = TEXT-x02
+              text_question         = TEXT-x01
+              text_button_1         = TEXT-x03
               icon_button_1         = 'ICON_OKAY'
-              text_button_2         = text-x04
+              text_button_2         = TEXT-x04
               icon_button_2         = 'ICON_CANCEL'
               default_button        = '2'
               display_cancel_button = abap_false
@@ -12799,30 +12766,30 @@ data DD05FV_TAB	TYPE DD05FVTAB.
             <lwa_fieldcat>-outputlen  = 16.
             <lwa_fieldcat>-key       = abap_true.
           WHEN 'SYMBOL_VALUE_USER'.
-            <lwa_fieldcat>-coltext   = text-a01.
+            <lwa_fieldcat>-coltext   = TEXT-a01.
             <lwa_fieldcat>-outputlen  = 20.
           WHEN 'SYMBOL_DESC_USER'.
-            <lwa_fieldcat>-coltext   = text-a02.
+            <lwa_fieldcat>-coltext   = TEXT-a02.
             <lwa_fieldcat>-key       = abap_true.
             <lwa_fieldcat>-outputlen  = 14.
           WHEN 'SYMBOL_VALUE_VAR'.
-            <lwa_fieldcat>-coltext   = text-a03.
+            <lwa_fieldcat>-coltext   = TEXT-a03.
             <lwa_fieldcat>-outputlen  = 20.
           WHEN 'SYMBOL_VAR'.
-            <lwa_fieldcat>-coltext   = text-a04.
+            <lwa_fieldcat>-coltext   = TEXT-a04.
             <lwa_fieldcat>-key       = abap_true.
             <lwa_fieldcat>-outputlen  = 14.
 *            begin of insert cockpit-294
           WHEN 'SYMBOL_TYPE_ICON_USER'.
-            <lwa_fieldcat>-coltext   = text-a05.
+            <lwa_fieldcat>-coltext   = TEXT-a05.
             <lwa_fieldcat>-outputlen  = 4.
             <lwa_fieldcat>-style = cl_gui_alv_grid=>mc_style_button.
           WHEN 'SYMBOL_DATATYPE_USER'.
-            <lwa_fieldcat>-coltext   = text-a06.
+            <lwa_fieldcat>-coltext   = TEXT-a06.
           WHEN 'SYMBOL_DATATYPE_VAR'.
-            <lwa_fieldcat>-coltext   = text-a07.
+            <lwa_fieldcat>-coltext   = TEXT-a07.
           WHEN 'SYMBOL_TYPE_ICON_VAR'.
-            <lwa_fieldcat>-coltext   = text-a05.
+            <lwa_fieldcat>-coltext   = TEXT-a05.
             <lwa_fieldcat>-outputlen  = 4.
             <lwa_fieldcat>-style = cl_gui_alv_grid=>mc_style_button.
 *            end   of insert cockpit-294
@@ -13806,24 +13773,24 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
         CASE ls_tbtco-status.
           WHEN 'F'. "Finished
-            MOVE text-stf TO l_sqlcjobsalv-jobstatus.
+            MOVE TEXT-stf TO l_sqlcjobsalv-jobstatus.
             ls_lvc_s_scol-fname = 'JOBSTATUS'.
             ls_lvc_s_scol-color-col = '5'.
             APPEND ls_lvc_s_scol TO l_sqlcjobsalv-ct_col.
           WHEN 'P'. "Scheduled
             CLEAR: l_sqlcjobsalv-end_date, l_sqlcjobsalv-end_time. "# 4660 - 20140919
-            MOVE text-stp TO l_sqlcjobsalv-jobstatus.
+            MOVE TEXT-stp TO l_sqlcjobsalv-jobstatus.
           WHEN 'S'. "Released
             CLEAR: l_sqlcjobsalv-end_date, l_sqlcjobsalv-end_time. "# 4660 - 20140919
-            MOVE text-sts TO l_sqlcjobsalv-jobstatus.
+            MOVE TEXT-sts TO l_sqlcjobsalv-jobstatus.
           WHEN 'R'. "Running
             CLEAR: l_sqlcjobsalv-end_date, l_sqlcjobsalv-end_time. "# 4660 - 20140919
-            MOVE text-str TO l_sqlcjobsalv-jobstatus.
+            MOVE TEXT-str TO l_sqlcjobsalv-jobstatus.
             ls_lvc_s_scol-fname = 'JOBSTATUS'.
             ls_lvc_s_scol-color-col = '5'.
             APPEND ls_lvc_s_scol TO l_sqlcjobsalv-ct_col.
           WHEN 'A'. "Canceled
-            MOVE text-stc TO l_sqlcjobsalv-jobstatus.
+            MOVE TEXT-stc TO l_sqlcjobsalv-jobstatus.
             ls_lvc_s_scol-fname = 'JOBSTATUS'.
             ls_lvc_s_scol-color-col = '6'.
             APPEND ls_lvc_s_scol TO l_sqlcjobsalv-ct_col.
@@ -13835,7 +13802,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
         APPEND ls_lvc_s_styl TO l_sqlcjobsalv-ct.
 
       ELSE.
-        MOVE text-stu TO l_sqlcjobsalv-jobstatus.
+        MOVE TEXT-stu TO l_sqlcjobsalv-jobstatus.
         ls_lvc_s_scol-fname = 'JOBSTATUS'.
         ls_lvc_s_scol-color-col = '7'.
         APPEND ls_lvc_s_scol TO l_sqlcjobsalv-ct_col.
@@ -13921,11 +13888,11 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     ENDIF.
 
 * Subject
-    l_subject = text-t10.
+    l_subject = TEXT-t10.
     CONCATENATE l_subject l_version INTO l_subject SEPARATED BY space.
 
 * Body
-    l_body = text-t14.
+    l_body = TEXT-t14.
 
 * Error Messages
     CLEAR l_error_string.
@@ -13965,7 +13932,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
         gc_clipboard_toolbar->set_button_info( EXPORTING fcode     = c_okcode_clipboard
                                                          icon      = '@K1@'
-                                                         quickinfo = text-q03 ).
+                                                         quickinfo = TEXT-q03 ).
 
         gc_clipboard_toolbar->set_button_visible(  EXPORTING visible = ' '
                                                              fcode   = 'CLEAR_CLIPBOARD' ).
@@ -13976,13 +13943,13 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
         gc_clipboard_toolbar->set_button_info( EXPORTING fcode     = c_okcode_clipboard
                                                          icon      = '@K2@'
-                                                         quickinfo = text-q05 ).
+                                                         quickinfo = TEXT-q05 ).
 
         gc_clipboard_toolbar->set_button_visible(  EXPORTING visible = abap_true
                                                              fcode   = 'CLEAR_CLIPBOARD' ).
 
         gc_clipboard_toolbar->set_button_info( EXPORTING fcode     = 'CLEAR_CLIPBOARD'
-                                                         quickinfo = text-q04 ).
+                                                         quickinfo = TEXT-q04 ).
         gc_clipboard_toolbar->get_height( IMPORTING height = DATA(lv_tb_height) ).
         cl_gui_cfw=>flush( ).
         gc_clipboard_toolbar->set_height( lv_tb_height ).
@@ -14004,19 +13971,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
   ENDMETHOD.
 
 
-  METHOD set_initial_date_history.
 
-    DATA l_date TYPE dats.
-
-    CONVERT DATE sy-datum TIME '235959' INTO TIME STAMP g_sel_hist_timestamp_to TIME ZONE 'UTC   '.
-    IF me->g_user_settings-history_last_x_days IS INITIAL.
-      CONVERT DATE sy-datum TIME 0 INTO TIME STAMP g_sel_hist_timestamp_from   TIME ZONE 'UTC   '.
-    ELSE.
-      l_date = sy-datum - ( me->g_user_settings-history_last_x_days - 1 ).
-      CONVERT DATE l_date TIME 0 INTO TIME STAMP g_sel_hist_timestamp_from   TIME ZONE 'UTC   '.
-    ENDIF.
-
-  ENDMETHOD.
 
 
   METHOD set_initial_date_jobmonitor.
@@ -14154,7 +14109,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
         gc_symbol_toolbar->set_button_info( EXPORTING  fcode            = c_okcode_symbols
                                                        icon             = '@K1@'
-                                                       quickinfo        = text-q10
+                                                       quickinfo        = TEXT-q10
                                             EXCEPTIONS OTHERS           = 1 ).
 
       WHEN abap_true.
@@ -14164,7 +14119,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
         gc_symbol_toolbar->set_button_info( EXPORTING  fcode            = c_okcode_symbols
                                                        icon             = '@K2@'
-                                                       quickinfo        = text-q11
+                                                       quickinfo        = TEXT-q11
                                             EXCEPTIONS OTHERS           = 3 ).
 
     ENDCASE.
@@ -14338,7 +14293,8 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       ENDIF.
 
       IF l_settings-history_last_x_days <> me->g_user_settings-history_last_x_days.
-        me->set_initial_date_history( ).
+        me->g_sel_hist_timestamp_from = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_from( me->g_user_settings-history_last_x_days ).
+        me->g_sel_hist_timestamp_to   = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_to( ).
         IF me->mv_toolbar_result_active = 'SHOW_LOG'.
           me->show_log( ).
         ENDIF.
@@ -14728,14 +14684,10 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 ****************************************************************************************************
 
 
-    DATA: l_lvc_s_layo  TYPE lvc_s_layo,
-          lt_sql_log    TYPE TABLE OF /cadaxo/sqlclog,
-          l_sqlclogalv  TYPE /cadaxo/sqlclogalv,
-          lt_fieldcat   TYPE slis_t_fieldcat_alv,
-          lt_lfc_t_fcat TYPE lvc_t_fcat,
-          l_lvc_s_fcat  TYPE lvc_s_fcat.
+    DATA: sqlclogalv  TYPE /cadaxo/sqlclogalv,
+          lt_fieldcat TYPE slis_t_fieldcat_alv.
 
-    DATA l_sqllog_xml TYPE /cadaxo/sqlc_sqllog.
+    DATA sqllog_xml TYPE /cadaxo/sqlc_sqllog.
     DATA l_xml        TYPE string.
 
     FIELD-SYMBOLS: <l_fieldcat>         TYPE slis_fieldcat_alv,
@@ -14763,76 +14715,26 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       EXPORTING
         text = g_progress_indicator_msg.
 
-* select the (userspecific) log from database
-    SELECT * FROM /cadaxo/sqlclog INTO TABLE lt_sql_log WHERE uname     = sy-uname
-                                                          AND timestamp BETWEEN g_sel_hist_timestamp_from AND g_sel_hist_timestamp_to.
-* delete old log entries
-    DELETE lt_sql_log WHERE sql_log IS INITIAL.
+    DATA(lt_sql_log) = /cadaxo/cl_sqlc_user_hist_log=>select_log( i_timestamp_from = g_sel_hist_timestamp_from
+                                                                  i_timestamp_to   = g_sel_hist_timestamp_to ).
 
-    CLEAR: gt_history_log.
+    gt_history_log = /cadaxo/cl_sqlc_user_hist_log=>convert_to_alv( lt_sql_log ).
 
-    LOOP AT lt_sql_log ASSIGNING <l_sqlclog>.
-
-      CLEAR: l_sqlclogalv,
-             l_sqllog_xml,
-             l_xml.
-
-      cl_abap_gzip=>decompress_text(
-        EXPORTING
-          gzip_in = <l_sqlclog>-sql_log
-        IMPORTING
-          text_out = l_xml ).
-
-      CALL TRANSFORMATION id
-         SOURCE XML l_xml
-         RESULT log = l_sqllog_xml.
-
-      MOVE: <l_sqlclog>-uname           TO l_sqlclogalv-uname,
-            l_sqllog_xml-sql_string     TO l_sqlclogalv-sql_string,
-            l_sqllog_xml-result_rows    TO l_sqlclogalv-result_rows,
-            l_sqllog_xml-result_runtime TO l_sqlclogalv-result_runtime.
-
-      CASE l_sqllog_xml-result_status.
-        WHEN '00'.
-          MOVE icon_green_light TO l_sqlclogalv-result_status_icon.
-        WHEN '01'.
-          MOVE icon_yellow_light TO l_sqlclogalv-result_status_icon.
-        WHEN '02'.
-          MOVE icon_red_light TO l_sqlclogalv-result_status_icon.
-        WHEN OTHERS.
-          MOVE icon_green_light TO l_sqlclogalv-result_status_icon.
-      ENDCASE.
-
-      CASE l_sqllog_xml-sql_mode.
-        WHEN '01' OR space.
-          MOVE icon_gis_pan        TO l_sqlclogalv-sql_mode_icon.
-        WHEN '02'.
-          MOVE icon_background_job TO l_sqlclogalv-sql_mode_icon.
-        WHEN OTHERS.
-          MOVE icon_dummy          TO l_sqlclogalv-sql_mode_icon.
-      ENDCASE.
-
-      CONVERT TIME STAMP <l_sqlclog>-timestamp TIME ZONE sy-zonlo
-              INTO DATE l_sqlclogalv-execute_date TIME l_sqlclogalv-execute_time.
-
-      APPEND l_sqlclogalv TO gt_history_log.
-    ENDLOOP.
-
-* sort logtable by date descending
     SORT gt_history_log BY execute_date DESCENDING execute_time DESCENDING.
 
 * set layout (zebra look, single select mode, optimize width)
-    l_lvc_s_layo-zebra      = 'X'.
-    l_lvc_s_layo-cwidth_opt = 'X'.
-    l_lvc_s_layo-sel_mode   = 'X'.
-    l_lvc_s_layo-smalltitle = 'X'.
+    DATA(layout) = VALUE lvc_s_layo( zebra      = abap_true
+                                     cwidth_opt = abap_true
+                                     sel_mode   = abap_true
+                                     smalltitle = abap_true
+                                     grid_title =
+                         /cadaxo/cl_sqlc_cockpit_assist=>create_alv_date_header( i_timestamp_from = g_sel_hist_timestamp_from
+                                                                                 i_timestamp_to = g_sel_hist_timestamp_to ) ).
 
-    l_lvc_s_layo-grid_title = /cadaxo/cl_sqlc_cockpit_assist=>create_alv_date_header( i_timestamp_from = g_sel_hist_timestamp_from
-                                                                                      i_timestamp_to = g_sel_hist_timestamp_to ).
+    DATA select_log_fildcats TYPE lvc_t_fcat.
 
-    IF lt_lfc_t_fcat IS INITIAL.
+    IF select_log_fildcats IS INITIAL.
 
-* build field catalog
       CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
         EXPORTING
           i_structure_name       = '/CADAXO/SQLCLOGALV'
@@ -14844,30 +14746,30 @@ data DD05FV_TAB	TYPE DD05FVTAB.
           OTHERS                 = 3.
       IF sy-subrc = 0.
         LOOP AT lt_fieldcat ASSIGNING <l_fieldcat>.
-          CLEAR: l_lvc_s_fcat.
-          MOVE-CORRESPONDING <l_fieldcat> TO l_lvc_s_fcat.
-          MOVE <l_fieldcat>-seltext_m TO l_lvc_s_fcat-scrtext_m.
-          MOVE <l_fieldcat>-seltext_l TO l_lvc_s_fcat-scrtext_l.
-          MOVE <l_fieldcat>-seltext_s TO l_lvc_s_fcat-scrtext_s.
+
+          APPEND CORRESPONDING #( <l_fieldcat> MAPPING scrtext_m = seltext_m
+                                                       scrtext_l = seltext_l
+                                                       scrtext_s = seltext_s
+                                ) TO select_log_fildcats REFERENCE INTO DATA(select_log_fildcat).
+
           CASE <l_fieldcat>-fieldname.
             WHEN 'SQL_STRING'.
-              l_lvc_s_fcat-dragdropid = dragdrop_handle_log.
+              select_log_fildcat->dragdropid = dragdrop_handle_log.
             WHEN 'UNAME'.
-              l_lvc_s_fcat-no_out = 'X'.
+              select_log_fildcat->no_out = 'X'.
             WHEN 'EXECUTE_DATE'.
-              l_lvc_s_fcat-outputlen = 12.
-              l_lvc_s_fcat-key = 'X'.
+              select_log_fildcat->outputlen = 12.
+              select_log_fildcat->key = 'X'.
             WHEN 'EXECUTE_TIME'.
-              l_lvc_s_fcat-outputlen = 12.
-              l_lvc_s_fcat-key = 'X'.
+              select_log_fildcat->outputlen = 12.
+              select_log_fildcat->key = 'X'.
             WHEN 'RESULT_STATUS_ICON'.
-              l_lvc_s_fcat-icon = 'X'.
+              select_log_fildcat->icon = 'X'.
             WHEN 'SQL_MODE_ICON'.
-              l_lvc_s_fcat-outputlen = 12.
-              l_lvc_s_fcat-icon = 'X'.
-              l_lvc_s_fcat-just = 'C'.
+              select_log_fildcat->outputlen = 12.
+              select_log_fildcat->icon = 'X'.
+              select_log_fildcat->just = 'C'.
           ENDCASE.
-          APPEND l_lvc_s_fcat TO lt_lfc_t_fcat.
         ENDLOOP.
       ELSE.
         MESSAGE e100(/cadaxo/sqlc).
@@ -14875,7 +14777,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     ENDIF.
 
     IF g_is_its IS INITIAL.
-      gs_splitter_results->set_grid( EXPORTING rows = 1 columns = 1 ).
+      gs_splitter_results->set_grid( rows = 1 columns = 1 ).
     ENDIF.
 
 * create container and grid
@@ -14898,27 +14800,23 @@ data DD05FV_TAB	TYPE DD05FVTAB.
 
     <l_cont_grid_result>-gui_alv_grid->set_table_for_first_display(
       EXPORTING
-        i_bypassing_buffer            = 'X'
-        is_layout                     = l_lvc_s_layo
-        it_toolbar_excluding          = me->g_history_toolbar_excluding
+        i_bypassing_buffer   = abap_true
+        is_layout            = layout
+        it_toolbar_excluding = me->g_history_toolbar_excluding
       CHANGING
-        it_outtab                     = gt_history_log
-        it_fieldcatalog               = lt_lfc_t_fcat
+        it_outtab            = gt_history_log
+        it_fieldcatalog      = select_log_fildcats
       EXCEPTIONS
-        invalid_parameter_combination = 1
-        program_error                 = 2
-        too_many_lines                = 3
-        OTHERS                        = 4 ).
+        OTHERS               = 1 ).
     IF sy-subrc <> 0.
       MESSAGE e100(/cadaxo/sqlc).
     ENDIF.
 
 * save memory
-    FREE: lt_lfc_t_fcat,
-          lt_sql_log,
+    FREE: lt_sql_log,
           lt_fieldcat,
           l_xml,
-          l_sqllog_xml.
+          sqllog_xml.
 
   ENDMETHOD.
 
@@ -15104,7 +15002,6 @@ data DD05FV_TAB	TYPE DD05FVTAB.
         READ TABLE gt_result_details INDEX l_tabix ASSIGNING <l_result_details>.
         IF sy-subrc = 0.
 
-* create grid title (xx records ( y.yyyy Microseconds )
           l_result_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = <l_result_details>-runtime
                                                                                               i_lines   = <l_result_details>-lines ).
 * create footer line
@@ -15757,8 +15654,8 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     " Show Multivalue Dialog
     CALL FUNCTION 'COMPLEX_SELECTIONS_DIALOG'
       EXPORTING
-        title             = text-q54
-        text              = text-q55
+        title             = TEXT-q54
+        text              = TEXT-q55
         no_interval_check = abap_true
         excluded_options  = ls_exl_opt
       TABLES
@@ -16079,7 +15976,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
       ELSE.
 
         ROLLBACK WORK.
-        MESSAGE s055(/cadaxo/sqlc) WITH text-deu DISPLAY LIKE 'E'.                      "CDX001-0020
+        MESSAGE s055(/cadaxo/sqlc) WITH TEXT-deu DISPLAY LIKE 'E'.                      "CDX001-0020
         RETURN.
 
       ENDIF.
@@ -16112,7 +16009,7 @@ data DD05FV_TAB	TYPE DD05FVTAB.
     DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t.           "COCKPIT-288 Insert
 
     IF gs_sel_variant IS INITIAL.
-      MESSAGE text-013 TYPE 'I'.
+      MESSAGE TEXT-013 TYPE 'I'.
       RETURN.
     ENDIF.
 

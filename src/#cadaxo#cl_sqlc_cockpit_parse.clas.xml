@@ -649,7 +649,7 @@
     <SEOCOMPOTX>
      <CMPNAME>RESULT_RUNTIME</CMPNAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>Natural Number</DESCRIPT>
+     <DESCRIPT>SQL Cockpit - Runtime</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CMPNAME>RESULT_SOURCE_T</CMPNAME>
@@ -717,6 +717,14 @@
      <DESCRIPT>SQL Cockpit - Where Syntax</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>UPDATE_SQL_TO_LOG</CMPNAME>
+     <SCONAME>I_RESULT_RUNTIME</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Runtime</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
   </asx:values>
  </asx:abap>
 </abapGit>

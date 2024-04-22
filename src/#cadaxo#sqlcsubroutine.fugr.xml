@@ -45,7 +45,7 @@
       </RSEXP>
       <RSEXP>
        <PARAMETER>E_RUNTIME</PARAMETER>
-       <TYP>INT4</TYP>
+       <TYP>/CADAXO/SQLCRUNTIME</TYP>
       </RSEXP>
       <RSEXP>
        <PARAMETER>E_RESULT_LINES</PARAMETER>
@@ -88,20 +88,22 @@
       <RSFDO>
        <PARAMETER>E_ERROR_MESSAGE</PARAMETER>
        <KIND>P</KIND>
+       <STEXT>Error Messages</STEXT>
       </RSFDO>
       <RSFDO>
        <PARAMETER>E_RUNTIME</PARAMETER>
        <KIND>P</KIND>
-       <STEXT>Natural number</STEXT>
+       <STEXT>Runtime</STEXT>
       </RSFDO>
       <RSFDO>
        <PARAMETER>E_RESULT_LINES</PARAMETER>
        <KIND>P</KIND>
-       <STEXT>Natural number</STEXT>
+       <STEXT>Result Lines</STEXT>
       </RSFDO>
       <RSFDO>
        <PARAMETER>ET_RESULT</PARAMETER>
        <KIND>P</KIND>
+       <STEXT>Result</STEXT>
       </RSFDO>
       <RSFDO>
        <PARAMETER>ET_DFIES_ALL</PARAMETER>

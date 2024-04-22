@@ -23,68 +23,6 @@
 ****************************************************************************************************
 REPORT /cadaxo/sqlc_select_log.
 
-CLASS lcl_worker DEFINITION CREATE PRIVATE.
-
-  PUBLIC SECTION.
-    TYPES: ty_sqlclogs    TYPE STANDARD TABLE OF /cadaxo/sqlclog WITH DEFAULT KEY.
-    TYPES: ty_sqlclogalvs TYPE STANDARD TABLE OF /cadaxo/sqlclogalv WITH DEFAULT KEY.
-    CLASS-METHODS: convert_to_alv IMPORTING i_sqllogs        TYPE ty_sqlclogs
-                                  RETURNING VALUE(r_sqlalvs) TYPE ty_sqlclogalvs.
-ENDCLASS.
-
-CLASS lcl_worker IMPLEMENTATION.
-
-  METHOD convert_to_alv.
-    DATA: xml_string TYPE string.
-    DATA: sqllog_xml TYPE /cadaxo/sqlc_sqllog.
-    DATA: sqllogalv  TYPE /cadaxo/sqlclogalv.
-
-    LOOP AT i_sqllogs ASSIGNING FIELD-SYMBOL(<sqlclog>).
-
-      TRY.
-          cl_abap_gzip=>decompress_text( EXPORTING gzip_in = <sqlclog>-sql_log
-                                         IMPORTING text_out = xml_string ).
-
-          CALL TRANSFORMATION id
-               SOURCE XML xml_string
-               RESULT log = sqllog_xml.
-
-          sqllogalv = VALUE #( uname              = <sqlclog>-uname
-                               sql_string         = sqllog_xml-sql_string
-                               result_rows        = sqllog_xml-result_rows
-                               result_runtime     = sqllog_xml-result_runtime
-                               result_status_icon = SWITCH #( sqllog_xml-result_status
-                                                              WHEN '00' THEN icon_green_light
-                                                              WHEN '01' THEN icon_yellow_light
-                                                              WHEN '02' THEN icon_red_light
-                                                              ELSE icon_green_light
-                                                            )
-                             ).
-        CATCH cx_parameter_invalid_range
-              cx_sy_buffer_overflow
-              cx_sy_conversion_codepage
-              cx_sy_compression_error.
-
-          sqllogalv = VALUE #( uname              = <sqlclog>-uname
-                               result_rows        = 0
-                               result_runtime     = 0
-                               result_status_icon = icon_red_light
-                             ).
-          MESSAGE e028(/cadaxo/sqlc_ulog) INTO sqllogalv-sql_string.
-
-      ENDTRY.
-
-      CONVERT TIME STAMP <sqlclog>-timestamp TIME ZONE sy-zonlo
-              INTO DATE sqllogalv-execute_date TIME sqllogalv-execute_time.
-
-      APPEND sqllogalv TO r_sqlalvs.
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-ENDCLASS.
-
 INCLUDE: icons.
 
 DATA: gs_sqlclog         TYPE /cadaxo/sqlclog,
@@ -198,7 +136,7 @@ START-OF-SELECTION.
                                AND timestamp      NOT BETWEEN gt_sel_timestamp-low AND gt_sel_timestamp-high
                                AND result_runtime IN so_runt
                                AND result_rows    IN so_rrows.
-      APPEND LINES OF lcl_worker=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
+      APPEND LINES OF /cadaxo/cl_sqlc_user_hist_log=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
     ENDSELECT.
 
   ELSEIF gt_sel_timestamp-option IS INITIAL.
@@ -206,7 +144,7 @@ START-OF-SELECTION.
        INTO TABLE gt_sqlclog WHERE uname IN so_uname
                                AND result_runtime IN so_runt
                                AND result_rows    IN so_rrows.
-      APPEND LINES OF lcl_worker=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
+      APPEND LINES OF /cadaxo/cl_sqlc_user_hist_log=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
     ENDSELECT.
 
   ELSE.
@@ -216,7 +154,7 @@ START-OF-SELECTION.
                                AND timestamp      BETWEEN gt_sel_timestamp-low AND gt_sel_timestamp-high
                                AND result_runtime IN so_runt
                                AND result_rows    IN so_rrows.
-      APPEND LINES OF lcl_worker=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
+      APPEND LINES OF /cadaxo/cl_sqlc_user_hist_log=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
     ENDSELECT.
   ENDIF.
 

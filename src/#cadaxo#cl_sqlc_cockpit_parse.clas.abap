@@ -56,7 +56,7 @@ public section.
   data RESULT_TABLE type ref to DATA .
   data RESULT_STRUCTURE type ref to DATA .
   data RESULT_LINES type INT4 .
-  data RESULT_RUNTIME type INT4 .
+  data RESULT_RUNTIME type /CADAXO/SQLCRUNTIME .
   data G_SELECT_DISTINCT type CHAR1 .
   data RESULT_COMPONENT_T type /CADAXO/SQLCPARSECOMPONENT_T .
   data RESULT_SOURCE_T type /CADAXO/SQLCSELECTSOURCE_T .
@@ -92,7 +92,7 @@ public section.
     importing
       !I_SQL_STRING type /CADAXO/SQLCSTRING
       !I_TIMESTAMP type TIMESTAMPL
-      !I_RESULT_RUNTIME type /CADAXO/SQLCRESULT_RUNTIME
+      !I_RESULT_RUNTIME type /CADAXO/SQLCRUNTIME
       !I_RESULT_LINES type /CADAXO/SQLCRESULT_ROWS
       !I_SQL_MODE type /CADAXO/SQLCSQL_MODE default '01' .
   methods EXECUTE_SELECT
@@ -268,8 +268,8 @@ protected section.
   methods EXECUTE_SELECT_VIA_SUBPOOL
     importing
       !I_PROGRESS_INDICATOR type CHAR1 optional
-    exporting
-      !E_RESULT_DETAILS type /CADAXO/SQLCRESULT_DETAILS
+    returning
+      value(E_RESULT_DETAILS) type /CADAXO/SQLCRESULT_DETAILS
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR .
   class-methods CHECK_SQL_STRING_INCLUDES_SUBQ
@@ -334,8 +334,8 @@ protected section.
   methods EXECUTE_SELECT_VIA_SUBPOOL_V_2
     importing
       !I_PROGRESS_INDICATOR type CHAR1 optional
-    exporting
-      !E_RESULT_DETAILS type /CADAXO/SQLCRESULT_DETAILS
+    returning
+      value(E_RESULT_DETAILS) type /CADAXO/SQLCRESULT_DETAILS
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR .
   methods SPLIT_FIELD_V_2
@@ -2077,13 +2077,10 @@ METHOD execute_select.
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 09.09.2010 | Fößleitner Johann    | DB Hints                                    | CDX001-0011    *
-*            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 29.05.2012 | Ana Lekic            | restricted lines info - jobs                | CDX130-017     *
-*            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
 * 31.05.2012 | Ana Lekic            | timestamps in where - catch dump            | CDX130-018     *
-*            |                      |                                             |                *
 ****************************************************************************************************
 
   CASE me->g_select_version.
@@ -2133,10 +2130,9 @@ METHOD execute_select_via_subpool.
 * 25.04.2016 | Ana Lekic            | trace                                       | $003 COCKPIT-59*
 ****************************************************************************************************
 
-  FIELD-SYMBOLS:  <l_result_table>  TYPE STANDARD TABLE,
-                  <l_result_struct> TYPE any.
+  FIELD-SYMBOLS: <l_result_table>  TYPE STANDARD TABLE,
+                 <l_result_struct> TYPE any.
 
-  DATA l_from            TYPE i.
   DATA l_line            TYPE string.
   DATA l_maxsel(10)      TYPE c.
   DATA lt_abap_code      TYPE /cadaxo/sqlcstring_t.
@@ -2151,9 +2147,180 @@ METHOD execute_select_via_subpool.
   ASSIGN me->result_table->*     TO <l_result_table>.
   ASSIGN me->result_structure->* TO <l_result_struct>.
 
-* create dynamic select subroutinen pool
-  create_dynamic_select_subpool.
+  "MACRO create_dynamic_select_subpool.
+  CLEAR: lt_abap_code.
 
+  APPEND 'REPORT SUBQUERY.' TO lt_abap_code.
+
+  APPEND 'DATA: L_ROWS         TYPE I,' TO lt_abap_code.
+  APPEND '      L_PERCENTAGE   TYPE I,' TO lt_abap_code.
+  APPEND '      L_PACKAGE_SIZE TYPE I.' TO lt_abap_code.
+
+  IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
+    APPEND 'DATA l_result_details         TYPE /cadaxo/sqlcresult_details.' TO lt_abap_code.
+    APPEND 'DATA l_sql_trace_activated    TYPE c LENGTH 1.' TO lt_abap_code.
+  ENDIF.
+
+  APPEND 'FORM FORM TABLES TAB_RESULT USING EXP_TAB_RESULT_EXP EXP_TAB_RESULT EXP_US_SQL_TRACE EXP_US_TB_TRACE CHANGING UCX_ROOT TYPE REF TO CX_ROOT.' TO lt_abap_code.
+  APPEND 'TRY.' TO lt_abap_code.
+
+  IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
+    me->get_code_trace_on( CHANGING ct_code = lt_abap_code ).
+  ENDIF.
+
+  IF NOT i_progress_indicator IS INITIAL.
+    APPEND ' SELECT COUNT( * )' TO lt_abap_code.
+    CONCATENATE ' FROM' me->source_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO lt_abap_code.
+    IF NOT l_maxsel IS INITIAL.
+      CONCATENATE ' UP TO' l_maxsel 'ROWS' INTO l_line SEPARATED BY space.
+      APPEND l_line TO lt_abap_code.
+    ENDIF.
+    APPEND ' INTO L_ROWS' TO lt_abap_code.
+    IF NOT me->where_syntax IS INITIAL.
+      CONCATENATE ' WHERE' me->where_syntax INTO l_line SEPARATED BY space.
+      APPEND l_line TO lt_abap_code.
+    ENDIF.
+    APPEND '.' TO lt_abap_code.
+    APPEND ' L_PACKAGE_SIZE = l_ROWS / 100 * 5.' TO lt_abap_code.
+  ENDIF.
+
+  IF NOT me->g_select_single IS INITIAL.
+    APPEND 'FIELD-SYMBOLS: <FS_STR_RESULT> TYPE ANY.' TO lt_abap_code.
+    APPEND 'APPEND INITIAL LINE TO TAB_RESULT ASSIGNING <fs_str_result>.' TO lt_abap_code.
+***    IF me->column_syntax EQ 'COUNT( * )' OR                       "bigld COCKPIT-100
+***       me->column_syntax EQ 'COUNT(*)'.                           "bigld COCKPIT-100
+    IF is_count_star_only( me->column_syntax ).                       "bigld COCKPIT-100
+      APPEND 'FIELD-SYMBOLS: <FS_result_count> TYPE ANY.' TO lt_abap_code.
+      APPEND 'ASSIGN (''<FS_STR_RESULT>-/CADAXO/SQLCAGGRCOUNT'') TO <FS_RESULT_COUNT>.' TO lt_abap_code.
+    ENDIF.
+    CONCATENATE ' SELECT SINGLE' me->column_syntax INTO l_line SEPARATED BY space.
+  ELSE.
+    IF NOT me->g_select_distinct IS INITIAL.
+      CONCATENATE ' SELECT DISTINCT' me->column_syntax INTO l_line SEPARATED BY space.
+    ELSE.
+      CONCATENATE ' SELECT' me->column_syntax INTO l_line SEPARATED BY space.
+    ENDIF.
+  ENDIF.
+
+  APPEND l_line TO lt_abap_code.
+
+  CONCATENATE ' FROM' me->source_syntax INTO l_line SEPARATED BY space.
+  APPEND l_line TO lt_abap_code.
+
+  cls_cdss.
+
+* connection
+  IF NOT me->connection_syntax IS INITIAL.
+    CONCATENATE ' CONNECTION' me->connection_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO lt_abap_code.
+  ENDIF.
+
+* add "up to x rows"
+  IF me->g_select_single IS INITIAL.
+    IF NOT me->g_up_to_x_rows IS INITIAL.
+      l_maxsel = me->g_up_to_x_rows.
+    ELSEIF NOT g_user_settings-maxsel IS INITIAL.
+      l_maxsel = me->g_user_settings-maxsel.
+    ENDIF.
+
+  ENDIF.
+
+  me->get_code_up_to_rows( CHANGING ct_code = lt_abap_code ).
+
+  me->get_code_bypassing_buffer( CHANGING ct_code = lt_abap_code ).
+
+  IF NOT i_progress_indicator IS INITIAL.
+    APPEND ' PACKAGE SIZE L_PACKAGE_SIZE' TO lt_abap_code.
+  ENDIF.
+
+* add the into syntax (structure or table)
+  IF NOT me->g_select_single IS INITIAL.
+***    IF me->column_syntax EQ 'COUNT( * )' OR                       "bigld COCKPIT-100
+***       me->column_syntax EQ 'COUNT(*)'.                           "bigld COCKPIT-100
+    IF is_count_star_only( me->column_syntax ).                      "bigld COCKPIT-100
+      APPEND ' INTO <fs_result_count>' TO lt_abap_code.
+    ELSE.
+      APPEND ' INTO <fs_str_result>' TO lt_abap_code.
+    ENDIF.
+  ELSE.
+*    CASE me->g_select_version. "SQLC30
+*      WHEN c_select_version_1."SQLC30
+    IF NOT i_progress_indicator IS INITIAL.
+      APPEND ' APPENDING TABLE TAB_RESULT' TO lt_abap_code.
+    ELSE.
+      APPEND ' INTO TABLE TAB_RESULT' TO lt_abap_code.
+    ENDIF.
+*      WHEN OTHERS."SQLC30
+*        IF NOT i_progress_indicator IS INITIAL."SQLC30
+*          APPEND ' APPENDING TABLE @DATA(TAB_RESULT_EXP)' TO lt_abap_code."SQLC30
+*        ELSE."SQLC30
+*          APPEND ' INTO TABLE @DATA(TAB_RESULT_EXP)' TO lt_abap_code."SQLC30
+*        ENDIF."SQLC30
+*    ENDCASE."SQLC30
+  ENDIF.
+
+* add the where syntax
+  IF NOT me->where_syntax IS INITIAL.
+    CONCATENATE ' WHERE' me->where_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO lt_abap_code.
+  ENDIF.
+
+* add the group by syntax
+  IF NOT me->group_syntax IS INITIAL.
+    CONCATENATE ' GROUP BY' me->group_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO lt_abap_code.
+  ENDIF.
+
+  me->get_code_having( CHANGING ct_code = lt_abap_code ).
+
+  me->get_code_order_by( CHANGING ct_code = lt_abap_code ).
+
+  me->get_code_dbhints( CHANGING ct_code = lt_abap_code ).
+
+  APPEND '.' TO lt_abap_code.
+
+  IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
+    me->get_code_trace_off( CHANGING ct_code = lt_abap_code ).
+  ENDIF.
+
+  IF NOT i_progress_indicator IS INITIAL.
+    APPEND ' l_percentage = l_percentage + 5.' TO lt_abap_code.
+    APPEND ' CALL FUNCTION ''SAPGUI_PROGRESS_INDICATOR''' TO lt_abap_code.
+    APPEND '   EXPORTING percentage = l_percentage.' TO lt_abap_code.
+    APPEND ' ENDSELECT.' TO lt_abap_code.
+  ENDIF.
+
+  APPEND 'CATCH CX_SY_OPEN_SQL_DB INTO UCX_ROOT.'  TO lt_abap_code.
+  APPEND 'ENDTRY.' TO lt_abap_code.
+
+* format the generated abap code (line length 80)
+  /cadaxo/cl_sqlc_cockpit_assist=>format_abap_code( CHANGING ct_code = lt_abap_code ).
+
+  APPEND 'ENDFORM.' TO lt_abap_code.
+
+***
+
+  g_async_calls = g_async_calls + 1.
+
+  DATA lr_tab_result_exp  TYPE REF TO cl_abap_tabledescr.
+  DATA lr_result          TYPE REF TO data.
+  DATA l_data             TYPE xstring.
+  DATA l_error_message    TYPE char128.
+  DATA lt_result_source   TYPE /cadaxo/sqlcselectsource_fla_t.
+
+  CREATE DATA lr_result TYPE c.
+
+  MOVE-CORRESPONDING me->result_source_t TO lt_result_source.
+
+  EXPORT dfies          = me->gt_result_ddfields
+         result_source  = lt_result_source
+         column_syntax  = me->column_syntax
+         source_syntax  = me->source_syntax
+         code           = lt_abap_code
+         user_settings  = me->g_main_ref->g_user_settings
+         TO DATA BUFFER l_data.
+  "MACRO END
   CLEAR mr_arfc_exception.
   CALL FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
     STARTING NEW TASK 'TASK1'
@@ -2195,11 +2362,9 @@ METHOD execute_select_via_subpool.
       EXPORTING
         message = ls_error-text.
   ELSE.
-    CASE me->g_select_version.
-      WHEN c_select_version_1.
-      WHEN OTHERS.
-        me->create_alv_field_catalog( ).
-    ENDCASE.
+    IF me->g_select_version <> c_select_version_1.
+      me->create_alv_field_catalog( ).
+    ENDIF.
   ENDIF.
 
 ENDMETHOD.
@@ -2214,14 +2379,210 @@ ENDMETHOD.
     DATA lt_result_source TYPE /cadaxo/sqlcselectsource_fla_t.
     DATA l_data           TYPE xstring.
     DATA l_error_message  TYPE char128.
-    DATA l_dummy TYPE string.
+    DATA l_dummy          TYPE string.
 
 ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_005 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001 STATIC .
 *...
-    CONSTANTS: lc_cs_active TYPE flag VALUE abap_false.
+CONSTANTS: lc_cs_active TYPE flag VALUE abap_false.
 END-ENHANCEMENT-SECTION.
 
-    create_dynamic_select_subpool2.
+    " MACRO create_dynamic_select_subpool2.
+
+    APPEND 'REPORT SUBQUERY.' TO lt_abap_code.
+
+    DATA lt_symbol_variable TYPE gtt_symbol_variable.
+
+    me->get_multisymbol_data_table( IMPORTING e_symbol_variable = lt_symbol_variable
+                                    CHANGING  c_sql_syntax      = me->sql_syntax "Cockpit-464
+                                              i_where_syntax    = me->where_syntax ).
+
+
+    APPEND 'DATA: L_ROWS         TYPE I,' TO lt_abap_code.
+    APPEND '      L_PERCENTAGE   TYPE I,' TO lt_abap_code.
+    APPEND '      L_PACKAGE_SIZE TYPE I.' TO lt_abap_code.
+
+    IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
+      APPEND 'DATA l_result_details         TYPE /cadaxo/sqlcresult_details.' TO lt_abap_code.
+      APPEND 'DATA l_sql_trace_activated    TYPE c LENGTH 1.' TO lt_abap_code.
+    ENDIF.
+
+    APPEND 'FORM FORM TABLES TAB_RESULT USING EXP_TAB_RESULT_EXP EXP_TAB_RESULT EXP_US_SQL_TRACE EXP_US_TB_TRACE RANGE_TAB TYPE /CADAXO/CL_SQLC_COCKPIT_PARSE=>gtt_symbol_variable CHANGING UCX_ROOT TYPE REF TO CX_ROOT.' TO lt_abap_code. "SQLC30
+    APPEND 'TRY.' TO lt_abap_code.
+
+    IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
+      me->get_code_trace_on( CHANGING ct_code = lt_abap_code ).
+    ENDIF.
+
+    LOOP AT lt_symbol_variable ASSIGNING FIELD-SYMBOL(<l_symbol_variable>).
+      APPEND |DATA { <l_symbol_variable>-var_name } TYPE RANGE OF { <l_symbol_variable>-data_type }.| TO lt_abap_code.
+      APPEND |{ <l_symbol_variable>-var_name } = CORRESPONDING #( range_tab[ var_name =  '{ <l_symbol_variable>-var_name }' ]-range_table ).| TO lt_abap_code.
+    ENDLOOP.
+
+    IF NOT i_progress_indicator IS INITIAL.
+      APPEND ' SELECT COUNT( * )' TO lt_abap_code.
+      CONCATENATE ' FROM' me->source_syntax INTO l_line SEPARATED BY space.
+      APPEND l_line TO lt_abap_code.
+      IF NOT l_maxsel IS INITIAL.
+        CONCATENATE ' UP TO' l_maxsel 'ROWS' INTO l_line SEPARATED BY space.
+        APPEND l_line TO lt_abap_code.
+      ENDIF.
+      APPEND ' INTO L_ROWS' TO lt_abap_code.
+      IF NOT me->where_syntax IS INITIAL.
+        CONCATENATE ' WHERE' me->where_syntax INTO l_line SEPARATED BY space.
+        APPEND l_line TO lt_abap_code.
+      ENDIF.
+      APPEND '.' TO lt_abap_code.
+      APPEND ' L_PACKAGE_SIZE = l_ROWS / 100 * 5.' TO lt_abap_code.
+    ENDIF.
+
+    IF NOT me->g_select_single IS INITIAL.
+      APPEND 'FIELD-SYMBOLS: <FS_STR_RESULT> TYPE ANY,' TO lt_abap_code.
+      APPEND ' <fs_tab_result> type standard table.' TO lt_abap_code.
+      APPEND 'APPEND INITIAL LINE TO TAB_RESULT ASSIGNING <fs_str_result>.' TO lt_abap_code.
+***    IF me->column_syntax EQ 'COUNT( * )' OR                       "bigld COCKPIT-100
+***       me->column_syntax EQ 'COUNT(*)'.                           "bigld COCKPIT-100
+      IF is_count_star_only( me->column_syntax ).                      "bigld COCKPIT-100
+        APPEND 'FIELD-SYMBOLS: <fs_result_count> TYPE any.' TO lt_abap_code.
+        APPEND 'ASSIGN (''<FS_STR_RESULT>-/CADAXO/SQLCAGGRCOUNT'') TO <fs_result_count>.' TO lt_abap_code.
+      ENDIF.
+      CONCATENATE ' SELECT SINGLE' me->column_syntax INTO l_line SEPARATED BY space.
+    ELSE.
+      IF NOT me->g_select_distinct IS INITIAL.
+        CONCATENATE ' SELECT DISTINCT' me->column_syntax INTO l_line SEPARATED BY space.
+      ELSE.
+        CONCATENATE ' SELECT' me->column_syntax INTO l_line SEPARATED BY space.
+      ENDIF.
+    ENDIF.
+
+    APPEND l_line TO lt_abap_code.
+
+    l_dummy = me->source_syntax && me->cds_parameter_syntax.
+    CONCATENATE ' FROM' l_dummy INTO l_line SEPARATED BY space.
+    APPEND l_line TO lt_abap_code.
+
+    cls_cdss.
+
+    me->get_code_fields( CHANGING ct_code = lt_abap_code ).
+
+    me->get_code_where(
+      EXPORTING i_only_initval = abap_false
+      CHANGING ct_code = lt_abap_code
+    ).
+
+    me->get_code_dbhints( CHANGING ct_code = lt_abap_code ).
+
+    me->get_code_group_by( CHANGING ct_code = lt_abap_code ).
+
+    me->get_code_having( CHANGING ct_code = lt_abap_code ).
+
+    me->get_code_order_by( CHANGING ct_code = lt_abap_code ).
+
+    me->get_code_into( EXPORTING i_progress_indicator = i_progress_indicator
+                       CHANGING ct_code = lt_abap_code ).
+
+    me->get_code_bypassing_buffer( CHANGING ct_code = lt_abap_code ).
+
+    IF NOT i_progress_indicator IS INITIAL.
+      APPEND ' PACKAGE SIZE L_PACKAGE_SIZE' TO lt_abap_code.
+    ENDIF.
+
+    me->get_code_offset( CHANGING ct_code = lt_abap_code ).
+
+    me->get_code_up_to_rows( CHANGING ct_code = lt_abap_code ).
+
+    me->get_code_connection( CHANGING ct_code = lt_abap_code ).
+
+    APPEND '.' TO lt_abap_code.
+
+*    CASE lr_typedescr->kind.
+*      WHEN cl_abap_typedescr=>kind_struct.
+
+    IF NOT me->g_main_ref->g_sql_trace_on IS INITIAL.
+      me->get_code_trace_off( CHANGING ct_code = lt_abap_code ).
+    ENDIF.
+
+    IF NOT me->g_select_single IS INITIAL.
+      APPEND 'DATA l_name TYPE string.' TO lt_abap_code.
+      APPEND 'DATA lr_result_element TYPE REF TO cl_abap_elemdescr.' TO lt_abap_code.
+      APPEND 'DATA lr_result_structure TYPE REF TO cl_abap_structdescr.' TO lt_abap_code.
+      APPEND 'DATA lr_result_table TYPE REF TO cl_abap_tabledescr.' TO lt_abap_code.
+      APPEND 'DATA lr_result  TYPE REF TO cl_abap_typedescr.' TO lt_abap_code.
+      APPEND 'DATA lr_data TYPE REF TO data.' TO lt_abap_code.
+      APPEND 'DATA ls_comp    TYPE abap_componentdescr.' TO lt_abap_code.
+      APPEND 'DATA lt_comp    TYPE abap_component_tab.' TO lt_abap_code.
+
+      APPEND 'FIELD-SYMBOLS: <lt_result> TYPE STANDARD TABLE,' TO lt_abap_code.
+      APPEND '<ls_result> TYPE any,' TO lt_abap_code.
+      APPEND '<ls_field>  TYPE any.' TO lt_abap_code.
+
+      APPEND 'lr_result ?= cl_abap_typedescr=>describe_by_data( LS_RESULT_EXP ).' TO lt_abap_code.
+
+      APPEND 'CASE lr_result->kind.' TO lt_abap_code.
+      APPEND 'WHEN cl_abap_typedescr=>kind_elem.' TO lt_abap_code.
+      APPEND 'CLEAR: l_name, ls_comp.' TO lt_abap_code.
+      APPEND 'lr_result_element ?= lr_result.' TO lt_abap_code.
+      APPEND 'l_name = lr_result_element->get_relative_name( ).' TO lt_abap_code.
+      APPEND 'if l_name is initial. l_name = `RESULT`. endif.' TO lt_abap_code.
+      APPEND 'ls_comp-type ?= lr_result.' TO lt_abap_code.
+      APPEND 'ls_comp-name = l_name.' TO lt_abap_code.
+      APPEND 'APPEND ls_comp TO lt_comp.' TO lt_abap_code.
+
+      APPEND 'lr_result_structure ?= cl_abap_structdescr=>create( p_components = lt_comp ).' TO lt_abap_code.
+      APPEND 'lr_result_table ?= cl_abap_tabledescr=>create( EXPORTING p_line_type = lr_result_structure ).' TO lt_abap_code.
+
+      APPEND 'CREATE DATA lr_data TYPE HANDLE lr_result_table.' TO lt_abap_code.
+
+      APPEND 'ASSIGN lr_data->* TO <lt_result>.' TO lt_abap_code.
+      APPEND 'APPEND INITIAL LINE TO <lt_result> ASSIGNING <ls_result>.' TO lt_abap_code.
+      APPEND 'ASSIGN COMPONENT ls_comp-name OF STRUCTURE <ls_result> TO <ls_field>.' TO lt_abap_code.
+
+      APPEND '<ls_field> = LS_RESULT_EXP.' TO lt_abap_code.
+
+      APPEND 'CREATE DATA EXP_TAB_RESULT LIKE <lt_result>.' TO lt_abap_code.
+      APPEND 'ASSIGN EXP_TAB_RESULT->* to FIELD-SYMBOL(<LT_TAB_RESULT>).' TO lt_abap_code.
+      APPEND '<LT_TAB_RESULT> = <lt_result>.' TO lt_abap_code.
+      APPEND 'WHEN cl_abap_typedescr=>kind_struct.' TO lt_abap_code.
+      APPEND 'lr_result_structure ?= lr_result.' TO lt_abap_code.
+      APPEND 'lr_result_table ?= cl_abap_tabledescr=>create( EXPORTING p_line_type = lr_result_structure ).' TO lt_abap_code.
+      APPEND 'CREATE DATA EXP_TAB_RESULT like table of LS_RESULT_EXP.' TO lt_abap_code.
+      APPEND 'ASSIGN EXP_TAB_RESULT->* TO <lt_result>.' TO lt_abap_code.
+      APPEND 'IF LS_RESULT_EXP IS NOT INITIAL. APPEND LS_RESULT_EXP to <lt_result>. ENDIF.' TO lt_abap_code.
+      APPEND 'ENDCASE.' TO lt_abap_code.
+    ELSE.
+      APPEND 'EXP_TAB_RESULT_EXP ?= cl_abap_tabledescr=>describe_by_data( TAB_RESULT_EXP ).' TO lt_abap_code.
+      APPEND 'CREATE DATA EXP_TAB_RESULT LIKE TAB_RESULT_EXP.' TO lt_abap_code.
+      APPEND 'ASSIGN EXP_TAB_RESULT->* to FIELD-SYMBOL(<LT_TAB_RESULT>).' TO lt_abap_code.
+      APPEND '<LT_TAB_RESULT> = TAB_RESULT_EXP.' TO lt_abap_code.
+    ENDIF.
+
+    IF NOT i_progress_indicator IS INITIAL.
+      APPEND ' l_percentage = l_percentage + 5.' TO lt_abap_code.
+      APPEND ' CALL FUNCTION ''SAPGUI_PROGRESS_INDICATOR''' TO lt_abap_code.
+      APPEND '   EXPORTING percentage = l_percentage.' TO lt_abap_code.
+      APPEND ' ENDSELECT.' TO lt_abap_code.
+    ENDIF.
+
+    APPEND 'CATCH CX_SY_OPEN_SQL_DB INTO UCX_ROOT.'  TO lt_abap_code.
+    APPEND 'ENDTRY.' TO lt_abap_code.
+
+* format the generated abap code (line length 80)
+    /cadaxo/cl_sqlc_cockpit_assist=>format_abap_code( CHANGING ct_code = lt_abap_code ).
+
+    APPEND 'ENDFORM.' TO lt_abap_code.
+
+    g_async_calls = g_async_calls + 1.
+
+    MOVE-CORRESPONDING me->result_source_t TO lt_result_source.
+
+    EXPORT dfies          = me->gt_result_ddfields
+           result_source  = lt_result_source
+           column_syntax  = me->column_syntax
+           source_syntax  = me->source_syntax
+           code           = lt_abap_code
+           range_tables   = lt_symbol_variable
+           user_settings  = me->g_main_ref->g_user_settings TO DATA BUFFER l_data.
+
+    " MACRO END
 
     CLEAR mr_arfc_exception.
 
@@ -2250,7 +2611,7 @@ END-ENHANCEMENT-SECTION.
             message = g_error_message.
       ENDIF.
       IF mr_arfc_exception IS NOT INITIAL.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = CONV #( text-e02 ) previous = mr_arfc_exception.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = CONV #( TEXT-e02 ) previous = mr_arfc_exception.
       ENDIF.
     ENDIF.
 * set result details
@@ -2270,15 +2631,13 @@ METHOD execute_select_v_1.
 
 ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_004 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001 STATIC.
 *...
-  CONSTANTS: lc_cs_active TYPE flag VALUE abap_false.
+CONSTANTS: lc_cs_active TYPE flag VALUE abap_false.
 END-ENHANCEMENT-SECTION.
 
 * Marco m_execute_select
   m_execute_select.
 
-  DATA: l_from    TYPE i,
-        l_to      TYPE i,
-        l_case(3) TYPE c,
+  DATA: l_case(3) TYPE c,
         l_maxsel  TYPE i.
 
   DATA: l_total_rows   TYPE i,
@@ -2290,8 +2649,8 @@ END-ENHANCEMENT-SECTION.
   DATA l_result_details         TYPE /cadaxo/sqlcresult_details.
   DATA l_sql_trace_activated    TYPE c LENGTH 1.
 
-  FIELD-SYMBOLS:  <l_result_table>  TYPE STANDARD TABLE,
-                  <l_result_struct> TYPE any.
+  FIELD-SYMBOLS: <l_result_table>  TYPE STANDARD TABLE,
+                 <l_result_struct> TYPE any.
   CLEAR: l_maxsel.
 
   IF i_user_settings IS SUPPLIED.
@@ -2346,7 +2705,7 @@ END-ENHANCEMENT-SECTION.
         ENDIF.
 
         IF me->gs_client_handling-client_specified IS INITIAL.
-          GET RUN TIME FIELD l_from.
+          DATA(runtime) = /cadaxo/cl_sqlc_rt_measurement=>start( ).
           SELECT (me->column_syntax)
                   FROM (me->source_syntax)
                   CONNECTION (me->connection_syntax)
@@ -2356,16 +2715,16 @@ END-ENHANCEMENT-SECTION.
                           DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                          informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
 
             APPEND <l_result_struct> TO <l_result_table>.
           ENDSELECT.
-          GET RUN TIME FIELD l_to.
+          e_result_details-runtime = runtime->end( ).
         ELSE.
           ASSERT lc_cs_active = abap_true.
-          GET RUN TIME FIELD l_from.
+          runtime = /cadaxo/cl_sqlc_rt_measurement=>start( ).
           SELECT (me->column_syntax)
                   FROM (me->source_syntax)
                   CLIENT SPECIFIED
@@ -2376,16 +2735,15 @@ END-ENHANCEMENT-SECTION.
                           DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                          informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                          INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
             APPEND <l_result_struct> TO <l_result_table>.
           ENDSELECT.
-          GET RUN TIME FIELD l_to.
+          e_result_details-runtime = runtime->end( ).
         ENDIF.
 
-        e_result_details-runtime = l_to - l_from.
-        MOVE sy-dbcnt TO e_result_details-lines. "l_LINES.
+        e_result_details-lines = sy-dbcnt. "l_LINES.
 
         IF l_sql_trace_activated IS NOT INITIAL.
           /cadaxo/cl_sqlc_cockpit_assist=>sql_trace_off(
@@ -2403,16 +2761,12 @@ END-ENHANCEMENT-SECTION.
 * do we need to use the subquery
         IF NOT me->subquery IS INITIAL.
 
-          me->execute_select_via_subpool(
-            EXPORTING
-              i_progress_indicator = i_progress_indicator
-            IMPORTING
-              e_result_details = e_result_details ).
+          e_result_details = me->execute_select_via_subpool( i_progress_indicator = i_progress_indicator ).
 
-          IF sy-dbcnt EQ l_maxsel.
+          IF l_maxsel > 0 AND l_maxsel = e_result_details-lines.
             MESSAGE s044(/cadaxo/sqlc) WITH l_maxsel.
-            MOVE abap_true TO e_result_details-restricted_lines."CDX130-017
-            MOVE l_maxsel  TO e_result_details-maxsel.      "CDX130-017
+            e_result_details-restricted_lines = abap_true."CDX130-017
+            e_result_details-maxsel = l_maxsel.      "CDX130-017
           ENDIF.
 
         ELSE.
@@ -2432,7 +2786,7 @@ END-ENHANCEMENT-SECTION.
           IF NOT me->g_select_single IS INITIAL.
 
             IF me->gs_client_handling-client_specified IS INITIAL.
-              GET RUN TIME FIELD l_from.
+              runtime = /cadaxo/cl_sqlc_rt_measurement=>start( ).
               SELECT SINGLE (me->column_syntax)
                  FROM (me->source_syntax)
                  CONNECTION (me->connection_syntax)
@@ -2444,13 +2798,13 @@ END-ENHANCEMENT-SECTION.
                          DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                         informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
-              GET RUN TIME FIELD l_to.
+              e_result_details-runtime = runtime->end( ).
             ELSE.
               ASSERT lc_cs_active = abap_true.
-              GET RUN TIME FIELD l_from.
+              runtime = /cadaxo/cl_sqlc_rt_measurement=>start( ).
               SELECT SINGLE (me->column_syntax)
                  FROM (me->source_syntax)
                  CLIENT SPECIFIED
@@ -2463,14 +2817,13 @@ END-ENHANCEMENT-SECTION.
                          DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                         informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                         INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
-              GET RUN TIME FIELD l_to.
+              e_result_details-runtime = runtime->end( ).
             ENDIF.
 
-            e_result_details-runtime = l_to - l_from.
-            MOVE sy-dbcnt TO e_result_details-lines.
+            e_result_details-lines = sy-dbcnt.
 
             APPEND <l_result_struct> TO <l_result_table>.
 
@@ -2480,7 +2833,7 @@ END-ENHANCEMENT-SECTION.
                   me->gs_client_handling-client_specified TO l_case+1(1),
                   me->g_bypassing_buffer TO l_case+2(1).
 
-            GET RUN TIME FIELD l_from.
+            runtime = /cadaxo/cl_sqlc_rt_measurement=>start( ).
 
             IF i_progress_indicator NE space.
 
@@ -2494,7 +2847,7 @@ END-ENHANCEMENT-SECTION.
                               DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                               DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                               AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                              informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                              INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                               ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                               ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
               l_package_size = l_total_rows / 100 * 5.
@@ -2521,7 +2874,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
 
@@ -2548,7 +2901,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
                 ENDIF.
@@ -2570,7 +2923,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
 
@@ -2596,7 +2949,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
                 ENDIF.
@@ -2619,7 +2972,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
 
@@ -2646,7 +2999,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
                 ENDIF.
@@ -2668,7 +3021,7 @@ END-ENHANCEMENT-SECTION.
                                     DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                     DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                     AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                    informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                    INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                     ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                     ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
 
@@ -2695,7 +3048,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
                 ENDIF.
@@ -2718,7 +3071,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
 
@@ -2745,7 +3098,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
                 ENDIF.
@@ -2767,7 +3120,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
 
@@ -2794,7 +3147,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
                 ENDIF.
@@ -2818,7 +3171,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
 
@@ -2846,7 +3199,7 @@ END-ENHANCEMENT-SECTION.
                                   DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                  INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
 
@@ -2871,7 +3224,7 @@ END-ENHANCEMENT-SECTION.
                                           DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                          informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
 
@@ -2899,20 +3252,19 @@ END-ENHANCEMENT-SECTION.
                                           DB6      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           DB2      me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                          informix me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
+                                          INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
                 ENDIF.
             ENDCASE.
 
-            GET RUN TIME FIELD l_to.
-            e_result_details-runtime = l_to - l_from.
-            MOVE sy-dbcnt TO e_result_details-lines. "l_LINES.
+            e_result_details-runtime = runtime->end( ).
+            e_result_details-lines = sy-dbcnt. "l_LINES.
 
-            IF sy-dbcnt EQ l_maxsel.
+            IF e_result_details-lines > 0 AND e_result_details-lines = l_maxsel.
               MESSAGE s044(/cadaxo/sqlc) WITH l_maxsel.
-              MOVE abap_true TO e_result_details-restricted_lines."CDX130-017
-              MOVE l_maxsel  TO e_result_details-maxsel.    "CDX130-017
+              e_result_details-restricted_lines = abap_true."CDX130-017
+              e_result_details-maxsel = l_maxsel.    "CDX130-017
             ENDIF.
 
           ENDIF.
@@ -2965,49 +3317,39 @@ METHOD execute_select_v_2.
   DATA lr_exception2      TYPE REF TO cx_sy_conversion_error.
   DATA lr_root_exception  TYPE REF TO /cadaxo/cx_sqlc_syntax_error.
 
-* Macro m_execute_select_v_2
-m_execute_select_v_2.
+  "MACRO m_execute_select_v_2
 
   CLEAR l_maxsel.
 
   IF i_user_settings IS SUPPLIED.
-    MOVE i_user_settings TO g_user_settings.
+    g_user_settings = i_user_settings.
   ENDIF.
 
   IF NOT me->g_up_to_x_rows IS INITIAL.
-    MOVE me->g_up_to_x_rows TO l_maxsel.
+    l_maxsel = me->g_up_to_x_rows.
   ELSEIF NOT g_user_settings-maxsel IS INITIAL.
-    MOVE g_user_settings-maxsel TO l_maxsel.
+    l_maxsel = g_user_settings-maxsel.
   ENDIF.
 
-* log data
   LOG-POINT ID /cadaxo/sqlc FIELDS me->column_syntax
-  me->source_syntax
-  me->where_syntax
-  me->group_syntax
-  me->having_syntax
-  me->order_syntax
-  me->g_select_distinct
-  me->g_bypassing_buffer
-  me->gs_client_handling
-  g_user_settings.
-
-*{   DELETE         A4HK9F001G                                        1
-*\  TRANSLATE me->dbhint_syntax USING `' `.
-*}   DELETE
+                                   me->source_syntax
+                                   me->where_syntax
+                                   me->group_syntax
+                                   me->having_syntax
+                                   me->order_syntax
+                                   me->g_select_distinct
+                                   me->g_bypassing_buffer
+                                   me->gs_client_handling
+                                   g_user_settings.
 
   TRY.
 
-      me->execute_select_via_subpool_v_2(
-      EXPORTING
-      i_progress_indicator = i_progress_indicator
-      IMPORTING
-      e_result_details = e_result_details ).
+      e_result_details = me->execute_select_via_subpool_v_2( i_progress_indicator = i_progress_indicator ).
 
-      IF e_result_details-lines EQ l_maxsel.
+      IF l_maxsel > 0 AND l_maxsel = e_result_details-lines.
         MESSAGE s044(/cadaxo/sqlc) WITH l_maxsel.
-        MOVE abap_true TO e_result_details-restricted_lines.
-        MOVE l_maxsel  TO e_result_details-maxsel.
+        e_result_details-restricted_lines = abap_true.
+        e_result_details-maxsel = l_maxsel.
       ENDIF.
 
       me->result_lines    = e_result_details-lines.
@@ -6384,25 +6726,23 @@ METHOD update_sql_to_log.
 * Date       | Developer            | Description                                 |                *
 *------------+----------------------+---------------------------------------------+----------------*
 *            |                      |                                             |                *
-*            |                      |                                             |                *
 *------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-  DATA l_sqlclog TYPE /cadaxo/sqlclog.
+  DATA l_sqlclog    TYPE /cadaxo/sqlclog.
   DATA l_sqllog_xml TYPE /cadaxo/sqlc_sqllog.
   DATA l_xml        TYPE string.
 
   CLEAR: l_sqlclog.
   CLEAR: l_sqllog_xml.
 
-  l_sqllog_xml-sql_string     = i_sql_string.
-  l_sqllog_xml-result_status  = '00'.
-  l_sqllog_xml-sql_mode       = i_sql_mode.
-  l_sqllog_xml-result_rows    = i_result_lines.
-  l_sqllog_xml-result_runtime = i_result_runtime.
-
+  l_sqllog_xml-sql_string          = i_sql_string.
+  l_sqllog_xml-result_status       = '00'.
+  l_sqllog_xml-sql_mode            = i_sql_mode.
+  l_sqllog_xml-result_rows         = i_result_lines.
+  l_sqllog_xml-result_runtime      = i_result_runtime-runtime.
+  l_sqllog_xml-result_runtime_unit = i_result_runtime-unit.
   CALL TRANSFORMATION id SOURCE log = l_sqllog_xml
                          RESULT XML l_xml .
   cl_abap_gzip=>compress_text( EXPORTING text_in  = l_xml
