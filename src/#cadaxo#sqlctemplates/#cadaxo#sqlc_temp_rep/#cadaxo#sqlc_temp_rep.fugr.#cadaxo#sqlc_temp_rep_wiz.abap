@@ -18,12 +18,15 @@ FUNCTION /cadaxo/sqlc_temp_rep_wiz.
 
   IF gcc_description IS BOUND. "COCKPIT-409
     gcc_description->finalize( ).
-    CLEAR: gcc_description.
+    CLEAR gcc_description.
   ENDIF.
-
+  IF gc_roadmap IS BOUND.
+    gc_roadmap->finalize( ).
+    CLEAR gc_roadmap.
+  ENDIF.
   IF gcc_roadmap IS BOUND.     "COCKPIT-409
     gcc_roadmap->finalize( ).
-    CLEAR: gcc_roadmap.
+    CLEAR gcc_roadmap.
   ENDIF.
 
   CASE c_templ_name.

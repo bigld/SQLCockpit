@@ -16,11 +16,13 @@ FUNCTION /cadaxo/sqlc_temp_rrg_wiz.
     CLEAR gcc_description.
     CLEAR gc_description.
   ENDIF.
-
+  IF gc_roadmap IS BOUND.
+    gc_roadmap->finalize( ).
+    CLEAR: gc_roadmap.
+  ENDIF.
   IF gcc_roadmap IS BOUND.
     gcc_roadmap->finalize( ).
     CLEAR: gcc_roadmap.
-    CLEAR: gc_roadmap.
   ENDIF.
 
   go_rrg_wiz = io_rrg_wiz.

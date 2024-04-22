@@ -46,10 +46,10 @@ DATA: gt_merge               TYPE swww_t_merge_table.
 DATA: go_odata_wiz           TYPE REF TO /cadaxo/cl_sqlc_odata_gen.
 DATA: gcc_description        TYPE REF TO cl_gui_custom_container.
 DATA: gcc_roadmap            TYPE REF TO cl_gui_custom_container.
-DATA: g_event                TYPE cntl_simple_event.
-DATA: gt_events              TYPE cntl_simple_events.
 DATA: gc_description         TYPE REF TO cl_gui_html_viewer.
 DATA: gc_roadmap             TYPE REF TO cl_gui_html_viewer.
+DATA: g_event                TYPE cntl_simple_event.
+DATA: gt_events              TYPE cntl_simple_events.
 DATA: g_description_url(4096).
 CLASS lcl_event_handler_html_viewer    DEFINITION DEFERRED.
 DATA: gr_receiver          TYPE REF TO lcl_event_handler_html_viewer .

@@ -160,7 +160,7 @@ FORM init_roadmap .
 
   CLEAR ls_roadmap.
   ls_roadmap-step_id            = 'START'.
-  ls_roadmap-step_description   = text-s01.
+  ls_roadmap-step_description   = TEXT-s01.
   ls_roadmap-step_documentation = '/CADAXO/SQLC_TEMP_ODAT_START'.
   ls_roadmap-step_active        = 'X'.
   ls_roadmap-step_subdynpro     = '0110'.
@@ -170,7 +170,7 @@ FORM init_roadmap .
 
   CLEAR ls_roadmap.
   ls_roadmap-step_id            = 'REPORT'.
-  ls_roadmap-step_description   = text-s02.
+  ls_roadmap-step_description   = TEXT-s02.
   ls_roadmap-step_subdynpro     = '0120'.
   ls_roadmap-step_documentation = '/CADAXO/SQLC_TEMP_ODATA_ATTR'.
   ls_roadmap-step_visible       = 'X'.
@@ -179,7 +179,7 @@ FORM init_roadmap .
 
   CLEAR ls_roadmap.
   ls_roadmap-step_id            = 'SELSCR'.
-  ls_roadmap-step_description   = text-s03.
+  ls_roadmap-step_description   = TEXT-s03.
   ls_roadmap-step_documentation = '/CADAXO/SQLC_TEMP_ODAT_SELSC'.
   ls_roadmap-step_subdynpro     = '0130'.
   ls_roadmap-step_visible       = 'X'.
@@ -188,7 +188,7 @@ FORM init_roadmap .
 
   CLEAR ls_roadmap.
   ls_roadmap-step_id            = 'GENERATE'.
-  ls_roadmap-step_description   = text-s99.
+  ls_roadmap-step_description   = TEXT-s99.
   ls_roadmap-step_documentation = '/CADAXO/SQLC_TEMP_ODATA_END'.
   ls_roadmap-step_subdynpro     = '0140'.
   ls_roadmap-step_visible       = 'X'.
@@ -251,11 +251,6 @@ ENDFORM.                    " GET_DOCUMENTATION
 *&---------------------------------------------------------------------*
 *&      Form  CONTAINER_130
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
-*  -->  p1        text
-*  <--  p2        text
-*----------------------------------------------------------------------*
 FORM container_130 .
   DATA: lwa_layout             TYPE lvc_s_layo.
   DATA: lt_fcat                TYPE lvc_t_fcat.
@@ -332,14 +327,7 @@ FORM container_130 .
     gr_grid->refresh_table_display( is_stable = lwa_stable_ref ).
   ENDIF.
 ENDFORM.
-*&---------------------------------------------------------------------*
-*&      Form  INIT_SELOPT
-*&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
-*  -->  p1        text
-*  <--  p2        text
-*----------------------------------------------------------------------*
+
 FORM init_selopt .
 
   IF NOT gr_handler IS INITIAL.
@@ -359,11 +347,7 @@ FORM init_selopt .
   go_odata_wiz->fill_selopt( IMPORTING et_selopt = go_odata_wiz->gt_selopt ).
 
 ENDFORM.
-*&---------------------------------------------------------------------*
-*&      Module  PROJECT  INPUT
-*&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
+
 MODULE package INPUT.
 
   go_odata_wiz->validate_package(
@@ -372,11 +356,7 @@ MODULE package INPUT.
       iv_project_name = gs_report_attr-project_name ).
 
 ENDMODULE.
-*&---------------------------------------------------------------------*
-*&      Module  PROJECT_NAME  INPUT
-*&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
+
 MODULE project_name INPUT.
 
   go_odata_wiz->validate_project_name(
@@ -384,17 +364,11 @@ MODULE project_name INPUT.
       iv_project_name = gs_report_attr-project_name ).
 
 ENDMODULE.
-*&---------------------------------------------------------------------*
-*&      Form  CLEAR_GLOBAL
-*&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
-*  -->  p1        text
-*  <--  p2        text
-*----------------------------------------------------------------------*
-FORM DELETE_CC .
+FORM delete_cc .
 
   gcc_description->free( ).
+  CLEAR gcc_description.
   gcc_roadmap->free( ).
+  CLEAR gcc_description.
 
 ENDFORM.
