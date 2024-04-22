@@ -10,10 +10,10 @@
     <SCRLEN2>17</SCRLEN2>
     <SCRLEN3>20</SCRLEN3>
     <DDTEXT>SQL Cockpit - Result Runtime</DDTEXT>
-    <REPTEXT>Result Runtime µs</REPTEXT>
-    <SCRTEXT_S>Runtime µs</SCRTEXT_S>
-    <SCRTEXT_M>Result Runtime µs</SCRTEXT_M>
-    <SCRTEXT_L>Result Runtime µs</SCRTEXT_L>
+    <REPTEXT>Result Runtime</REPTEXT>
+    <SCRTEXT_S>Runtime</SCRTEXT_S>
+    <SCRTEXT_M>Result Runtime</SCRTEXT_M>
+    <SCRTEXT_L>Result Runtime</SCRTEXT_L>
     <DTELMASTER>E</DTELMASTER>
     <DATATYPE>INT4</DATATYPE>
     <LENG>000010</LENG>
@@ -26,10 +26,10 @@
     <item>
      <DDLANGUAGE>D</DDLANGUAGE>
      <DDTEXT>SQL Cockpit - Ausführungszeit</DDTEXT>
-     <REPTEXT>Laufzeit µs</REPTEXT>
-     <SCRTEXT_S>Laufz. µs</SCRTEXT_S>
-     <SCRTEXT_M>Ausführungsz. µs</SCRTEXT_M>
-     <SCRTEXT_L>Ausführungszeit µs</SCRTEXT_L>
+     <REPTEXT>Laufzeit</REPTEXT>
+     <SCRTEXT_S>Laufzeit</SCRTEXT_S>
+     <SCRTEXT_M>Ausführungsz.</SCRTEXT_M>
+     <SCRTEXT_L>Ausführungszeit</SCRTEXT_L>
     </item>
    </DD04_TEXTS>
   </asx:values>

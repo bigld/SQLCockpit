@@ -1,6 +1,6 @@
 FUNCTION /cadaxo/sqlcsubroutinepool.
 *"----------------------------------------------------------------------
-*"*"Lokale Schnittstelle:
+*"*"Local Interface:
 *"  IMPORTING
 *"     VALUE(I_VERSION) TYPE  /CADAXO/SQLC_SELECT_VERSION
 *"     VALUE(I_TRACE) TYPE  BOOLEAN
@@ -8,7 +8,7 @@ FUNCTION /cadaxo/sqlcsubroutinepool.
 *"     VALUE(I_USER_SETT_TABB_TRACE) TYPE  /CADAXO/SQLCTABLEBUFFERTRACE
 *"  EXPORTING
 *"     VALUE(E_ERROR_MESSAGE) TYPE  STRING
-*"     VALUE(E_RUNTIME) TYPE  INT4
+*"     VALUE(E_RUNTIME) TYPE  /CADAXO/SQLCRUNTIME
 *"     VALUE(E_RESULT_LINES) TYPE  INT4
 *"     VALUE(ET_RESULT) TYPE  XSTRING
 *"     VALUE(ET_DFIES_ALL) TYPE  /CADAXO/SQLCDFIES_T
