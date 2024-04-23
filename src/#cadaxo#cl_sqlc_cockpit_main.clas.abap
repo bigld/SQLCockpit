@@ -74,13 +74,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     EVENTS settings_changed_upto
       EXPORTING
         VALUE(i_new_upto) TYPE /cadaxo/sqlcmaxsel .
-
-    CLASS-METHODS calculate_height_for_button
-      RETURNING
-        VALUE(e_height) TYPE int4 .
-    CLASS-METHODS calculate_width_for_button
-      RETURNING
-        VALUE(e_width) TYPE int4 .
     CLASS-METHODS api_execute_sql
       IMPORTING
         !i_sql_string TYPE /cadaxo/sqlcsql_string
@@ -339,11 +332,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !i_symbol_multivalue TYPE /cadaxo/sqlcsymbol_multivalue
       RETURNING
         VALUE(r_count)       TYPE i .
-    METHODS error_calc_height
-      IMPORTING
-        !iv_errors       TYPE i
-      RETURNING
-        VALUE(ev_height) TYPE i .
     CLASS-METHODS build_result_grid_footer
       IMPORTING
         !iv_syst             TYPE sysysid
@@ -1202,25 +1190,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD calculate_height_for_button.
 
-    e_height = cl_gui_cfw=>compute_metric_from_dynp( metric = cl_gui_control=>metric_pixel x_or_y = 'Y' in = 1 ) + 4.
-    IF e_height < 20.
-      e_height = 20.
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD calculate_width_for_button.
-
-    e_width = cl_gui_cfw=>compute_metric_from_dynp( metric = cl_gui_control=>metric_pixel x_or_y = 'X' in = 3 ).
-
-    IF e_width < 30.
-      e_width = 30.
-    ENDIF.
-
-  ENDMETHOD.
 
 
   METHOD calc_result_rows_and_cols.
@@ -1583,7 +1553,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       ENDLOOP.
 
-* refresh table display and set the height to 0
       gc_abap_error->refresh_table_display( ).
 
       IF lt_rest IS INITIAL.
@@ -1664,18 +1633,13 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
 
   METHOD class_constructor.
+    DATA(resolution) = /cadaxo/cl_sqlc_resolution=>get_instance( ).
+    toolbar_row_height = resolution->get_button_height( ).
+    toolbar_col_width = resolution->get_button_width( ).
 
-    toolbar_row_height = calculate_height_for_button( ).
-    toolbar_col_width = calculate_width_for_button( ).
-
-    /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value(
-        EXPORTING
-          i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
-       RECEIVING
-         r_parameter_value    = g_version_nr
-        EXCEPTIONS
-          OTHERS              = 2
-             ).
+    /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value( EXPORTING i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
+                                                         RECEIVING r_parameter_value    = g_version_nr
+                                                         EXCEPTIONS OTHERS              = 2 ).
 
   ENDMETHOD.
 
@@ -3836,15 +3800,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD error_calc_height.
-    ev_height = toolbar_row_height * 3.
 
-    IF iv_errors <= 2.
-      ev_height = toolbar_row_height * 3.
-    ELSEIF iv_errors <= 4.
-      ev_height = toolbar_row_height * 5.
-    ENDIF.
-  ENDMETHOD.
 
 
   METHOD execute_sql.
@@ -6460,7 +6416,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     DELETE ADJACENT DUPLICATES FROM gt_errors.
     gc_abap_error->refresh_table_display( ).
-    gs_splitter_editor->set_row_height( id = 2 height = me->error_calc_height( lines( gt_errors ) ) ).
+    gs_splitter_editor->set_row_height( id = 2 height = /cadaxo/cl_sqlc_resolution=>get_instance( )->calculate_error_height( i_number_of_errors = lines( gt_errors ) ) ).
 
   ENDMETHOD.
 

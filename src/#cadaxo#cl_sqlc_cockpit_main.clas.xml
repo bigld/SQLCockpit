@@ -2527,16 +2527,6 @@
      <DESCRIPT>Create Result Grid Title</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CMPNAME>CALCULATE_HEIGHT_FOR_BUTTON</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Calculate height for one button (toolbar)</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CMPNAME>CALCULATE_WIDTH_FOR_BUTTON</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Calculate width for one button (toolbar)</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
      <CMPNAME>CALL_ADMIN</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Call Admin</DESCRIPT>
@@ -2790,11 +2780,6 @@
      <CMPNAME>DRAGDROP_HANDLE_SYMBOL</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Handle symbol</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CMPNAME>ERROR_CALC_HEIGHT</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Calculate the height of the Error message Control</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CMPNAME>EXECUTE_SQL</CMPNAME>
