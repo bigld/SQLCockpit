@@ -978,7 +978,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>161</MSGNR>
-     <TEXT>More than 10 filter criteria is not yet supported</TEXT>
+     <TEXT>More than 10 filter criteria are not supported yet</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -3116,7 +3116,7 @@
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>161</MSGNR>
-     <TEXT>Mehr als 10 Filterkriterien werden nicht unterstützt!</TEXT>
+     <TEXT>Mehr als 10 Filterkriterien werden nicht unterstützt</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>

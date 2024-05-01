@@ -37,7 +37,7 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
         /iwbep/cx_sbcm_exception .
 
     METHODS execute_template_generation
-         REDEFINITION .
+        REDEFINITION .
   PROTECTED SECTION.
 
     METHODS create_project
@@ -177,7 +177,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
 
 
   METHOD add_entity_attributes.
@@ -215,7 +215,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   METHOD count.
 
-    APPEND text-004                                                 TO ct_code.
+    APPEND TEXT-004                                                 TO ct_code.
 
     APPEND `IF io_tech_request_context->has_count( ) EQ abap_true.` TO ct_code.
     APPEND `  es_response_context-count = lines( et_entityset ).`   TO ct_code.
@@ -232,9 +232,9 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
     lo_od_factory ?= /iwbep/cl_sbod=>get_factory( ).
 
-    gr_entity_type = lo_od_factory->create_entity_type( conv #( gv_entity ) ).
+    gr_entity_type = lo_od_factory->create_entity_type( CONV #( gv_entity ) ).
     gr_model->/iwbep/if_sbdm_node~insert_child( gr_entity_type ).
-    gr_entity_set = lo_od_factory->create_entity_set( conv #( gv_entity_set ) ).
+    gr_entity_set = lo_od_factory->create_entity_set( CONV #( gv_entity_set ) ).
     gr_entity_set->set_entity_type( gr_entity_type ).
     gr_model->/iwbep/if_sbdm_node~insert_child( gr_entity_set ).
 
@@ -362,25 +362,33 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   METHOD filter.
 
-    APPEND text-001                                                                                    TO ct_code.
-
-    APPEND `IF  iv_filter_string         IS NOT INITIAL`                                               TO ct_code.
-    APPEND `AND it_filter_select_options IS INITIAL .`                                                 TO ct_code.
-    APPEND `  RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_mgw_busi`                                     TO ct_code.
-    APPEND `    EXPORTING`                                                                             TO ct_code.
-    APPEND `      textid       = /cadaxo/cx_sqlc_odata_mgw_busi=>sql_filter`                           TO ct_code.
-    APPEND `      filter_param = iv_filter_string.`                                                    TO ct_code.
-    APPEND `ENDIF.`                                                                                    TO ct_code.
-    APPEND `IF lines( it_filter_select_options ) GT ` && c_filter_cnt && `.`                           TO ct_code.
-    APPEND `  RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_mgw_busi`                                     TO ct_code.
-    APPEND `    EXPORTING`                                                                             TO ct_code.
-    APPEND `      textid       = /cadaxo/cx_sqlc_odata_mgw_busi=>filter_criteria.`                     TO ct_code.
-    APPEND `ENDIF.`                                                                                    TO ct_code.
+    APPEND TEXT-001                                                                                    TO ct_code.
+    IF 1 = 2. "where used
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_mgw_busi.
+    ENDIF.
+    APPEND |TRY.|                                                                      TO ct_code.
+    APPEND |  IF  iv_filter_string         IS NOT INITIAL|                             TO ct_code.
+    APPEND |  AND it_filter_select_options IS INITIAL .|                               TO ct_code.
+    APPEND |    RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_mgw_busi|                   TO ct_code.
+    APPEND |      EXPORTING|                                                           TO ct_code.
+    APPEND |        textid       = /cadaxo/cx_sqlc_odata_mgw_busi=>sql_filter|         TO ct_code.
+    APPEND |        filter_param = iv_filter_string.|                                  TO ct_code.
+    APPEND |  ENDIF.|                                                                  TO ct_code.
+    APPEND |  IF lines( it_filter_select_options ) GT { c_filter_cnt }.|               TO ct_code.
+    APPEND |    RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_mgw_busi|                   TO ct_code.
+    APPEND |      EXPORTING|                                                           TO ct_code.
+    APPEND |        textid       = /cadaxo/cx_sqlc_odata_mgw_busi=>filter_criteria.|   TO ct_code.
+    APPEND |  ENDIF.|                                                                  TO ct_code.
+    APPEND |CATCH /cadaxo/cx_sqlc_odata_mgw_busi INTO DATA(exception).|                TO ct_code.
+    APPEND |  RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception|                       TO ct_code.
+    APPEND |    EXPORTING textid = /iwbep/cx_mgw_busi_exception=>filter_not_supported| TO ct_code.
+    APPEND |              previous = exception.|                                       TO ct_code.
+    APPEND |ENDTRY.|                                                                   TO ct_code.
     get_new_line( CHANGING ct_code = ct_code ).
 
-    APPEND `DATA lv_where     TYPE string.`                                                            TO ct_code.
-    APPEND `DATA lv_where_sql TYPE string.`                                                            TO ct_code.
-    APPEND `DATA l_property type string.`                                                              TO ct_code.
+    APPEND `DATA lv_where     TYPE string.`                                            TO ct_code.
+    APPEND `DATA lv_where_sql TYPE string.`                                            TO ct_code.
+    APPEND `DATA l_property type string.`                                              TO ct_code.
 
     IF lines( gt_selopt ) GT c_filter_cnt .
       DATA(lv_count) = c_filter_cnt .
@@ -388,9 +396,9 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
       lv_count = lines( gt_selopt ).
     ENDIF.
 
-    APPEND `LOOP AT it_filter_select_options ASSIGNING FIELD-SYMBOL(<fs_filter_select_options>).`      TO ct_code.
+    APPEND `LOOP AT it_filter_select_options ASSIGNING FIELD-SYMBOL(<filter_select_options>).`      TO ct_code.
 
-    APPEND `  CASE <fs_filter_select_options>-property.`                                               TO ct_code.
+    APPEND `  CASE <filter_select_options>-property.`                                               TO ct_code.
 
     LOOP AT gr_parser->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<ddfields>).
       IF <ddfields>-/cadaxo/alias_field <> '' AND <ddfields>-/cadaxo/alias = ''.
@@ -406,14 +414,14 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
     ENDLOOP.
 
     APPEND `  when others.`                                                                            TO ct_code.
-    APPEND `  l_property = <fs_filter_select_options>-property.`                                       TO ct_code.
+    APPEND `  l_property = <filter_select_options>-property.`                                       TO ct_code.
     APPEND `  endcase.`                                                                                TO ct_code.
 
     APPEND `  CASE sy-tabix.`                                                                          TO ct_code.
     DO lv_count TIMES.
       APPEND `    WHEN ` && sy-index && `.`                                                            TO ct_code.
       APPEND `      FIELD-SYMBOLS: <fs` && sy-index && `> TYPE any .`                                  TO ct_code.
-      APPEND `      ASSIGN <fs_filter_select_options>-select_options TO <fs` && sy-index && `>.`       TO ct_code.
+      APPEND `      ASSIGN <filter_select_options>-select_options TO <fs` && sy-index && `>.`       TO ct_code.
       APPEND `      lv_where = l_property  && | IN @<fs` && sy-index && `>|.`  TO ct_code.
     ENDDO.
     APPEND `  ENDCASE.`                                              TO ct_code.
@@ -716,7 +724,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
     DATA l_line TYPE string.
 
-    APPEND text-007 TO ct_code.
+    APPEND TEXT-007 TO ct_code.
     IF NOT gr_parser->g_select_single IS INITIAL.
       l_line = `SELECT SINGLE ` && gr_parser->column_syntax.
     ELSE.
@@ -797,7 +805,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   METHOD get_entity_set.
 
-    APPEND text-002                                                                                 TO ct_code.
+    APPEND TEXT-002                                                                                 TO ct_code.
 
     APPEND `DATA lo_table TYPE REF TO cl_abap_tabledescr.`                                          TO ct_code.
     APPEND `DATA lo_struc TYPE REF TO cl_abap_structdescr.`                                         TO ct_code.
@@ -893,7 +901,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   METHOD order_by.
 
-    APPEND text-003                                               TO ct_code.
+    APPEND TEXT-003                                               TO ct_code.
 
     APPEND `DATA lt_otab TYPE abap_sortorder_tab.`                TO ct_code.
     APPEND `DATA ls_otab LIKE LINE OF lt_otab.`                   TO ct_code.
@@ -1043,7 +1051,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   METHOD skip.
 
-    APPEND text-005                                                         TO ct_code.
+    APPEND TEXT-005                                                         TO ct_code.
 
     APPEND `IF io_tech_request_context->get_skip( ) > 0.`                   TO ct_code.
     APPEND `  DELETE et_entityset TO io_tech_request_context->get_skip( ).` TO ct_code.
@@ -1069,7 +1077,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   METHOD top.
 
-    APPEND text-006                                                              TO ct_code.
+    APPEND TEXT-006                                                              TO ct_code.
 
     APPEND `IF io_tech_request_context->get_top( ) > 0.`                         TO ct_code.
     APPEND `  DELETE et_entityset FROM io_tech_request_context->get_top( ) + 1.` TO ct_code.

@@ -53,7 +53,7 @@ CLASS lcl_event_handler_alv IMPLEMENTATION.
 
     ASSIGN COMPONENT e_column_id-fieldname OF STRUCTURE <ls_selopt> TO FIELD-SYMBOL(<l_field>).
     IF sy-subrc = 0.
-      IF <l_field> EQ abap_true.
+      IF <l_field> = abap_true.
         <l_field> = abap_false.
       ELSE.
         <l_field> = abap_true.

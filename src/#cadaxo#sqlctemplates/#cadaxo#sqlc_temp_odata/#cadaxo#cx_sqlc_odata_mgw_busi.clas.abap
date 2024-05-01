@@ -1,9 +1,11 @@
 class /CADAXO/CX_SQLC_ODATA_MGW_BUSI definition
   public
-  inheriting from /IWBEP/CX_MGW_BUSI_EXCEPTION
+  inheriting from CX_STATIC_CHECK
   create public .
 
 public section.
+
+  interfaces IF_T100_MESSAGE .
 
   constants:
     begin of SQL_FILTER,
@@ -23,20 +25,13 @@ public section.
       attr3 type scx_attrname value '',
       attr4 type scx_attrname value '',
     end of FILTER_CRITERIA .
+  data FILTER_PARAM type STRING .
 
   methods CONSTRUCTOR
     importing
       !TEXTID like IF_T100_MESSAGE=>T100KEY optional
       !PREVIOUS like PREVIOUS optional
-      !MESSAGE_CONTAINER type ref to /IWBEP/IF_MESSAGE_CONTAINER optional
-      !HTTP_STATUS_CODE type /IWBEP/MGW_HTTP_STATUS_CODE default GCS_HTTP_STATUS_CODES-BAD_REQUEST
-      !HTTP_HEADER_PARAMETERS type /IWBEP/T_MGW_NAME_VALUE_PAIR optional
-      !SAP_NOTE_ID type /IWBEP/MGW_SAP_NOTE_ID optional
-      !ENTITY_TYPE type STRING optional
-      !MESSAGE type BAPI_MSG optional
-      !MESSAGE_UNLIMITED type STRING optional
-      !FILTER_PARAM type STRING optional
-      !OPERATION_NO type I optional .
+      !FILTER_PARAM type STRING optional .
 protected section.
 private section.
 ENDCLASS.
@@ -50,16 +45,8 @@ CLASS /CADAXO/CX_SQLC_ODATA_MGW_BUSI IMPLEMENTATION.
 CALL METHOD SUPER->CONSTRUCTOR
 EXPORTING
 PREVIOUS = PREVIOUS
-MESSAGE_CONTAINER = MESSAGE_CONTAINER
-HTTP_STATUS_CODE = HTTP_STATUS_CODE
-HTTP_HEADER_PARAMETERS = HTTP_HEADER_PARAMETERS
-SAP_NOTE_ID = SAP_NOTE_ID
-ENTITY_TYPE = ENTITY_TYPE
-MESSAGE = MESSAGE
-MESSAGE_UNLIMITED = MESSAGE_UNLIMITED
-FILTER_PARAM = FILTER_PARAM
-OPERATION_NO = OPERATION_NO
 .
+me->FILTER_PARAM = FILTER_PARAM .
 clear me->textid.
 if textid is initial.
   IF_T100_MESSAGE~T100KEY = IF_T100_MESSAGE=>DEFAULT_TEXTID.
