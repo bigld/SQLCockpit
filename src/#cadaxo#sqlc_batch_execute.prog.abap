@@ -20,12 +20,10 @@
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-REPORT  /cadaxo/sqlc_batch_execute.
+REPORT /cadaxo/sqlc_batch_execute.
 
 PARAMETERS: pjobguid TYPE /cadaxo/sqlc_jobguid OBLIGATORY.
 
 START-OF-SELECTION.
 
-  /cadaxo/cl_sqlc_cockpit_main=>execute_sql_background( pjobguid ).
-
-END-OF-SELECTION.
+  /cadaxo/cl_sqlc_background=>execute_sql_background( pjobguid ).
