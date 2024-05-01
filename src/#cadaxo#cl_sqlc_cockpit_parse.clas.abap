@@ -32,69 +32,112 @@ public section.
   types:
     gtt_domval TYPE TABLE OF gts_domval .
 
-    "COCKPIT-458 END
-  data G_HOLD_RESULT type CHAR1 .
-  data COLUMN_SYNTAX type /CADAXO/SQLCSELECTCOLUMNSYNTAX .
-  data WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX .
-  data FIELDS_SYNTAX type /CADAXO/SQLCSELECTFIELDSSYNTAX .
-  data OFFSET_SYNTAX type /CADAXO/SQLCSELECTOFFSETSYNTAX .
-  data WHERE_SYNTAX_WILDCARD type /CADAXO/SQLCSELECTWHERESYNTAX .
-  data SOURCE_SYNTAX type /CADAXO/SQLCSELECTSOURCESYNTAX .
-  data CDS_PARAMETER_SYNTAX type /CADAXO/SQLCSELECTCDSPARSYNTAX .
-  data GROUP_SYNTAX type /CADAXO/SQLCSELECTGROUPSYNTAX .
-  data HAVING_SYNTAX type /CADAXO/SQLCSELECTHAVINGSYNTAX .
-  data ORDER_SYNTAX type /CADAXO/SQLCSELECTORDERSYNTAX .
-  data DBHINT_SYNTAX type /CADAXO/SQLCSELECTDBHINTSYNTAX .
-  data CONNECTION_SYNTAX type /CADAXO/SQLCSELECTDBHINTSYNTAX .
-  data GT_RESULT_DDFIELDS type /CADAXO/SQLCDFIES_T .
-  data SQL_SYNTAX type STRING .
-  data SQL_SYNTAX_WITHOUT_WHERE type STRING .
-  data GT_SQL_WHERE_COL_TAB_T type /CADAXO/SQLCWHERECOL_STR_T .
-  data G_SELECT_SINGLE type CHAR1 .
-  data G_UP_TO_X_ROWS type INT4 .
-  data SUBQUERY type CHAR1 .
-  data RESULT_TABLE type ref to DATA .
-  data RESULT_STRUCTURE type ref to DATA .
-  data RESULT_LINES type INT4 .
-  data RESULT_RUNTIME type /CADAXO/SQLCRUNTIME .
-  data G_SELECT_DISTINCT type CHAR1 .
-  data RESULT_COMPONENT_T type /CADAXO/SQLCPARSECOMPONENT_T .
-  data RESULT_SOURCE_T type /CADAXO/SQLCSELECTSOURCE_T .
-  data G_BYPASSING_BUFFER type CHAR1 .
-  data GS_CLIENT_HANDLING type GTS_CLIENT_HANDLING .
-  data G_SAVED_LIST type ABAP_BOOL .
   constants C_SELECT_VERSION_0 type /CADAXO/SQLC_SELECT_VERSION value 0 ##NO_TEXT.
   constants C_SELECT_VERSION_1 type /CADAXO/SQLC_SELECT_VERSION value 1 ##NO_TEXT.
   constants C_SELECT_VERSION_2 type /CADAXO/SQLC_SELECT_VERSION value 2 ##NO_TEXT.
-  data G_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION read-only .
-  data GT_LVC_T_FCAT type LVC_T_FCAT .
   class-data G_MAIN_REF type ref to /CADAXO/CL_SQLC_COCKPIT_MAIN .
+  data CDS_PARAMETER_SYNTAX type /CADAXO/SQLCSELECTCDSPARSYNTAX .
+  data COLUMN_SYNTAX type /CADAXO/SQLCSELECTCOLUMNSYNTAX .
   data COLUMN_WORDS_T type /CADAXO/SQLCCODELINE_T .
-  data GT_RESULT_DDFIELDS_ALL type /CADAXO/SQLCDFIES_T .
-  data G_NO_UPTO type FLAG .
+  data COMP type /CADAXO/SQLC_COMPDESC_T .
+  data COMPONENTS type /IWBEP/T_ABAP_COMPDESCR .
+  data CONNECTION_SYNTAX type /CADAXO/SQLCSELECTDBHINTSYNTAX .
+  data DBHINT_SYNTAX type /CADAXO/SQLCSELECTDBHINTSYNTAX .
+  data FIELDS_SYNTAX type /CADAXO/SQLCSELECTFIELDSSYNTAX .
+  data GROUP_SYNTAX type /CADAXO/SQLCSELECTGROUPSYNTAX .
+  data GS_CLIENT_HANDLING type GTS_CLIENT_HANDLING .
   data GT_COMPONENTS type ABAP_COMPONENT_VIEW_TAB .
-  data GT_SUB_COMPONENTS type ABAP_COMPONENT_TAB .
   data GT_COMPONENTS_DOMVAL type /CADAXO/SQLCPARSECOMPONENT_T .
   data GT_DOMVAL type /CADAXO/SQLC_DOMVAL_T .
-  data COMPONENTS type /IWBEP/T_ABAP_COMPDESCR .
-  data COMP type /CADAXO/SQLC_COMPDESC_T .
+  data GT_LVC_T_FCAT type LVC_T_FCAT .
+  data GT_RESULT_DDFIELDS type /CADAXO/SQLCDFIES_T .
+  data GT_RESULT_DDFIELDS_ALL type /CADAXO/SQLCDFIES_T .
+  data GT_SQL_WHERE_COL_TAB_T type /CADAXO/SQLCWHERECOL_STR_T .
+  data GT_SUB_COMPONENTS type ABAP_COMPONENT_TAB .
+  data G_BYPASSING_BUFFER type CHAR1 .
+    "COCKPIT-458 END
+  data G_HOLD_RESULT type CHAR1 .
+  data G_NO_UPTO type FLAG .
+  data G_SAVED_LIST type ABAP_BOOL .
+  data G_SELECT_DISTINCT type CHAR1 .
+  data G_SELECT_SINGLE type CHAR1 .
+  data G_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION read-only .
+  data G_UP_TO_X_ROWS type INT4 .
+  data HAVING_SYNTAX type /CADAXO/SQLCSELECTHAVINGSYNTAX .
+  data OFFSET_SYNTAX type /CADAXO/SQLCSELECTOFFSETSYNTAX .
+  data ORDER_SYNTAX type /CADAXO/SQLCSELECTORDERSYNTAX .
+  data RESULT_COMPONENT_T type /CADAXO/SQLCPARSECOMPONENT_T .
+  data RESULT_LINES type INT4 .
+  data RESULT_RUNTIME type /CADAXO/SQLCRUNTIME .
+  data RESULT_SOURCE_T type /CADAXO/SQLCSELECTSOURCE_T .
+  data RESULT_STRUCTURE type ref to DATA .
+  data RESULT_TABLE type ref to DATA .
+  data SOURCE_SYNTAX type /CADAXO/SQLCSELECTSOURCESYNTAX .
+  data SQL_SYNTAX type STRING .
+  data SQL_SYNTAX_WITHOUT_WHERE type STRING .
+  data SUBQUERY type CHAR1 .
+  data WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX .
+  data WHERE_SYNTAX_WILDCARD type /CADAXO/SQLCSELECTWHERESYNTAX .
 
+  methods ADD_DOMAIN_VALUE
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods ADD_DOMAIN_VALUE_ELM
+    exporting
+      !E_ELM type ABAP_SIMPLE_COMPONENTDESCR
+      !E_PARENT_STR_NAME type STRING
+    changing
+      !C_DOMAIN_VALUES type GTT_DOMVAL
+      !C_DOMAIN_VALUE type GTS_DOMVAL
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods ADD_DOMAIN_VALUE_SUB
+    exporting
+      !E_COMP type ABAP_SIMPLE_COMPONENTDESCR
+    changing
+      !C_COMPONENTS_NEW type ABAP_COMPONENT_TAB
+      !C_DOMAIN_VALUES type GTT_DOMVAL
+      !C_DOMAIN_VALUE type GTS_DOMVAL
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods BLACKLIST_CHECK_TABLES .
+  methods CHECK_SQL_ODATA_SYNTAX
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR
+      /CADAXO/CX_SQLC_ODATA_GEN .
+  class-methods CHECK_SQL_SYNTAX
+    importing
+      !I_SQL_PARSED type /CADAXO/SQLC_CL_COCKPIT_PARSET
+      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_COCKPIT_PARSE=>C_SELECT_VERSION_1
+    exporting
+      !ET_REST type SCIT_REST
+      !E_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
   methods CONSTRUCTOR
     importing
       !I_MAIN_REF_ID type I optional .
-  class-methods INSERT_SQL_TO_LOG
+  methods CREATE_ALV_FIELD_CATALOG
     importing
-      !I_SQL_STRING type /CADAXO/SQLCSQL_STRING
-      !I_SQL_MODE type /CADAXO/SQLCSQL_MODE default '01'
-    exporting
-      !E_TIMESTAMP type TIMESTAMPL .
-  class-methods UPDATE_SQL_TO_LOG
+      !I_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN optional
+      !I_DRAGDROP_HANDLE type INT4 optional
+    returning
+      value(R_LVC_T_FCAT) type LVC_T_FCAT .
+  methods CREATE_ALV_FIELD_CATALOG_V_1
     importing
-      !I_SQL_STRING type /CADAXO/SQLCSTRING
-      !I_TIMESTAMP type TIMESTAMPL
-      !I_RESULT_RUNTIME type /CADAXO/SQLCRUNTIME
-      !I_RESULT_LINES type /CADAXO/SQLCRESULT_ROWS
-      !I_SQL_MODE type /CADAXO/SQLCSQL_MODE default '01' .
+      !I_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN optional
+      !I_DRAGDROP_HANDLE type INT4 optional
+    returning
+      value(R_LVC_T_FCAT) type LVC_T_FCAT .
+  methods CREATE_ALV_FIELD_CATALOG_V_2
+    importing
+      !I_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN optional
+      !I_DRAGDROP_HANDLE type INT4 optional
+    returning
+      value(R_LVC_T_FCAT) type LVC_T_FCAT .
+  methods CREATE_RESULT_STRUCTURES
+    importing
+      !I_MODE type CHAR1 default 'D' .
   methods EXECUTE_SELECT
     importing
       !I_USER_SETTINGS type /CADAXO/SQLCUSRP_XML optional
@@ -128,10 +171,6 @@ public section.
       /CADAXO/CX_SQLC_SYNTAX_ERROR
       CX_SY_DYNAMIC_OSQL_SEMANTICS
       CX_SY_CONVERSION_OVERFLOW .
-  methods CREATE_RESULT_STRUCTURES
-    importing
-      !I_MODE type CHAR1 default 'D' .
-  methods BLACKLIST_CHECK_TABLES .
   class-methods PARSE_SQL_I
     importing
       !I_SQL type /CADAXO/SQLCSQL_STRING
@@ -163,72 +202,23 @@ public section.
       /CADAXO/CX_SQLC_SYMB_NOT_FOUND
       /CADAXO/CX_SQLC_SYNTAX_ERROR
       /CADAXO/CX_SQLC_INVALID_VALUE .
-  methods CREATE_ALV_FIELD_CATALOG
-    importing
-      !I_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN optional
-      !I_DRAGDROP_HANDLE type INT4 optional
-    returning
-      value(R_LVC_T_FCAT) type LVC_T_FCAT .
-  class-methods CHECK_SQL_SYNTAX
-    importing
-      !I_SQL_PARSED type /CADAXO/SQLC_CL_COCKPIT_PARSET
-      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_COCKPIT_PARSE=>C_SELECT_VERSION_1
-    exporting
-      !ET_REST type SCIT_REST
-      !E_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods CHECK_SQL_ODATA_SYNTAX
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR
-      /CADAXO/CX_SQLC_ODATA_GEN .
   methods SERIALIZE
     exporting
       !E_XML type STRING .
+  methods SET_BACHGROUND_MODE
+    importing
+      !I_BACKGROUND_MODE type FLAG default ABAP_TRUE .
+  methods SUBPOOL_RESULT
+    importing
+      !P_TASK type CLIKE
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
   methods UPDATE_ALV_FIELD_CATALOG_SL
     importing
       !I_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN optional
       !I_DRAGDROP_HANDLE type INT4 optional
     changing
       value(C_LVC_T_FCAT) type LVC_T_FCAT .
-  methods CREATE_ALV_FIELD_CATALOG_V_1
-    importing
-      !I_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN optional
-      !I_DRAGDROP_HANDLE type INT4 optional
-    returning
-      value(R_LVC_T_FCAT) type LVC_T_FCAT .
-  methods CREATE_ALV_FIELD_CATALOG_V_2
-    importing
-      !I_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN optional
-      !I_DRAGDROP_HANDLE type INT4 optional
-    returning
-      value(R_LVC_T_FCAT) type LVC_T_FCAT .
-  methods SUBPOOL_RESULT
-    importing
-      !P_TASK type CLIKE
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods ADD_DOMAIN_VALUE_ELM
-    exporting
-      !E_ELM type ABAP_SIMPLE_COMPONENTDESCR
-      !E_PARENT_STR_NAME type STRING
-    changing
-      !C_DOMAIN_VALUES type GTT_DOMVAL
-      !C_DOMAIN_VALUE type GTS_DOMVAL
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods ADD_DOMAIN_VALUE_SUB
-    exporting
-      !E_COMP type ABAP_SIMPLE_COMPONENTDESCR
-    changing
-      !C_COMPONENTS_NEW type ABAP_COMPONENT_TAB
-      !C_DOMAIN_VALUES type GTT_DOMVAL
-      !C_DOMAIN_VALUE type GTS_DOMVAL
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods ADD_DOMAIN_VALUE
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
 protected section.
 
   types:
@@ -241,19 +231,140 @@ protected section.
   types:
     gtt_subpool_result type TABLE OF gts_subpool_result .
 
-  data GT_SYMBOL_VARIABLE type GTT_SYMBOL_VARIABLE .
-  class-data SQL_STRING type STRING .
   constants C_APOSTROPHE type CHAR1 value '''' ##NO_TEXT.
   class-data GT_ABAP_TYPEDESCR type /CADAXO/SQLCTABTYPEDESCR_T .
-  class-data G_USER_SETTINGS type /CADAXO/SQLCUSRP_XML .
-  data G_COUNT_SUBROUTINENPOOL type INT4 .
   class-data G_ROLE type /CADAXO/SQLCROLE_AUTH_XML .
+  class-data G_USER_SETTINGS type /CADAXO/SQLCUSRP_XML .
+  class-data SQL_STRING type STRING .
+  data GT_SUBPOOL_RESULT type GTT_SUBPOOL_RESULT .
+  data GT_SYMBOL_VARIABLE type GTT_SYMBOL_VARIABLE .
   data G_ASYNC_CALLS type INT4 .
+  data G_COUNT_SUBROUTINENPOOL type INT4 .
   data G_ERROR_MESSAGE type STRING .
   data G_TMP_RESULT_DETAILS type /CADAXO/SQLCRESULT_DETAILS .
-  data GT_SUBPOOL_RESULT type GTT_SUBPOOL_RESULT .
   data MR_ARFC_EXCEPTION type ref to CX_ROOT .
+  data G_MAIN_REF_ID type I .
+  data BACKGROUND_MODE type FLAG .
 
+  class-methods BUILD_ABAP_CODE
+    importing
+      !I_CL_COCKPIT_PARSE type ref to /CADAXO/CL_SQLC_COCKPIT_PARSE
+      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_COCKPIT_PARSE=>C_SELECT_VERSION_1
+    exporting
+      !E_ABAP_CODE type /CADAXO/SQLCSTRING_T
+      !E_ABAP_CODE_DATA type /CADAXO/SQLCSTRING_T .
+  class-methods CHECK_FOR_HOST_EXPRESSIONS
+    importing
+      !I_STRING type STRING .
+  class-methods CHECK_FOR_HOST_EXPR_METH
+    importing
+      !I_STRING type STRING .
+  methods CHECK_RUNTIME_ERROR
+    importing
+      !IV_ERROR_MESSAGE type STRING
+    returning
+      value(EV_ERROR_MESSAGE) type STRING .
+  class-methods CHECK_SQL_STRING_INCLUDES_SUBQ
+    importing
+      !I_SQL_STRING type /CADAXO/SQLCSQL_STRING
+    returning
+      value(R_TRUE) type /CADAXO/SQLCFLAGTRUEFALSE .
+  class-methods CONCATENATE_AGGR_PREFIX
+    importing
+      !I_PREFIX type STRING
+    changing
+      !C_SQLCDFIES type /CADAXO/SQLCDFIES .
+  methods EXECUTE_SELECT_VIA_SUBPOOL
+    importing
+      !I_PROGRESS_INDICATOR type CHAR1 optional
+    returning
+      value(E_RESULT_DETAILS) type /CADAXO/SQLCRESULT_DETAILS
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  methods EXECUTE_SELECT_VIA_SUBPOOL_V_2
+    importing
+      !I_PROGRESS_INDICATOR type CHAR1 optional
+    returning
+      value(E_RESULT_DETAILS) type /CADAXO/SQLCRESULT_DETAILS
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  class-methods FORMAT_ABAP_CODE
+    importing
+      !I_COLUMNS type I optional
+    changing
+      !CT_ABAP_CODE type /CADAXO/SQLCSTRING_T .
+  methods FORMAT_VALUE
+    importing
+      !I_ABAP_TYPE type ref to CL_ABAP_ELEMDESCR
+    exporting
+      !E_ADDED type I
+    changing
+      !C_WHERE_COL type /CADAXO/SQLCWHERECOL_STR
+    raising
+      CX_SY_CONVERSION_NO_NUMBER
+      /CADAXO/CX_SQLC_INVALID_VALUE .
+  methods FORMAT_VALUE_WO_DDIC
+    importing
+      !IV_VALUE type CSEQUENCE
+    changing
+      !CV_VALUE type ANY
+    raising
+      CX_SY_CONVERSION_NO_NUMBER .
+  class-methods GET_ABAP_TYPEDESCR
+    importing
+      !I_NAME type STRING
+    returning
+      value(R_ABAP_TYPEDESCR) type ref to CL_ABAP_TYPEDESCR
+    raising
+      /CADAXO/CX_SQLC_TYPE_NOT_FOUND .
+  methods GET_CODE_BYPASSING_BUFFER
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_CONNECTION
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_DBHINTS
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_FIELDS
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_GROUP_BY
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_HAVING
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_INTO
+    importing
+      !I_PROGRESS_INDICATOR type CHAR1 optional
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_OFFSET
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_ORDER_BY
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_TRACE_OFF
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_TRACE_ON
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_UP_TO_ROWS
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_CODE_WHERE
+    importing
+      !I_ONLY_INITVAL type ABAP_BOOL optional
+    changing
+      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
+  methods GET_DDIC_FIELD_LIST
+    importing
+      !I_CL_ABAP_STRUCTDESCR type ref to CL_ABAP_STRUCTDESCR
+    returning
+      value(R_FIELDS_T) type DDFIELDS .
   class-methods GET_MULTISYMBOL_DATA_TABLE
     exporting
       !E_SYMBOL_VARIABLE type GTT_SYMBOL_VARIABLE
@@ -265,35 +376,12 @@ protected section.
       !IV_FIELDLIST type STRING
     returning
       value(EV_IS_COUNT_STAR_ONLY) type FLAG .
-  methods EXECUTE_SELECT_VIA_SUBPOOL
+  methods PROCESS_SUBPOOL_RESULT
     importing
-      !I_PROGRESS_INDICATOR type CHAR1 optional
-    returning
-      value(E_RESULT_DETAILS) type /CADAXO/SQLCRESULT_DETAILS
+      !I_DATA type XSTRING
+      !I_ERROR_MESSAGE type STRING
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  class-methods CHECK_SQL_STRING_INCLUDES_SUBQ
-    importing
-      !I_SQL_STRING type /CADAXO/SQLCSQL_STRING
-    returning
-      value(R_TRUE) type /CADAXO/SQLCFLAGTRUEFALSE .
-  methods GET_DDIC_FIELD_LIST
-    importing
-      !I_CL_ABAP_STRUCTDESCR type ref to CL_ABAP_STRUCTDESCR
-    returning
-      value(R_FIELDS_T) type DDFIELDS .
-  class-methods CONCATENATE_AGGR_PREFIX
-    importing
-      !I_PREFIX type STRING
-    changing
-      !C_SQLCDFIES type /CADAXO/SQLCDFIES .
-  class-methods GET_ABAP_TYPEDESCR
-    importing
-      !I_NAME type STRING
-    returning
-      value(R_ABAP_TYPEDESCR) type ref to CL_ABAP_TYPEDESCR
-    raising
-      /CADAXO/CX_SQLC_TYPE_NOT_FOUND .
   methods SPLIT_FIELD
     importing
       !I_FIELD type ANY
@@ -302,42 +390,6 @@ protected section.
       !E_TABLE type ANY
       !E_ALIAS type ANY
       !E_TABFLD type ANY .
-  class-methods BUILD_ABAP_CODE
-    importing
-      !I_CL_COCKPIT_PARSE type ref to /CADAXO/CL_SQLC_COCKPIT_PARSE
-      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_COCKPIT_PARSE=>C_SELECT_VERSION_1
-    exporting
-      !E_ABAP_CODE type /CADAXO/SQLCSTRING_T
-      !E_ABAP_CODE_DATA type /CADAXO/SQLCSTRING_T .
-  class-methods FORMAT_ABAP_CODE
-    importing
-      !I_COLUMNS type I optional
-    changing
-      !CT_ABAP_CODE type /CADAXO/SQLCSTRING_T .
-  methods FORMAT_VALUE_WO_DDIC
-    importing
-      !IV_VALUE type CSEQUENCE
-    changing
-      !CV_VALUE type ANY
-    raising
-      CX_SY_CONVERSION_NO_NUMBER .
-  methods FORMAT_VALUE
-    importing
-      !I_ABAP_TYPE type ref to CL_ABAP_ELEMDESCR
-    exporting
-      !E_ADDED type I
-    changing
-      !C_WHERE_COL type /CADAXO/SQLCWHERECOL_STR
-    raising
-      CX_SY_CONVERSION_NO_NUMBER
-      /CADAXO/CX_SQLC_INVALID_VALUE .
-  methods EXECUTE_SELECT_VIA_SUBPOOL_V_2
-    importing
-      !I_PROGRESS_INDICATOR type CHAR1 optional
-    returning
-      value(E_RESULT_DETAILS) type /CADAXO/SQLCRESULT_DETAILS
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
   methods SPLIT_FIELD_V_2
     importing
       !I_VALUE type STRING
@@ -346,65 +398,7 @@ protected section.
       !E_FIELD type STRING
       !E_ALIAS type STRING
       !E_ALIAS_FIELD type STRING .
-  methods GET_CODE_DBHINTS
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_ORDER_BY
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_GROUP_BY
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_HAVING
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_BYPASSING_BUFFER
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_CONNECTION
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_WHERE
-    importing
-      !I_ONLY_INITVAL type ABAP_BOOL optional
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_FIELDS
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_OFFSET
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_INTO
-    importing
-      !I_PROGRESS_INDICATOR type CHAR1 optional
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_UP_TO_ROWS
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_TRACE_ON
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods GET_CODE_TRACE_OFF
-    changing
-      value(CT_CODE) type /CADAXO/SQLCSTRING_T .
-  methods CHECK_RUNTIME_ERROR
-    importing
-      !IV_ERROR_MESSAGE type STRING
-    returning
-      value(EV_ERROR_MESSAGE) type STRING .
-  class-methods CHECK_FOR_HOST_EXPRESSIONS
-    importing
-      !I_STRING type STRING .
-  class-methods CHECK_FOR_HOST_EXPR_METH
-    importing
-      !I_STRING type STRING .
 private section.
-
-*"* private components of class /CADAXO/CL_SQLC_COCKPIT_PARSE
-*"* do not include other source files here!!!
-  data G_MAIN_REF_ID type I .
 ENDCLASS.
 
 
@@ -1084,7 +1078,7 @@ ENDMETHOD.
 
   METHOD check_runtime_error.
 ****************************************************************************************************
-* Description             : Check fro Runtime Error and adjust Error Messages                      *
+* Description             : Check for Runtime Error and adjust Error Messages                      *
 *--------------------------------------------------------------------------------------------------*
 * Additional informations :                                                                        *
 *                                                                                                  *
@@ -2299,9 +2293,6 @@ METHOD execute_select_via_subpool.
 
   APPEND 'ENDFORM.' TO lt_abap_code.
 
-***
-
-  g_async_calls = g_async_calls + 1.
 
   DATA lr_tab_result_exp  TYPE REF TO cl_abap_tabledescr.
   DATA lr_result          TYPE REF TO data.
@@ -2320,41 +2311,63 @@ METHOD execute_select_via_subpool.
          code           = lt_abap_code
          user_settings  = me->g_main_ref->g_user_settings
          TO DATA BUFFER l_data.
-  "MACRO END
+
   CLEAR mr_arfc_exception.
-  CALL FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
-    STARTING NEW TASK 'TASK1'
-    CALLING me->subpool_result ON END OF TASK
-    EXPORTING
-      i_version              = me->g_select_version
-      i_trace                = me->g_main_ref->g_sql_trace_on "$003
-      i_user_sett_sql_trace  = me->g_main_ref->g_user_settings-sql_trace  "$003
-      i_user_sett_tabb_trace = me->g_main_ref->g_user_settings-tablebuffer_trace "$003
-    CHANGING
-      ic_data                = l_data
-    EXCEPTIONS
-      system_failure         = 1 MESSAGE l_error_message
-      communication_failure  = 2 MESSAGE l_error_message
-      resource_failure       = 3
-      OTHERS                 = 4.
 
-  IF sy-subrc = 0.
-    CLEAR g_error_message. "$003
-    WAIT FOR ASYNCHRONOUS TASKS UNTIL g_async_calls = 0.
-    IF sy-subrc <> 0. "$003
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error "$003
-        EXPORTING "$003
-          message = g_error_message. "$003
-    ENDIF.
-    IF mr_arfc_exception IS NOT INITIAL.
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING previous = mr_arfc_exception.
-    ENDIF.
+  IF me->background_mode = abap_false.
+    g_async_calls = g_async_calls + 1.
+    CALL FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
+      STARTING NEW TASK 'TASK1'
+      CALLING me->subpool_result ON END OF TASK
+      EXPORTING
+        i_version              = me->g_select_version
+        i_trace                = me->g_main_ref->g_sql_trace_on "$003
+        i_user_sett_sql_trace  = me->g_main_ref->g_user_settings-sql_trace  "$003
+        i_user_sett_tabb_trace = me->g_main_ref->g_user_settings-tablebuffer_trace "$003
+      CHANGING
+        ic_data                = l_data
+      EXCEPTIONS
+        system_failure         = 1 MESSAGE l_error_message
+        communication_failure  = 2 MESSAGE l_error_message
+        resource_failure       = 3
+        OTHERS                 = 4.
 
+    IF sy-subrc = 0.
+      CLEAR g_error_message. "$003
+      WAIT FOR ASYNCHRONOUS TASKS UNTIL g_async_calls = 0.
+      IF sy-subrc <> 0. "$003
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error "$003
+          EXPORTING "$003
+            message = g_error_message. "$003
+      ENDIF.
+      IF mr_arfc_exception IS NOT INITIAL.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING previous = mr_arfc_exception.
+      ENDIF.
+
+    ENDIF.
+  ELSE.
+    DATA: error_message TYPE string.
+    CALL FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
+      EXPORTING
+        i_version              = me->g_select_version
+        i_trace                = me->g_main_ref->g_sql_trace_on
+        i_user_sett_sql_trace  = me->g_main_ref->g_user_settings-sql_trace
+        i_user_sett_tabb_trace = me->g_main_ref->g_user_settings-tablebuffer_trace
+      IMPORTING
+        e_error_message        = error_message
+        e_runtime              = g_tmp_result_details-runtime
+        e_result_lines         = g_tmp_result_details-lines
+        et_dfies               = me->gt_result_ddfields
+        et_dfies_all           = me->gt_result_ddfields_all
+      CHANGING
+        ic_data                = l_data.
+
+    process_subpool_result( i_data          = l_data
+                            i_error_message = error_message ).
   ENDIF.
-
   e_result_details-runtime = g_tmp_result_details-runtime.
   e_result_details-lines   = g_tmp_result_details-lines.
-***
+
 
   READ TABLE me->g_main_ref->gt_errors WITH KEY msgtype = icon_red_light INTO DATA(ls_error).
   IF sy-subrc = 0.
@@ -2586,34 +2599,57 @@ END-ENHANCEMENT-SECTION.
 
     CLEAR mr_arfc_exception.
 
-    CALL FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
-      STARTING NEW TASK 'TASK1'
-      CALLING me->subpool_result ON END OF TASK
-      EXPORTING
-        i_version              = me->g_select_version
-        i_trace                = me->g_main_ref->g_sql_trace_on
-        i_user_sett_sql_trace  = me->g_main_ref->g_user_settings-sql_trace
-        i_user_sett_tabb_trace = me->g_main_ref->g_user_settings-tablebuffer_trace
-      CHANGING
-        ic_data                = l_data
-      EXCEPTIONS
-        system_failure         = 1 MESSAGE l_error_message
-        communication_failure  = 2 MESSAGE l_error_message
-        resource_failure       = 3
-        OTHERS                 = 4.
+    IF me->background_mode = abap_false.
+      CALL FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
+        STARTING NEW TASK 'TASK1'
+        CALLING me->subpool_result ON END OF TASK
+        EXPORTING
+          i_version              = me->g_select_version
+          i_trace                = me->g_main_ref->g_sql_trace_on
+          i_user_sett_sql_trace  = me->g_main_ref->g_user_settings-sql_trace
+          i_user_sett_tabb_trace = me->g_main_ref->g_user_settings-tablebuffer_trace
+        CHANGING
+          ic_data                = l_data
+        EXCEPTIONS
+          system_failure         = 1 MESSAGE l_error_message
+          communication_failure  = 2 MESSAGE l_error_message
+          resource_failure       = 3
+          OTHERS                 = 4.
 
-    IF sy-subrc = 0.
-      CLEAR g_error_message.
-      WAIT FOR ASYNCHRONOUS TASKS UNTIL g_async_calls = 0.
-      IF sy-subrc <> 0.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-          EXPORTING
-            message = g_error_message.
+      IF sy-subrc = 0.
+        CLEAR g_error_message.
+        WAIT FOR ASYNCHRONOUS TASKS UNTIL g_async_calls = 0.
+        IF sy-subrc <> 0.
+          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
+            EXPORTING
+              message = g_error_message.
+        ENDIF.
+        IF mr_arfc_exception IS NOT INITIAL.
+          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = CONV #( TEXT-e02 ) previous = mr_arfc_exception.
+        ENDIF.
       ENDIF.
-      IF mr_arfc_exception IS NOT INITIAL.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = CONV #( TEXT-e02 ) previous = mr_arfc_exception.
-      ENDIF.
+
+    ELSE.
+
+      DATA: error_message TYPE string.
+      CALL FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
+        EXPORTING
+          i_version              = me->g_select_version
+          i_trace                = me->g_main_ref->g_sql_trace_on
+          i_user_sett_sql_trace  = me->g_main_ref->g_user_settings-sql_trace
+          i_user_sett_tabb_trace = me->g_main_ref->g_user_settings-tablebuffer_trace
+        IMPORTING
+          e_error_message        = error_message
+          e_runtime              = g_tmp_result_details-runtime
+          e_result_lines         = g_tmp_result_details-lines
+          et_dfies               = me->gt_result_ddfields
+          et_dfies_all           = me->gt_result_ddfields_all
+        CHANGING
+          ic_data                = l_data.
+      process_subpool_result( i_data          = l_data
+                              i_error_message = error_message ).
     ENDIF.
+
 * set result details
     e_result_details-runtime = g_tmp_result_details-runtime.
     e_result_details-lines   = g_tmp_result_details-lines.
@@ -4058,60 +4094,6 @@ METHOD get_multisymbol_data_table.
     SORT e_symbol_variable.
     DELETE ADJACENT DUPLICATES FROM e_symbol_variable.
   ENDIF.
-ENDMETHOD.
-
-
-METHOD insert_sql_to_log.
-****************************************************************************************************
-* Description             : Insert sql command to log                                              *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.03.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-
-  DATA l_sqlclog    TYPE /cadaxo/sqlclog.
-  DATA l_sqllog_xml TYPE /cadaxo/sqlc_sqllog.
-  DATA l_xml        TYPE string.
-
-  CLEAR: l_sqlclog.
-
-  GET TIME STAMP FIELD e_timestamp.
-
-  CLEAR l_sqllog_xml.
-  l_sqllog_xml-sql_string    = i_sql_string.
-  l_sqllog_xml-result_status = '01'.
-  l_sqllog_xml-sql_mode      = i_sql_mode.
-
-  CALL TRANSFORMATION id SOURCE log = l_sqllog_xml
-                         RESULT XML l_xml.
-
-  cl_abap_gzip=>compress_text( EXPORTING text_in  = l_xml
-                               IMPORTING gzip_out = l_sqlclog-sql_log ).
-  l_sqlclog-timestamp = e_timestamp.
-  l_sqlclog-uname     = sy-uname.
-
-
-  INSERT /cadaxo/sqlclog FROM l_sqlclog.            "#EC CI_IMUD_NESTED
-
-  COMMIT WORK.
-
-  FREE: l_sqlclog, l_xml, l_sqllog_xml.
-
 ENDMETHOD.
 
 
@@ -6273,10 +6255,190 @@ METHOD parse_sql_where_columns.
 ENDMETHOD.
 
 
+  METHOD process_subpool_result.
+****************************************************************************************************
+* Description             : Subpool Result                                                         *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
+* Date                    : 01.01.2010               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
+* Date                    : xx.xx.xxxx                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 31.05.2016 | Ana Lekic            | error message from subpool                  | COCKPIT-61     *
+*            |                      |                                             | $001           *
+*------------+----------------------+---------------------------------------------+----------------*
+* 05.10.2016 | Domi Bigl            | String,XString,DecFloat16/34                |$002 COCKPIT-117*
+*------------+----------------------+---------------------------------------------+----------------*
+* 28.12.2016 | Domi Bigl            | INT8                                        |$003 COCKPIT-148*
+*------------+----------------------+---------------------------------------------+----------------*
+* 19.02.2017 | Domi Bigl            | Runtime errors                              | COCKPIT-103    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 20.07.2017 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-236    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 01.05.2020 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-437    *
+****************************************************************************************************
+
+
+    DATA l_sql_abap_componentdescr  TYPE abap_componentdescr.
+    DATA lt_result_ddfields         TYPE /cadaxo/sqlcdfies_t.
+    DATA l_decimals                 TYPE i.
+    DATA l_intlen                   TYPE i.
+
+    FIELD-SYMBOLS: <lt_result_table> TYPE STANDARD TABLE,
+                   <ls_ddfields>     TYPE /cadaxo/sqlcdfies,
+                   <ls_ddfieldsg>    TYPE /cadaxo/sqlcdfies.
+
+    IF i_error_message IS NOT INITIAL.
+
+      CLEAR me->g_main_ref->gt_errors.
+      g_error_message = me->check_runtime_error( i_error_message ).
+      RETURN.
+    ENDIF. "$001
+
+    lt_result_ddfields = me->gt_result_ddfields.
+
+    IF me->gt_result_ddfields IS INITIAL                                            "COCKPIT-236
+       AND me->g_select_version = /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_1 "COCKPIT-236
+      AND lt_result_ddfields IS NOT INITIAL.                                        "COCKPIT-236
+      me->gt_result_ddfields = lt_result_ddfields.                                  "COCKPIT-236
+    ENDIF.                                                                          "COCKPIT-236
+
+*          IF me->gt_result_ddfields IS INITIAL.  "+COCKPIT-372
+*            me->gt_result_ddfields = lt_dflies.  "+COCKPIT-372 failsafe - in case there was some scenario where gt_result_ddfield is blank and needs to be filled from rfc '/CADAXO/SQLCSUBROUTINEPOOL'
+*          ENDIF.                                 "+COCKPIT-372
+
+    LOOP AT me->gt_result_ddfields ASSIGNING <ls_ddfields>.
+      UNASSIGN <ls_ddfieldsg>.
+      READ TABLE lt_result_ddfields WITH KEY /cadaxo/alias_field = <ls_ddfields>-fieldname ASSIGNING <ls_ddfieldsg>.
+      IF sy-subrc = 0.
+        <ls_ddfields>-/cadaxo/alias_field = <ls_ddfields>-fieldname.
+      ELSE.
+        LOOP AT lt_result_ddfields ASSIGNING <ls_ddfieldsg> WHERE fieldname = <ls_ddfields>-fieldname AND /cadaxo/alias_field = space.
+          IF <ls_ddfieldsg>-/cadaxo/alias IS NOT INITIAL.
+            DATA(l_name) = <ls_ddfieldsg>-/cadaxo/alias && '~' && <ls_ddfieldsg>-fieldname && ','.
+            READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
+            IF sy-subrc <> 0.
+              l_name = <ls_ddfieldsg>-/cadaxo/alias && '~' && <ls_ddfieldsg>-fieldname.
+              READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
+              IF sy-subrc <> 0.
+                l_name = <ls_ddfieldsg>-/cadaxo/alias && '~*'.
+                READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
+              ENDIF.
+            ENDIF.
+            IF sy-subrc = 0.
+              EXIT. "LOOP
+            ENDIF.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+      IF <ls_ddfieldsg> IS ASSIGNED.
+        <ls_ddfields>-reffield            = <ls_ddfieldsg>-reffield.
+        <ls_ddfields>-datatype            = <ls_ddfieldsg>-datatype.
+        <ls_ddfields>-keyflag             = <ls_ddfieldsg>-keyflag.
+        <ls_ddfields>-/cadaxo/alias       = <ls_ddfieldsg>-/cadaxo/alias.
+        <ls_ddfields>-/cadaxo/alias_value = <ls_ddfieldsg>-/cadaxo/alias_value.
+      ENDIF.
+    ENDLOOP.
+
+    ASSIGN me->result_table->* TO <lt_result_table>.
+    IF <lt_result_table> IS NOT ASSIGNED.
+
+      CLEAR me->result_component_t.
+
+      LOOP AT me->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<l_fields>).
+
+        IF <l_fields>-stru_name NE space.
+
+          CLEAR l_sql_abap_componentdescr.
+          l_sql_abap_componentdescr-name = <l_fields>-fieldname.
+          l_sql_abap_componentdescr-as_include = <l_fields>-as_include.
+          l_sql_abap_componentdescr-type ?= cl_abap_structdescr=>describe_by_name( <l_fields>-stru_name ).
+          APPEND l_sql_abap_componentdescr TO me->result_component_t.
+
+          CAST cl_abap_structdescr( l_sql_abap_componentdescr-type )->get_components( ).
+        ELSE.
+
+          CLEAR l_sql_abap_componentdescr.
+
+          l_sql_abap_componentdescr-name = <l_fields>-fieldname.
+
+          l_decimals = <l_fields>-decimals.
+          l_intlen   = <l_fields>-intlen.
+
+          CASE <l_fields>-inttype.
+            WHEN 'P'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_p( p_length = l_intlen p_decimals = l_decimals ).
+            WHEN 'I'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_i( ).
+            WHEN 'T'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_t( ).
+            WHEN 'D'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_d( ).
+            WHEN 'N'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_n( p_length = l_intlen ).
+            WHEN 'F'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_f( ).
+            WHEN 'X'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_x( p_length = l_intlen ).
+            WHEN 'C'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_c( p_length = l_intlen ).
+            WHEN 'b'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>describe_by_name( '/CADAXO/SQLC_REFERENCE_TYPES-INT1' ).
+            WHEN 's'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>describe_by_name( '/CADAXO/SQLC_REFERENCE_TYPES-INT2' ).
+            WHEN 'g'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_string( ).
+            WHEN 'y'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_xstring( ).
+            WHEN 'a'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_decfloat16( ).
+            WHEN 'e'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_decfloat34( ).
+            WHEN '8'.
+              CALL METHOD cl_abap_elemdescr=>('GET_INT8')
+                RECEIVING
+                  p_result = l_sql_abap_componentdescr-type.
+            WHEN OTHERS.
+              mr_arfc_exception = NEW /cadaxo/cx_sqlc_type_not_found( type = CONV #( <l_fields>-inttype ) ).
+          ENDCASE.
+
+          APPEND l_sql_abap_componentdescr TO me->result_component_t.
+
+        ENDIF.
+      ENDLOOP.
+
+      me->create_result_structures( ).
+
+      ASSIGN me->result_table->* TO <lt_result_table>.
+
+    ENDIF.
+
+    IMPORT data = <lt_result_table> FROM DATA BUFFER i_data.
+
+    DELETE me->gt_result_ddfields WHERE fieldname IS INITIAL
+                                    AND rollname  <> '/CADAXO/SQLCAGGRCOUNT'. "COCKPIT-437
+
+  ENDMETHOD.
+
+
 METHOD serialize.
   FREE result_table.
   FREE result_structure.
 ENDMETHOD.
+
+
+  METHOD set_bachground_mode.
+    background_mode = i_background_mode.
+  ENDMETHOD.
 
 
 METHOD split_field.
@@ -6423,29 +6585,17 @@ endmethod.
 * 20.07.2017 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-236    *
 *------------+----------------------+---------------------------------------------+----------------*
 * 01.05.2020 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-437    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 01.05.2024 | Domi Bigl            | no aRFC in Background Mode + CC             | SQL-26         *
 ****************************************************************************************************
 
     DATA l_data                     TYPE xstring.
     DATA lv_sys_error_message       TYPE char128.
     DATA lv_error_message           TYPE string.
-    DATA lwa_result                 TYPE gts_subpool_result.
-    DATA l_sql_abap_componentdescr  TYPE abap_componentdescr.
-    DATA lt_result_ddfields         TYPE /cadaxo/sqlcdfies_t.
-    DATA lt_dflies                  TYPE /cadaxo/sqlcdfies_t.
-    DATA l_decimals                 TYPE i.
-    DATA l_intlen                   TYPE i.
-
-    FIELD-SYMBOLS: <lt_result_table> TYPE STANDARD TABLE,
-                   <ls_ddfields>     TYPE /cadaxo/sqlcdfies,
-                   <ls_ddfieldsg>    TYPE /cadaxo/sqlcdfies.
 
     TRY.
-        lwa_result-task = p_task.
-        CLEAR: lv_error_message.
-        CLEAR: lv_sys_error_message.
-
-        lt_result_ddfields = me->gt_result_ddfields.
-
+*        lwa_result-task = p_task.
+        g_async_calls = g_async_calls - 1.
         RECEIVE RESULTS FROM FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
            IMPORTING
              e_error_message       = lv_error_message                 "COCKPIT-103
@@ -6455,151 +6605,22 @@ endmethod.
 *             et_dfies              = lt_dflies                        "+COCKPIT-372
              et_dfies_all          = me->gt_result_ddfields_all
           CHANGING
-            ic_data                = l_data
-            EXCEPTIONS
-              system_failure        = 1 MESSAGE lv_sys_error_message "$001 "COCKPIT-103
-              communication_failure = 2 MESSAGE lv_sys_error_message "$001 "COCKPIT-103
-              resource_failure      = 3
-              OTHERS                = 4.
+             ic_data                = l_data
+          EXCEPTIONS
+             system_failure        = 1 MESSAGE lv_sys_error_message "$001 "COCKPIT-103
+             communication_failure = 2 MESSAGE lv_sys_error_message "$001 "COCKPIT-103
+             resource_failure      = 3
+             OTHERS                = 4.
         IF sy-subrc <> 0 OR lv_error_message IS NOT INITIAL. "$001                "COCKPIT-103
 
           IF lv_sys_error_message IS NOT INITIAL.                                 "COCKPIT-103
             lv_error_message = lv_sys_error_message.                              "COCKPIT-103
           ENDIF.                                                                  "COCKPIT-103
+        ENDIF. "$001
 
-          CLEAR: me->g_main_ref->gt_errors.
-
-          g_error_message = me->check_runtime_error( lv_error_message ). "COCKPIT-103
-
-          EXIT.
-
-        ELSE. "$001
-
-          IF me->gt_result_ddfields IS INITIAL                                            "COCKPIT-236
-             AND me->g_select_version = /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_1 "COCKPIT-236
-            AND lt_result_ddfields IS NOT INITIAL.                                        "COCKPIT-236
-            me->gt_result_ddfields = lt_result_ddfields.                                  "COCKPIT-236
-          ENDIF.                                                                          "COCKPIT-236
-
-*          IF me->gt_result_ddfields IS INITIAL.  "+COCKPIT-372
-*            me->gt_result_ddfields = lt_dflies.  "+COCKPIT-372 failsafe - in case there was some scenario where gt_result_ddfield is blank and needs to be filled from rfc '/CADAXO/SQLCSUBROUTINEPOOL'
-*          ENDIF.                                 "+COCKPIT-372
-
-          LOOP AT me->gt_result_ddfields ASSIGNING <ls_ddfields>.
-            UNASSIGN <ls_ddfieldsg>.
-            READ TABLE lt_result_ddfields WITH KEY /cadaxo/alias_field = <ls_ddfields>-fieldname ASSIGNING <ls_ddfieldsg>.
-            IF sy-subrc = 0.
-              <ls_ddfields>-/cadaxo/alias_field = <ls_ddfields>-fieldname.
-            ELSE.
-              LOOP AT lt_result_ddfields ASSIGNING <ls_ddfieldsg> WHERE fieldname = <ls_ddfields>-fieldname AND /cadaxo/alias_field = space.
-                IF <ls_ddfieldsg>-/cadaxo/alias IS NOT INITIAL.
-                  DATA(l_name) = <ls_ddfieldsg>-/cadaxo/alias && '~' && <ls_ddfieldsg>-fieldname && ','.
-                  READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
-                  IF sy-subrc <> 0.
-                    l_name = <ls_ddfieldsg>-/cadaxo/alias && '~' && <ls_ddfieldsg>-fieldname.
-                    READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
-                    IF sy-subrc <> 0.
-                      l_name = <ls_ddfieldsg>-/cadaxo/alias && '~*'.
-                      READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
-                    ENDIF.
-                  ENDIF.
-                  IF sy-subrc = 0.
-                    EXIT. "LOOP
-                  ENDIF.
-                ENDIF.
-              ENDLOOP.
-            ENDIF.
-            IF <ls_ddfieldsg> IS ASSIGNED.
-              <ls_ddfields>-reffield            = <ls_ddfieldsg>-reffield.
-              <ls_ddfields>-datatype            = <ls_ddfieldsg>-datatype.
-              <ls_ddfields>-keyflag             = <ls_ddfieldsg>-keyflag.
-              <ls_ddfields>-/cadaxo/alias       = <ls_ddfieldsg>-/cadaxo/alias.
-              <ls_ddfields>-/cadaxo/alias_value = <ls_ddfieldsg>-/cadaxo/alias_value.
-            ENDIF.
-          ENDLOOP.
-
-          ASSIGN me->result_table->* TO <lt_result_table>.
-          IF <lt_result_table> IS NOT ASSIGNED.
-
-            CLEAR me->result_component_t.
-
-            LOOP AT me->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<l_fields>).
-
-              IF <l_fields>-stru_name NE space.
-
-                CLEAR l_sql_abap_componentdescr.
-                l_sql_abap_componentdescr-name = <l_fields>-fieldname.
-                l_sql_abap_componentdescr-as_include = <l_fields>-as_include.
-                l_sql_abap_componentdescr-type ?= cl_abap_structdescr=>describe_by_name( <l_fields>-stru_name ).
-                APPEND l_sql_abap_componentdescr TO me->result_component_t.
-
-                CAST cl_abap_structdescr( l_sql_abap_componentdescr-type )->get_components( ).
-              ELSE.
-
-                CLEAR l_sql_abap_componentdescr.
-
-                l_sql_abap_componentdescr-name = <l_fields>-fieldname.
-
-                l_decimals = <l_fields>-decimals.
-                l_intlen   = <l_fields>-intlen.
-
-                CASE <l_fields>-inttype.
-                  WHEN 'P'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_p( p_length = l_intlen p_decimals = l_decimals ).
-                  WHEN 'I'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_i( ).
-                  WHEN 'T'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_t( ).
-                  WHEN 'D'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_d( ).
-                  WHEN 'N'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_n( p_length = l_intlen ).
-                  WHEN 'F'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_f( ).
-                  WHEN 'X'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_x( p_length = l_intlen ).
-                  WHEN 'C'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_c( p_length = l_intlen ).
-                  WHEN 'b'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>describe_by_name( '/CADAXO/SQLC_REFERENCE_TYPES-INT1' ).
-                  WHEN 's'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>describe_by_name( '/CADAXO/SQLC_REFERENCE_TYPES-INT2' ).
-                  WHEN 'g'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_string( ).
-                  WHEN 'y'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_xstring( ).
-                  WHEN 'a'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_decfloat16( ).
-                  WHEN 'e'.
-                    l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_decfloat34( ).
-                  WHEN '8'.
-                    CALL METHOD cl_abap_elemdescr=>('GET_INT8')
-                      RECEIVING
-                        p_result = l_sql_abap_componentdescr-type.
-                  WHEN OTHERS.
-                    mr_arfc_exception = NEW /cadaxo/cx_sqlc_type_not_found( type = CONV #( <l_fields>-inttype ) ).
-                ENDCASE.
-
-                APPEND l_sql_abap_componentdescr TO me->result_component_t.
-
-              ENDIF.
-            ENDLOOP.
-
-            me->create_result_structures( ).
-
-            ASSIGN me->result_table->* TO <lt_result_table>.
-
-          ENDIF.
-
-          IMPORT data = <lt_result_table> FROM DATA BUFFER l_data.
-
-        ENDIF.
-
-        g_async_calls = g_async_calls - 1.
-
-        DELETE me->gt_result_ddfields WHERE fieldname IS INITIAL
-                                        AND rollname  <> '/CADAXO/SQLCAGGRCOUNT'. "COCKPIT-437
-
+        me->process_subpool_result( i_data          = l_data
+                                    i_error_message = lv_error_message
+                                  ).
       CATCH cx_root INTO mr_arfc_exception.
     ENDTRY.
   ENDMETHOD.
@@ -6704,57 +6725,5 @@ METHOD update_alv_field_catalog_sl.
     ENDIF.
   ENDLOOP.
 
-ENDMETHOD.
-
-
-METHOD update_sql_to_log.
-****************************************************************************************************
-* Description             : Insert sql command to log                                              *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.03.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-
-  DATA l_sqlclog    TYPE /cadaxo/sqlclog.
-  DATA l_sqllog_xml TYPE /cadaxo/sqlc_sqllog.
-  DATA l_xml        TYPE string.
-
-  CLEAR: l_sqlclog.
-  CLEAR: l_sqllog_xml.
-
-  l_sqllog_xml-sql_string          = i_sql_string.
-  l_sqllog_xml-result_status       = '00'.
-  l_sqllog_xml-sql_mode            = i_sql_mode.
-  l_sqllog_xml-result_rows         = i_result_lines.
-  l_sqllog_xml-result_runtime      = i_result_runtime-runtime.
-  l_sqllog_xml-result_runtime_unit = i_result_runtime-unit.
-  CALL TRANSFORMATION id SOURCE log = l_sqllog_xml
-                         RESULT XML l_xml .
-  cl_abap_gzip=>compress_text( EXPORTING text_in  = l_xml
-                               IMPORTING gzip_out = l_sqlclog-sql_log ).
-
-  l_sqlclog-uname     = sy-uname.
-  l_sqlclog-timestamp = i_timestamp.
-
-  UPDATE /cadaxo/sqlclog FROM l_sqlclog.            "#EC CI_IMUD_NESTED
-
-  COMMIT WORK.
-
-  FREE: l_sqlclog, l_xml, l_sqllog_xml.
 ENDMETHOD.
 ENDCLASS.
