@@ -175,9 +175,15 @@ FORM process_version_2 CHANGING e_error_message TYPE string
 
   CREATE OBJECT lr_parser.
 
-  IMPORT code = lt_code FROM DATA BUFFER ic_data.
-  IMPORT user_settings = l_user_settings FROM DATA BUFFER ic_data. "$001
-  IMPORT range_tables = lt_symbol_ranges FROM DATA BUFFER ic_data.
+  IMPORT dfies         = lr_parser->gt_result_ddfields
+         result_source = lt_result_source
+         source_syntax = lr_parser->source_syntax
+         column_syntax = lr_parser->column_syntax
+         fields_syntax = lr_parser->fields_syntax
+         code          = lt_code
+         user_settings = l_user_settings "$002
+         range_tables  = lt_symbol_ranges
+         FROM DATA BUFFER ic_data.
 
   ASSIGN lt_result TO <lt_result_table>.
 
@@ -216,13 +222,23 @@ FORM process_version_2 CHANGING e_error_message TYPE string
 
     lr_parser->result_table = lr_result.
 
-    lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( EXPORTING p_data_ref = lr_result ).
+*    IF (    lr_parser->fields_syntax = '*'
+*         OR lr_parser->column_syntax = '*' ) AND lr_parser->source_syntax IS NOT INITIAL.
+*      lr_typedescr ?= cl_abap_structdescr=>describe_by_name( CONV tabname( lr_parser->source_syntax ) ).
+*    ELSE.
+    lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( lr_result ).
     lr_typedescr ?= lr_tabledescr->get_table_line_type( ).
+*    ENDIF.
 
+    TRY.
+        DATA(ddfields) = CAST cl_abap_structdescr( lr_typedescr )->get_ddic_field_list( ).
+      CATCH cx_root.
+    ENDTRY.
     CASE lr_typedescr->kind.
       WHEN cl_abap_typedescr=>kind_struct.
         lr_strucdescr_main ?= lr_typedescr.
         lt_components = lr_strucdescr_main->get_components( ).
+*        lt_components = CORRESPONDING #( lr_strucdescr_main->get_included_view(  ) ).
 
       WHEN cl_abap_typedescr=>kind_elem.
         lr_element ?= lr_typedescr.
@@ -271,12 +287,17 @@ FORM process_version_2 CHANGING e_error_message TYPE string
 
             IF lr_element->is_ddic_type( ) = abap_true.
 
-              l_dfies = lr_element->get_ddic_field( ).
+              IF line_exists( ddfields[ fieldname = lsqlc_dfies-fieldname ] ).
+                l_dfies = ddfields[ fieldname = lsqlc_dfies-fieldname ].
+              ELSE.
+                l_dfies = lr_element->get_ddic_field( ).
+              ENDIF.
 
               lsqlc_dfies-scrtext_s   = l_dfies-scrtext_s.
               lsqlc_dfies-scrtext_m   = l_dfies-scrtext_m.
               lsqlc_dfies-scrtext_l   = l_dfies-scrtext_l.
               lsqlc_dfies-domname     = l_dfies-domname.
+              lsqlc_dfies-keyflag     = l_dfies-keyflag.
               lsqlc_dfies-rollname    = l_dfies-rollname.
               lsqlc_dfies-checktable  = l_dfies-checktable.
               lsqlc_dfies-precfield   = l_dfies-precfield.
@@ -286,28 +307,28 @@ FORM process_version_2 CHANGING e_error_message TYPE string
               lsqlc_dfies-f4availabl  = l_dfies-f4availabl.
 
             ENDIF.
-        ENDCASE.
+          ENDCASE.
 
-        APPEND lsqlc_dfies TO <et_dfies>.
+          APPEND lsqlc_dfies TO <et_dfies>.
 
-      ENDLOOP.
-      IF lr_strucdescr_main IS NOT BOUND.
-        EXIT. "DO.
-      ELSE.
+        ENDLOOP.
+        IF lr_strucdescr_main IS NOT BOUND.
+          EXIT. "DO.
+        ELSE.
 
-        lt_incl_view = lr_strucdescr_main->get_included_view( ).
-        MOVE-CORRESPONDING lt_incl_view TO lt_components.
+          lt_incl_view = lr_strucdescr_main->get_included_view( ).
+          MOVE-CORRESPONDING lt_incl_view TO lt_components.
 
-        ASSIGN et_dfies_all TO <et_dfies>.
-      ENDIF.
-    ENDDO.
+          ASSIGN et_dfies_all TO <et_dfies>.
+        ENDIF.
+      ENDDO.
 
-    ASSIGN lr_parser->result_table->* TO <lt_result_table>.
-    CLEAR ic_data.
+      ASSIGN lr_parser->result_table->* TO <lt_result_table>.
+      CLEAR ic_data.
 
-    EXPORT data = <lt_result_table> TO DATA BUFFER ic_data.
+      EXPORT data = <lt_result_table> TO DATA BUFFER ic_data.
 
-  ENDIF.
+    ENDIF.
 
 * MACRO END
 ENDFORM.

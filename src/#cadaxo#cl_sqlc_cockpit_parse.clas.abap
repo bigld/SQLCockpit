@@ -2587,13 +2587,14 @@ END-ENHANCEMENT-SECTION.
 
     MOVE-CORRESPONDING me->result_source_t TO lt_result_source.
 
-    EXPORT dfies          = me->gt_result_ddfields
-           result_source  = lt_result_source
-           column_syntax  = me->column_syntax
-           source_syntax  = me->source_syntax
-           code           = lt_abap_code
-           range_tables   = lt_symbol_variable
-           user_settings  = me->g_main_ref->g_user_settings TO DATA BUFFER l_data.
+    EXPORT dfies         = me->gt_result_ddfields
+           result_source = lt_result_source
+           column_syntax = me->column_syntax
+           fields_syntax = me->fields_syntax
+           source_syntax = me->source_syntax
+           code          = lt_abap_code
+           range_tables  = lt_symbol_variable
+           user_settings = me->g_main_ref->g_user_settings TO DATA BUFFER l_data.
 
     " MACRO END
 
