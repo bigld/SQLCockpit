@@ -159,6 +159,8 @@ FORM process_version_2 CHANGING e_error_message TYPE string
   DATA lr_result          TYPE REF TO data.
   DATA lr_tab_result_exp  TYPE REF TO cl_abap_tabledescr.
   DATA lrx_root           TYPE REF TO cx_root.
+  DATA lr_ddictypedescr   TYPE REF TO cl_abap_typedescr.
+  DATA ddfields           TYPE ddfields.
   DATA lr_typedescr       TYPE REF TO cl_abap_typedescr.
   DATA lr_tabledescr      TYPE REF TO cl_abap_tabledescr.
   DATA lr_strucdescr      TYPE REF TO cl_abap_structdescr.
@@ -222,23 +224,33 @@ FORM process_version_2 CHANGING e_error_message TYPE string
 
     lr_parser->result_table = lr_result.
 
-*    IF (    lr_parser->fields_syntax = '*'
-*         OR lr_parser->column_syntax = '*' ) AND lr_parser->source_syntax IS NOT INITIAL.
-*      lr_typedescr ?= cl_abap_structdescr=>describe_by_name( CONV tabname( lr_parser->source_syntax ) ).
-*    ELSE.
+    IF lt_result_source IS NOT INITIAL.
+      TRY.
+          LOOP AT lt_result_source REFERENCE INTO DATA(tablename).
+            cl_abap_structdescr=>describe_by_name( EXPORTING p_name         = tablename->table
+                                                   RECEIVING p_descr_ref    = lr_ddictypedescr
+                                                   EXCEPTIONS OTHERS         = 1 ).
+            IF sy-subrc = 0.
+
+              append lines of CAST cl_abap_structdescr( lr_ddictypedescr )->get_ddic_field_list( ) to ddfields.
+            ENDIF.
+          ENDLOOP.
+        CATCH cx_root.
+      ENDTRY.
+    ENDIF.
+
     lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( lr_result ).
     lr_typedescr ?= lr_tabledescr->get_table_line_type( ).
-*    ENDIF.
 
-    TRY.
-        DATA(ddfields) = CAST cl_abap_structdescr( lr_typedescr )->get_ddic_field_list( ).
-      CATCH cx_root.
-    ENDTRY.
+
+    IF ddfields IS INITIAL AND  lr_typedescr->is_ddic_type( ).
+      ddfields = CAST cl_abap_structdescr( lr_typedescr )->get_ddic_field_list( ).
+    ENDIF.
+
     CASE lr_typedescr->kind.
       WHEN cl_abap_typedescr=>kind_struct.
         lr_strucdescr_main ?= lr_typedescr.
         lt_components = lr_strucdescr_main->get_components( ).
-*        lt_components = CORRESPONDING #( lr_strucdescr_main->get_included_view(  ) ).
 
       WHEN cl_abap_typedescr=>kind_elem.
         lr_element ?= lr_typedescr.
@@ -285,14 +297,15 @@ FORM process_version_2 CHANGING e_error_message TYPE string
             ENDIF.                                                                                 "$002
             lsqlc_dfies-leng            = lsqlc_dfies-intlen.
 
-            IF lr_element->is_ddic_type( ) = abap_true.
-
-              IF line_exists( ddfields[ fieldname = lsqlc_dfies-fieldname ] ).
-                l_dfies = ddfields[ fieldname = lsqlc_dfies-fieldname ].
-              ELSE.
+            CLEAR l_dfies.
+            IF line_exists( ddfields[ fieldname = lsqlc_dfies-fieldname ] ).
+              l_dfies = ddfields[ fieldname = lsqlc_dfies-fieldname ].
+            ELSE.
+              IF lr_element->is_ddic_type( ) = abap_true.
                 l_dfies = lr_element->get_ddic_field( ).
               ENDIF.
-
+            ENDIF.
+            IF l_dfies IS NOT INITIAL.
               lsqlc_dfies-scrtext_s   = l_dfies-scrtext_s.
               lsqlc_dfies-scrtext_m   = l_dfies-scrtext_m.
               lsqlc_dfies-scrtext_l   = l_dfies-scrtext_l.
@@ -305,30 +318,30 @@ FORM process_version_2 CHANGING e_error_message TYPE string
               lsqlc_dfies-fieldtext   = l_dfies-fieldtext.
               lsqlc_dfies-reptext     = l_dfies-reptext.
               lsqlc_dfies-f4availabl  = l_dfies-f4availabl.
-
             ENDIF.
-          ENDCASE.
 
-          APPEND lsqlc_dfies TO <et_dfies>.
+        ENDCASE.
 
-        ENDLOOP.
-        IF lr_strucdescr_main IS NOT BOUND.
-          EXIT. "DO.
-        ELSE.
+        APPEND lsqlc_dfies TO <et_dfies>.
 
-          lt_incl_view = lr_strucdescr_main->get_included_view( ).
-          MOVE-CORRESPONDING lt_incl_view TO lt_components.
+      ENDLOOP.
+      IF lr_strucdescr_main IS NOT BOUND.
+        EXIT. "DO.
+      ELSE.
 
-          ASSIGN et_dfies_all TO <et_dfies>.
-        ENDIF.
-      ENDDO.
+        lt_incl_view = lr_strucdescr_main->get_included_view( ).
+        MOVE-CORRESPONDING lt_incl_view TO lt_components.
 
-      ASSIGN lr_parser->result_table->* TO <lt_result_table>.
-      CLEAR ic_data.
+        ASSIGN et_dfies_all TO <et_dfies>.
+      ENDIF.
+    ENDDO.
 
-      EXPORT data = <lt_result_table> TO DATA BUFFER ic_data.
+    ASSIGN lr_parser->result_table->* TO <lt_result_table>.
+    CLEAR ic_data.
 
-    ENDIF.
+    EXPORT data = <lt_result_table> TO DATA BUFFER ic_data.
+
+  ENDIF.
 
 * MACRO END
 ENDFORM.

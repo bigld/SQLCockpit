@@ -616,8 +616,14 @@
     <item>
      <ID>I</ID>
      <KEY>F15</KEY>
-     <ENTRY>CSV File</ENTRY>
-     <LENGTH>11</LENGTH>
+     <ENTRY>CSV File (frontend)</ENTRY>
+     <LENGTH>30</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>F16</KEY>
+     <ENTRY>CSV File (application server)</ENTRY>
+     <LENGTH>30</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -1863,8 +1869,14 @@
       <item>
        <ID>I</ID>
        <KEY>F15</KEY>
-       <ENTRY>CSV Datei</ENTRY>
-       <LENGTH>11</LENGTH>
+       <ENTRY>CSV Datei (Frontend)</ENTRY>
+       <LENGTH>30</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>F16</KEY>
+       <ENTRY>CSV Datei (Appserver)</ENTRY>
+       <LENGTH>30</LENGTH>
       </item>
       <item>
        <ID>I</ID>
@@ -2987,11 +2999,6 @@
      <DESCRIPT>Element ALV</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CMPNAME>GC_FCODE_CSV</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>SQL Cockpit - fcode CSV Export</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
      <CMPNAME>GC_RESULT_TOOLBAR</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Toolbar Control</DESCRIPT>
@@ -3677,11 +3684,6 @@
      <DESCRIPT>handle result command COMPARE_WITH_</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CMPNAME>HANDLE_RESULT_COMMAND_EXP_CSV</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>SQL Cockpit - Handel Result Command CSV Export</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
      <CMPNAME>HANDLE_RESULT_COMMAND_FULLDISP</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>handle result command FULLDISP</DESCRIPT>
@@ -3700,6 +3702,16 @@
      <CMPNAME>HANDLE_RESULT_COMMAND_REFRLST</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>handle result command REFRESH_LIST</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HDLCMD_EXPORT_CSV_BACKEND</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Handel Result Command CSV Export</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HDLCMD_EXPORT_CSV_FRONTEND</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SQL Cockpit - Handel Result Command CSV Export</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CMPNAME>INSERT_CODEBLOCK_AT_POSITION</CMPNAME>

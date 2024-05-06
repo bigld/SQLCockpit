@@ -280,7 +280,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA g_result_layout TYPE lvc_s_layo .
     DATA g_result_toolbar_excluding TYPE ui_functions .
     DATA g_show_clipboard TYPE boolean .
-    DATA gs_sel_variant TYPE /cadaxo/sqlc_il_variants .   "Cockpit-321
+    DATA gs_sel_variant TYPE /cadaxo/sqlc_il_variants .     "Cockpit-321
     DATA:
       BEGIN OF ms_additional_functions,                 "COCKPIT-48
         uptomenu TYPE REF TO /cadaxo/cl_sqlc_uptomenu,  "COCKPIT-48
@@ -414,7 +414,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       EXPORTING
         !e_symbols TYPE /cadaxo/sqlc_symbol_t .
     METHODS get_variant .
-    METHODS handle_result_command_exp_csv
+    METHODS hdlcmd_export_csv_frontend
       IMPORTING
         !i_grid_i TYPE i .
     METHODS handle_command_show_full_value
@@ -783,8 +783,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !is_items TYPE /cadaxo/sqlcapip .
     METHODS share_saved_list
       IMPORTING
-        !iv_receiver TYPE /cadaxo/sqlcapi_receiver OPTIONAL     "+cockpit-420
-        !iv_text     TYPE /cadaxo/sqlc_char_1024 OPTIONAL .             "+cockpit-420
+        !iv_receiver TYPE /cadaxo/sqlcapi_receiver OPTIONAL       "+cockpit-420
+        !iv_text     TYPE /cadaxo/sqlc_char_1024 OPTIONAL .                   "+cockpit-420
     METHODS populate_saved_list
       IMPORTING
         !iv_list_guid         TYPE /cadaxo/sqlc_list_exp_sqlx-list_guid
@@ -821,6 +821,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !i_result_dref TYPE REF TO data
         !i_tabix       TYPE sy-tabix .
     METHODS tippsandtricks .
+    METHODS hdlcmd_export_csv_backend
+      IMPORTING
+        !i_grid_i TYPE i .
   PRIVATE SECTION.
     CONSTANTS: BEGIN OF editor_type,
                  new TYPE char1 VALUE 'A' ##NO_TEXT,
@@ -847,7 +850,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     CONSTANTS c_width_right_clipboard TYPE i VALUE 500 ##NO_TEXT.
     CONSTANTS c_width_right_symbols TYPE i VALUE 500 ##NO_TEXT.
     CONSTANTS c_width_right_window TYPE i VALUE 500 ##NO_TEXT.
-    CONSTANTS gc_fcode_csv TYPE ui_func VALUE 'EXPORT_CSV' ##NO_TEXT.
+    CONSTANTS: BEGIN OF c_button_fcode,
+                 export_csv_frontent TYPE ui_func VALUE 'EXPORT_CSV',
+                 export_csv_backend  TYPE ui_func VALUE 'EXPORT_CSV_SRV',
+               END OF c_button_fcode.
     CLASS-DATA gt_main_classes TYPE gtt_main_classes .
     CLASS-DATA g_main_counter TYPE i .
     DATA gcont_html_viewer TYPE REF TO cl_gui_container .
@@ -924,7 +930,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
 
 
   METHOD api_execute_sql.
@@ -1142,9 +1147,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     CONDENSE r_grid_title.
 
   ENDMETHOD.
-
-
-
 
 
   METHOD calc_result_rows_and_cols.
@@ -3634,8 +3636,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-
-
   METHOD delete_symbols.
 ****************************************************************************************************
 * Description             : delete user symbols                                                    *
@@ -3752,9 +3752,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
-
-
 
 
   METHOD execute_sql.
@@ -3945,7 +3942,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     FREE: lt_lvc_t_fcat.
   ENDMETHOD.
-
 
 
   METHOD execute_sql_background_wiz.
@@ -6323,97 +6319,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD handle_result_command_exp_csv.
-****************************************************************************************************
-* Description             : Handle Export to CSV                                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Dusan Sacha              Company    : CADAXO GesmbH                    *
-* Date                    : 12.03.2018               Release    : WAS 7.40                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxxxxx                 *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA lv_filename     TYPE string.
-    DATA lv_path         TYPE string.
-    DATA lv_fullpath     TYPE string.
-    DATA lv_user_action  TYPE i.
-    DATA iv_output_table TYPE TABLE OF string .
-    DATA lv_tmp_dats     TYPE char30.
-    DATA lv_tmp_out      TYPE string.
-
-    FIELD-SYMBOLS: <lt_result> TYPE STANDARD TABLE.
-
-    ASSIGN dref_result_tab_t[ i_grid_i ] TO FIELD-SYMBOL(<lr_dref>).
-    ASSIGN gt_lvc_t_fcat[ i_grid_i ] TO FIELD-SYMBOL(<lt_fields>).
-    ASSIGN <lr_dref>->* TO <lt_result>.
-
-    IF <lt_result> IS NOT INITIAL.
-
-*Begin of Insert Cockpit-398
-      /cadaxo/cl_sqlc_csv_cust_util=>get_csv_from_itab( EXPORTING it_table      = <lt_result>
-                                                                  i_fieldcat    = <lt_fields>
-                                                        IMPORTING ev_output_csv = iv_output_table
-                                                                  ev_cancel     = DATA(lv_cancel) ).
-
-      IF lv_cancel = abap_true.
-        RETURN.
-      ENDIF.
-*End   of Insert Cockpit-398
-
-*Begin of Comments Cockpit-398
-*      CALL METHOD me->get_csv_from_int_tab
-*        EXPORTING
-*          it_table      = <lt_result>
-*          i_grid_i      = i_grid_i
-*        IMPORTING
-*          ev_output_csv = iv_output_table.
-*End   of Comments Cockpit-398
-
-      cl_gui_frontend_services=>file_save_dialog(
-        EXPORTING
-          default_extension    = 'csv'
-          file_filter          = '.csv'
-        CHANGING
-          filename             = lv_filename
-          path                 = lv_path
-          fullpath             = lv_fullpath
-          user_action          = lv_user_action
-        EXCEPTIONS
-          OTHERS               = 1
-      ).
-
-      IF sy-subrc EQ 0 AND lv_user_action EQ 0.
-
-        cl_gui_frontend_services=>gui_download(
-            EXPORTING
-                filename = lv_fullpath
-            CHANGING
-                data_tab = iv_output_table
-            EXCEPTIONS
-                OTHERS = 1
-        ).
-        IF sy-subrc <> 0.
-          MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
-                     WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
-        ENDIF.
-      ENDIF.
-    ENDIF.
-
-  ENDMETHOD.
-
-
   METHOD handle_result_command_fulldisp.
 ****************************************************************************************************
 * Description             : Open ALV in Fullscreen Mode                                            *
@@ -6822,6 +6727,157 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           ls_layout_tmp,
           ls_layout,
           lv_footer.
+
+  ENDMETHOD.
+
+
+  METHOD hdlcmd_export_csv_backend.
+****************************************************************************************************
+* Description             : Handle Export to CSV                                            *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Domi Bigl                Company    : CADAXO GesmbH                    *
+* Date                    : 16.05.2024               Release    : WAS 7.40                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxxxxx                 *
+* Date                    : xx.xx.xxxx                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+****************************************************************************************************
+
+    DATA output_table TYPE TABLE OF string .
+    FIELD-SYMBOLS: <lt_result> TYPE STANDARD TABLE.
+
+    ASSIGN dref_result_tab_t[ i_grid_i ] TO FIELD-SYMBOL(<lr_dref>).
+    ASSIGN <lr_dref>->* TO <lt_result>.
+
+    ASSIGN gt_lvc_t_fcat[ i_grid_i ] TO FIELD-SYMBOL(<lt_fields>).
+
+    IF <lt_result> IS NOT INITIAL.
+      /cadaxo/cl_sqlc_csv_cust_util=>get_csv_parameter_from_user( EXPORTING i_to_appserver = abap_true
+                                                                  IMPORTING ev_cancel  = DATA(cancel)
+                                                                            e_csv_attr = DATA(csv_attr) ).
+      IF cancel = abap_true.
+        RETURN.
+      ENDIF.
+
+      output_table = /cadaxo/cl_sqlc_csv_cust_util=>get_csv_from_itab( it_table   = <lt_result>
+                                                                       i_fieldcat = <lt_fields>
+                                                                       i_csv_attr = csv_attr ).
+
+      OPEN DATASET csv_attr-file_full FOR OUTPUT IN TEXT MODE ENCODING UTF-8.
+      IF sy-subrc <> 0.
+        MESSAGE ID '/CADAXO/SQLC' TYPE 'W'  NUMBER 165 WITH csv_attr-file_full 'Application Server' DISPLAY LIKE 'E'.
+        RETURN.
+      ENDIF.
+      LOOP AT output_table REFERENCE INTO DATA(record).
+        TRANSFER record->* TO  csv_attr-file_full.
+      ENDLOOP.
+
+      CLOSE DATASET csv_attr-file_full.
+      MESSAGE ID '/CADAXO/SQLC' TYPE 'S' NUMBER 164 WITH csv_attr-file_full 'Application Server'.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD hdlcmd_export_csv_frontend.
+****************************************************************************************************
+* Description             : Handle Export to CSV                                            *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Dusan Sacha              Company    : CADAXO GesmbH                    *
+* Date                    : 12.03.2018               Release    : WAS 7.40                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxxxxx                 *
+* Date                    : xx.xx.xxxx                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+****************************************************************************************************
+
+    DATA lv_filename     TYPE string.
+    DATA lv_path         TYPE string.
+    DATA lv_fullpath     TYPE string.
+    DATA lv_user_action  TYPE i.
+    DATA iv_output_table TYPE TABLE OF string .
+    DATA lv_tmp_dats     TYPE char30.
+    DATA lv_tmp_out      TYPE string.
+
+    FIELD-SYMBOLS: <lt_result> TYPE STANDARD TABLE.
+
+    ASSIGN dref_result_tab_t[ i_grid_i ] TO FIELD-SYMBOL(<lr_dref>).
+    ASSIGN gt_lvc_t_fcat[ i_grid_i ] TO FIELD-SYMBOL(<lt_fields>).
+    ASSIGN <lr_dref>->* TO <lt_result>.
+
+    IF <lt_result> IS NOT INITIAL.
+
+      /cadaxo/cl_sqlc_csv_cust_util=>get_csv_parameter_from_user( IMPORTING ev_cancel  = DATA(cancel)
+                                                                            e_csv_attr = DATA(csv_attr) ).
+      IF cancel = abap_true.
+        RETURN.
+      ENDIF.
+
+*Begin of Insert Cockpit-398
+      iv_output_table = /cadaxo/cl_sqlc_csv_cust_util=>get_csv_from_itab( it_table   = <lt_result>
+                                                                          i_fieldcat = <lt_fields>
+                                                                          i_csv_attr = csv_attr ).
+*End   of Insert Cockpit-398
+
+*Begin of Comments Cockpit-398
+*      CALL METHOD me->get_csv_from_int_tab
+*        EXPORTING
+*          it_table      = <lt_result>
+*          i_grid_i      = i_grid_i
+*        IMPORTING
+*          ev_output_csv = iv_output_table.
+*End   of Comments Cockpit-398
+
+      cl_gui_frontend_services=>file_save_dialog(
+        EXPORTING
+          default_extension    = 'csv'
+          file_filter          = '.csv'
+        CHANGING
+          filename             = lv_filename
+          path                 = lv_path
+          fullpath             = lv_fullpath
+          user_action          = lv_user_action
+        EXCEPTIONS
+          OTHERS               = 1
+      ).
+
+      IF sy-subrc EQ 0 AND lv_user_action EQ 0.
+
+        cl_gui_frontend_services=>gui_download(
+            EXPORTING
+                filename = lv_fullpath
+            CHANGING
+                data_tab = iv_output_table
+            EXCEPTIONS
+                OTHERS = 1
+        ).
+        IF sy-subrc <> 0.
+          MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                     WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+        ENDIF.
+      ENDIF.
+    ENDIF.
 
   ENDMETHOD.
 
@@ -9671,40 +9727,29 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         lr_menu = NEW cl_ctmenu( ).
         lr_menu_export = NEW cl_ctmenu( ).
 
-        lr_menu_export->add_function(
-          EXPORTING
-            fcode = cl_gui_alv_grid=>mc_fc_call_xxl
-            text  = TEXT-f07 ).
+        lr_menu_export->add_function( fcode = cl_gui_alv_grid=>mc_fc_call_xxl
+                                      text  = TEXT-f07 ).
 
-        lr_menu_export->add_function(
-          EXPORTING
-            fcode = cl_gui_alv_grid=>mc_fc_word_processor
-            text  = TEXT-f08 ).
+        lr_menu_export->add_function( fcode = cl_gui_alv_grid=>mc_fc_word_processor
+                                      text  = TEXT-f08 ).
 
-        lr_menu_export->add_function(
-          EXPORTING
-            fcode = cl_gui_alv_grid=>mc_fc_pc_file
-            text  = TEXT-f09 ).
+        lr_menu_export->add_function( fcode = cl_gui_alv_grid=>mc_fc_pc_file
+                                      text  = TEXT-f09 ).
 
-        lr_menu_export->add_function(
-          EXPORTING
-            fcode = cl_gui_alv_grid=>mc_fc_send
-            text  = TEXT-f10 ).
+        lr_menu_export->add_function( fcode = cl_gui_alv_grid=>mc_fc_send
+                                      text  = TEXT-f10 ).
 
-        lr_menu_export->add_function(
-          EXPORTING
-            fcode = cl_gui_alv_grid=>mc_fc_to_office
-            text  = TEXT-f11 ).
+        lr_menu_export->add_function( fcode = cl_gui_alv_grid=>mc_fc_to_office
+                                      text  = TEXT-f11 ).
 
-        lr_menu_export->add_function(
-          EXPORTING
-            fcode = cl_gui_alv_grid=>mc_fc_html
-            text  = TEXT-f12 ).
+        lr_menu_export->add_function( fcode = cl_gui_alv_grid=>mc_fc_html
+                                      text  = TEXT-f12 ).
 
-        lr_menu_export->add_function(        "COCKPIT-271
-          EXPORTING                          "COCKPIT-271
-            fcode = gc_fcode_csv             "COCKPIT-271
-            text  = TEXT-f15 ).              "COCKPIT-271
+        lr_menu_export->add_function( fcode = c_button_fcode-export_csv_frontent "COCKPIT-271
+                                      text  = TEXT-f15 ).                        "COCKPIT-271
+
+        lr_menu_export->add_function( fcode = c_button_fcode-export_csv_backend
+                                      text  = TEXT-f16 ).
 
 *      lr_menu->add_function(
 *        EXPORTING
@@ -10102,8 +10147,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           me->handle_result_command_keyfix( EXPORTING i_grid_i = l_grid_name_i ).
         WHEN 'RESFULLDISP'.
           me->handle_result_command_fulldisp( EXPORTING i_grid_i = l_grid_name_i ).
-        WHEN gc_fcode_csv.                                                             "COCKPIT-271
-          me->handle_result_command_exp_csv( EXPORTING i_grid_i = l_grid_name_i ).     "COCKPIT-271
+        WHEN c_button_fcode-export_csv_frontent.                                       "COCKPIT-271
+          me->hdlcmd_export_csv_frontend( l_grid_name_i ).                             "COCKPIT-271
+        WHEN c_button_fcode-export_csv_backend.
+          me->hdlcmd_export_csv_backend( l_grid_name_i ).
         WHEN c_cmd_show_full_value.
           me->handle_command_show_full_value( EXPORTING i_grid_i = l_grid_name_i ).
         WHEN c_cmd_create_symbol.
@@ -13619,9 +13666,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   METHOD set_gt_used_symbols.
     gt_used_symbols = i_used_symbols.
   ENDMETHOD.
-
-
-
 
 
   METHOD set_initial_date_jobmonitor.

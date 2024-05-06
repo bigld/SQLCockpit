@@ -49,17 +49,24 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util DEFINITION
         VALUE(rv_converted_time) TYPE char8 .
     CLASS-METHODS get_csv_from_itab
       IMPORTING
-        !it_table      TYPE ANY TABLE
+        it_table       TYPE ANY TABLE
         i_fieldcat     TYPE lvc_t_fcat
-        i_csv_attr     TYPE /cadaxo/sqlc_csv_cust OPTIONAL
-      EXPORTING
-        !ev_output_csv TYPE ty_strings
-        !ev_cancel     TYPE abap_bool.
+        i_csv_attr     TYPE /cadaxo/sqlc_csv_cust
+      RETURNING VALUE(ev_output_csv) TYPE ty_strings.
     CLASS-METHODS csv_tab_2_string
       IMPORTING
         it_csv_tab          TYPE ty_strings
       RETURNING
         VALUE(e_csv_string) TYPE string .
+    CLASS-METHODS get_csv_parameter_from_user
+      IMPORTING
+        i_csv_attr     TYPE /cadaxo/sqlc_csv_cust OPTIONAL
+        i_to_appserver TYPE flag DEFAULT abap_false
+      EXPORTING
+        ev_cancel      TYPE abap_bool
+        e_csv_attr     TYPE /cadaxo/sqlc_csv_cust.
+  PRIVATE SECTION.
+
 
 ENDCLASS.
 
@@ -138,23 +145,10 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
 
     CLEAR ev_output_csv.
 
-    IF i_csv_attr IS NOT INITIAL.
-      DATA(csv_attr) = i_csv_attr.
-    ELSE.
-      CALL FUNCTION '/CADAXO/SQLC_CUSTOM_CSV_POPUP'
-        IMPORTING
-          ev_cancel   = ev_cancel
-        CHANGING
-          cs_csv_attr = csv_attr.
-      IF ev_cancel = abap_true.
-        RETURN.
-      ENDIF.
-    ENDIF.
+    DATA(lv_separator) = get_separator( i_separator_setting = i_csv_attr-field_separator
+                                        i_separator_others  = i_csv_attr-field_separator_other ).
 
-    DATA(lv_separator) = get_separator( i_separator_setting = csv_attr-field_separator
-                                        i_separator_others  = csv_attr-field_separator_other ).
-
-    IF csv_attr-add_header = abap_true.
+    IF i_csv_attr-add_header = abap_true.
       LOOP AT i_fieldcat ASSIGNING FIELD-SYMBOL(<ls_field>).
         lv_output_line = lv_output_line && lv_separator && <ls_field>-fieldname.
       ENDLOOP.
@@ -171,11 +165,11 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
 
         IF  <ls_field>-inttype = 'T'.
           " Export Date and Time in user format
-          lv_tmp_dats = convert_time( i_time_type = csv_attr-time_format
+          lv_tmp_dats = convert_time( i_time_type = i_csv_attr-time_format
                                       i_time_int  = <ls_line> ).
           lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
         ELSEIF <ls_field>-inttype = 'D'.
-          lv_tmp_dats = convert_date( i_date_type = csv_attr-date_format
+          lv_tmp_dats = convert_date( i_date_type = i_csv_attr-date_format
                                       i_date      = <ls_line> ).
           lv_output_line = lv_output_line && lv_separator && lv_tmp_dats.
         ELSEIF <ls_field>-inttype = 'C' AND ( <ls_line> CP |*{ lv_separator }*| OR <ls_line> CP '*"*' ).
@@ -195,6 +189,31 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
+
+  METHOD get_csv_parameter_from_user.
+
+    IF i_csv_attr IS NOT INITIAL.
+      e_csv_attr  = i_csv_attr.
+    ELSE.
+      e_csv_attr = VALUE #( add_header      = abap_true
+                            field_separator = 'SEMICOLON'
+                            date_format     = '06'
+                            time_format     = '02'
+                            file_path       = 'TMP'
+                            file_name       = |CockpitExport{ sy-datum }{ sy-uzeit }.csv| ).
+
+      CALL FUNCTION '/CADAXO/SQLC_CUSTOM_CSV_POPUP'
+        EXPORTING
+          i_on_appserver = i_to_appserver
+        IMPORTING
+          ev_cancel      = ev_cancel
+        CHANGING
+          cs_csv_attr    = e_csv_attr.
+    ENDIF.
+
+  ENDMETHOD.
+
+
 
 
   METHOD csv_tab_2_string.
