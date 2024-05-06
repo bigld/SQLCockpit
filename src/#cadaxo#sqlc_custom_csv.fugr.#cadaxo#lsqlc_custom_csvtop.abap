@@ -6,11 +6,15 @@ DATA: g_col   TYPE i,
       g_col_t TYPE i,
       g_row_t TYPE i.
 
-DATA rad_separated_by_tab       TYPE c LENGTH 1.
-DATA rad_separated_by_comma     TYPE c LENGTH 1.
-DATA rad_separated_by_semicolon TYPE c LENGTH 1.
-DATA rad_separated_by_space     TYPE c LENGTH 1.
-DATA rad_separated_by_other     TYPE c LENGTH 1.
+DATA: BEGIN OF rad_separated_by,
+        tab        TYPE c LENGTH 1,
+        comma      TYPE c LENGTH 1,
+        semicolon  TYPE c LENGTH 1,
+        whitespace TYPE c LENGTH 1,
+        other      TYPE c LENGTH 1,
+      END OF rad_separated_by.
 
 DATA: g_csv_attr TYPE /cadaxo/sqlc_csv_cust.
-DATA: g_cancel TYPE abap_bool.
+DATA: appserver  TYPE flag.
+DATA: dataset    TYPE c LENGTH 1024.
+DATA: g_cancel   TYPE abap_bool.

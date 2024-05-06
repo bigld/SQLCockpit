@@ -767,7 +767,7 @@ METHOD blacklist_check_tables.
 
     LOOP AT me->g_role-included ASSIGNING <l_auth>.
       IF <l_result_source>-table CP <l_auth> OR
-         <l_result_source>-table EQ <l_auth>.
+         <l_result_source>-table = <l_auth>.
         l_yes = abap_true.
         EXIT.
       ENDIF.
@@ -778,7 +778,7 @@ METHOD blacklist_check_tables.
         IF <l_result_source>-table CP <l_auth>.
           CLEAR l_yes.
           IF l_tables IS INITIAL.
-            MOVE <l_result_source>-table TO l_tables.
+            l_tables = <l_result_source>-table.
           ELSE.
             CONCATENATE l_tables ',' INTO l_tables.
             CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
@@ -788,7 +788,7 @@ METHOD blacklist_check_tables.
       ENDLOOP.
     ELSE.
       IF l_tables IS INITIAL.
-        MOVE <l_result_source>-table TO l_tables.
+        l_tables = <l_result_source>-table.
       ELSE.
         CONCATENATE l_tables ',' INTO l_tables.
         CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
@@ -810,32 +810,22 @@ METHOD blacklist_check_tables.
       l_view_name = <l_result_source>-table.
       CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
         EXPORTING
-          view_action                    = 'U'
-          view_name                      = l_view_name
-          no_warning_for_clientindep     = 'X'
+          view_action                = 'S' "SHOW
+          view_name                  = l_view_name
+          no_warning_for_clientindep = abap_true
         EXCEPTIONS
-          invalid_action                 = 1
-          no_authority                   = 2
-          no_clientindependent_authority = 3
-          table_not_found                = 4
-          no_linedependent_authority     = 5
-          OTHERS                         = 6.
+          OTHERS                     = 1.
       IF sy-subrc NE 0.
         CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
           EXPORTING
-            view_action                    = 'S'
-            view_name                      = l_view_name
-            no_warning_for_clientindep     = 'X'
+            view_action                = 'U' "UPDATE
+            view_name                  = l_view_name
+            no_warning_for_clientindep = abap_true
           EXCEPTIONS
-            invalid_action                 = 1
-            no_authority                   = 2
-            no_clientindependent_authority = 3
-            table_not_found                = 4
-            no_linedependent_authority     = 5
-            OTHERS                         = 6.
+            OTHERS                     = 1.
         IF sy-subrc NE 0.
           IF l_tables IS INITIAL.
-            MOVE <l_result_source>-table TO l_tables.
+            l_tables = <l_result_source>-table.
           ELSE.
             CONCATENATE l_tables ',' INTO l_tables.
             CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
@@ -1271,8 +1261,7 @@ METHOD check_sql_syntax.
     IF lv_select_version = c_select_version_1.                    "COCKPIT-214
       /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex(          "COCKPIT-214
         EXPORTING i_where_syntax = <l_cl_sql_parse>->where_syntax "COCKPIT-214
-        IMPORTING e_result_tab   =  lt_results                    "COCKPIT-214
-      ).
+        IMPORTING e_result_tab   =  lt_results ).                 "COCKPIT-214
 
       IF lt_results IS NOT INITIAL.                               "COCKPIT-214
         lv_select_version = c_select_version_2.                   "COCKPIT-214
@@ -1317,7 +1306,8 @@ METHOD check_sql_syntax.
                                                                                        OR lwa_key-msgnumber = '541'
                                                                                        OR lwa_key-msgnumber = '544' )
                                        OR lv_select_version = c_select_version_2 AND (    lwa_key-msgnumber = '547' ) )
-       OR lwa_key-keyword = 'MESSAGE'  AND (   lv_select_version = c_select_version_1 AND lwa_key-msgnumber = 'G2F' ).
+       OR lwa_key-keyword = 'MESSAGE'  AND (   lv_select_version = c_select_version_1 AND lwa_key-msgnumber = 'G2F' )
+       OR lwa_key-keyword = 'MESSAGE'  AND (   lv_select_version = c_select_version_1 AND lwa_key-msgnumber = 'GF5' ).
 
       IF lv_select_version = c_select_version_2 AND ( lwa_key-msgnumber = '547' ).
         IF <l_cl_sql_parse>->g_no_upto IS INITIAL.
@@ -1348,7 +1338,7 @@ METHOD check_sql_syntax.
          ( lwa_key-keyword = 'SYS$$INCOMPLETE$$' AND lwa_key-msgnumber = '000' ).
 *The length of the current statement is greater that the allowed maximum length of 28 kilobytes.
 *The last statement is not complete (period missing).
-        l_mess = l_mess && ' ' && text-e04.
+        l_mess = l_mess && ' ' && TEXT-e04.
       ENDIF.
 
 *    RAISE syntax_error.
@@ -1879,7 +1869,7 @@ METHOD create_alv_field_catalog_v_2.
 
   CLEAR me->gt_lvc_t_fcat.
 
-  lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( EXPORTING p_data_ref = me->result_table ).
+  lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( me->result_table ).
 
   CREATE DATA lr_tab TYPE HANDLE lr_tabledescr.
 
@@ -4240,8 +4230,10 @@ METHOD parse_sql_i.
   DATA: l_sql_string_c(100) TYPE c.
   DATA: l_maxsel            TYPE i.
   DATA: l_sql_string        TYPE string.
-
-  DATA ls_adm_cust TYPE /cadaxo/sqlc_admin_cust.
+  DATA: l_off_tmp           TYPE i.
+  DATA: l_len_tmp           TYPE i.
+  DATA: l_moff_tmp          TYPE i.
+  DATA: ls_adm_cust         TYPE /cadaxo/sqlc_admin_cust.
 
   FIELD-SYMBOLS: <l_match_result> TYPE match_result,
                  <l_split>        LIKE LINE OF lt_split.
@@ -4464,15 +4456,15 @@ METHOD parse_sql_i.
 
 ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_001 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001.
 *...
-    FIND REGEX 'CLIENT\s+SPECIFIED' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
-    IF sy-subrc EQ 0.
-      MESSAGE e013(/cadaxo/sqlc).
-    ENDIF.
+FIND REGEX 'CLIENT\s+SPECIFIED' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
+IF sy-subrc EQ 0.
+  MESSAGE e013(/cadaxo/sqlc).
+ENDIF.
 
-    FIND REGEX 'USING\s+CLIENT' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.   "COCKPIT-225
-    IF sy-subrc EQ 0.                                                                               "COCKPIT-225
-      MESSAGE e121(/cadaxo/sqlc).                                                                   "COCKPIT-225
-    ENDIF.                                                                                          "COCKPIT-225
+FIND REGEX 'USING\s+CLIENT' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.   "COCKPIT-225
+IF sy-subrc EQ 0.                                                                               "COCKPIT-225
+  MESSAGE e121(/cadaxo/sqlc).                                                                   "COCKPIT-225
+ENDIF.                                                                                          "COCKPIT-225
 
 END-ENHANCEMENT-SECTION.
 
@@ -4541,11 +4533,6 @@ END-ENHANCEMENT-SECTION.
                     WHEN 'GROUP'.
                       macro_case_section.
                       l_group_f = l_moff + 1.
-
-                      DATA l_off_tmp TYPE i.
-                      DATA l_len_tmp TYPE i.
-                      DATA l_moff_tmp TYPE i.
-
                       l_off_tmp = l_moff + 1.
 
                       FIND REGEX '^ *BY +' IN SECTION OFFSET l_off_tmp OF sql_string MATCH OFFSET l_moff_tmp MATCH LENGTH l_len_tmp.
@@ -5288,9 +5275,8 @@ METHOD parse_sql_ii_2.
         /cadaxo/cl_sqlc_cockpit_assist=>replace_apostrophes_with_space( CHANGING c_string = l_cols ).
         SPLIT l_cols AT space INTO TABLE me->column_words_t.
 
-        cl_abap_classdescr=>describe_by_name( EXPORTING  p_name         = <l_result_source>-table
-                                              EXCEPTIONS type_not_found = 1
-                                                         OTHERS         = 2 ).
+        cl_abap_classdescr=>describe_by_name( EXPORTING  p_name = <l_result_source>-table
+                                              EXCEPTIONS OTHERS = 1 ).
         IF sy-subrc EQ 0.
 
           lcl_structtype ?= cl_abap_typedescr=>describe_by_name(  <l_result_source>-table ).

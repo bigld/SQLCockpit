@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/CADAXO/SQLC_CSVCUS_PATH</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>PATHINTERN</DOMNAME>
+    <HEADLEN>16</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>16</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>SQL Cockpit - CSV Cust - Logical Pathname</DDTEXT>
+    <REPTEXT>Path</REPTEXT>
+    <SCRTEXT_S>Path</SCRTEXT_S>
+    <SCRTEXT_M>Path</SCRTEXT_M>
+    <SCRTEXT_L>Path</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <SHLPNAME>H_FILEPATH</SHLPNAME>
+    <SHLPFIELD>PATHINTERN</SHLPFIELD>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>SQL Cockpit - CSV Cust - Logischer Dateipfad</DDTEXT>
+     <REPTEXT>Pfad</REPTEXT>
+     <SCRTEXT_S>Pfad</SCRTEXT_S>
+     <SCRTEXT_M>Pfad</SCRTEXT_M>
+     <SCRTEXT_L>Pfad</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

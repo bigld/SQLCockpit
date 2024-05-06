@@ -14,6 +14,13 @@
     <item>
      <FUNCNAME>/CADAXO/SQLC_CUSTOM_CSV_POPUP</FUNCNAME>
      <SHORT_TEXT>Pop-up for custom CSV selections</SHORT_TEXT>
+     <IMPORT>
+      <RSIMP>
+       <PARAMETER>I_ON_APPSERVER</PARAMETER>
+       <REFERENCE>X</REFERENCE>
+       <TYP>FLAG</TYP>
+      </RSIMP>
+     </IMPORT>
      <CHANGING>
       <RSCHA>
        <PARAMETER>CS_CSV_ATTR</PARAMETER>
@@ -29,6 +36,10 @@
       </RSEXP>
      </EXPORT>
      <DOCUMENTATION>
+      <RSFDO>
+       <PARAMETER>I_ON_APPSERVER</PARAMETER>
+       <KIND>P</KIND>
+      </RSFDO>
       <RSFDO>
        <PARAMETER>EV_CANCEL</PARAMETER>
        <KIND>P</KIND>
@@ -50,8 +61,8 @@
       <DESCRIPT>SQL Cockpit - CSV Customization</DESCRIPT>
       <TYPE>N</TYPE>
       <NEXTSCREEN>0500</NEXTSCREEN>
-      <LINES>009</LINES>
-      <COLUMNS>102</COLUMNS>
+      <LINES>012</LINES>
+      <COLUMNS>103</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -60,7 +71,7 @@
       </RPY_DYCATT>
       <RPY_DYCATT>
        <TYPE>RADIOGROUP</TYPE>
-       <NAME>%A_RAD_SEPARATED_BY_TAB</NAME>
+       <NAME>%A_RAD_SEPARATED_BY-TAB</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
        <LINE>002</LINE>
        <COLUMN>005</COLUMN>
@@ -207,6 +218,93 @@
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>FRAME</TYPE>
+       <NAME>BACKEND_PATH</NAME>
+       <TEXT>Path_____________________________________________________________</TEXT>
+       <LINE>008</LINE>
+       <COLUMN>002</COLUMN>
+       <LENGTH>066</LENGTH>
+       <VISLENGTH>066</VISLENGTH>
+       <HEIGHT>005</HEIGHT>
+       <GROUP4>BEP</GROUP4>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>/CADAXO/SQLC_CSV_CUST-FILE_PATH</NAME>
+       <LINE>009</LINE>
+       <COLUMN>003</COLUMN>
+       <LENGTH>016</LENGTH>
+       <VISLENGTH>016</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <GROUP4>BEP</GROUP4>
+       <FORMAT>CHAR</FORMAT>
+       <FROM_DICT>X</FROM_DICT>
+       <MODIFIC>2</MODIFIC>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <LABELLEFT>X</LABELLEFT>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>G_CSV_ATTR-FILE_PATH</NAME>
+       <TEXT>?___________________________________________________________</TEXT>
+       <ROLLING>X</ROLLING>
+       <LINE>009</LINE>
+       <COLUMN>020</COLUMN>
+       <LENGTH>060</LENGTH>
+       <VISLENGTH>047</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <GROUP4>BEP</GROUP4>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <REQU_ENTRY>O</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>/CADAXO/SQLC_CSV_CUST-FILE_NAME</NAME>
+       <LINE>010</LINE>
+       <COLUMN>003</COLUMN>
+       <LENGTH>016</LENGTH>
+       <VISLENGTH>016</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <GROUP4>BEP</GROUP4>
+       <FORMAT>CHAR</FORMAT>
+       <FROM_DICT>X</FROM_DICT>
+       <MODIFIC>2</MODIFIC>
+       <UP_LOWER>X</UP_LOWER>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <LABELLEFT>X</LABELLEFT>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>G_CSV_ATTR-FILE_NAME</NAME>
+       <TEXT>?___________________________________________________________________________________________________________________________________</TEXT>
+       <ROLLING>X</ROLLING>
+       <LINE>010</LINE>
+       <COLUMN>020</COLUMN>
+       <LENGTH>255</LENGTH>
+       <VISLENGTH>047</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <GROUP4>BEP</GROUP4>
+       <FORMAT>CHAR</FORMAT>
+       <UP_LOWER>X</UP_LOWER>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <REQU_ENTRY>O</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>OKCODE</TYPE>
        <NAME>G_OK_CODE</NAME>
        <TEXT>____________________</TEXT>
@@ -218,9 +316,9 @@
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>RADIOGROUP</CONT_TYPE>
-       <CONT_NAME>%A_RAD_SEPARATED_BY_TAB</CONT_NAME>
+       <CONT_NAME>%A_RAD_SEPARATED_BY-TAB</CONT_NAME>
        <TYPE>RADIO</TYPE>
-       <NAME>RAD_SEPARATED_BY_TAB</NAME>
+       <NAME>RAD_SEPARATED_BY-TAB</NAME>
        <TEXT>Tab___________</TEXT>
        <LINE>002</LINE>
        <COLUMN>005</COLUMN>
@@ -234,9 +332,9 @@
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>RADIOGROUP</CONT_TYPE>
-       <CONT_NAME>%A_RAD_SEPARATED_BY_TAB</CONT_NAME>
+       <CONT_NAME>%A_RAD_SEPARATED_BY-TAB</CONT_NAME>
        <TYPE>RADIO</TYPE>
-       <NAME>RAD_SEPARATED_BY_SEMICOLON</NAME>
+       <NAME>RAD_SEPARATED_BY-SEMICOLON</NAME>
        <TEXT>Semicolon_____</TEXT>
        <LINE>002</LINE>
        <COLUMN>026</COLUMN>
@@ -250,9 +348,9 @@
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>RADIOGROUP</CONT_TYPE>
-       <CONT_NAME>%A_RAD_SEPARATED_BY_TAB</CONT_NAME>
+       <CONT_NAME>%A_RAD_SEPARATED_BY-TAB</CONT_NAME>
        <TYPE>RADIO</TYPE>
-       <NAME>RAD_SEPARATED_BY_OTHER</NAME>
+       <NAME>RAD_SEPARATED_BY-OTHER</NAME>
        <TEXT>Other____</TEXT>
        <LINE>002</LINE>
        <COLUMN>049</COLUMN>
@@ -266,9 +364,9 @@
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>RADIOGROUP</CONT_TYPE>
-       <CONT_NAME>%A_RAD_SEPARATED_BY_TAB</CONT_NAME>
+       <CONT_NAME>%A_RAD_SEPARATED_BY-TAB</CONT_NAME>
        <TYPE>RADIO</TYPE>
-       <NAME>RAD_SEPARATED_BY_COMMA</NAME>
+       <NAME>RAD_SEPARATED_BY-COMMA</NAME>
        <TEXT>Comma_________</TEXT>
        <LINE>003</LINE>
        <COLUMN>005</COLUMN>
@@ -282,9 +380,9 @@
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>RADIOGROUP</CONT_TYPE>
-       <CONT_NAME>%A_RAD_SEPARATED_BY_TAB</CONT_NAME>
+       <CONT_NAME>%A_RAD_SEPARATED_BY-TAB</CONT_NAME>
        <TYPE>RADIO</TYPE>
-       <NAME>RAD_SEPARATED_BY_SPACE</NAME>
+       <NAME>RAD_SEPARATED_BY-SPACE</NAME>
        <TEXT>Space_________</TEXT>
        <LINE>003</LINE>
        <COLUMN>026</COLUMN>
@@ -313,7 +411,19 @@
        <LINE>  MODULE pai_0500.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
+       <LINE>  CHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>    FIELD: g_csv_attr-file_path, g_csv_attr-file_path MODULE check_file.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
        <LINE>  MODULE user_command_0500.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  MODULE user_command_0500 AT EXIT-COMMAND.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
     </item>
@@ -343,6 +453,7 @@
      <RSMPE_FUNT>
       <CODE>CANCEL</CODE>
       <TEXTNO>001</TEXTNO>
+      <TYPE>E</TYPE>
       <TEXT_TYPE>S</TEXT_TYPE>
       <TEXT_NAME>ICON_CANCEL</TEXT_NAME>
       <ICON_ID>@0W@</ICON_ID>
