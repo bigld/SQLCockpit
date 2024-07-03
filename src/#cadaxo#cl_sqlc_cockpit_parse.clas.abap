@@ -4015,7 +4015,7 @@ METHOD GET_DDIC_FIELD_LIST.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-  r_fields_t = i_cl_abap_structdescr->get_ddic_field_list( ).
+  r_fields_t = i_cl_abap_structdescr->get_ddic_field_list(  ).
 
 ENDMETHOD.
 

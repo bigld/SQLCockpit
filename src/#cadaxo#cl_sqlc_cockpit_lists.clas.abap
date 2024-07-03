@@ -540,9 +540,7 @@ METHOD save_list.
 
   DATA lt_saved_lists TYPE /cadaxo/sqlcsresalv_t.
   DATA l_free_space_kb TYPE int4.
-  DATA l_max_space_kb TYPE int4.
   DATA ls_adm_cust TYPE /cadaxo/sqlc_admin_cust.
-  DATA l_header_line TYPE /cadaxo/sqlcheaderline.
 
   FIELD-SYMBOLS: <ls_cl_sql_parse>   LIKE LINE OF i_cl_sql_parse,
                  <ls_t>              TYPE ANY TABLE,
@@ -579,7 +577,6 @@ METHOD save_list.
           <ls_cl_sql_parse>->dbhint_syntax       TO ls_sqlcresultsave-parse-dbhint_syntax,
           <ls_cl_sql_parse>->connection_syntax   TO ls_sqlcresultsave-parse-connection_syntax,
           <ls_cl_sql_parse>->sql_syntax          TO ls_sqlcresultsave-parse-sql_syntax,
-          <ls_cl_sql_parse>->gt_result_ddfields  TO ls_sqlcresultsave-parse-result_ddfields,
           <ls_cl_sql_parse>->result_source_t     TO ls_sqlcresultsave-parse-result_source,
           <ls_cl_sql_parse>->g_up_to_x_rows      TO ls_sqlcresultsave-parse-up_to_x_rows,
           <ls_cl_sql_parse>->g_select_single     TO ls_sqlcresultsave-parse-select_single,
@@ -590,7 +587,14 @@ METHOD save_list.
           <ls_cl_sql_parse>->gt_components_domval   TO ls_sqlcresultsave-parse-components_domval,  "COCKPIT-468
           <ls_cl_sql_parse>->comp                   TO ls_sqlcresultsave-parse-comp,               "COCKPIT-468
           <ls_cl_sql_parse>->gt_domval              TO ls_sqlcresultsave-parse-domval.             "COCKPIT-468
-    MOVE <ls_cl_sql_parse>->result_table TO ls_sqlcresult_ref-table_dref.
+
+    ls_sqlcresult_ref-table_dref = <ls_cl_sql_parse>->result_table.
+
+    IF lines( <ls_cl_sql_parse>->gt_result_ddfields_all ) > lines( <ls_cl_sql_parse>->gt_result_ddfields ).
+      ls_sqlcresultsave-parse-result_ddfields = <ls_cl_sql_parse>->gt_result_ddfields_all.
+    ELSE.
+      ls_sqlcresultsave-parse-result_ddfields = <ls_cl_sql_parse>->gt_result_ddfields.
+    ENDIF.
 
     ASSIGN ls_sqlcresult_ref-table_dref->* TO <ls_t>.
 
@@ -602,8 +606,7 @@ METHOD save_list.
       IMPORTING
         gzip_out       = ls_result_list_raw ).
 
-
-    MOVE l_result_details TO ls_sqlcresultsave-main-result_details.
+    ls_sqlcresultsave-main-result_details = l_result_details.
 
     APPEND ls_sqlcresultsave TO lt_sqlcresultsave.
     APPEND ls_result_list_raw TO lt_result_list_raw.
