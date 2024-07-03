@@ -55,6 +55,7 @@ DATA: gd_home_local      TYPE c.
 DATA: g_adm              TYPE c.
 DATA: gs_adm_cust        TYPE /cadaxo/sqlc_admin_cust.
 
+DATA: g_dynpro_text      TYPE string.
 DATA: gt_excluding_fcode TYPE TABLE OF fcode.
 
 DATA: g_title_version    TYPE string.
@@ -70,7 +71,6 @@ DATA: g_col   TYPE i,
       g_col_t TYPE i,
       g_row_t TYPE i.
 
-DATA g_dynpro_text      TYPE string.
 DATA g_sqlcsres         TYPE /cadaxo/sqlcsres.
 DATA gt_sqlcadoc        TYPE TABLE OF /cadaxo/sqlcadoc.
 DATA gt_sqlcadot        TYPE TABLE OF /cadaxo/sqlcadot.
@@ -108,8 +108,6 @@ DATA: gv_share_rfcdest  TYPE /cadaxo/sqlcapi_rfcdest. "cockpit-295
 *----------------------------------------------------------------------*
 *       CLASS lcl_event_handler DEFINITION
 *----------------------------------------------------------------------*
-*
-*----------------------------------------------------------------------*
 CLASS lcl_event_handler DEFINITION.
   PUBLIC SECTION.
     METHODS: on_col_tree_double_click_item FOR EVENT item_double_click OF cl_gui_column_tree
@@ -121,15 +119,12 @@ ENDCLASS.                    "lcl_event_handler DEFINITION
 *----------------------------------------------------------------------*
 *       CLASS lcl_event_handler IMPLEMENTATION
 *----------------------------------------------------------------------*
-*
-*----------------------------------------------------------------------*
 CLASS lcl_event_handler IMPLEMENTATION.
   METHOD on_addons_alv_click.
 
-    DATA ls_log        TYPE /cadaxo/sqlculog_api.
-
+    DATA ls_log TYPE /cadaxo/sqlculog_api.
     READ TABLE gt_installed_addons INDEX es_row_no-row_id INTO gs_installed_addons.
-    IF sy-subrc EQ 0.
+    IF sy-subrc = 0.
 
       CLEAR ls_log.
 
@@ -157,14 +152,10 @@ CLASS lcl_event_handler IMPLEMENTATION.
 
       ENDIF.
       PERFORM get_installed_addons.
-      CALL METHOD g_addons_grid->refresh_table_display.
-
-      lcl_controller->gr_user_log->add_ulog(
-          i_log_message = ls_log ).
+      g_addons_grid->refresh_table_display( ).
+      lcl_controller->gr_user_log->add_ulog( i_log_message = ls_log ).
 
     ENDIF.
-
-
 
     CALL FUNCTION 'SAPGUI_SET_FUNCTIONCODE'.
 
@@ -177,27 +168,12 @@ ENDCLASS.                    "lcl_event_handler IMPLEMENTATION
 
 START-OF-SELECTION.
 
-  CREATE OBJECT lcl_controller.
-
-  CREATE OBJECT glcl_event_handler.
-
+  lcl_controller = NEW #( ).
+  glcl_event_handler = NEW #( ).
   CALL SCREEN 0100.
 
 END-OF-SELECTION.
 
-*&---------------------------------------------------------------------*
-*&      Form  GET_SQL_VARIANT
-*&---------------------------------------------------------------------*
-*FORM get_sql_variant .
-*
-*  g_col = ( sy-scols / 2 ) - 65. " 160 / 2 = 80 - 60 = 20
-*  g_row = ( sy-srows / 2 ) - 15.
-*  g_col_t = g_col + 130.
-*  g_row_t = g_row + 20.
-*
-*  CALL SCREEN 200 STARTING AT g_col g_row ENDING AT g_col_t g_row_t.
-*
-*ENDFORM.                    " GET_SQL_VARIANT
 
 *&---------------------------------------------------------------------*
 *&      Module  PBO_0100  OUTPUT
@@ -229,31 +205,31 @@ MODULE pbo_0100 OUTPUT.
   ENDIF.
 
 * Fill dynamic SQL Button - With Trace
-  MOVE text-b01 TO g_button_sql_trace-text.
-  MOVE text-b01 TO g_button_sql_trace-icon_text.
+  MOVE TEXT-b01 TO g_button_sql_trace-text.
+  MOVE TEXT-b01 TO g_button_sql_trace-icon_text.
 
   IF lcl_controller->g_sql_trace_on IS INITIAL.
     MOVE icon_led_inactive TO g_button_sql_trace-icon_id.
-    MOVE text-bi1 TO g_button_sql_trace-quickinfo.
+    MOVE TEXT-bi1 TO g_button_sql_trace-quickinfo.
     IF  lcl_controller->g_user_settings-sql_trace IS INITIAL          "CDX001-0010
     AND lcl_controller->g_user_settings-tablebuffer_trace IS INITIAL. "CDX001-0010
       APPEND 'TRACETOGGL' TO gt_excluding_fcode.                      "CDX001-0010
     ENDIF.                                                            "CDX001-0010
   ELSE.
     MOVE icon_led_green TO  g_button_sql_trace-icon_id.
-    MOVE text-bi2 TO g_button_sql_trace-quickinfo.
+    MOVE TEXT-bi2 TO g_button_sql_trace-quickinfo.
   ENDIF.
 
 * Fill dynamic SQL Button - With Progress
-  MOVE text-b02 TO g_button_progress-text.
-  MOVE text-b02 TO g_button_progress-icon_text.
-  MOVE text-bi2 TO g_button_progress-quickinfo.
+  MOVE TEXT-b02 TO g_button_progress-text.
+  MOVE TEXT-b02 TO g_button_progress-icon_text.
+  MOVE TEXT-bi2 TO g_button_progress-quickinfo.
   IF lcl_controller->g_sql_progress_on IS INITIAL.
     MOVE icon_led_inactive TO g_button_progress-icon_id.
-    MOVE text-bi1 TO g_button_progress-quickinfo.
+    MOVE TEXT-bi1 TO g_button_progress-quickinfo.
   ELSE.
     MOVE icon_led_green TO g_button_progress-icon_id.
-    MOVE text-bi2 TO g_button_progress-quickinfo.
+    MOVE TEXT-bi2 TO g_button_progress-quickinfo.
   ENDIF.
 
   SET PF-STATUS 'MAIN_0100' EXCLUDING gt_excluding_fcode. "cockpit-416
@@ -269,7 +245,7 @@ MODULE pbo_0100 OUTPUT.
              ).
   ENDIF.
   IF NOT g_title_version_nr IS INITIAL.
-    g_title_version = text-v00.
+    g_title_version = TEXT-v00.
   ENDIF.
   SET TITLEBAR '0100' WITH g_title_version_nr g_title_version.
 
@@ -328,12 +304,12 @@ MODULE pai_0100 INPUT.
     WHEN 'SQL_SHR_ME'.                       "cockpit-420
       DATA lv_uname TYPE /cadaxo/sqlcapi_receiver. "cockpit-420
       lv_uname = sy-uname.                   "cockpit-420
-      PERFORM share_sql_area USING lv_uname text-012. "cockpit-420
+      PERFORM share_sql_area USING lv_uname TEXT-012. "cockpit-420
     WHEN 'QUEUE'.
       PERFORM show_api_queue.
     WHEN 'SAVE_LISTS'.
       PERFORM save_lists.
-        WHEN OTHERS.
+    WHEN OTHERS.
       lcl_controller->pai_0100( EXPORTING i_ok_code = g_ok_code ).
   ENDCASE.
 
@@ -391,8 +367,8 @@ MODULE pai_0500 INPUT.
     WHEN 'CANCEL'.
       SET SCREEN 0. LEAVE SCREEN.
     WHEN 'SAVE'.
-      lcl_controller->set_user_settings( EXPORTING i_settings = /cadaxo/sqlcusrp_dyn ).
-      lcl_controller->set_symbol_alv( ).
+      lcl_controller->set_user_settings( /cadaxo/sqlcusrp_dyn ).
+*      lcl_controller->set_symbol_alv( ).
       SET SCREEN 0. LEAVE SCREEN.
   ENDCASE.
   CLEAR g_ok_code.
@@ -466,7 +442,7 @@ ENDFORM.
 *----------------------------------------------------------------------*
 FORM share_sql_area
   USING iv_receiver TYPE /cadaxo/sqlcapi_receiver "+Cockpit-420
-        iv_text     TYPE /CADAXO/SQLC_CHAR_1024. "+Cockpit-420
+        iv_text     TYPE /cadaxo/sqlc_char_1024. "+Cockpit-420
   DATA(lt_sql) = lcl_controller->get_sql_area_lt_code( ).                     "COCKPIT-295
   DATA l_message TYPE string.                                                 "COCKPIT-269
   DATA lr_exception             TYPE REF TO cx_root.                          "COCKPIT-269
@@ -484,7 +460,7 @@ FORM share_sql_area
             iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-sql    "COCKPIT-295
             it_sql         = lt_sql                                          "COCKPIT-295
             iv_receiver    = iv_receiver                                      "Cockpit-420
-            iv_text        = iv_text    .                                     "Cockpit-420
+            iv_text        = iv_text.                                     "Cockpit-420
       ENDIF.                                                                  "COCKPIT-269
     CATCH /cadaxo/cx_sqlc_syntax_error INTO lr_exception.                     "COCKPIT-269
       l_message = lr_exception->get_text( ).                                  "COCKPIT-269
@@ -574,7 +550,7 @@ FORM generate_template.
     CATCH /cadaxo/cx_sqlc_syntax_error /cadaxo/cx_sqlc_invalid_value.
   ENDTRY.
 
-ENDFORM.                    " GENERATE_TEMPLATE
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  ADMIN_SETTINGS
 *&---------------------------------------------------------------------*
@@ -586,63 +562,38 @@ FORM admin_settings .
 
   CALL SCREEN 900 STARTING AT g_col g_row ENDING AT g_col_t g_row_t.
 
-ENDFORM.                    " ADMIN_SETTINGS
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  confirm_symbol_overwrite
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
-FORM confirm_symbol_overwrite.
+FORM confirm_symbol_overwrite USING i_popup_size TYPE /cadaxo/cl_sqlc_symbols=>ty_popup_size.
 
-  g_col = 10.
-  g_row = ( sy-srows / 2 ) - 10.
-  g_col_t = g_col + 119.
-  g_row_t = g_row + 11.
-* begin of change cockpit274
-  IF g_col LT 1.
-    g_col = 1.
-  ENDIF.
-  IF g_row LT 1.
-    g_row = 1.
-  ENDIF.
-* end   of change cockpit274
-  CALL SCREEN 700 STARTING AT g_col g_row ENDING AT g_col_t g_row_t.
+  g_dynpro_text = TEXT-q03.
+  CALL SCREEN 700 STARTING AT i_popup_size-column i_popup_size-row ENDING AT i_popup_size-column_to i_popup_size-row_to.
 
-ENDFORM.                    "confirm_symbol_overwrite
+ENDFORM.
 *----------------------------------------------------------------------*
 *  MODULE pbo_0700 OUTPUT
-*----------------------------------------------------------------------*
-*
 *----------------------------------------------------------------------*
 MODULE pbo_0700 OUTPUT.
 
   SET PF-STATUS 'MAIN_0700'.
   SET TITLEBAR '0700'.
+  lcl_controller->symbols_controller->pbo_0700(  ).
 
-  g_dynpro_text = text-q03.
-  lcl_controller->pbo_0700(  ).
-ENDMODULE.                    "pbo_0700 OUTPUT
+ENDMODULE.
 *----------------------------------------------------------------------*
 *  MODULE pai_0700 INPUT
 *----------------------------------------------------------------------*
-*
-*----------------------------------------------------------------------*
 MODULE pai_0700 INPUT.
 
-  lcl_controller->pai_0700(
-    EXPORTING
-      i_ok_code = g_ok_code ).
-
+  lcl_controller->symbols_controller->pai_0700( g_ok_code ).
   CLEAR g_ok_code.
+
 ENDMODULE.                    "pai_0700 INPUT
 *&---------------------------------------------------------------------*
 *&      Form  SAVE_LISTS
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
-*  -->  p1        text
-*  <--  p2        text
-*----------------------------------------------------------------------*
 FORM save_lists .
 
   DATA lt_saved_lists TYPE /cadaxo/sqlcsresalv_t.
@@ -673,8 +624,6 @@ ENDFORM.                    " SAVE_LISTS
 *&---------------------------------------------------------------------*
 *&      Module  PBO_0800  OUTPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pbo_0800 OUTPUT.
 
   SET PF-STATUS 'MAIN_0800'.
@@ -686,8 +635,6 @@ ENDMODULE.                 " PBO_0800  OUTPUT
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0800  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pai_0800 INPUT.
 
   lcl_controller->pai_0800(
@@ -697,12 +644,10 @@ MODULE pai_0800 INPUT.
 
   CLEAR g_ok_code.
 
-ENDMODULE.                 " PAI_0800  INPUT
+ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  PBO_0900  OUTPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pbo_0900 OUTPUT.
 
   DATA l_icon TYPE string.
@@ -798,8 +743,6 @@ ENDMODULE.                 " PBO_0900  OUTPUT
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0900  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pai_0900 INPUT.
   CASE g_ok_code.
     WHEN 'MAIN'.
@@ -832,8 +775,6 @@ ENDMODULE.                 " PAI_0900  INPUT
 *&---------------------------------------------------------------------*
 *&      Module  PBO_0910  OUTPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pbo_0910 OUTPUT.
   DATA ls_lvc_s_styl       TYPE lvc_s_styl.
 
@@ -917,12 +858,12 @@ MODULE pbo_0910 OUTPUT.
   ENDIF.
 
 ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_005 SPOTS /cadaxo/sqlc_ehnsp_cls_se_002 .
-  LOOP AT SCREEN.
-    IF screen-group1 = 'CLS'.
-      screen-invisible = '1'.
-      MODIFY SCREEN.
-    ENDIF.
-  ENDLOOP.
+LOOP AT SCREEN.
+  IF screen-group1 = 'CLS'.
+    screen-invisible = '1'.
+    MODIFY SCREEN.
+  ENDIF.
+ENDLOOP.
 END-ENHANCEMENT-SECTION.
 
 
@@ -930,21 +871,10 @@ ENDMODULE.                 " PBO_0910  OUTPUT
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0910  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE pai_0910 INPUT.
 
   CASE g_ok_code.
     WHEN 'OK' OR 'ENT'.
-
-*      IF gs_adm_cust-maxsel GE 1 AND gs_adm_cust-maxsel LE 30.   "COCKPIT-194
-*        IF gs_adm_cust-maxsel GT 16.                             "COCKPIT-194
-*          MESSAGE i087(/cadaxo/sqlc).                            "COCKPIT-194
-*        ENDIF.                                                   "COCKPIT-194
-*      ELSE.                                                      "COCKPIT-194
-*        MESSAGE i088(/cadaxo/sqlc).                              "COCKPIT-194
-*      ENDIF.                                                     "COCKPIT-194
-
       CASE 'X'.
         WHEN gd_home_link.
           gs_adm_cust-home_use_link = abap_true.
@@ -1032,8 +962,6 @@ ENDMODULE.                 " PAI_0980  INPUT
 *&---------------------------------------------------------------------*
 *&      Module  HIDE_TAB  OUTPUT
 *&---------------------------------------------------------------------*
-*       Define which Tabs in the new Adminscreen (900) are visible
-*----------------------------------------------------------------------*
 MODULE hide_tab OUTPUT.
   LOOP AT SCREEN.
     CASE screen-name.
@@ -1109,8 +1037,6 @@ ENDFORM.                    " GET_INSTALLED_ADDONS
 *&---------------------------------------------------------------------*
 *&      Module  HELP_RECEIVER  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE help_receiver INPUT.
 
   DATA lt_dynpfields TYPE TABLE OF dynpread.
@@ -1147,8 +1073,6 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  CHECK_RECEIVER  INPUT
 *&---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
 MODULE check_receiver INPUT.
 
   READ TABLE gt_sql_cockpit_standard_users TRANSPORTING NO FIELDS WITH KEY uname = g_receiver.

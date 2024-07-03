@@ -1,9 +1,3 @@
-TYPES: BEGIN OF gts_main_classes,
-  nr  TYPE i,
-  ref TYPE REF TO /cadaxo/cl_sqlc_cockpit_main,
-  END OF gts_main_classes.
-TYPES: gtt_main_classes TYPE TABLE OF gts_main_classes.
-
 *----------------------------------------------------------------------*
 *       CLASS lcl_dragdrop_receiver DEFINITION
 *----------------------------------------------------------------------*

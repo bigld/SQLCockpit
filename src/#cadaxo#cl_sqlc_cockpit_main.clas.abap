@@ -1,17 +1,25 @@
 CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
   PUBLIC
   CREATE PUBLIC
-  GLOBAL FRIENDS /cadaxo/cl_sqlc_background.
+
+  GLOBAL FRIENDS /cadaxo/cl_sqlc_background
+                 /cadaxo/cl_sqlc_symbols .
 
   PUBLIC SECTION.
 
-    TYPES:
-      t_symbol_db TYPE TABLE OF /cadaxo/sqlcusym .
     TYPES:
       gtt_char255 TYPE TABLE OF char255 .
     TYPES:
       t_string    TYPE TABLE OF string .
 
+    CONSTANTS:
+      BEGIN OF editor_type,
+        new TYPE char1 VALUE 'A' ##NO_TEXT,
+        old TYPE char1 VALUE '',
+      END OF editor_type .
+    CONSTANTS c_width_right_clipboard TYPE i VALUE 500 ##NO_TEXT.
+    CONSTANTS c_width_right_symbols TYPE i VALUE 500 ##NO_TEXT.
+    CONSTANTS c_width_right_window TYPE i VALUE 500 ##NO_TEXT.
     CONSTANTS c_cmd_create_symbol TYPE ui_func VALUE 'CREATE_SYMBOL' ##NO_TEXT.
     CONSTANTS c_cmd_home TYPE ui_func VALUE 'HOME' ##NO_TEXT.
     CONSTANTS c_cmd_insert_cc TYPE ui_func VALUE 'INSERT_CC' ##NO_TEXT.
@@ -32,10 +40,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     CONSTANTS c_cmd_show_value_as_html_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_HTML_BROW' ##NO_TEXT.
     CONSTANTS c_cmd_show_value_as_xml_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_XML_BROW' ##NO_TEXT.
     CONSTANTS c_okcode_clipboard TYPE syucomm VALUE 'CLIPBOARD' ##NO_TEXT.
-    CONSTANTS c_okcode_symbols TYPE syucomm VALUE 'SYMBOL' ##NO_TEXT.
     CONSTANTS c_saved_list_share TYPE stb_button-function VALUE 'SAVED_LIST_SHARE' ##NO_TEXT.
-    CONSTANTS c_saved_list_share_oth TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_OTH' ##NO_TEXT.   "+COCKPIT420
-    CONSTANTS c_saved_list_share_me TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_ME' ##NO_TEXT.   "+COCKPIT420
+    CONSTANTS c_saved_list_share_oth TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_OTH' ##NO_TEXT.     "+COCKPIT420
+    CONSTANTS c_saved_list_share_me TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_ME' ##NO_TEXT.     "+COCKPIT420
     CONSTANTS c_sqleditor_name TYPE string VALUE 'CADAXO_SQL_EDITOR' ##NO_TEXT.
     CONSTANTS c_template_name_odata TYPE /cadaxo/sqlctempl_name VALUE '/CADAXO/ODATA' ##NO_TEXT.
     CONSTANTS gc_saved_list_shared TYPE /cadaxo/sqlc_list_type VALUE 'SHR' ##NO_TEXT.
@@ -45,6 +52,13 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     CLASS-DATA gt_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
     CLASS-DATA toolbar_col_width TYPE int4 READ-ONLY .
     CLASS-DATA toolbar_row_height TYPE int4 READ-ONLY .
+    CONSTANTS:
+      BEGIN OF cs_windowresolution,
+        horizontal TYPE /cadaxo/sqlcreswindorientation VALUE 'H' ##NO_TEXT,
+        vertical   TYPE /cadaxo/sqlcreswindorientation VALUE 'V' ##NO_TEXT,
+        matrix     TYPE /cadaxo/sqlcreswindorientation VALUE 'M' ##NO_TEXT,
+        tab        TYPE /cadaxo/sqlcreswindorientation VALUE 'T' ##NO_TEXT,
+      END OF cs_windowresolution .
     DATA dragdrop_handle TYPE i .
     DATA dref_result_tab_t TYPE /cadaxo/sqlc_dref_result_tab_t .
     DATA gc_abap_parser TYPE REF TO cl_abap_parser .
@@ -75,6 +89,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     EVENTS settings_changed_upto
       EXPORTING
         VALUE(i_new_upto) TYPE /cadaxo/sqlcmaxsel .
+
     CLASS-METHODS api_execute_sql
       IMPORTING
         !i_sql_string TYPE /cadaxo/sqlcsql_string
@@ -84,7 +99,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       RETURNING
         VALUE(r_true) TYPE char1 .
     CLASS-METHODS class_constructor .
-
     CLASS-METHODS match_saved_fieldcat_orig
       IMPORTING
         !it_fcat         TYPE lvc_t_fcat
@@ -106,6 +120,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !it_result_table TYPE any
       RETURNING
         VALUE(rt_sort)   TYPE lvc_t_sort .
+    CLASS-METHODS param_replace_tags
+      CHANGING
+        !data TYPE string .
     CLASS-METHODS set_gt_used_symbols
       IMPORTING
         !i_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
@@ -131,68 +148,53 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !e_assigend_url TYPE c
         !e_html_string  TYPE string .
     METHODS get_sql_area
-      EXPORTING
-        !e_code_string    TYPE string
-        !e_code_string_cr TYPE string
+      RETURNING
+        VALUE(e_code_string) TYPE string
       RAISING
         /cadaxo/cx_sqlc_syntax_error .
+    "! get sql area
+    "! @parameter planetype | Type of plane
+    METHODS get_sql_area_lt_code
+      RETURNING
+        VALUE(r_lt_code) TYPE /cadaxo/sqlccodeline_t .
     METHODS get_sql_hist_lines
       RETURNING
         VALUE(r_sql_hist_lines) TYPE i .
+    METHODS handle_msg_exception
+      IMPORTING
+        !i_msg       TYPE string
+        !i_exception TYPE REF TO cx_root .
     METHODS is_result_filled
       RETURNING
         VALUE(r_filled) TYPE abap_bool .
     METHODS pai_0100
       IMPORTING
         !i_ok_code TYPE sy-ucomm .
-    METHODS pai_0700
-      IMPORTING
-        !i_ok_code TYPE sy-ucomm .
     METHODS pai_0800
       IMPORTING
         !i_ok_code  TYPE sy-ucomm
         !i_sqlcsres TYPE /cadaxo/sqlcsres .
-    METHODS pai_3000
-      IMPORTING
-        !i_ok_code TYPE sy-ucomm .
     METHODS pai_2000
       IMPORTING
         !i_ok_code TYPE sy-ucomm .
-    CLASS-METHODS param_replace_tags
-      CHANGING
-        !data TYPE string .
+    METHODS pai_3000
+      IMPORTING
+        !i_ok_code TYPE sy-ucomm .
     METHODS pbo_0100 .
-    METHODS pbo_0700 .
     METHODS pbo_0800 .
-    METHODS pbo_3000 .
     "! PBO for Dynpro 2000
     METHODS pbo_2000 .
-    METHODS save_clipboard .
-    METHODS set_clipboard_alv .
-    "! get sql area
-    "! @parameter planetype | Type of plane
-    METHODS get_sql_area_lt_code
-      RETURNING
-        VALUE(r_lt_code) TYPE /cadaxo/sqlccodeline_t .
-    METHODS set_symbol_alv .
-    METHODS set_user_settings
-      IMPORTING
-        !i_settings TYPE /cadaxo/sqlcusrp_dyn .
-    METHODS handle_msg_exception
-      IMPORTING
-        !i_msg       TYPE string
-        !i_exception TYPE REF TO cx_root .
+    METHODS pbo_3000 .
     METHODS prepare_result_table
       IMPORTING
         !is_sqlcsres TYPE /cadaxo/sqlcsres
         !is_sqlcress TYPE /cadaxo/sqlcress .
-
-    METHODS create_symbol_db
+    METHODS save_clipboard .
+    METHODS set_clipboard_alv .
+    METHODS set_user_settings
       IMPORTING
-        !it_symbol_create TYPE t_symbol_db
-      RETURNING
-        VALUE(rv_success) TYPE boolean .
-
+        !i_settings TYPE /cadaxo/sqlcusrp_dyn .
+    DATA symbols_controller TYPE REF TO /cadaxo/cl_sqlc_symbols .
   PROTECTED SECTION.
 
     DATA g_trstart_timestamp TYPE timestamp .
@@ -205,10 +207,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA dragdrop_behaviour_editor TYPE REF TO cl_dragdrop .
     DATA dragdrop_behaviour_elementinfo TYPE REF TO cl_dragdrop .
     DATA dragdrop_behaviour_log TYPE REF TO cl_dragdrop .
-    DATA dragdrop_behaviour_symbol TYPE REF TO cl_dragdrop .
     DATA dragdrop_handle_elementinfo TYPE i .
     DATA dragdrop_handle_log TYPE i .
-    DATA dragdrop_handle_symbol TYPE i .
     DATA gcont_abap_editor TYPE REF TO cl_gui_container .
     DATA gcont_abap_error TYPE REF TO cl_gui_container .
     DATA gcont_abap_splitter TYPE REF TO cl_gui_container .
@@ -223,15 +223,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA gcont_grid_elementinfo_t TYPE /cadaxo/sqlcclguicontainer_t .
     DATA gcont_grid_results TYPE REF TO cl_gui_container .
     DATA gcont_grid_result_t TYPE /cadaxo/sqlcclguicontainer_t .
-    DATA gcont_grid_symbol_t TYPE /cadaxo/sqlcclguicontainer_t .
     DATA gcont_result_bottom TYPE REF TO cl_gui_container .
     DATA gcont_result_toolbar TYPE REF TO cl_gui_container .
     DATA gcont_splitter_bottom TYPE REF TO cl_gui_container .
     DATA gcont_splitter_top TYPE REF TO cl_gui_container .
-    DATA gcont_symbol TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar_btns TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar_img TYPE REF TO cl_gui_container .
     DATA gcont_toolbar_elementinfo TYPE REF TO cl_gui_container .
     DATA gc_abap_editor TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit .
     DATA gc_abap_editor_text TYPE REF TO cl_gui_textedit .
@@ -245,9 +240,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA gc_html_viewer TYPE REF TO cl_gui_html_viewer .
     DATA gc_result_toolbar TYPE REF TO cl_gui_toolbar .
     DATA gc_splitter TYPE REF TO cl_gui_splitter_container .
-    DATA gc_symbol_alv TYPE REF TO cl_gui_alv_grid .
-    DATA gc_symbol_toolbar TYPE REF TO cl_gui_toolbar .
-    DATA gc_symbol_toolbar_img TYPE REF TO cl_gui_picture .
     DATA gs_splitter_bottom TYPE REF TO cl_gui_splitter_container .
     DATA gs_splitter_clipboard TYPE REF TO cl_gui_splitter_container .
     DATA gs_splitter_editor TYPE REF TO cl_gui_splitter_container .
@@ -257,8 +249,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA gs_splitter_results_tabdat TYPE REF TO cl_gui_splitter_container .
     DATA gr_results_tab_toolbar TYPE REF TO cl_gui_toolbar .
     DATA gs_splitter_res_button TYPE REF TO cl_gui_splitter_container .
-    DATA gs_splitter_symbol TYPE REF TO cl_gui_splitter_container .
-    DATA gs_splitter_symbol_toolbar TYPE REF TO cl_gui_splitter_container .
     DATA gs_splitter_toolbar TYPE REF TO cl_gui_splitter_container .
     DATA gs_splitter_top TYPE REF TO cl_gui_splitter_container .
     DATA gt_clipboard TYPE /cadaxo/sqlcclipboard_t .
@@ -280,7 +270,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA g_result_layout TYPE lvc_s_layo .
     DATA g_result_toolbar_excluding TYPE ui_functions .
     DATA g_show_clipboard TYPE boolean .
-    DATA gs_sel_variant TYPE /cadaxo/sqlc_il_variants .     "Cockpit-321
+    DATA gs_sel_variant TYPE /cadaxo/sqlc_il_variants .       "Cockpit-321
     DATA:
       BEGIN OF ms_additional_functions,                 "COCKPIT-48
         uptomenu TYPE REF TO /cadaxo/cl_sqlc_uptomenu,  "COCKPIT-48
@@ -289,48 +279,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA g_saved_list_gui_container TYPE REF TO cl_gui_custom_container .
     DATA g_active_list_tab TYPE i .
 
-    METHODS check_dbtable_modification
-      RETURNING
-        VALUE(r_answer) TYPE char1 .
-    METHODS create_symbol_multival_tab_dyn
-      IMPORTING
-        !i_symbol_datatype TYPE /cadaxo/sqlcsymbol_datatype
-      EXPORTING
-        !e_data            TYPE data
-        !e_data_struct     TYPE data .
-    METHODS get_symbol_datatype_desc
-      IMPORTING
-        !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
-      RETURNING
-        VALUE(r_desc) TYPE as4text .
-    METHODS get_symbol_datatype_info
-      IMPORTING
-        !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
-      RETURNING
-        VALUE(r_info) TYPE /cadaxo/sqlcsymbol_datainfo .
-    METHODS check_symbol_datatype
-      IMPORTING
-        !i_value TYPE lvc_value
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    METHODS show_symbolmulti_dialog
-      IMPORTING
-        !i_symbol_multivalue  TYPE /cadaxo/sqlcsymbol_multivalue
-        !i_symbol_datatype    TYPE /cadaxo/sqlcsymbol_datatype
-      RETURNING
-        VALUE(r_symbol_value) TYPE rseloption
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    METHODS on_symbol_button_click
-      FOR EVENT button_click OF cl_gui_alv_grid
-      IMPORTING
-        !es_col_id
-        !es_row_no .
-    METHODS get_user_symbol_count
-      IMPORTING
-        !i_symbol_multivalue TYPE /cadaxo/sqlcsymbol_multivalue
-      RETURNING
-        VALUE(r_count)       TYPE i .
+
+
     CLASS-METHODS build_result_grid_footer
       IMPORTING
         !iv_syst             TYPE sysysid
@@ -346,18 +296,20 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !i_message          TYPE string OPTIONAL
       RETURNING
         VALUE(r_grid_title) TYPE lvc_title .
-    METHODS insert_saved_list
+    METHODS add_hold_lists .
+    METHODS api_saved_list_import
       IMPORTING
-        !it_saved_list      TYPE /cadaxo/sqlc_list_exp_sqlx_t
-      RETURNING
-        VALUE(ev_update_ok) TYPE abap_bool .
+        !ir_api   TYPE REF TO /cadaxo/cl_sqlc_cockpit_api
+        !is_items TYPE /cadaxo/sqlcapip .
     METHODS calc_result_rows_and_cols
       IMPORTING
         !i_lines TYPE i
       EXPORTING
         !e_rows  TYPE i
         !e_cols  TYPE i .
-    METHODS confirm_symbol_overwrite .
+    METHODS check_dbtable_modification
+      RETURNING
+        VALUE(r_answer) TYPE char1 .
     METHODS create_clipboard_ui_control .
     METHODS create_controls .
     METHODS create_dyn_document
@@ -368,14 +320,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       CHANGING
         !ic_document   TYPE REF TO cl_dd_document .
     METHODS create_editor_ui_control .
+    METHODS create_elementinfo_ui_control .
     METHODS create_primary_ui_controls .
     METHODS create_result_ui_controls .
-    METHODS create_elementinfo_ui_control .
-    METHODS create_symbol_ui_control .
     METHODS create_variant .
-    METHODS delete_symbols
-      EXPORTING
-        !e_success TYPE boolean .
     METHODS execute_sql
       IMPORTING
         !i_progress_indicator TYPE char1 OPTIONAL
@@ -385,11 +333,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         /cadaxo/cx_sqlc_invalid_value
         /cadaxo/cx_sqlc_syntax_error .
     METHODS execute_sql_background_wiz .
-    METHODS focus_symbol_alv_cell
-      IMPORTING
-        !i_row_id     TYPE lvc_index
-        !i_field_name TYPE lvc_fname .
     METHODS free_result_controls .
+    METHODS get_current_grid_number
+      RETURNING
+        VALUE(r_grid_number) TYPE i .
     METHODS get_link
       IMPORTING
         !i_html_id TYPE /cadaxo/sqlcparameter_id
@@ -397,26 +344,20 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !e_url     TYPE c
       CHANGING
         !ct_cache  TYPE gtt_char255 .
+    METHODS get_saved_list_fieldcat
+      RETURNING
+        VALUE(r_saved_list_fieldcat) TYPE lvc_t_fcat .
     METHODS get_saved_results
       IMPORTING
         !i_ress_guid      TYPE /cadaxo/sqlc_ress_guid_t OPTIONAL
         !i_clear_old_alvs TYPE flag OPTIONAL
           PREFERRED PARAMETER i_ress_guid .
-    METHODS get_symbols_selected
-      EXPORTING
-        VALUE(e_success) TYPE boolean .
-    METHODS get_symbols .
-    METHODS get_user_symbol_from_sql
+    METHODS get_selected_elem_inf_flds
       IMPORTING
-        !i_varguid TYPE /cadaxo/sqlc_variant_guid OPTIONAL
-        !i_sql     TYPE /cadaxo/sqlccodeline_t
-        !i_type    TYPE char1
-      EXPORTING
-        !e_symbols TYPE /cadaxo/sqlc_symbol_t .
+        !i_index        TYPE lvc_index
+      RETURNING
+        VALUE(r_fields) TYPE string .
     METHODS get_variant .
-    METHODS hdlcmd_export_csv_frontend
-      IMPORTING
-        !i_grid_i TYPE i .
     METHODS handle_command_show_full_value
       IMPORTING
         !i_grid_i TYPE i OPTIONAL
@@ -429,6 +370,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       IMPORTING
         !i_grid_i TYPE i OPTIONAL
         !i_log    TYPE abap_bool OPTIONAL .
+    METHODS handle_delete_saved_lists .
+    METHODS handle_export_saved_list .
     METHODS handle_result_command_cdxexp
       IMPORTING
         !i_grid_i TYPE i .
@@ -439,6 +382,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       IMPORTING
         !i_source TYPE i
         !i_target TYPE i .
+    METHODS handle_result_command_fulldisp
+      IMPORTING
+        !i_grid_i TYPE i .
     METHODS handle_result_command_hold
       IMPORTING
         !i_grid_i TYPE i .
@@ -448,7 +394,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     METHODS handle_result_command_refrlst
       IMPORTING
         !i_grid_i TYPE i .
-    METHODS handle_result_command_fulldisp
+    METHODS hdlcmd_export_csv_backend
+      IMPORTING
+        !i_grid_i TYPE i .
+    METHODS hdlcmd_export_csv_frontend
       IMPORTING
         !i_grid_i TYPE i .
     METHODS insert_codeblock_at_position
@@ -457,10 +406,20 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !iv_pos       TYPE i
         !iv_sqlstring TYPE /cadaxo/sqlcstring
         !i_set_focus  TYPE abap_bool DEFAULT abap_false .
+    METHODS insert_codeblock_currpos_nosel
+      IMPORTING
+        !iv_sqlstring TYPE /cadaxo/sqlcstring
+        !i_set_focus  TYPE abap_bool DEFAULT abap_true .
+    METHODS insert_saved_list
+      IMPORTING
+        !it_saved_list      TYPE /cadaxo/sqlc_list_exp_sqlx_t
+      RETURNING
+        VALUE(ev_update_ok) TYPE abap_bool .
     METHODS insert_table_to_editor
       IMPORTING
         !i_string TYPE string .
     METHODS load_home_html .
+    METHODS log_alv_line_selection .
     METHODS move_back_to_sql .
     METHODS move_forw_to_sql .
     METHODS on_abap_error_hotspot_click
@@ -476,13 +435,13 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !e_column
         !es_row_no
         !e_dragdropobj .
-    METHODS on_alv_result_double_click
+    METHODS on_alv_queue_double_click_3000
       FOR EVENT double_click OF cl_gui_alv_grid
       IMPORTING
         !e_row
         !e_column
         !es_row_no .
-    METHODS on_alv_queue_double_click_3000
+    METHODS on_alv_result_double_click
       FOR EVENT double_click OF cl_gui_alv_grid
       IMPORTING
         !e_row
@@ -518,6 +477,22 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !line
         !pos
         !dragdrop_object .
+    METHODS on_editor_insert_pattern
+      FOR EVENT insert_pattern OF cl_gui_abapedit
+      IMPORTING
+        !datatype
+        !flags
+        !patternkey
+        !xpos
+        !ypos
+        !sender .
+    METHODS on_editor_quick_info
+      FOR EVENT quick_info OF cl_gui_abapedit
+      IMPORTING
+        !contextstring
+        !datatype
+        !xpos
+        !ypos .
     METHODS on_editor_text_drop
       FOR EVENT on_drop OF cl_gui_textedit
       IMPORTING
@@ -525,6 +500,25 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !line
         !pos
         !dragdrop_object .
+    METHODS on_elementinfo_double_click
+      FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no .
+    METHODS on_elementinfo_drag
+      FOR EVENT ondrag OF cl_gui_alv_grid
+      IMPORTING
+        !e_row
+        !e_column
+        !es_row_no
+        !e_dragdropobj .
+    METHODS on_elementinfo_hotspot_de
+      FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+        !e_row_id
+        !e_column_id
+        !es_row_no .
     METHODS on_handle_job_toolbar
       FOR EVENT toolbar OF cl_gui_alv_grid
       IMPORTING
@@ -534,10 +528,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       FOR EVENT user_command OF cl_gui_alv_grid
       IMPORTING
         !e_ucomm .
-    METHODS on_log_alv_context_menu
-      FOR EVENT context_menu_request OF cl_gui_alv_grid
-      IMPORTING
-        !e_object .
     METHODS on_handle_result_context_menu
       FOR EVENT context_menu_request OF cl_gui_alv_grid
       IMPORTING
@@ -567,12 +557,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       FOR EVENT user_command OF cl_gui_alv_grid
       IMPORTING
         !e_ucomm .
-    METHODS on_handle_varsym_click
-      FOR EVENT hotspot_click OF cl_gui_alv_grid
-      IMPORTING
-        !e_row_id
-        !e_column_id
-        !es_row_no .
     METHODS on_home_sapevent
       FOR EVENT sapevent OF cl_gui_html_viewer
       IMPORTING
@@ -592,6 +576,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
         !e_row_id
         !e_column_id
         !es_row_no .
+    METHODS on_log_alv_context_menu
+      FOR EVENT context_menu_request OF cl_gui_alv_grid
+      IMPORTING
+        !e_object .
     METHODS on_log_alv_double_click
       FOR EVENT double_click OF cl_gui_alv_grid
       IMPORTING
@@ -624,70 +612,21 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       FOR EVENT function_selected OF cl_gui_toolbar
       IMPORTING
         !fcode .
-    METHODS on_tabbar_toolbar_funcsel
-      FOR EVENT function_selected OF cl_gui_toolbar
+    METHODS on_saved_list_menu_click
+      FOR EVENT menu_button OF cl_gui_alv_grid
       IMPORTING
-        !fcode .
+        !e_object
+        !e_ucomm .
     METHODS on_saved_list_select_line
       FOR EVENT double_click OF cl_gui_alv_grid
       IMPORTING
         !e_row
         !e_column
         !es_row_no .
-    METHODS on_symbol_alv_data_change
-      FOR EVENT data_changed OF cl_gui_alv_grid
+    METHODS on_tabbar_toolbar_funcsel
+      FOR EVENT function_selected OF cl_gui_toolbar
       IMPORTING
-        !er_data_changed
-        !e_onf4
-        !e_onf4_before
-        !e_onf4_after
-        !e_ucomm .
-    METHODS on_symbol_alv_data_changed_fin
-      FOR EVENT data_changed_finished OF cl_gui_alv_grid
-      IMPORTING
-        !e_modified
-        !et_good_cells .
-    METHODS on_symbol_alv_toolbar
-      FOR EVENT toolbar OF cl_gui_alv_grid
-      IMPORTING
-        !e_object
-        !e_interactive .
-    METHODS on_symbol_alv_user_command
-      FOR EVENT user_command OF cl_gui_alv_grid
-      IMPORTING
-        !e_ucomm .
-    METHODS on_elementinfo_double_click
-      FOR EVENT double_click OF cl_gui_alv_grid
-      IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-    METHODS on_symbol_double_click
-      FOR EVENT double_click OF cl_gui_alv_grid
-      IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-    METHODS on_elementinfo_hotspot_de
-      FOR EVENT hotspot_click OF cl_gui_alv_grid
-      IMPORTING
-        !e_row_id
-        !e_column_id
-        !es_row_no .
-    METHODS on_elementinfo_drag
-      FOR EVENT ondrag OF cl_gui_alv_grid
-      IMPORTING
-        !e_row
-        !e_column
-        !es_row_no
-        !e_dragdropobj .
-    METHODS on_symbol_drag
-      FOR EVENT ondrag OF cl_gui_alv_grid
-      IMPORTING
-        !e_row
-        !e_column
-        !es_row_no
-        !e_dragdropobj .
+        !fcode .
     METHODS on_toolbar_function_selected
       FOR EVENT function_selected OF cl_gui_toolbar
       IMPORTING
@@ -703,9 +642,13 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       IMPORTING
         !fcode
         !sender .
-    METHODS save_symbols
-      EXPORTING
-        !e_success TYPE boolean .
+    METHODS populate_saved_list
+      IMPORTING
+        !iv_list_guid         TYPE /cadaxo/sqlc_list_exp_sqlx-list_guid
+        !iv_saved_list_shared TYPE /cadaxo/sqlc_list_exp_sqlx-type
+      RETURNING
+        VALUE(rs_saved_list)  TYPE /cadaxo/sqlc_list_exp_sqlx .
+    METHODS save_hold_lists .
     METHODS select_jobdata .
     METHODS send_sql_via_mail .
     METHODS set_initial_date_jobmonitor .
@@ -715,6 +658,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     METHODS set_sql_area
       IMPORTING
         !i_codelines_t TYPE /cadaxo/sqlccodeline_t .
+    METHODS share_saved_list
+      IMPORTING
+        !iv_receiver TYPE /cadaxo/sqlcapi_receiver OPTIONAL         "+cockpit-420
+        !iv_text     TYPE /cadaxo/sqlc_char_1024 OPTIONAL .                         "+cockpit-420
     METHODS show_admhelp .
     METHODS show_html
       IMPORTING
@@ -722,143 +669,37 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     METHODS show_jobmonitor .
     METHODS show_log .
     METHODS show_result .
-    METHODS show_saved_lists .
-    METHODS store_sql_to_hist
-      IMPORTING
-        !i_codelines_t TYPE /cadaxo/sqlccodeline_t OPTIONAL .
-    METHODS update_field_catalog_alv .
-    METHODS usr_action_clear_sql_area .
-    METHODS usr_action_leave_sql_cockpit .
-    METHODS usr_action_pretty_printer .
-    METHODS usr_action_show_abap_docu .
-    METHODS usr_action_sql_trace_onoff .
-    METHODS on_editor_quick_info
-      FOR EVENT quick_info OF cl_gui_abapedit
-      IMPORTING
-        !contextstring
-        !datatype
-        !xpos
-        !ypos .
-    METHODS on_editor_insert_pattern
-      FOR EVENT insert_pattern OF cl_gui_abapedit
-      IMPORTING
-        !datatype
-        !flags
-        !patternkey
-        !xpos
-        !ypos
-        !sender .
-    METHODS get_current_grid_number
-      RETURNING
-        VALUE(r_grid_number) TYPE i .
-    METHODS save_hold_lists .
-    METHODS add_hold_lists .
-    METHODS delete_symbol_db
-      RETURNING
-        VALUE(rv_success) TYPE boolean .
-    METHODS update_symbol_db
-      IMPORTING
-        VALUE(it_symbol_update) TYPE t_symbol_db
-      RETURNING
-        VALUE(rv_success)       TYPE boolean .
-    METHODS check_symbol_value_valid
-      IMPORTING
-        !is_symbol_line TYPE /cadaxo/sqlc_symbol
-      RAISING
-        /cadaxo/cx_sqlc_invalid_value .
-    METHODS on_symbol_button_variant
-      FOR EVENT button_click OF cl_gui_alv_grid
-      IMPORTING
-        !es_col_id
-        !es_row_no .
-    METHODS sql_search .
-    METHODS sql_search_next .
-    METHODS log_alv_line_selection .
-    METHODS handle_command_create_symbol
-      IMPORTING
-        !i_grid_i TYPE i OPTIONAL .
-    METHODS api_saved_list_import
-      IMPORTING
-        !ir_api   TYPE REF TO /cadaxo/cl_sqlc_cockpit_api
-        !is_items TYPE /cadaxo/sqlcapip .
-    METHODS share_saved_list
-      IMPORTING
-        !iv_receiver TYPE /cadaxo/sqlcapi_receiver OPTIONAL       "+cockpit-420
-        !iv_text     TYPE /cadaxo/sqlc_char_1024 OPTIONAL .                   "+cockpit-420
-    METHODS populate_saved_list
-      IMPORTING
-        !iv_list_guid         TYPE /cadaxo/sqlc_list_exp_sqlx-list_guid
-        !iv_saved_list_shared TYPE /cadaxo/sqlc_list_exp_sqlx-type
-      RETURNING
-        VALUE(rs_saved_list)  TYPE /cadaxo/sqlc_list_exp_sqlx .
-    METHODS get_selected_elem_inf_flds
-      IMPORTING
-        !i_index        TYPE lvc_index
-      RETURNING
-        VALUE(r_fields) TYPE string .
-    METHODS get_saved_list_fieldcat
-      RETURNING
-        VALUE(r_saved_list_fieldcat) TYPE lvc_t_fcat .
-    METHODS handle_delete_saved_lists .
-    METHODS handle_export_saved_list .
-    METHODS on_symbol_menu_button
-      FOR EVENT menu_button OF cl_gui_alv_grid
-      IMPORTING
-        !e_object
-        !e_ucomm .
-    METHODS on_saved_list_menu_click
-      FOR EVENT menu_button OF cl_gui_alv_grid
-      IMPORTING
-        !e_object
-        !e_ucomm .
-    METHODS update_variant .
-    METHODS fill_used_symbols
-      RETURNING
-        VALUE(rt_symbols) TYPE /cadaxo/sqlcusedsymbols_t .
     METHODS show_result_tab .
     METHODS show_result_table
       IMPORTING
         !i_result_dref TYPE REF TO data
         !i_tabix       TYPE sy-tabix .
-    METHODS tippsandtricks .
-    METHODS hdlcmd_export_csv_backend
+    METHODS show_saved_lists .
+    METHODS sql_search .
+    METHODS sql_search_next .
+    METHODS store_sql_to_hist
       IMPORTING
-        !i_grid_i TYPE i .
+        !i_codelines_t TYPE /cadaxo/sqlccodeline_t OPTIONAL .
+    METHODS tippsandtricks .
+    METHODS update_field_catalog_alv .
+    METHODS update_variant .
+    METHODS usr_action_clear_sql_area .
+    METHODS usr_action_leave_sql_cockpit .
+    METHODS usr_action_pretty_printer .
+    METHODS usr_action_show_abap_docu .
+    METHODS usr_action_sql_trace_onoff .
+
   PRIVATE SECTION.
-    CONSTANTS: BEGIN OF editor_type,
-                 new TYPE char1 VALUE 'A' ##NO_TEXT,
-                 old TYPE char1 VALUE '',
-               END OF editor_type.
-    CONSTANTS:
-      BEGIN OF cs_symbol_type,
-        user    TYPE char1 VALUE 'U' ##NO_TEXT,
-        program TYPE char1 VALUE 'P' ##NO_TEXT,
-        create  TYPE char1 VALUE 'C' ##NO_TEXT,
-        modify  TYPE char1 VALUE 'M' ##NO_TEXT,
-      END OF cs_symbol_type .
-    CONSTANTS:
-      BEGIN OF cs_windowresolution,
-        horizontal TYPE /cadaxo/sqlcreswindorientation VALUE 'H' ##NO_TEXT,
-        vertical   TYPE /cadaxo/sqlcreswindorientation VALUE 'V' ##NO_TEXT,
-        matrix     TYPE /cadaxo/sqlcreswindorientation VALUE 'M' ##NO_TEXT,
-        tab        TYPE /cadaxo/sqlcreswindorientation VALUE 'T' ##NO_TEXT,
-      END OF cs_windowresolution .
+
     CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
-    CONSTANTS c_program_symbols_hide TYPE flag VALUE space ##NO_TEXT.
-    CONSTANTS c_program_symbols_show TYPE flag VALUE 'X' ##NO_TEXT.
-    CONSTANTS c_symbol_type TYPE /cadaxo/sqlcapi_position_typ VALUE '3' ##NO_TEXT.
-    CONSTANTS c_width_right_clipboard TYPE i VALUE 500 ##NO_TEXT.
-    CONSTANTS c_width_right_symbols TYPE i VALUE 500 ##NO_TEXT.
-    CONSTANTS c_width_right_window TYPE i VALUE 500 ##NO_TEXT.
-    CONSTANTS: BEGIN OF c_button_fcode,
-                 export_csv_frontent TYPE ui_func VALUE 'EXPORT_CSV',
-                 export_csv_backend  TYPE ui_func VALUE 'EXPORT_CSV_SRV',
-               END OF c_button_fcode.
+    CONSTANTS:
+      BEGIN OF c_button_fcode,
+        export_csv_frontent TYPE ui_func VALUE 'EXPORT_CSV',
+        export_csv_backend  TYPE ui_func VALUE 'EXPORT_CSV_SRV',
+      END OF c_button_fcode .
     CLASS-DATA gt_main_classes TYPE gtt_main_classes .
     CLASS-DATA g_main_counter TYPE i .
     DATA gcont_html_viewer TYPE REF TO cl_gui_container .
-    DATA gr_alv_symb_ow TYPE REF TO cl_gui_alv_grid .
-    DATA gr_cc_alv_symb_ow TYPE REF TO cl_gui_custom_container .
     DATA gt_elementinfo TYPE /cadaxo/sqlc_elementinfo_t .
     DATA gt_headerlines TYPE /cadaxo/sqlcheaderlines_t .
     DATA gt_history_log TYPE /cadaxo/sqlclogalv_t .
@@ -873,17 +714,13 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA gt_selected_rows TYPE lvc_t_row .
     DATA gt_symbol TYPE /cadaxo/sqlc_symbol_t .
     DATA gt_symbol_delete TYPE /cadaxo/sqlc_symbol_t .
-    DATA gt_symbol_ow TYPE /cadaxo/sqlc_symbol_ow_t .
     DATA gt_symbol_selected TYPE /cadaxo/sqlc_symbol_t .
     DATA gt_toolbuttons_clipboard TYPE ttb_button .
     DATA gt_toolbuttons_result TYPE ttb_button .
-    DATA gt_toolbuttons_symbol TYPE ttb_button .
     DATA gv_selected_counter TYPE sy-tabix .
     DATA gv_selected_total TYPE sy-tabix .
-    DATA g_abap_editor_type TYPE char1 VALUE editor_type-new.
+    DATA g_abap_editor_type TYPE char1 VALUE editor_type-new ##NO_TEXT.
     DATA g_auth_sql_cockpit_actvt TYPE activ_auth .
-    DATA g_curr_col TYPE lvc_fname .
-    DATA g_curr_row TYPE /cadaxo/sqlcsymbol_name .
     DATA g_free_space_kb TYPE int4 .
     DATA g_html_request TYPE c .
     DATA g_is_its TYPE char1 VALUE space ##NO_TEXT.
@@ -892,9 +729,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     DATA g_sel_hist_timestamp_to TYPE timestamp .
     DATA g_sel_job_timestamp_from TYPE timestamp .
     DATA g_sel_job_timestamp_to TYPE timestamp .
-    DATA g_symbol_toolbar_excluding TYPE ui_functions .
-    CLASS-DATA g_version_nr TYPE string VALUE '3.4' ##NO_TEXT.
-
+    CLASS-DATA g_version_nr TYPE string VALUE '3.9' ##NO_TEXT.
 
     METHODS call_admin .
     METHODS _split_error_text
@@ -1356,7 +1191,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     CLEAR <lt_cl_sql_parse>.
 
 * get sql string from editor control
-    me->get_sql_area( IMPORTING e_code_string    = l_sql_string ).
+    l_sql_string = me->get_sql_area( ).
 
     CLEAR: l_message,
            l_message_long,           "CDX
@@ -1521,73 +1356,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD check_symbol_datatype.
-
-    DATA ls_dd04l TYPE dd04l.
-
-    SELECT SINGLE datatype, leng FROM dd04l
-      INTO CORRESPONDING FIELDS OF @ls_dd04l
-      WHERE rollname = @i_value. "#EC CI_SEL_NESTED "#EC CI_SROFC_NESTED
-
-    IF sy-subrc = 0.
-
-      IF ls_dd04l-datatype = 'FLTP' OR
-         ls_dd04l-datatype = 'STRG' OR
-         ls_dd04l-datatype = 'RAWSTRING'.
-
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_symb_not_found
-          EXPORTING
-            textid              = /cadaxo/cx_sqlc_symb_not_found=>datatype_not_allowed
-            /cadaxo/datatype    = CONV #( ls_dd04l-datatype )
-            /cadaxo/dataelement = CONV #( i_value ).
-
-      ENDIF.
-
-      IF ls_dd04l-leng > 45.
-
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_symb_not_found
-          EXPORTING
-            textid = /cadaxo/cx_sqlc_symb_not_found=>dataelement_longer_than_45.
-
-      ENDIF.
-
-    ELSE.
-
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_symb_not_found
-        EXPORTING
-          textid              = /cadaxo/cx_sqlc_symb_not_found=>dataelement_not_found
-          /cadaxo/dataelement = CONV #( i_value ).
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD check_symbol_value_valid.
-
-    CONSTANTS: lc_allowed TYPE string VALUE ''' `Ã‚Â´'.
-    DATA(lv_symbol_value) = CONV string( is_symbol_line-symbol_value ).
-    /cadaxo/cl_sqlc_cockpit_assist=>replace_apostrophes_with_space( CHANGING c_string = lv_symbol_value ).
-
-    IF /cadaxo/cl_sqlc_cockpit_assist=>has_code_open_literal( iv_abap_code = lv_symbol_value ).
-
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value
-        EXPORTING
-          textid = /cadaxo/cx_sqlc_invalid_value=>open_literal.
-
-    ENDIF.
-
-    IF lv_symbol_value CN lc_allowed AND is_symbol_line-symbol_multivalue IS INITIAL.
-
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value
-        EXPORTING
-          textid = /cadaxo/cx_sqlc_invalid_value=>too_much_literals.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
   METHOD class_constructor.
     DATA(resolution) = /cadaxo/cl_sqlc_resolution=>get_instance( ).
     toolbar_row_height = resolution->get_button_height( ).
@@ -1598,37 +1366,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                                                          EXCEPTIONS OTHERS              = 2 ).
 
   ENDMETHOD.
-
-
-  METHOD confirm_symbol_overwrite.
-****************************************************************************************************
-* Description             : Delete a variant                                                       *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Domi Bigl                Company    : CADAXO GesmbH                    *
-* Date                    : 01.11.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 10.11.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    PERFORM confirm_symbol_overwrite IN PROGRAM /cadaxo/sqlc_main IF FOUND.
-
-  ENDMETHOD.
-
 
   METHOD constructor.
 ****************************************************************************************************
@@ -1966,6 +1703,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     GET TIME STAMP FIELD me->g_trstart_timestamp.
 *   end   of COCKPIT-371
 
+
+    me->symbols_controller = NEW /cadaxo/cl_sqlc_symbols( i_user_settings = REF #( me->g_user_settings )
+                                                          i_main          = me
+                                                        ).
   ENDMETHOD.
 
 
@@ -2060,11 +1801,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     gs_splitter_bottom->set_column_width( id = 2 width = toolbar_col_width ).
 
 * add splitter to toolbar
-    CREATE OBJECT gs_splitter_toolbar
-      EXPORTING
-        parent  = gcont_clipboard_toolbar
-        rows    = 2
-        columns = 1.
+    gs_splitter_toolbar = NEW #( parent  = gcont_clipboard_toolbar
+                                 rows    = 2
+                                 columns = 1 ).
 
     gs_splitter_toolbar->set_row_sash( id    = 1
                                        type  = gs_splitter_toolbar->type_movable
@@ -2257,7 +1996,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       me->create_result_ui_controls( ).
 
-      me->create_symbol_ui_control( ).
+      me->symbols_controller->create_symbol_ui_control( gs_splitter_top->get_container( row = 1 column = 2 )  ).
 
       me->create_editor_ui_control( ).
 
@@ -3160,7 +2899,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     CREATE OBJECT dragdrop_behaviour_alv.
 
-    IF me->g_abap_editor_type = 'A'.
+    IF me->g_abap_editor_type = editor_type-new.
 
       dragdrop_behaviour_alv->add( flavor = 'ALV_TO_EDITOR'
                                    dragsrc = 'X' droptarget = ' '
@@ -3176,387 +2915,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                                  effect = cl_dragdrop=>copy ).
 
     dragdrop_behaviour_alv->get_handle( IMPORTING handle = dragdrop_handle ).
-
-  ENDMETHOD.
-
-
-  METHOD create_symbol_db.
-
-    IF NOT it_symbol_create IS INITIAL.
-
-      INSERT /cadaxo/sqlcusym FROM TABLE it_symbol_create.
-      IF sy-subrc = 0.
-
-        rv_success = 'X'.
-
-      ELSE.
-
-        ROLLBACK WORK.
-        MESSAGE s055(/cadaxo/sqlc) WITH TEXT-dec.                      "CDX001-0020
-        RETURN.
-
-      ENDIF.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD create_symbol_multival_tab_dyn.
-    DATA lt_comp TYPE abap_component_tab.
-    DATA ls_comp TYPE abap_componentdescr.
-    DATA lr_abap_elem TYPE REF TO cl_abap_elemdescr.
-    DATA lr_struct TYPE REF TO cl_abap_structdescr.
-    DATA lr_table TYPE REF TO cl_abap_tabledescr.
-
-    lr_abap_elem ?= cl_abap_elemdescr=>describe_by_name(
-      EXPORTING
-        p_name         = 'TVARV_SIGN'
-    ).
-    ls_comp-name = 'SIGN'.
-    ls_comp-type = lr_abap_elem.
-    APPEND ls_comp TO lt_comp.
-
-    lr_abap_elem ?= cl_abap_elemdescr=>describe_by_name(
-      EXPORTING
-        p_name         = 'TVARV_OPTI'
-    ).
-    ls_comp-name = 'OPTION'.
-    ls_comp-type = lr_abap_elem.
-    APPEND ls_comp TO lt_comp.
-
-    lr_abap_elem ?= cl_abap_elemdescr=>describe_by_name(
-      EXPORTING
-        p_name         = i_symbol_datatype
-    ).
-
-    ls_comp-name = 'LOW'.
-    ls_comp-type = lr_abap_elem.
-    APPEND ls_comp TO lt_comp.
-
-    ls_comp-name = 'HIGH'.
-    ls_comp-type = lr_abap_elem.
-    APPEND ls_comp TO lt_comp.
-
-    cl_abap_structdescr=>create(
-      EXPORTING
-        p_components          = lt_comp
-      RECEIVING
-        p_result              = lr_struct
-    ).
-
-    lr_table = cl_abap_tabledescr=>create(
-      EXPORTING
-        p_line_type          = lr_struct ).
-
-    CREATE DATA e_data_struct TYPE HANDLE lr_struct.
-    CREATE DATA e_data TYPE HANDLE lr_table.
-  ENDMETHOD.
-
-
-  METHOD create_symbol_ui_control.
-****************************************************************************************************
-* Description             : Create symbol ui control                                               *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.11.2010 | Domi Bigl            | Sort global/user                            | CDX001-0020    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Move Symbol Window to hide Editor Area      | CR22-033       *
-*            |                      | (for Auditors)                              | Clocking4720   *
-*------------+----------------------+---------------------------------------------+----------------*
-* 01.02.2017 | Dusan Sacha          | Added new splitter + vertical image         |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 31.07.2017 | Dusan Sacha          |  Symbol Multi Value                         | COCKPIT-240    *
-****************************************************************************************************
-
-
-    DATA lt_events TYPE cntl_simple_events.
-    DATA ls_button_data TYPE stb_button.
-    DATA ls_lvc_layo TYPE lvc_s_layo.
-    DATA lt_fieldcat TYPE slis_t_fieldcat_alv.
-    DATA lt_lvc_fcat TYPE lvc_t_fcat.
-    DATA ls_lvc_fcat TYPE lvc_s_fcat.
-    DATA lv_image_url(255).
-    DATA query_table TYPE TABLE OF w3query.
-    DATA s_query_table LIKE LINE OF query_table.
-    DATA html_table TYPE TABLE OF w3html.
-    DATA return_code TYPE w3param-ret_code.
-    DATA content_type TYPE  w3param-cont_type.
-    DATA content_length TYPE  w3param-cont_len.
-    DATA pic_data TYPE TABLE OF w3mime.
-    DATA pic_size TYPE i.
-
-    FIELD-SYMBOLS: <l_fieldcat>    TYPE slis_fieldcat_alv,
-                   <l_cont_symbol> TYPE /cadaxo/sqlcclguicontainer.
-
-* get symbol container
-    gcont_symbol = gs_splitter_top->get_container( row = 1 column = 2 ).
-    gcont_symbol->set_name( 'GCONT_SYMBOL' ).
-
-* create splitter (ALV & toolbar)
-    gs_splitter_symbol = NEW #( parent  = gcont_symbol
-                                rows    = 1
-                                columns = 2 ).
-    gs_splitter_symbol->set_name( 'GS_SPLITTER_SYMBOL' ).
-    gs_splitter_symbol->set_column_mode( 0 ).
-    gs_splitter_symbol->set_column_width( id = 1 width = toolbar_col_width ).
-    gs_splitter_symbol->set_column_sash( id = 1 type = 1 value = gs_splitter_symbol->false  ).
-
-    gcont_symbol_toolbar = gs_splitter_symbol->get_container( row = 1 column = 1 ).
-
-    gs_splitter_top->set_column_mode( 0 ).
-
-* If User has no change rights in editor (e.g. is an auditor) symbol window is "hiding" editor area
-    AUTHORITY-CHECK OBJECT 'ZCADXOSQ01' ID 'ACTVT' FIELD '16'.                       "CR22-033
-    IF sy-subrc = 0.                                                                "CR22-033
-      AUTHORITY-CHECK OBJECT 'ZCADXOSQ01' ID 'ACTVT' FIELD '23'.                     "CR22-033
-      IF sy-subrc = 4.                                                              "CR22-033
-        gs_splitter_top->set_column_width( id = 2 width = 3000 ).                    "CR22-033
-      ELSE.                                                                          "CR22-033
-        IF me->g_user_settings-symbols_show = abap_true.                             "CDX001-0020
-          gs_splitter_top->set_column_width( id = 2 width = c_width_right_symbols ). "Default open
-        ELSE.                                                                        "CDX001-0020
-          gs_splitter_top->set_column_width( id = 2 width = toolbar_col_width )."Default closed     "CDX001-0020
-        ENDIF.                                                                       "CDX001-0020
-      ENDIF.
-    ENDIF.
-
-* splitter in toolbar
-    gs_splitter_symbol_toolbar = NEW #( parent  = gcont_symbol_toolbar
-                                        rows    = 2
-                                        columns = 1 ).
-
-    gs_splitter_symbol_toolbar->set_row_height( EXPORTING  id     = 1
-                                                           height = toolbar_row_height
-                                                EXCEPTIONS OTHERS = 1 ).
-
-    gs_splitter_symbol_toolbar->set_row_sash(
-      id    = 1
-      type  = gs_splitter_symbol_toolbar->type_movable
-      value = gs_splitter_symbol_toolbar->false ).
-
-    gs_splitter_symbol_toolbar->set_row_sash(
-      id    = 1
-      type  = gs_splitter_symbol_toolbar->type_sashvisible
-      value = gs_splitter_symbol_toolbar->false ).
-
-    gcont_symbol_toolbar_btns = gs_splitter_symbol_toolbar->get_container( row = 1 column = 1 ).
-    gcont_symbol_toolbar_img = gs_splitter_symbol_toolbar->get_container( row = 2 column = 1 ).
-
-    gc_symbol_toolbar = NEW #(  parent       = gcont_symbol_toolbar_btns
-                                display_mode = cl_gui_toolbar=>m_mode_vertical ).
-
-* create control toolbar img
-    gc_symbol_toolbar_img = NEW #( parent = gcont_symbol_toolbar_img ).
-
-* load sidebar image
-    s_query_table-name = '_OBJECT_ID'.
-
-    IF ( sy-langu = 'D' ).
-      s_query_table-value = '/CADAXO/SQLC_SIDEBAR_IMG_SYMBOLS_DE'.
-    ELSE.
-      s_query_table-value = '/CADAXO/SQLC_SIDEBAR_IMG_SYMBOLS'.
-    ENDIF.
-
-    APPEND s_query_table TO query_table.
-
-* load sidebar image data
-    CALL FUNCTION 'WWW_GET_MIME_OBJECT'
-      TABLES
-        query_string   = query_table
-        html           = html_table
-        mime           = pic_data
-      CHANGING
-        return_code    = return_code
-        content_type   = content_type
-        content_length = content_length
-      EXCEPTIONS
-        OTHERS         = 3.
-    IF sy-subrc = 0.
-      pic_size = content_length.
-    ENDIF.
-
-* create sidebar image url
-    CLEAR lv_image_url.
-    CALL FUNCTION 'DP_CREATE_URL'
-      EXPORTING
-        ##NO_TEXT
-        type     = 'image'
-        subtype  = cndp_sap_tab_unknown
-        size     = pic_size
-        lifetime = cndp_lifetime_transaction
-      TABLES
-        data     = pic_data
-      CHANGING
-        url      = lv_image_url
-      EXCEPTIONS
-        OTHERS   = 1.
-
-* insert picture url to toolbar
-    gc_symbol_toolbar_img->load_picture_from_url( lv_image_url ).
-
-
-* add button symbols show/hide
-    ls_button_data-function = c_okcode_symbols.
-    IF me->g_user_settings-symbols_show = abap_true.                             "CDX001-0020
-      ls_button_data-icon = '@K2@'.                                              "CDX001-0020
-      ls_button_data-quickinfo = TEXT-q11.                                       "CDX001-0020
-    ELSE.                                                                        "CDX001-0020
-      ls_button_data-icon = '@K1@'.
-      ls_button_data-quickinfo = TEXT-q10.
-    ENDIF.                                                                       "CDX001-0020
-
-    ls_button_data-butn_type = cntb_btype_button.
-
-    APPEND ls_button_data TO gt_toolbuttons_symbol.
-
-
-    lt_events = VALUE #( ( eventid = cl_gui_toolbar=>m_id_function_selected appl_event = abap_false ) ).
-
-    gc_symbol_toolbar->set_registered_events( EXPORTING events = lt_events ).
-    SET HANDLER me->on_toolbar_function_selected FOR gc_symbol_toolbar.
-
-* add the buttons to the toolbar
-    gc_symbol_toolbar->add_button_group( EXPORTING data_table = gt_toolbuttons_symbol ).
-
-    IF dragdrop_behaviour_symbol IS INITIAL.
-*   create drag/drop behaviour
-      dragdrop_behaviour_symbol = NEW #( ).
-      dragdrop_behaviour_symbol->add( flavor     = 'SYMBOL_TO_EDITOR'
-                                      dragsrc    = abap_true
-                                      droptarget = abap_false
-                                      effect     = cl_dragdrop=>copy ).
-      dragdrop_behaviour_symbol->get_handle( IMPORTING handle = dragdrop_handle_symbol ).
-
-    ENDIF.
-
-
-    ls_lvc_layo = VALUE #( zebra      = abap_true
-                           cwidth_opt = abap_true
-                           sel_mode   = 'A'
-                           stylefname = 'CELL_STYLE'
-                            ).
-
-* build field catalog
-    CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
-      EXPORTING
-        i_structure_name = '/CADAXO/SQLC_SYMBOL'
-      CHANGING
-        ct_fieldcat      = lt_fieldcat
-      EXCEPTIONS
-        OTHERS           = 1.
-    IF sy-subrc = 0.
-      LOOP AT lt_fieldcat ASSIGNING <l_fieldcat>.
-        CLEAR: ls_lvc_fcat.
-        ls_lvc_fcat = CORRESPONDING #( <l_fieldcat> MAPPING scrtext_m = seltext_m scrtext_l = seltext_l scrtext_s = seltext_s ).
-        CASE <l_fieldcat>-fieldname.
-          WHEN 'SYMBOL_NAME'.
-            ls_lvc_fcat-key = abap_true.
-            ls_lvc_fcat-dragdropid = dragdrop_handle_symbol.
-          WHEN 'SYMBOL_MULTIVALUE'.                                "COCKPIT-240
-            ls_lvc_fcat-no_out = abap_true.                        "COCKPIT-240
-            ls_lvc_fcat-tech   = abap_true.                        "COCKPIT-240
-          WHEN 'TYPE' OR 'USED_IN_EDITOR'.                         "CR22-033
-            ls_lvc_fcat-no_out = abap_true.
-            ls_lvc_fcat-tech   = abap_true.
-          WHEN 'SYMBOL_ICON'.
-            ls_lvc_fcat-key     = abap_true.                       "COCKPIT-240
-            ls_lvc_fcat-col_pos = 1.                               "CDX001-0020   COCKPIT-240
-          WHEN 'SYMBOL_DATATYPE'.
-            ls_lvc_fcat-f4availabl = abap_true.                    "COCKPIT-240
-            ls_lvc_fcat-ref_table  = 'DD04L'.                      "COCKPIT-240
-            ls_lvc_fcat-ref_field  = 'ROLLNAME'.                   "COCKPIT-240
-        ENDCASE.
-        APPEND ls_lvc_fcat TO lt_lvc_fcat.
-      ENDLOOP.
-    ELSE.
-      MESSAGE e100(/cadaxo/sqlc).
-    ENDIF.
-
-* Create container and grid
-    APPEND INITIAL LINE TO gcont_grid_symbol_t ASSIGNING <l_cont_symbol>.
-
-    <l_cont_symbol>-gui_container = gs_splitter_symbol->get_container( EXPORTING row = 1 column = 2 ).
-
-    <l_cont_symbol>-gui_container->set_name( 'CONTAINER_SYMBOL' ).
-
-    gc_symbol_alv = NEW #( i_parent = <l_cont_symbol>-gui_container ).
-
-    gc_symbol_alv->set_ready_for_input( i_ready_for_input = 1 ). "CDX PERFORMANCE
-
-* Exlcude Symbol Toolbar Buttons
-    IF me->g_symbol_toolbar_excluding IS INITIAL.
-
-      APPEND cl_gui_alv_grid=>mc_mb_variant           TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_mb_subtot            TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_mb_sum               TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_print             TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_views             TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_mb_export            TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_graph             TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_info              TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_help              TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_check             TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_insert_row    TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_refresh           TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_append_row    TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_copy          TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_copy_row      TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_cut           TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_delete_row    TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_insert_row    TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_move_row      TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_paste         TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_paste_new_row TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_loc_undo          TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_sort              TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_sort_asc          TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_sort_dsc          TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_detail            TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_find              TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_find_more         TO me->g_symbol_toolbar_excluding.
-      APPEND cl_gui_alv_grid=>mc_fc_filter            TO me->g_symbol_toolbar_excluding.
-    ENDIF.
-
-* Get user and program symbols
-    me->get_symbols( ).
-* Set handler
-    SET HANDLER: me->on_symbol_drag               FOR gc_symbol_alv,
-                 me->on_symbol_button_click       FOR gc_symbol_alv,     "COCKPIT-204
-*                 me->on_row_click_select          FOR gc_symbol_alv,     "Cockpit-418
-                 me->on_symbol_double_click       FOR gc_symbol_alv,
-                 me->on_symbol_alv_data_change    FOR gc_symbol_alv,
-                 me->on_symbol_alv_toolbar        FOR gc_symbol_alv,
-                 me->on_symbol_alv_user_command   FOR gc_symbol_alv.
-    SET HANDLER  me->on_symbol_alv_data_changed_fin FOR gc_symbol_alv.                "CDX001-0020
-    SET HANDLER  me->on_symbol_menu_button        FOR gc_symbol_alv.  "+  Cockpit-420
-    gc_symbol_alv->register_edit_event( i_event_id = gc_symbol_alv->mc_evt_modified )."CDX001-0020
-
-
-    gc_symbol_alv->set_table_for_first_display( EXPORTING  i_bypassing_buffer   = abap_true "abap_false
-                                                           is_layout            = ls_lvc_layo
-                                                           it_toolbar_excluding = me->g_symbol_toolbar_excluding
-                                                CHANGING   it_outtab            = gt_symbol
-                                                           it_fieldcatalog      = lt_lvc_fcat
-                                                EXCEPTIONS OTHERS               = 1 ).
-    IF sy-subrc <> 0.
-      MESSAGE e100(/cadaxo/sqlc).
-    ENDIF.
-
-    "    gc_symbol_alv->set_ready_for_input( i_ready_for_input = 1 ). "CDX PERFORMANCE
 
   ENDMETHOD.
 
@@ -3581,28 +2939,24 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 * 25.11.2020 | Attila Kajtar        | Feedback/Support 3.3.0                      | COCKPIT-321    *
 ****************************************************************************************************
     DATA: ls_variant    TYPE /cadaxo/sqlc_il_variants.
-    DATA: l_string      TYPE string.
     DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t.           "COCKPIT-288 Insert
     DATA: lv_variant_created TYPE /cadaxo/sqlcvari_name.       "COCKPIT-321 KA
 * get editor
-    me->get_sql_area( IMPORTING e_code_string = l_string ).
+    DATA(l_string) = me->get_sql_area( ).
 
     IF NOT l_string IS INITIAL.
 
       ls_variant-t_sql     = me->get_sql_area_lt_code( ).
 
-      me->get_user_symbol_from_sql(
-        EXPORTING
-          i_sql      = ls_variant-t_sql
-          i_type     = 'U'
-        IMPORTING
-          e_symbols  = lt_symbols ).
-
-      LOOP AT lt_symbols ASSIGNING FIELD-SYMBOL(<ls_symbol>).
-
-        APPEND CORRESPONDING #( <ls_symbol> ) TO ls_variant-t_symbol. "COCKPIT-288 Insert
-
-      ENDLOOP.
+      me->symbols_controller->get_user_symbol_from_sql( EXPORTING i_sql     = ls_variant-t_sql
+                                                                  i_type    = /cadaxo/cl_sqlc_symbols=>cs_symbol_type-user
+                                                        IMPORTING e_symbols = lt_symbols ).
+      ls_variant-t_symbol = CORRESPONDING #( lt_symbols ).
+*      LOOP AT lt_symbols ASSIGNING FIELD-SYMBOL(<ls_symbol>).
+*
+*        APPEND CORRESPONDING #( <ls_symbol> ) TO . "COCKPIT-288 Insert
+*
+*      ENDLOOP.
 
 * execute create variant popup
       CALL FUNCTION '/CADAXO/SQLC_CREATE_VARIANT_UI'
@@ -3616,139 +2970,17 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       IF lv_variant_created IS NOT INITIAL.
         gs_sel_variant-varname = lv_variant_created.
         DATA(l_ctmenu3) = NEW cl_ctmenu( ).
-        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET' text = TEXT-q40 checked = abap_true icon = icon_alv_variant_save ).
-        l_ctmenu3->add_function( EXPORTING fcode = 'SQLVARSET_UPD' text = CONV #( |{ TEXT-b46 } { lv_variant_created }| )
-                                                                   disabled = abap_false ).
+        l_ctmenu3->add_function( fcode = 'SQLVARSET' text = TEXT-q40 checked = abap_true icon = icon_alv_variant_save ).
+        l_ctmenu3->add_function( fcode = 'SQLVARSET_UPD' text = CONV #( |{ TEXT-b46 } { lv_variant_created }| )
+                                 disabled = abap_false ).
 
-        gc_splitter_top_toolbar->set_static_ctxmenu(
-          EXPORTING
-            fcode                = 'SQLVARSET'
-            ctxmenu              = l_ctmenu3
-        ).
+        gc_splitter_top_toolbar->set_static_ctxmenu( fcode = 'SQLVARSET' ctxmenu = l_ctmenu3 ).
 
       ENDIF.
       "end of COCKPIT-321
 
     ELSE.
       MESSAGE e048(/cadaxo/sqlc).
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD delete_symbols.
-****************************************************************************************************
-* Description             : delete user symbols                                                    *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.11.2010 | Domi Bigl            | I18N Messages                               | CDX001-0020    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA: lt_index_rows TYPE lvc_t_row,
-          ls_index_row  LIKE LINE OF lt_index_rows.
-
-    DATA ls_symbol LIKE LINE OF gt_symbol.
-    DATA: lt_delete_rows_index TYPE TABLE OF i,
-          ld_index             TYPE i.
-
-* get selected records
-    gc_symbol_alv->get_selected_rows( IMPORTING et_index_rows = lt_index_rows ).
-    LOOP AT lt_index_rows INTO ls_index_row.
-
-      READ TABLE gt_symbol INDEX ls_index_row-index
-                           INTO ls_symbol
-                           TRANSPORTING symbol_name
-                                        type.
-      IF sy-subrc = 0.
-*     delete program symbol not allowed
-        IF ls_symbol-type = cs_symbol_type-program.
-
-          REFRESH gt_symbol_delete.
-*       focus the record
-          me->focus_symbol_alv_cell( i_row_id     = ls_index_row-index
-                                     i_field_name = 'SYMBOL_NAME' ).
-
-          MESSAGE s057(/cadaxo/sqlc) DISPLAY LIKE 'E'.               "CDX001-0020
-          RETURN.
-
-        ENDIF.
-*     Exclude create symbols
-        IF NOT ls_symbol-type = cs_symbol_type-create.
-          APPEND ls_symbol TO gt_symbol_delete.
-        ENDIF.
-
-        ld_index = ls_index_row-index.
-        APPEND ld_index TO lt_delete_rows_index.
-
-      ENDIF.
-
-    ENDLOOP.
-
-* delete records on ALV
-    SORT lt_delete_rows_index DESCENDING.
-    LOOP AT lt_delete_rows_index INTO ld_index.
-
-      DELETE gt_symbol INDEX ld_index.
-
-    ENDLOOP.
-
-    e_success = abap_true.
-
-    me->on_symbol_alv_user_command( e_ucomm = 'SYMBOL_SAVE' ).                   "CDX001-0020
-
-
-  ENDMETHOD.
-
-
-  METHOD delete_symbol_db.
-
-    DATA lt_symbol_db_delete TYPE TABLE OF /cadaxo/sqlcusym.
-
-    DATA l_symbol    LIKE LINE OF gt_symbol[].
-    DATA l_symbol_db LIKE LINE OF lt_symbol_db_delete.
-
-    IF NOT gt_symbol_delete IS INITIAL.
-
-      LOOP AT gt_symbol_delete INTO l_symbol.
-
-        MOVE-CORRESPONDING l_symbol TO l_symbol_db.
-        l_symbol_db-username = sy-uname.
-        APPEND l_symbol_db TO lt_symbol_db_delete.
-
-      ENDLOOP.
-
-      REFRESH gt_symbol_delete.
-
-      DELETE /cadaxo/sqlcusym FROM TABLE lt_symbol_db_delete.
-      IF sy-subrc = 0.
-
-        rv_success = abap_true.
-
-      ELSE.
-
-        ROLLBACK WORK.
-        MESSAGE s055(/cadaxo/sqlc) WITH TEXT-ded DISPLAY LIKE 'E'."CDX001-0020
-        RETURN.
-
-      ENDIF.
-
     ENDIF.
 
   ENDMETHOD.
@@ -4036,7 +3268,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         ls_sqlcsres-nr_of_selects = l_lines.            "CDX130-004
 
 * get sql string from editor control
-        me->get_sql_area( IMPORTING e_code_string = l_sql_string ).
+        l_sql_string = me->get_sql_area( ).
 
 * get source code from sql editor
         IF me->gc_abap_editor IS BOUND.                                                    "COCKPIT-7
@@ -4238,80 +3470,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       CATCH cx_root INTO lr_exception.
         l_message = lr_exception->get_text( ).
     ENDTRY.
-
-  ENDMETHOD.
-
-
-  METHOD fill_used_symbols.
-
-    DATA: lv_sql_string TYPE string.
-    DATA: lt_results    TYPE match_result_tab.
-    FIELD-SYMBOLS: <ls_result> LIKE LINE OF lt_results.
-
-    IF gc_abap_editor IS INITIAL AND gc_abap_editor_text IS INITIAL.
-      RETURN.
-    ENDIF.
-    me->get_sql_area( IMPORTING e_code_string    = lv_sql_string ).
-
-    /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex(
-      EXPORTING
-        i_where_syntax =     lv_sql_string
-      IMPORTING
-        e_result_tab   =     lt_results
-    ).
-
-    LOOP AT lt_results ASSIGNING <ls_result>.
-
-      DATA(l_from) = <ls_result>-offset + 1.
-      DATA(l_length) = <ls_result>-length - 2.
-
-      DATA(l_symbol_name) = lv_sql_string+l_from(l_length).
-      APPEND to_upper( l_symbol_name ) TO rt_symbols.
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD focus_symbol_alv_cell.
-****************************************************************************************************
-* Description             : focus symbol alv cell                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA: l_row_id    TYPE lvc_s_row,
-          l_column_id TYPE lvc_s_col,
-          l_row_no    TYPE lvc_s_roid.
-
-    l_row_id-index        = i_row_id.
-    l_column_id-fieldname = i_field_name.
-    l_row_no-row_id       = i_row_id.
-
-    CALL METHOD gc_symbol_alv->set_current_cell_via_id
-      EXPORTING
-        is_row_id    = l_row_id
-        is_column_id = l_column_id
-        is_row_no    = l_row_no.
-
 
   ENDMETHOD.
 
@@ -5019,33 +4177,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ENDLOOP.
 **** Test Ana End
 
-***  LOOP AT lt_code ASSIGNING <l_code> WHERE table_line(11) CS '&%HEADER_'."CR22-034
-***    l_string = <l_code>.                                    "CR22-034
-***    ls_headerline-alv_no = l_string+10(2). "Provides the number           "CR22-034
-***    l_string = l_string+13.                "Takes Header_XY: text, and Header_XY:text (without space in between) "CR22-034
-***    CONDENSE l_string.                                      "CR22-034
-***    ls_headerline-text   = l_string.    "Provides the header text         "CR22-034
-***
-***    APPEND ls_headerline TO gt_headerlines.                 "CR22-034
-***
-***  ENDLOOP.                                                  "CR22-034
-***
-**** Check if Header Line Number is used twice (or more times)
-***  lt_headerline_e = gt_headerlines.                         "CR22-034
-***
-***  SORT gt_headerlines  ASCENDING.                           "CR22-034
-***  SORT lt_headerline_e ASCENDING.                           "CR22-034
-***
-***  DELETE ADJACENT DUPLICATES FROM gt_headerlines.           "CR22-034
-***
-***  IF NOT gt_headerlines = lt_headerline_e.                  "CR22-034
-***    MESSAGE e106(/cadaxo/sqlc) INTO l_message.              "CR22-034
-***
-***    RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error       "CR22-034
-***       EXPORTING                                            "CR22-034
-***         message = l_message.                               "CR22-034
-***  ENDIF.                                                    "CR22-034
-
 
 * remove comments * or "
     LOOP AT lt_code ASSIGNING <l_code> WHERE table_line(1) <> '*' AND table_line(1) <> '"'. "CDX001-0011
@@ -5142,470 +4273,18 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD get_symbols.
-****************************************************************************************************
-* Description             : Get symbols                                                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.11.2010 | Domi Bigl            | Sort global/user                            | CDX001-0020    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
-*            |                      |                                             | RT235          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 31.07.2017 | Dusan Sacha          | Symbol Multi Value                          | COCKPIT-240    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-****************************************************************************************************
-
-    DATA ls_symbol LIKE LINE OF gt_symbol.
-    DATA lt_program_symbol TYPE TABLE OF /cadaxo/sqlcsymb.
-    DATA ls_celltab TYPE lvc_s_styl.
-    DATA lt_user_symbol LIKE gt_symbol[].
-    DATA lv_tabix TYPE i.
-    DATA: i_values_count TYPE i.           "COCKPIT-240
-    DATA: lv_symbol_enabled TYPE raw4.     "COCKPIT-240
-    DATA: lv_datatype_enabled TYPE raw4.   "COCKPIT-240
-
-    FIELD-SYMBOLS <ls_user_symbol> LIKE LINE OF lt_user_symbol.
-
-* For Used Symbols
-    " DATA lt_symbol       LIKE gt_symbol.                      "CR22-002
-
-    REFRESH gt_symbol.
-
-* Get user symbols(user dependent)
-    SELECT symbol_name
-           symbol_value
-           symbol_desc
-           symbol_multivalue                                              "COCKPIT-240
-           symbol_datatype                                                "COCKPIT-240
-           FROM /cadaxo/sqlcusym
-             INTO CORRESPONDING FIELDS OF TABLE lt_user_symbol
-             WHERE username = sy-uname.
-*             ORDER BY symbol_name.                                          "COCKPIT-240 "COCKPIT-403
-    IF sy-subrc = 0.
-      SORT lt_user_symbol BY symbol_name."COCKPIT-403
-      LOOP AT lt_user_symbol ASSIGNING <ls_user_symbol>.
-
-        "     Get Multi Values Count
-        i_values_count = get_user_symbol_count( i_symbol_multivalue = <ls_user_symbol>-symbol_multivalue ). "COCKPIT-240
-        lv_datatype_enabled = cl_gui_alv_grid=>mc_style_enabled.                                            "COCKPIT-240
-        "     Get Icon
-        IF ( <ls_user_symbol>-symbol_multivalue IS NOT INITIAL ).                    "COCKPIT-240
-          <ls_user_symbol>-symbol_icon = '@3W@'.                                     "COCKPIT-240
-          lv_symbol_enabled = cl_gui_alv_grid=>mc_style_disabled.                    "COCKPIT-240
-          <ls_user_symbol>-symbol_value = '<' && i_values_count &&' VALUES' && '>'.  "COCKPIT-240
-          IF i_values_count > 0.                                                     "COCKPIT-240
-            lv_datatype_enabled = cl_gui_alv_grid=>mc_style_disabled.                "COCKPIT-240
-          ENDIF.                                                                     "COCKPIT-240
-        ELSE.                                                                        "COCKPIT-240
-          <ls_user_symbol>-symbol_icon = '@7L@'.                                     "COCKPIT-240
-          lv_symbol_enabled = cl_gui_alv_grid=>mc_style_enabled.                     "COCKPIT-240
-        ENDIF.                                                                       "COCKPIT-240
-
-        "     Get Data Element Info
-        IF ( <ls_user_symbol>-symbol_datatype IS NOT INITIAL ).
-          <ls_user_symbol>-symbol_datadesc = me->get_symbol_datatype_desc( i_datatype = <ls_user_symbol>-symbol_datatype ).
-          <ls_user_symbol>-symbol_datainfo = me->get_symbol_datatype_info( i_datatype = <ls_user_symbol>-symbol_datatype ).
-        ENDIF.
-
-        <ls_user_symbol>-type = cs_symbol_type-user.
-*     Editable for fields value and desc.
-        ls_celltab-fieldname = 'SYMBOL_NAME'.
-        ls_celltab-style = cl_gui_alv_grid=>mc_style_disabled.
-        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.
-        ls_celltab-fieldname = 'SYMBOL_ICON'.                         "COCKPIT-240
-        ls_celltab-style = cl_gui_alv_grid=>mc_style_button.          "COCKPIT-240
-        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.     "COCKPIT-240
-        ls_celltab-fieldname = 'SYMBOL_VALUE'.                        "COCKPIT-240
-        ls_celltab-style = lv_symbol_enabled.                         "COCKPIT-240
-        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.
-        ls_celltab-fieldname = 'SYMBOL_DESC'.
-        ls_celltab-style = cl_gui_alv_grid=>mc_style_enabled.
-        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.
-        ls_celltab-fieldname = 'SYMBOL_DATATYPE'.                     "COCKPIT-240
-        ls_celltab-style = lv_datatype_enabled.                       "COCKPIT-240
-        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.     "COCKPIT-240
-
-      ENDLOOP.
-
-      APPEND LINES OF lt_user_symbol TO gt_symbol.
-
-    ENDIF.
-
-
-    IF me->g_user_settings-symbols_program_show = c_program_symbols_show.                   "CDX001-0020
-      TRY.
-*     Get program symbols
-          SELECT symbol symbol_descr
-                 FROM /cadaxo/sqlcsymb
-                 INTO CORRESPONDING FIELDS OF TABLE lt_program_symbol.
-          LOOP AT lt_program_symbol ASSIGNING FIELD-SYMBOL(<ls_program_symbol>).
-
-            ls_symbol-symbol_name = <ls_program_symbol>-symbol.
-
-            /cadaxo/cl_sqlc_cockpit_assist=>get_global_symbol_value( EXPORTING i_symbol       = <ls_program_symbol>-symbol
-                                                                     IMPORTING e_symbol_value = ls_symbol-symbol_value ).
-            ls_symbol-symbol_desc = <ls_program_symbol>-symbol_descr.
-            ls_symbol-type = cs_symbol_type-program.
-
-            ls_celltab-fieldname = 'SYMBOL_NAME'.
-            ls_celltab-style = cl_gui_alv_grid=>mc_style_disabled.
-            INSERT ls_celltab INTO TABLE ls_symbol-cell_style.
-            ls_celltab-fieldname = 'SYMBOL_VALUE'.
-            ls_celltab-style = cl_gui_alv_grid=>mc_style_disabled.
-            INSERT ls_celltab INTO TABLE ls_symbol-cell_style.
-            ls_celltab-fieldname = 'SYMBOL_DESC'.
-            ls_celltab-style = cl_gui_alv_grid=>mc_style_disabled.
-            INSERT ls_celltab INTO TABLE ls_symbol-cell_style.
-
-            APPEND ls_symbol TO gt_symbol.
-
-            CLEAR ls_symbol.
-
-          ENDLOOP.
-
-        CATCH /cadaxo/cx_sqlc_symb_not_found .
-
-      ENDTRY.
-    ENDIF.                                                             "CDX001-0020
-
-* If Flag is on, e.g. g_user_settings-only_used_symbols = 'X', or button is clicked
-    IF g_user_settings-only_used_symbols = 'X'.               "CR22-002
-*      SORT gt_used_symbols.                                   "CR22-002 "*-Cockpit-431
-* begin of insert Cockpit-431
-      IF   gt_used_symbols IS NOT INITIAL.
-        DATA(lt_used_symbols) = gt_used_symbols.
-      ELSE.
-        lt_used_symbols = me->fill_used_symbols( ).
-      ENDIF.
-      SORT lt_used_symbols.
-* end of insert Cockpit-431
-      LOOP AT gt_symbol INTO ls_symbol.                       "CR22-002
-        lv_tabix = sy-tabix.                                  "CR22-002
-*       READ TABLE gt_used_symbols FROM ls_symbol-symbol_name TRANSPORTING NO FIELDS. "CR22-002"-Cockpit-431
-        READ TABLE lt_used_symbols FROM ls_symbol-symbol_name TRANSPORTING NO FIELDS. "CR22-002"+Cockpit-431
-        IF sy-subrc <> 0.                                     "CR22-002
-          DELETE gt_symbol INDEX lv_tabix.                    "CR22-002
-        ENDIF.                                                "CR22-002
-      ENDLOOP.                                                "CR22-002
-    ENDIF.                                                    "CR22-002
-
-  ENDMETHOD.
-
-
-  METHOD get_symbols_selected.
-****************************************************************************************************
-* Description             : get_symbols_selected                                                   *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Pat Patil                Company    : CADAXO GesmbH                    *
-* Date                    : 26.01.2018               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    : CADAXO GesmbH                    *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 26.01.2018 |Pat                   |select symbols for export                    |COCKPIT-294     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 22.10.2019 |Pat                   |Symbol Sharing should work exactly for one   |COCKPIT-418     *
-*                                    selection                                                     *
-*------------+----------------------+---------------------------------------------+----------------*
-
-    CLEAR gt_symbol_selected.
-
-* get selected records
-    gc_symbol_alv->get_selected_rows( IMPORTING et_index_rows = DATA(lt_index_rows) ).
-    IF lines( lt_index_rows ) > 1."cockpit-418
-      MESSAGE s131(/cadaxo/sqlc) DISPLAY LIKE 'E'.
-      RETURN.
-    ENDIF.
-
-    IF lt_index_rows IS INITIAL.
-      gc_symbol_alv->get_current_cell( IMPORTING es_row_id = DATA(ls_row_info) ).
-      APPEND ls_row_info TO lt_index_rows.
-    ENDIF.
-    LOOP AT lt_index_rows ASSIGNING FIELD-SYMBOL(<index_row>).
-
-      READ TABLE gt_symbol INDEX <index_row>-index
-                           ASSIGNING FIELD-SYMBOL(<symbol>).
-      IF sy-subrc = 0.
-
-*     program symbol not allowed
-        IF <symbol>-type = cs_symbol_type-program.
-
-*       focus the record
-          me->focus_symbol_alv_cell( i_row_id     = <index_row>-index
-                                     i_field_name = 'SYMBOL_NAME' ).
-
-          MESSAGE s132(/cadaxo/sqlc) DISPLAY LIKE 'E'.               "CDX001-0020
-          RETURN.
-
-        ENDIF.
-
-        APPEND <symbol> TO gt_symbol_selected.
-      ENDIF.
-
-    ENDLOOP.
-
-    IF gt_symbol_selected IS NOT INITIAL.
-      e_success = abap_true.
-    ELSE.
-      MESSAGE s131(/cadaxo/sqlc) DISPLAY LIKE 'E'.               "CDX001-0020
-    ENDIF.
-
-
-  ENDMETHOD.
-
-
-  METHOD get_symbol_datatype_desc.
-
-    SELECT SINGLE ddtext FROM dd04t
-      INTO r_desc
-      WHERE rollname   = i_datatype AND
-            ddlanguage = sy-langu AND
-            as4local   = 'A'.   "#EC CI_SEL_NESTED "#EC CI_SROFC_NESTED
-
-  ENDMETHOD.
-
-
-  METHOD get_symbol_datatype_info.
-
-    DATA: ls_datatype_info TYPE dd04v.
-    DATA: lv_info          LIKE r_info.
-
-    CALL FUNCTION 'DDIF_DTEL_GET'
-      EXPORTING
-        name          = i_datatype
-        state         = 'A'
-        langu         = sy-langu
-      IMPORTING
-        dd04v_wa      = ls_datatype_info
-      EXCEPTIONS
-        illegal_input = 1
-        OTHERS        = 2.
-    IF sy-subrc <> 0.
-    ENDIF.
-
-    IF ls_datatype_info-leng IS INITIAL.
-      lv_info = to_lower( ls_datatype_info-datatype  ).
-    ELSEIF ls_datatype_info-decimals IS INITIAL.
-      lv_info = to_lower( ls_datatype_info-datatype  ) && '(' && shift_left( val = ls_datatype_info-leng sub = '0' ) && ')'.
-    ELSE.
-      lv_info = to_lower( ls_datatype_info-datatype ) && '(' && shift_left( val = ls_datatype_info-leng sub = '0' )
-                                                                         && ',' && shift_left( val = ls_datatype_info-decimals sub = '0' ) && ')'.
-    ENDIF.
-
-    r_info = lv_info.
-  ENDMETHOD.
-
-
-  METHOD get_user_symbol_count.
-    DATA: lt_symbol_value TYPE rseloption.
-
-    IF i_symbol_multivalue IS NOT INITIAL.
-      /cadaxo/cl_sqlc_cockpit_assist=>decompress_symbol_multivalue(
-        EXPORTING
-          i_symbol_multivalue = i_symbol_multivalue
-        IMPORTING
-          e_symbol_multivalue = lt_symbol_value
-      ).
-    ENDIF.
-
-    DESCRIBE TABLE lt_symbol_value LINES r_count.
-
-  ENDMETHOD.
-
-
-  METHOD get_user_symbol_from_sql.
-****************************************************************************************************
-* Description             : get user symbols from SQL                                              *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 22.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
-* Date                    : 17.11.2014                                                             *
-*--------------------------------------------------------------------------------------------------
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 09.11.2010 | Domi Bigl            | Symbols for global variant                  | CDX001-0020    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.05.2012 | Johann Fößleitner    | translate symbolname to upper case          | CDX130-009     *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
-*            |                      |                                             | RT235          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 20.02.2018 | Dusan Sacha          | Symbol Multivalue Upgrade                   | Cadaxo-288     *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-****************************************************************************************************
-
-    DATA l_symbol LIKE LINE OF e_symbols.
-
-    DATA lt_results TYPE match_result_tab.
-
-    DATA: lt_sql LIKE i_sql[],
-          l_sql  LIKE LINE OF lt_sql.
-
-    DATA  l_symbol_name TYPE string.
-
-    DATA  l_count TYPE i.
-
-
-    FIELD-SYMBOLS: <l_result> LIKE LINE OF lt_results,
-                   <l_symbol> LIKE l_symbol.
-
-    REFRESH e_symbols.
-
-    lt_sql[] = i_sql[].
-* delete blank line
-    DELETE lt_sql WHERE table_line IS INITIAL.
-
-    CLEAR gt_used_symbols.                     "CR22-002
-
-    LOOP AT lt_sql INTO l_sql.
-
-      CLEAR lt_results.
-
-      FIND ALL OCCURRENCES OF REGEX '&(\w|/)+&' IN l_sql RESULTS lt_results.
-      IF sy-subrc = 0.
-
-        LOOP AT lt_results ASSIGNING <l_result>.
-
-          MOVE l_sql+<l_result>-offset(<l_result>-length) TO l_symbol_name.
-*       delete leading and ending '&'
-          REPLACE ALL OCCURRENCES OF '&' IN l_symbol_name WITH space.
-          CONDENSE l_symbol_name NO-GAPS.
-          TRANSLATE l_symbol_name TO UPPER CASE.                                 "CDX130-009
-          l_symbol-symbol_name = l_symbol_name.
-
-* creates list of user_symbols used in the Editor
-          APPEND l_symbol_name TO gt_used_symbols.                               "CR22-002
-
-          IF i_type = cs_windowresolution-vertical OR i_type IS INITIAL.
-            SELECT SINGLE COUNT(*) FROM /cadaxo/sqlcvnsy
-                                   INTO l_count
-                                   WHERE varguid = i_varguid
-                                     AND symbol_name = l_symbol_name.
-
-          ELSE.
-
-            SELECT SINGLE COUNT(*) FROM /cadaxo/sqlcusym
-                                  INTO l_count
-                                  WHERE symbol_name = l_symbol_name
-                                    AND username = sy-uname. "#EC CI_BYPASS
-
-          ENDIF.
-
-          IF l_count = 1.
-
-            CLEAR l_count.
-
-            APPEND l_symbol TO e_symbols.
-
-          ENDIF.
-
-        ENDLOOP.
-
-*     get distinct user symbols
-        SORT e_symbols BY symbol_name.
-        DELETE ADJACENT DUPLICATES FROM e_symbols COMPARING symbol_name.         "CDX001-0020
-
-        LOOP AT e_symbols ASSIGNING <l_symbol>.
-
-          IF NOT i_type IS INITIAL."If initial, no need to get value and desc
-
-            CASE i_type.
-
-              WHEN 'V'."Get symbol value and desc from variant
-                SELECT SINGLE
-                  symbol_value
-                  symbol_desc
-                  symbol_multivalue
-                  symbol_datatype
-                  FROM /cadaxo/sqlcvnsy
-                    INTO CORRESPONDING FIELDS OF <l_symbol>
-                    WHERE varguid = i_varguid
-                      AND symbol_name = <l_symbol>-symbol_name.
-
-              WHEN 'U'."Get current symbol value and desc from variant
-*             get current user symbol value
-
-                SELECT SINGLE
-                  symbol_value
-                  symbol_desc
-                  symbol_multivalue                                              "COCKPIT-240
-                  symbol_datatype                                                "COCKPIT-240
-                  FROM /cadaxo/sqlcusym
-                    INTO CORRESPONDING FIELDS OF <l_symbol>
-                    WHERE username = sy-uname
-                     AND symbol_name = <l_symbol>-symbol_name.                                          "COCKPIT-240
-            ENDCASE.
-
-            "     Get Data Element Info
-            IF ( <l_symbol>-symbol_datatype IS NOT INITIAL ).
-              <l_symbol>-symbol_datadesc = me->get_symbol_datatype_desc( i_datatype = <l_symbol>-symbol_datatype ).
-              <l_symbol>-symbol_datainfo = me->get_symbol_datatype_info( i_datatype = <l_symbol>-symbol_datatype ).
-            ENDIF.
-
-          ENDIF.
-
-        ENDLOOP.
-
-      ENDIF.
-
-    ENDLOOP.
-
-* Delete Duplicate entries in GT_USED_SYMBOLS
-    SORT gt_used_symbols.                             "CR22-002
-    DELETE ADJACENT DUPLICATES FROM gt_used_symbols.  "CR22-002
-
-  ENDMETHOD.
-
-
   METHOD get_variant.
 
     DATA l_sqlcvari    TYPE /cadaxo/sqlcvari.
     DATA lt_sqlcusym   TYPE TABLE OF /cadaxo/sqlcusym.
     DATA l_sqlcusym    LIKE LINE OF lt_sqlcusym.
-    DATA ls_symbol_ow  TYPE /cadaxo/sqlc_symbol_ow.
     DATA ls_layout     TYPE lvc_s_layo.
-*  DATA lt_symbols    TYPE /cadaxo/sqlc_il_variants_symbt.  " Cockpit-288 Delete
-    DATA lt_symbols    TYPE /cadaxo/sqlc_symbol_t.           " Cockpit-288 Insert
+    DATA lt_symbols    TYPE /cadaxo/sqlc_symbol_t.
 
     FIELD-SYMBOLS: <ls_symbol_ow> TYPE /cadaxo/sqlc_symbol_ow,
                    <ls_symbols>   LIKE LINE OF lt_symbols.
 
-    CLEAR : gs_sel_variant.
+    CLEAR gs_sel_variant.
     CALL FUNCTION '/CADAXO/SQLC_MAINTAINT_VAR_UI'
       EXPORTING
         i_mode       = 'G'
@@ -5615,81 +4294,20 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     IF NOT gs_sel_variant IS INITIAL.
 
 * set sql editor lines
-      me->set_sql_area( i_codelines_t =  gs_sel_variant-t_sql  ).
+      me->set_sql_area( gs_sel_variant-t_sql  ).
 
       l_sqlcvari = CORRESPONDING #( gs_sel_variant ).
 
       l_sqlcvari-username = gs_sel_variant-cruser.
 
-      me->get_user_symbol_from_sql( EXPORTING i_varguid = gs_sel_variant-varguid
-                                              i_sql     = gs_sel_variant-t_sql
-                                              i_type    = 'V'
-                                    IMPORTING e_symbols = lt_symbols ).
+      me->symbols_controller->get_user_symbol_from_sql( EXPORTING i_varguid = gs_sel_variant-varguid
+                                                                  i_sql     = gs_sel_variant-t_sql
+                                                                  i_type    = /cadaxo/cl_sqlc_symbols=>cs_symbol_type-variant
+                                                        IMPORTING e_symbols = lt_symbols ).
       IF NOT lt_symbols IS INITIAL.
 
-        DATA(lv_username) = cl_abap_syst=>get_user_name( ).
-        SELECT *
-               FROM /cadaxo/sqlcusym
-               INTO TABLE lt_sqlcusym
-               FOR ALL ENTRIES IN lt_symbols
-               WHERE symbol_name = lt_symbols-symbol_name
-                 AND username    = lv_username
-               .
+        me->symbols_controller->merge_symbols( lt_symbols ).
 
-        CLEAR gt_symbol_ow.
-
-        LOOP AT lt_symbols ASSIGNING <ls_symbols>.
-
-          READ TABLE lt_sqlcusym
-          WITH KEY symbol_name = <ls_symbols>-symbol_name
-          INTO l_sqlcusym.
-
-          IF sy-subrc = 0
-          AND (   l_sqlcusym-symbol_value      <> <ls_symbols>-symbol_value
-               OR l_sqlcusym-symbol_desc       <> <ls_symbols>-symbol_desc
-               OR l_sqlcusym-symbol_multivalue <> <ls_symbols>-symbol_multivalue ).
-            ls_symbol_ow-symbol_name       = <ls_symbols>-symbol_name.
-            ls_symbol_ow-symbol_value_user = l_sqlcusym-symbol_value.
-            ls_symbol_ow-symbol_desc_user  = l_sqlcusym-symbol_desc.
-            ls_symbol_ow-symbol_value_var  = <ls_symbols>-symbol_value.
-            ls_symbol_ow-symbol_var        = <ls_symbols>-symbol_desc.
-            ls_symbol_ow-var               = icon_wd_radio_button_empty.
-            ls_symbol_ow-own               = icon_radiobutton.
-            APPEND ls_symbol_ow TO gt_symbol_ow.
-          ENDIF.
-
-        ENDLOOP.
-
-        IF NOT gt_symbol_ow IS INITIAL.
-          confirm_symbol_overwrite( ).
-        ENDIF.
-
-        LOOP AT lt_symbols ASSIGNING <ls_symbols>.
-
-          READ TABLE gt_symbol_ow                                              "CDX001-0020
-          ASSIGNING <ls_symbol_ow>                                             "CDX001-0020
-          WITH KEY symbol_name = <ls_symbols>-symbol_name.                     "CDX001-0020
-          IF sy-subrc = 0 AND <ls_symbol_ow>-var <> icon_radiobutton.          "CDX001-0020
-            CONTINUE.                                                          "CDX001-0020
-          ENDIF.                                                               "CDX001-0020
-
-          MOVE-CORRESPONDING <ls_symbols> TO l_sqlcusym.
-          l_sqlcusym-username = sy-uname.
-          APPEND l_sqlcusym TO lt_sqlcusym.
-          CLEAR l_sqlcusym.
-
-        ENDLOOP.
-
-        MODIFY /cadaxo/sqlcusym FROM TABLE lt_sqlcusym.
-
-      ENDIF.
-
-      me->get_symbols( ).
-      gc_symbol_alv->refresh_table_display( i_soft_refresh = abap_true ).
-      gc_symbol_alv->get_frontend_layout( IMPORTING es_layout = ls_layout ).
-      IF ls_layout-cwidth_opt <> abap_true.
-        ls_layout-cwidth_opt = abap_true.
-        gc_symbol_alv->set_frontend_layout( ls_layout ).
       ENDIF.
 
       DATA(variant_menu_text) = CONV gui_text( |{ TEXT-b46 } { gs_sel_variant-varname }| ).
@@ -5709,86 +4327,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     gc_splitter_top_toolbar->set_static_ctxmenu(  fcode   = 'SQLVARSET'
                                                   ctxmenu = l_ctmenu3 ).
-
-  ENDMETHOD.
-
-
-  METHOD handle_command_create_symbol.
-****************************************************************************************************
-* Description             : Handle Show Full Value                                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Pratik Patil             Company    : CADAXO GesmbH                    *
-* Date                    : 26.02.2019               Release    : 3.5                              *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxxxxx                 *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-    DATA gui_control     TYPE REF TO cl_gui_control.
-    DATA gui_alv_grid    TYPE REF TO cl_gui_alv_grid.
-    DATA selected_col    TYPE lvc_s_col.
-    DATA dref_field      TYPE REF TO data.
-    DATA sel_field_val_string TYPE string.
-
-    FIELD-SYMBOLS:
-      <result_tab>         TYPE STANDARD TABLE,
-      <result_line>        TYPE any,
-      <selected_field_val> TYPE any,
-      <selected_field_tab> TYPE STANDARD TABLE,
-      <dref_line>          TYPE REF TO data,
-      <result_field>       TYPE any.
-
-    cl_gui_alv_grid=>get_focus( IMPORTING control = gui_control ).
-
-    TRY.
-        gui_alv_grid ?= gui_control.
-        gui_alv_grid->get_current_cell( IMPORTING es_col_id = selected_col ).
-      CATCH cx_sy_move_cast_error.
-    ENDTRY.
-
-    ASSIGN dref_result_tab_t[ i_grid_i ] TO <dref_line>.
-    ASSIGN <dref_line>->* TO <result_tab>.
-
-    DATA(lr_cl_sql_parse) = gt_cl_sql_parse[ i_grid_i ].
-    TRY.
-        DATA(result_ddfield) = lr_cl_sql_parse->gt_lvc_t_fcat[ fieldname = selected_col-fieldname ].
-      CATCH cx_sy_itab_line_not_found.
-        MESSAGE i142(/cadaxo/sqlc).
-        RETURN.
-    ENDTRY.
-    IF result_ddfield-rollname IS INITIAL.
-      MESSAGE i141(/cadaxo/sqlc).
-      RETURN.
-    ENDIF.
-    CREATE DATA dref_field TYPE TABLE OF (result_ddfield-rollname).
-    ASSIGN dref_field->* TO <selected_field_tab>.
-
-    LOOP AT <result_tab> ASSIGNING <result_line>.
-      ASSIGN COMPONENT selected_col-fieldname OF STRUCTURE <result_line> TO <selected_field_val>.
-      sel_field_val_string = <selected_field_val>.
-      IF strlen( sel_field_val_string ) > 45.
-        MESSAGE i148(/cadaxo/sqlc).
-        RETURN.
-      ENDIF.
-      APPEND <selected_field_val> TO <selected_field_tab>.
-    ENDLOOP.
-
-    CALL FUNCTION '/CADAXO/SQLC_CREATE_SYMBOL'
-      EXPORTING
-        iv_rollname      = result_ddfield-rollname
-        it_symbol_values = <selected_field_tab>.
-
-    me->get_symbols( ).
-    gc_symbol_alv->refresh_table_display( i_soft_refresh = abap_true ).
 
   ENDMETHOD.
 
@@ -6989,6 +5527,37 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD insert_codeblock_currpos_nosel.
+    DATA: l_from_line TYPE i,
+          l_from_pos  TYPE i,
+          l_to_line   TYPE i,
+          l_to_pos    TYPE i.
+
+    gc_abap_editor->get_selection_pos(  IMPORTING  from_line = l_from_line
+                                                   from_pos  = l_from_pos
+                                                   to_line   = l_to_line
+                                                   to_pos    = l_to_pos
+                                        EXCEPTIONS OTHERS    = 1 ).
+    IF sy-subrc = 0.
+
+      IF l_from_line <> l_to_line OR
+         l_from_pos  <> l_to_pos.
+
+        MESSAGE i005(/cadaxo/sqlc).
+
+      ELSE.
+
+        me->insert_codeblock_at_position( iv_line      = l_from_line
+                                          iv_pos       = l_from_pos
+                                          iv_sqlstring = iv_sqlstring
+                                          i_set_focus  = i_set_focus ).
+
+      ENDIF.
+
+    ENDIF.
+  ENDMETHOD.
+
+
   METHOD insert_saved_list.
 
     DATA ls_sqlcress TYPE /cadaxo/sqlcress.
@@ -7046,39 +5615,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-    DATA: l_from_line TYPE i,
-          l_from_pos  TYPE i,
-          l_to_line   TYPE i,
-          l_to_pos    TYPE i.
+    insert_codeblock_currpos_nosel( i_string ).
 
-* get the actual selection
-    gc_abap_editor->get_selection_pos(
-      IMPORTING
-        from_line              = l_from_line
-        from_pos               = l_from_pos
-        to_line                = l_to_line
-        to_pos                 = l_to_pos
-      EXCEPTIONS
-        error_cntl_call_method = 1
-        OTHERS                 = 2 ).
-
-    IF sy-subrc = 0.
-
-      IF l_from_line <> l_to_line OR
-         l_from_pos  <> l_to_pos.
-
-        MESSAGE i005(/cadaxo/sqlc).
-
-      ELSE.
-
-        me->insert_codeblock_at_position(
-            iv_line = l_from_line
-            iv_pos = l_from_pos
-            iv_sqlstring = i_string
-            i_set_focus = abap_true ).
-
-      ENDIF.
-    ENDIF.
   ENDMETHOD.
 
 
@@ -7865,12 +6403,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     DATA lt_sql TYPE /cadaxo/sqlccodeline_t.
 
 * begin of change COCKPIT-294
-    DATA: lt_symbols      TYPE /cadaxo/sqlc_symbol_t,
-          ls_user_symbol  TYPE /cadaxo/sqlcusym,
-          lt_sqlcusym     TYPE TABLE OF /cadaxo/sqlcusym,
-          lt_sqlcusym_upd TYPE TABLE OF /cadaxo/sqlcusym,
-          ls_symbol_ow    TYPE /cadaxo/sqlc_symbol_ow,
-          ls_layout       TYPE lvc_s_layo.
+    DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t,
+          ls_user_symbol TYPE /cadaxo/sqlcusym,
+
+*          ls_symbol_ow    TYPE /cadaxo/sqlc_symbol_ow,
+          ls_layout      TYPE lvc_s_layo.
 * end   of change COCKPIT-294
     DATA lt_variant TYPE TABLE OF /cadaxo/sqlc_il_variants.
 
@@ -7904,77 +6441,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                             IMPORTING rt_item     = lt_symbols ).
 
           IF NOT lt_symbols IS INITIAL. " check symbols and give pop-up if identical data exists
-
-            SELECT * FROM /cadaxo/sqlcusym
-            INTO TABLE lt_sqlcusym FOR ALL ENTRIES IN lt_symbols
-            WHERE symbol_name = lt_symbols-symbol_name
-            AND username    = sy-uname.
-
-            CLEAR gt_symbol_ow.
-
-            LOOP AT lt_symbols ASSIGNING FIELD-SYMBOL(<ls_symbols>).
-              READ TABLE lt_sqlcusym
-              WITH KEY symbol_name = <ls_symbols>-symbol_name
-              INTO DATA(l_sqlcusym).
-
-              IF     sy-subrc = 0
-              AND ( l_sqlcusym-symbol_value <> <ls_symbols>-symbol_value
-              OR    l_sqlcusym-symbol_desc  <> <ls_symbols>-symbol_desc
-              OR l_sqlcusym-symbol_multivalue <> <ls_symbols>-symbol_multivalue ).
-
-                ls_symbol_ow-symbol_name       = <ls_symbols>-symbol_name.
-                ls_symbol_ow-symbol_value_user = l_sqlcusym-symbol_value.
-                ls_symbol_ow-symbol_desc_user  = l_sqlcusym-symbol_desc.
-                ls_symbol_ow-symbol_value_var  = <ls_symbols>-symbol_value.
-                ls_symbol_ow-symbol_var        = <ls_symbols>-symbol_desc.
-                ls_symbol_ow-var               = icon_wd_radio_button_empty.
-                ls_symbol_ow-own               = icon_radiobutton.
-
-                IF ( <ls_symbols>-symbol_multivalue IS NOT INITIAL ).
-                  ls_symbol_ow-symbol_type_icon_var = '@3W@'.
-                ELSE.
-                  ls_symbol_ow-symbol_type_icon_var = '@7L@'.
-                ENDIF.
-
-                IF ( l_sqlcusym-symbol_multivalue IS NOT INITIAL ).
-                  ls_symbol_ow-symbol_type_icon_user = '@3W@'.
-                ELSE.
-                  ls_symbol_ow-symbol_type_icon_user = '@7L@'.
-                ENDIF.
-
-                ls_symbol_ow-symbol_multivalue_var = <ls_symbols>-symbol_multivalue.
-                ls_symbol_ow-symbol_datatype_var   = <ls_symbols>-symbol_datatype.
-                ls_symbol_ow-symbol_multivalue_user  = l_sqlcusym-symbol_multivalue.
-                ls_symbol_ow-symbol_datatype_user    = l_sqlcusym-symbol_datatype.
-
-                APPEND ls_symbol_ow TO gt_symbol_ow.
-              ENDIF.
-            ENDLOOP.
-
-            IF NOT gt_symbol_ow IS INITIAL.
-              confirm_symbol_overwrite( ).
-            ENDIF.
-
-            LOOP AT lt_symbols ASSIGNING FIELD-SYMBOL(<ls_symbols_upd>).
-
-              READ TABLE gt_symbol_ow
-              ASSIGNING FIELD-SYMBOL(<ls_symbol_ow>)
-              WITH KEY symbol_name = <ls_symbols_upd>-symbol_name.
-              IF sy-subrc = 0 AND <ls_symbol_ow>-var <> icon_radiobutton.
-                CONTINUE.
-              ENDIF.
-
-              MOVE-CORRESPONDING <ls_symbols_upd> TO l_sqlcusym.
-              l_sqlcusym-username = sy-uname.
-              APPEND l_sqlcusym TO lt_sqlcusym_upd.
-              CLEAR l_sqlcusym.
-
-            ENDLOOP.
-
-            IF lt_sqlcusym_upd IS NOT INITIAL.
-              MODIFY /cadaxo/sqlcusym FROM TABLE lt_sqlcusym_upd.
-            ENDIF.
-
+            me->symbols_controller->merge_symbols( lt_symbols ).
           ENDIF.
 * end   of change COCKPIT-294
 
@@ -7996,14 +6463,14 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       ENDLOOP.
 
-* begin of change COCKPIT-294
-      me->get_symbols( )  .
-      gc_symbol_alv->get_frontend_layout( IMPORTING es_layout = ls_layout ).
-      IF ls_layout-cwidth_opt <> abap_true.
-        ls_layout-cwidth_opt = abap_true.
-        gc_symbol_alv->set_frontend_layout( EXPORTING is_layout = ls_layout ).
-      ENDIF.
-      gc_symbol_alv->refresh_table_display( EXPORTING i_soft_refresh = abap_true ).
+**** begin of change COCKPIT-294
+***      me->get_symbols( )  .
+***      gc_symbol_alv->get_frontend_layout( IMPORTING es_layout = ls_layout ).
+***      IF ls_layout-cwidth_opt <> abap_true.
+***        ls_layout-cwidth_opt = abap_true.
+***        gc_symbol_alv->set_frontend_layout( EXPORTING is_layout = ls_layout ).
+***      ENDIF.
+***      gc_symbol_alv->refresh_table_display( EXPORTING i_soft_refresh = abap_true ).
 
       IF lt_sql IS NOT INITIAL.
 * end   of change COCKPIT-294
@@ -8111,7 +6578,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ENDIF.                                                              "FOE29012011
 
 * this function is only available with the new frontend editor
-    IF me->g_abap_editor_type <> 'A'.
+    IF me->g_abap_editor_type <> editor_type-new.
       MESSAGE i041(/cadaxo/sqlc).
       EXIT.
     ENDIF.
@@ -8229,33 +6696,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
               RETURN.
           ENDTRY.
 
-          gc_abap_editor->get_selection_pos( IMPORTING  from_line = l_from_line
-                                                        from_pos  = l_from_pos
-                                                        to_line   = l_to_line
-                                                        to_pos    = l_to_pos
-                                             EXCEPTIONS OTHERS    = 2 ).
-          IF sy-subrc = 0.
+          insert_codeblock_currpos_nosel( l_fieldvalue ).
 
-            IF l_from_line <> l_to_line OR
-               l_from_pos  <> l_to_pos.
-
-              MESSAGE i005(/cadaxo/sqlc).
-
-            ELSE.
-
-              me->insert_codeblock_at_position(
-                 iv_line = l_from_line
-                 iv_pos = l_from_pos
-                 iv_sqlstring = l_fieldvalue
-                 i_set_focus = abap_true
-              ).
-
-
-            ENDIF.
-          ELSE.
-            MESSAGE e100(/cadaxo/sqlc).
-
-          ENDIF.
         ENDIF.
       ENDIF.                                                  "CDX001-0006
     ENDIF.
@@ -9098,7 +7540,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           l_to_pos    TYPE i.
 
 * this function is only available with the new frontend editor
-    IF me->g_abap_editor_type <> 'A'.
+    IF me->g_abap_editor_type <> editor_type-new.
       MESSAGE i041(/cadaxo/sqlc).
       EXIT.
     ENDIF.
@@ -9107,26 +7549,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     IF l_fields IS NOT INITIAL.
 
-      gc_abap_editor->get_selection_pos( IMPORTING  from_line              = l_from_line
-                                                    from_pos               = l_from_pos
-                                                    to_line                = l_to_line
-                                                    to_pos                 = l_to_pos
-                                         EXCEPTIONS OTHERS                 = 1 ).
-      IF sy-subrc = 0.
-        IF l_from_line <> l_to_line OR
-          l_from_pos  <> l_to_pos.
-          MESSAGE i005(/cadaxo/sqlc).
-        ELSE.
-
-          me->insert_codeblock_at_position(
-             iv_line = l_from_line
-             iv_pos = l_from_pos
-             iv_sqlstring = l_fields
-             i_set_focus = abap_true ).
-
-        ENDIF.
-
-      ENDIF.
+      insert_codeblock_currpos_nosel( l_fields ).
 
     ENDIF.
 
@@ -10155,7 +8578,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         WHEN c_cmd_show_full_value.
           me->handle_command_show_full_value( EXPORTING i_grid_i = l_grid_name_i ).
         WHEN c_cmd_create_symbol.
-          me->handle_command_create_symbol( EXPORTING i_grid_i = l_grid_name_i ).
+          me->symbols_controller->create_symbol_from_result( i_result_data = dref_result_tab_t[ l_grid_name_i ]
+                                                             i_result_fieldcat = gt_cl_sql_parse[ l_grid_name_i ]->gt_lvc_t_fcat
+                                                           ).
         WHEN c_cmd_show_value_as_html_brow.
           me->handle_command_show_html_brow( EXPORTING i_grid_i = l_grid_name_i ).
         WHEN c_cmd_show_value_as_xml_brow.
@@ -10517,53 +8942,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD on_handle_varsym_click.
-****************************************************************************************************
-* Description             : handle hotspot variant symbol overwrite                                *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Domi Bigl                Company    : CADAXO GesmbH                    *
-* Date                    : 01.09.2012               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 30.11.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    FIELD-SYMBOLS: <lwa_symbol_ow> TYPE /cadaxo/sqlc_symbol_ow.
-    DATA: lwa_stable               TYPE lvc_s_stbl.
-
-    READ TABLE gt_symbol_ow ASSIGNING <lwa_symbol_ow> INDEX e_row_id-index.
-    IF sy-subrc <> 0.
-      RETURN.
-    ENDIF.
-
-    CASE e_column_id-fieldname.
-      WHEN 'OWN'.
-        <lwa_symbol_ow>-var = icon_wd_radio_button_empty.
-        <lwa_symbol_ow>-own = icon_radiobutton.
-      WHEN 'VAR'.
-        <lwa_symbol_ow>-var = icon_radiobutton.
-        <lwa_symbol_ow>-own = icon_wd_radio_button_empty.
-      WHEN OTHERS.
-        RETURN.
-    ENDCASE.
-
-    lwa_stable-row = abap_true.
-    lwa_stable-col = abap_true.
-    gr_alv_symb_ow->refresh_table_display( EXPORTING  is_stable      = lwa_stable
-                                                      i_soft_refresh = abap_true
-                                           EXCEPTIONS OTHERS         = 1 ).
-  ENDMETHOD.
-
-
   METHOD on_home_sapevent.
     DATA: l_html_id TYPE /cadaxo/sqlcparameter_id.
 
@@ -10672,7 +9050,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     FIELD-SYMBOLS: <l_history_log> TYPE /cadaxo/sqlclogalv.
 
 * this function is only available with the new frontend editor
-    IF me->g_abap_editor_type <> 'A'.
+    IF me->g_abap_editor_type <> editor_type-new.
       MESSAGE i041(/cadaxo/sqlc).
       EXIT.
     ENDIF.
@@ -10680,6 +9058,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     IF e_column-fieldname = 'SQL_STRING'.
       READ TABLE gt_history_log INDEX e_row-index ASSIGNING <l_history_log>.
       IF sy-subrc = 0.
+
+
         gc_abap_editor->get_selection_pos( IMPORTING  from_line = l_from_line
                                                       from_pos  = l_from_pos
                                                       to_line   = l_to_line
@@ -11184,659 +9564,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD on_symbol_alv_data_change.
-****************************************************************************************************
-* Description             : on alv symbol data change                                              *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA: l_mod_cell  TYPE lvc_s_modi,
-          lt_mod_cell LIKE TABLE OF l_mod_cell.
-
-    FIELD-SYMBOLS <l_symbol> LIKE LINE OF gt_symbol.
-
-    lt_mod_cell = er_data_changed->mt_mod_cells.
-
-    IF NOT lt_mod_cell IS INITIAL.
-*   get distinct records by rowid
-      SORT lt_mod_cell BY row_id.
-      DELETE ADJACENT DUPLICATES FROM lt_mod_cell
-                                 COMPARING row_id.
-      LOOP AT lt_mod_cell INTO l_mod_cell.
-
-*      "Check Symbol Datatype
-
-
-        IF l_mod_cell-fieldname = 'SYMBOL_DATATYPE'.
-          IF l_mod_cell-value IS INITIAL.
-            READ TABLE gt_symbol INDEX l_mod_cell-row_id
-                             ASSIGNING <l_symbol>.
-            IF <l_symbol>-symbol_multivalue IS NOT INITIAL.
-              MESSAGE s122(/cadaxo/sqlc) WITH <l_symbol>-symbol_name DISPLAY LIKE 'E'.
-              RETURN.
-            ENDIF.
-          ELSE.
-            l_mod_cell-value = to_upper( val = l_mod_cell-value ).
-            TRY.
-                me->check_symbol_datatype( i_value = l_mod_cell-value ).
-
-              CATCH /cadaxo/cx_sqlc_symb_not_found INTO DATA(lr_exception).
-
-                MESSAGE lr_exception->get_text( ) TYPE 'S' DISPLAY LIKE 'E'.
-
-                RETURN.
-
-            ENDTRY.
-          ENDIF.
-        ENDIF.
-
-        READ TABLE gt_symbol INDEX l_mod_cell-row_id
-                             ASSIGNING <l_symbol>.
-        IF sy-subrc = 0.
-          IF <l_symbol>-type = cs_symbol_type-user.
-*         mark modify type
-            <l_symbol>-type = cs_symbol_type-modify.
-
-          ENDIF.
-        ENDIF.
-
-      ENDLOOP.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD on_symbol_alv_data_changed_fin.
-****************************************************************************************************
-* Description             : Build the result grit title                                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Domi Bigl                Company    : CADAXO GesmbH                    *
-* Date                    : 01.11.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxx                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    IF e_modified = 'X'.
-      me->on_symbol_alv_user_command( e_ucomm = 'SYMBOL_SAVE' ).
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD on_symbol_alv_toolbar.
-****************************************************************************************************
-* Description             : Add buttons to symbol list functions                                   *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
-* Date                    : 17.11.2014                                                             *
-*--------------------------------------------------------------------------------------------------
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.11.2010 | Domi Bigl            | Sort global/user                            | CDX001-0020    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
-*            |                      |                                             | RT235          *
-* 27.02.2018 | Pat                  | Symbol export                               | Cockpit-294    *
-*------------+----------------------+---------------------------------------------+----------------*
-****************************************************************************************************
-
-    DATA: l_button TYPE stb_button.
-    FIELD-SYMBOLS: <lwa_symbol> TYPE /cadaxo/sqlc_symbol.                "CDX001-0020
-    DATA: l_sh_disabled TYPE c.                                          "CDX001-0020
-
-* add buttons
-
-    LOOP AT gt_symbol_delete ASSIGNING <lwa_symbol>.                     "CDX001-0020
-      EXIT.                                                              "CDX001-0020
-    ENDLOOP.                                                             "CDX001-0020
-    IF sy-subrc = 0.                                                     "CDX001-0020
-      l_sh_disabled = 'X'.                                               "CDX001-0020
-    ENDIF.                                                               "CDX001-0020
-    LOOP AT gt_symbol ASSIGNING <lwa_symbol>                             "CDX001-0020
-                      WHERE type <> cs_symbol_type-program
-                        AND type <> cs_symbol_type-user.                  "CDX001-0020
-      EXIT.                                                              "CDX001-0020
-    ENDLOOP.                                                             "CDX001-0020
-    IF sy-subrc = 0.                                                     "CDX001-0020
-      l_sh_disabled = 'X'.                                               "CDX001-0020
-    ENDIF.                                                               "CDX001-0020
-    IF me->g_user_settings-symbols_program_show = c_program_symbols_hide.                      "CDX001-0020
-* show program symbols                                                 "CDX001-0020
-      CLEAR l_button.                                                    "CDX001-0020
-      MOVE: 'SYMBOL_P_SHOW'  TO l_button-function,                       "CDX001-0020
-          icon_expand        TO l_button-icon,                           "CDX001-0020
-          TEXT-q18           TO l_button-quickinfo,                      "CDX001-0020
-          0                  TO l_button-butn_type,                      "CDX001-0020
-          l_sh_disabled      TO l_button-disabled.                       "CDX001-0020
-      APPEND l_button TO e_object->mt_toolbar.                           "CDX001-0020
-    ELSE.                                                                "CDX001-0020
-* hide program symbols                                                 "CDX001-0020
-      CLEAR l_button.                                                    "CDX001-0020
-      MOVE: 'SYMBOL_P_HIDE'  TO l_button-function,                       "CDX001-0020
-          icon_collapse      TO l_button-icon,                           "CDX001-0020
-          TEXT-q19           TO l_button-quickinfo,                      "CDX001-0020
-          0                  TO l_button-butn_type,                      "CDX001-0020
-          l_sh_disabled      TO l_button-disabled.                       "CDX001-0020
-      APPEND l_button TO e_object->mt_toolbar.                           "CDX001-0020
-    ENDIF.                                                               "CDX001-0020
-
-* separator                                                            "CDX001-0020
-    CLEAR l_button.                                                      "CDX001-0020
-    MOVE: 3                TO l_button-butn_type,                        "CDX001-0020
-        space              TO l_button-disabled.                         "CDX001-0020
-    APPEND l_button TO e_object->mt_toolbar.                             "CDX001-0020
-
-* show only symbols that are used in the editor
-    IF me->g_user_settings-only_used_symbols = space.
-      CLEAR l_button.
-      MOVE: 'SYMBOLS_EDITOR_ONLY'    TO l_button-function,
-          icon_filter                TO l_button-icon,
-          TEXT-q32                   TO l_button-quickinfo,
-          0                          TO l_button-butn_type,
-          space                      TO l_button-disabled.
-      APPEND l_button TO e_object->mt_toolbar.
-    ELSE.
-      CLEAR l_button.
-      l_button-checked = abap_true.
-      MOVE: 'SYMBOLS_ALL'            TO l_button-function,
-          icon_filter                TO l_button-icon,
-          TEXT-q33                   TO l_button-quickinfo,
-          0                          TO l_button-butn_type,
-          space                      TO l_button-disabled.
-      APPEND l_button TO e_object->mt_toolbar.
-    ENDIF.
-
-* separator                                                            "CDX001-0020
-    CLEAR l_button.                                                      "CDX001-0020
-    MOVE: 3                TO l_button-butn_type,                        "CDX001-0020
-        space              TO l_button-disabled.                         "CDX001-0020
-    APPEND l_button TO e_object->mt_toolbar.
-
-* create
-    CLEAR l_button.
-    MOVE: 'SYMBOL_CREATE'    TO l_button-function,
-        icon_create        TO l_button-icon,
-        TEXT-q15           TO l_button-quickinfo,
-        0                  TO l_button-butn_type,
-        space              TO l_button-disabled.
-    APPEND l_button TO e_object->mt_toolbar.
-
-* begin of insert cockpit-294
-
-* separator
-    CLEAR l_button.
-    MOVE: 3                TO l_button-butn_type,
-        space              TO l_button-disabled.
-    APPEND l_button TO e_object->mt_toolbar.
-
-    CLEAR l_button.
-    MOVE: 'SYMBOL_SHARE'    TO l_button-function,
-        icon_workflow_external_event TO l_button-icon,
-        TEXT-b42           TO l_button-quickinfo,
-*        cntb_btype_button  TO l_button-butn_type, "-Cockpit-420
-*        cntb_btype_menu TO l_button-butn_type, "-Cockpit-420
-        cntb_btype_dropdown TO l_button-butn_type, "+Cockpit-420 KA
-        space              TO l_button-disabled.
-    APPEND l_button TO e_object->mt_toolbar.
-
-* separator
-    CLEAR l_button.
-    MOVE: 3                TO l_button-butn_type,
-        space              TO l_button-disabled.
-    APPEND l_button TO e_object->mt_toolbar.
-* end   of insert cockpit-294
-
-* delete
-    MOVE: 'SYMBOL_DELETE'    TO l_button-function,
-        icon_delete        TO l_button-icon,
-        TEXT-q16           TO l_button-quickinfo,
-        0                  TO l_button-butn_type,
-        space              TO l_button-disabled.
-    APPEND l_button TO e_object->mt_toolbar.
-* save
-*  CLEAR l_button.                                                     "CDX001-0020
-*  MOVE: 'SYMBOL_SAVE'    TO l_button-function,                        "CDX001-0020
-*      icon_system_save TO l_button-icon,                              "CDX001-0020
-*      text-q17           TO l_button-quickinfo,                       "CDX001-0020
-*      0                  TO l_button-butn_type,                       "CDX001-0020
-*      space              TO l_button-disabled.                        "CDX001-0020
-*  APPEND l_button TO e_object->mt_toolbar.                            "CDX001-0020
-
-  ENDMETHOD.
-
-
-  METHOD on_symbol_alv_user_command.
-****************************************************************************************************
-* Description             : on alv symbol user command                                             *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
-* Date                    : 17.11.2014                                                             *
-*--------------------------------------------------------------------------------------------------
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.11.2010 | Domi Bigl            | Sort global/user                            | CDX001-0020    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
-*            |                      |                                             | RT235          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 28.02.2018 | Pat Patil            | Symbol Export                               | Cockpit-294    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 16.11.2020 | Attila Kajtar        | Sharing: sharing with same user / system!   | Cockpit-420    *
-****************************************************************************************************
-    DATA  l_symbol LIKE LINE OF gt_symbol.
-
-    DATA  l_celltab LIKE LINE OF l_symbol-cell_style.
-
-    DATA  l_refresh TYPE boolean.
-
-    DATA: l_itab_count TYPE i,
-          l_row_id     TYPE lvc_index.
-
-    DATA: lwa_layout      TYPE lvc_s_layo.                                       "CDX001-0020
-
-    DATA: lcl_controller  TYPE REF TO /cadaxo/cl_sqlc_cockpit_main.               """""
-    "  DATA: l_sqlcusrp_dyn  TYPE /cadaxo/sqlcusrp_dyn.                              """""
-
-    CREATE OBJECT lcl_controller. """""
-
-    /cadaxo/cl_sqlc_functrace=>add_trace( |ON_SYMBOL_ALV_USER_COMMAND:| && e_ucomm ).
-
-    CASE e_ucomm.
-
-      WHEN 'SYMBOL_CREATE'.
-* Show ALL Symbols Mode, before creating new symbol
-        me->g_user_settings-only_used_symbols = space.        "CR22-002
-        me->get_symbols( ).                                   "CR22-002
-
-        l_symbol-type = cs_symbol_type-create.
-*     ALL fields Editable
-        l_celltab-fieldname = 'SYMBOL_NAME'.
-        l_celltab-style = cl_gui_alv_grid=>mc_style_enabled.
-        INSERT l_celltab INTO TABLE l_symbol-cell_style.
-        l_celltab-fieldname = 'SYMBOL_VALUE'.
-        l_celltab-style = cl_gui_alv_grid=>mc_style_enabled.
-        INSERT l_celltab INTO TABLE l_symbol-cell_style.
-        l_celltab-fieldname = 'SYMBOL_DESC'.
-        l_celltab-style = cl_gui_alv_grid=>mc_style_enabled.
-        INSERT l_celltab INTO TABLE l_symbol-cell_style.
-        APPEND l_symbol TO gt_symbol.
-*     focus new record
-        DESCRIBE TABLE gt_symbol LINES l_itab_count.
-        l_row_id = l_itab_count.
-
-        l_refresh = abap_true.
-
-      WHEN 'SYMBOL_DELETE'.
-        me->delete_symbols( IMPORTING e_success = l_refresh ).
-
-      WHEN 'SYMBOL_SAVE'.
-        me->save_symbols( IMPORTING e_success = l_refresh ).
-        IF NOT l_refresh IS INITIAL.                                             "CDX001-0020
-          me->get_symbols( ).                                                    "CDX001-0020
-        ENDIF.                                                                   "CDX001-0020
-
-      WHEN 'SYMBOL_P_HIDE'.                                                      "CDX001-0020
-        me->g_user_settings-symbols_program_show = c_program_symbols_hide.       "CDX001-0020
-*       refresh symbol ALV                                                     "CDX001-0020
-        me->get_symbols( ).                                                      "CDX001-0020
-        l_refresh = abap_true.
-        me->set_user_settings( EXPORTING i_settings = me->g_user_settings )."CR22-002
-      WHEN 'SYMBOL_P_SHOW'.                                                      "CDX001-0020
-        me->g_user_settings-symbols_program_show = c_program_symbols_show.       "CDX001-0020
-*       refresh symbol ALV                                                     "CDX001-0020
-        me->get_symbols( ).                                                      "CDX001-0020
-        l_refresh = abap_true.
-        me->set_user_settings( EXPORTING i_settings = me->g_user_settings ). "CR22-002                                                       "CDX001-0020
-* Only symbols used in Editor
-      WHEN 'SYMBOLS_EDITOR_ONLY'.                             "CR22-002
-        me->g_user_settings-only_used_symbols = abap_true.          "CR22-002
-        me->get_symbols( ).                                   "CR22-002
-        l_refresh = abap_true.                                      "CR22-002
-        me->set_user_settings( EXPORTING i_settings = me->g_user_settings )."CR22-002
-      WHEN 'SYMBOLS_ALL'.                                     "CR22-002
-        me->g_user_settings-only_used_symbols = space.        "CR22-002
-        me->get_symbols( ).                                   "CR22-002
-        l_refresh = abap_true.                                      "CR22-002
-        me->set_user_settings( EXPORTING i_settings = me->g_user_settings )."CR22-002
-
-* begin of changes cockpit-294
-      WHEN 'SYMBOL_EXPORT'
-        OR 'SYMBOL_SHARE'. "Cockpit-420 KA
-        me->get_symbols_selected( IMPORTING e_success = l_refresh ).
-        IF NOT l_refresh IS INITIAL.
-          CALL FUNCTION '/CADAXO/SQLC_SHARE'
-            EXPORTING
-              iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-symbols
-              it_symbols     = gt_symbol_selected.
-        ENDIF.
-* end   of changes cockpit-294
-* begin of insert cockpit-420
-      WHEN 'SYMBOL_EXPORT_ME'.
-        me->get_symbols_selected( IMPORTING e_success = l_refresh ).
-        IF NOT l_refresh IS INITIAL.
-          CALL FUNCTION '/CADAXO/SQLC_SHARE'
-            EXPORTING
-              iv_export_type = /cadaxo/cl_sqlc_cockpit_api=>cs_api_types-symbols
-              it_symbols     = gt_symbol_selected
-              iv_receiver    = CONV /cadaxo/sqlcapi_receiver( sy-uname )
-              iv_text        = TEXT-012.
-        ENDIF.
-* end   of insert cockpit-420
-    ENDCASE.
-
-    IF l_refresh = abap_true.
-
-      gc_symbol_alv->get_frontend_layout( IMPORTING es_layout = lwa_layout ).    "CDX001-0020
-      lwa_layout-cwidth_opt = 'X'.                                               "CDX001-0020
-      gc_symbol_alv->set_frontend_layout( EXPORTING is_layout = lwa_layout ).    "CDX001-0020
-
-      gc_symbol_alv->refresh_table_display(
-                       EXPORTING
-                         i_soft_refresh = 'X' ).
-
-      IF e_ucomm = 'SYMBOL_CREATE'.
-*     focus new record
-        CALL METHOD me->focus_symbol_alv_cell
-          EXPORTING
-            i_row_id     = l_row_id
-            i_field_name = 'SYMBOL_NAME'.
-      ELSEIF NOT g_curr_col IS INITIAL.                                          "CDX001-0020
-        READ TABLE gt_symbol WITH KEY symbol_name = g_curr_row                   "CDX001-0020
-                             TRANSPORTING NO FIELDS.                             "CDX001-0020
-        l_row_id = sy-tabix.                                                     "CDX001-0020
-        CALL METHOD me->focus_symbol_alv_cell                                    "CDX001-0020
-          EXPORTING                                                              "CDX001-0020
-            i_row_id     = l_row_id                                              "CDX001-0020
-            i_field_name = g_curr_col.                                           "CDX001-0020
-        CLEAR g_curr_col.                                                        "CDX001-0020
-        CLEAR g_curr_row.                                                        "CDX001-0020
-      ENDIF.
-      CLEAR l_refresh.
-    ENDIF.
-  ENDMETHOD.
-
-
-  METHOD on_symbol_button_click.
-
-    DATA: r_symbol_value TYPE rseloption.
-
-    FIELD-SYMBOLS <l_symbol> LIKE LINE OF gt_symbol.
-
-    READ TABLE gt_symbol INDEX es_row_no-row_id ASSIGNING <l_symbol>.
-
-    TRY.
-        me->check_symbol_datatype( i_value = CONV #( <l_symbol>-symbol_datatype ) ).
-
-      CATCH /cadaxo/cx_sqlc_symb_not_found INTO DATA(lr_exception).
-
-        MESSAGE lr_exception->get_text( ) TYPE 'S' DISPLAY LIKE 'E'.
-
-        RETURN.
-
-    ENDTRY.
-
-    TRY.
-        r_symbol_value = me->show_symbolmulti_dialog( EXPORTING i_symbol_multivalue = <l_symbol>-symbol_multivalue
-                                                                i_symbol_datatype   = <l_symbol>-symbol_datatype ).
-
-        " Compress symbol multivalue
-        /cadaxo/cl_sqlc_cockpit_assist=>compress_symbol_multivalue( EXPORTING i_symbol_multivalue = r_symbol_value
-                                                                    IMPORTING e_data = DATA(lv_data) ).
-
-        <l_symbol>-symbol_multivalue = lv_data.
-        <l_symbol>-type = cs_symbol_type-modify.
-        me->on_symbol_alv_user_command( e_ucomm = 'SYMBOL_SAVE' ).
-
-      CATCH /cadaxo/cx_sqlc_symb_not_found ##no_handler.
-    ENDTRY.
-    "ENDIF.
-  ENDMETHOD.
-
-
-  METHOD on_symbol_button_variant.
-
-    DATA: r_symbol_value TYPE rseloption.
-
-    TRY.
-        DATA(ls_symbol_ow) = gt_symbol_ow[ es_row_no-row_id ].
-      CATCH cx_sy_itab_line_not_found INTO DATA(lr_exception).
-        MESSAGE s100(/cadaxo/sqlc) WITH lr_exception->get_text( ) DISPLAY LIKE 'E'.
-        RETURN.
-    ENDTRY.
-
-    TRY.
-        IF es_col_id = 'SYMBOL_TYPE_ICON_VAR' AND ls_symbol_ow-symbol_multivalue_var IS NOT INITIAL.
-
-          r_symbol_value = me->show_symbolmulti_dialog( EXPORTING i_symbol_multivalue = ls_symbol_ow-symbol_multivalue_var
-                                                                  i_symbol_datatype   = ls_symbol_ow-symbol_datatype_var ).
-
-        ELSEIF es_col_id = 'SYMBOL_TYPE_ICON_USER' AND ls_symbol_ow-symbol_multivalue_user IS NOT INITIAL.
-
-          r_symbol_value = me->show_symbolmulti_dialog( EXPORTING i_symbol_multivalue = ls_symbol_ow-symbol_multivalue_user
-                                                                  i_symbol_datatype   = ls_symbol_ow-symbol_datatype_user ).
-
-        ENDIF.
-      CATCH /cadaxo/cx_sqlc_symb_not_found.
-    ENDTRY.
-
-  ENDMETHOD.
-
-
-  METHOD on_symbol_double_click.
-****************************************************************************************************
-* Description             : on symbol double click                                                 *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA: l_fieldvalue TYPE string,
-          l_from_line  TYPE i,
-          l_from_pos   TYPE i,
-          l_to_line    TYPE i,
-          l_to_pos     TYPE i.
-
-    DATA: l_symbol LIKE LINE OF gt_symbol.
-
-    IF me->g_abap_editor_type <> 'A'.
-      MESSAGE i041(/cadaxo/sqlc).
-      EXIT.
-    ENDIF.
-
-    READ TABLE gt_symbol INDEX e_row-index
-                         INTO l_symbol
-                         TRANSPORTING symbol_name
-                                      type.
-    IF sy-subrc = 0.
-*   only saved symbols can be double clicked
-      CHECK l_symbol-type = cs_symbol_type-program OR l_symbol-type = cs_symbol_type-user.
-
-      CONCATENATE '&'
-                  l_symbol-symbol_name
-                  '&'
-                  INTO l_fieldvalue.
-
-      gc_abap_editor->get_selection_pos(  IMPORTING  from_line = l_from_line
-                                                     from_pos  = l_from_pos
-                                                     to_line   = l_to_line
-                                                     to_pos    = l_to_pos
-                                          EXCEPTIONS OTHERS    = 1 ).
-      IF sy-subrc = 0.
-
-        IF l_from_line <> l_to_line OR
-           l_from_pos  <> l_to_pos.
-
-          MESSAGE i005(/cadaxo/sqlc).
-
-        ELSE.
-
-          me->insert_codeblock_at_position(
-             iv_line = l_from_line
-             iv_pos = l_from_pos
-             iv_sqlstring = l_fieldvalue
-             i_set_focus = abap_true
-          ).
-
-        ENDIF.
-
-      ENDIF.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD on_symbol_drag.
-****************************************************************************************************
-* Description             : on symbol alv drag                                                     *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA: lr_drag_object         TYPE REF TO lcl_drag_object.
-
-    DATA  l_fieldvalue TYPE string.
-
-    DATA  l_symbol LIKE LINE OF gt_symbol.
-
-    READ TABLE gt_symbol INDEX e_row-index
-                         INTO l_symbol
-                         TRANSPORTING symbol_name
-                                      type.
-    IF sy-subrc = 0.
-*   only saved symbols can be dragged
-      CHECK l_symbol-type = cs_symbol_type-program OR l_symbol-type = cs_symbol_type-user.
-
-      CONCATENATE '&'
-                  l_symbol-symbol_name
-                  '&'
-             INTO l_fieldvalue.
-      CREATE OBJECT lr_drag_object.
-      lr_drag_object->fieldvalue = l_fieldvalue.
-      e_dragdropobj->object = lr_drag_object.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD on_symbol_menu_button.
-
-    IF e_ucomm = 'SYMBOL_SHARE'.
-
-      DATA(lr_menu) = NEW cl_ctmenu( ).
-
-      lr_menu->add_function(
-        EXPORTING
-          fcode = 'SYMBOL_EXPORT'
-          text  = TEXT-b47
-          icon  = icon_workflow_external_event
-          insert_at_the_top = abap_true
-          checked           = abap_true "Cockpit-420 KA
-          ).
-      lr_menu->add_function(
-         EXPORTING
-          fcode = 'SYMBOL_EXPORT_ME'
-           text = TEXT-b44
-          icon  = icon_workflow_internal_event ).
-
-      CALL METHOD e_object->add_menu
-        EXPORTING
-          menu = lr_menu.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
   METHOD on_tabbar_toolbar_funcsel.
 
     DATA code TYPE string.
@@ -11886,16 +9613,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       WHEN 'CLEAR_CLIPBOARD'.
         gc_clipboard_textedit->delete_text( ).
-
-      WHEN c_okcode_symbols.
-        CASE me->g_user_settings-symbols_show.
-          WHEN abap_true.
-            me->g_user_settings-symbols_show = abap_false.
-          WHEN abap_false.
-            me->g_user_settings-symbols_show = abap_true.
-        ENDCASE.
-        me->set_user_settings( EXPORTING i_settings = me->g_user_settings )."CR22-002
-        set_symbol_alv( ).
 
       WHEN OTHERS.
     ENDCASE.
@@ -11951,7 +9668,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     DATA: lt_table TYPE /cadaxo/sqlccodeline_t.
     DATA: lv_rc    TYPE c  LENGTH 1.
 
-    gc_symbol_alv->check_changed_data(  ).
+    me->symbols_controller->check_changed_data(  ).
+
 
     CLEAR g_html_request.
 
@@ -12091,60 +9809,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       WHEN 'ADM_LINK'.
         me->show_admhelp( ).
     ENDCASE.
-  ENDMETHOD.
-
-
-  METHOD pai_0700.
-****************************************************************************************************
-* Description ....... PAI Module of Dynpro 0700                                                    *
-* Developer ......... Domi Bigl                      Date .... 01.11.2010                          *
-* Status ............ xxxxxxxxx                                                                    *
-* Qual. Check(opt.)       :                          Company    : CADAXO GesmbH                    *
-* Date                    :                                                                        *
-****************************************************************************************************
-* Date       | User              | Description                                       |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-* <date>     | <developer name>  | <short description>                               |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-****************************************************************************************************
-
-    CLEAR g_html_request.
-
-    CASE i_ok_code.
-*    WHEN 'OVERWRITE'. "Task #3497
-*      gr_alv_symb_ow->get_selected_rows( IMPORTING et_row_no = lt_row_no ).
-*      LOOP AT lt_row_no ASSIGNING <lwa_row_no>.
-*        READ TABLE gt_symbol_ow ASSIGNING <lwa_symbol_ow> INDEX <lwa_row_no>-row_id.
-*        IF sy-subrc = 0.
-**          <lwa_symbol_ow>-mark = 'X'.
-*        ENDIF.
-*      ENDLOOP.
-*      gr_alv_symb_ow->free( EXCEPTIONS OTHERS = 1 ).
-*      gr_cc_alv_symb_ow->free( EXCEPTIONS OTHERS = 1 ).
-*      CLEAR gr_alv_symb_ow.
-*      CLEAR gr_cc_alv_symb_ow.
-*
-*      SET SCREEN 0.
-*      LEAVE SCREEN.
-*    WHEN 'KEEP'. "Task #3497
-*      SET SCREEN 0. LEAVE SCREEN.
-      WHEN 'SAVE'.
-        gr_alv_symb_ow->free( EXCEPTIONS OTHERS = 1 ).
-        gr_cc_alv_symb_ow->free( EXCEPTIONS OTHERS = 1 ).
-        CLEAR gr_alv_symb_ow.
-        CLEAR gr_cc_alv_symb_ow.
-
-        SET SCREEN 0.
-        LEAVE SCREEN.
-*                ls_symbol_ow-var               = icon_wd_radio_button_empty.
-*          ls_symbol_ow-own               = icon_radiobutton.
-    ENDCASE.
-
   ENDMETHOD.
 
 
@@ -12400,112 +10064,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 * Create UI Controls
     me->create_controls( ).
 
-  ENDMETHOD.
-
-
-  METHOD pbo_0700.
-****************************************************************************************************
-* Description             : pbo 0700                                                               *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Domi Bigl                Company    : CADAXO GesmbH                    *
-* Date                    : 01.11.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    : CADAXO GesmbH                    *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA: lt_fieldcat       TYPE lvc_t_fcat.
-    DATA: lwa_layout        TYPE lvc_s_layo.
-
-    FIELD-SYMBOLS: <lwa_fieldcat>       TYPE lvc_s_fcat.
-
-    IF gr_cc_alv_symb_ow IS INITIAL.
-* create alv controls
-      gr_cc_alv_symb_ow = NEW #( container_name = 'GCONT_ALV_SYMB_OW' ).
-      gr_alv_symb_ow = NEW #( i_parent = gr_cc_alv_symb_ow ).
-      SET HANDLER me->on_handle_varsym_click FOR gr_alv_symb_ow ACTIVATION abap_true.
-      SET HANDLER me->on_symbol_button_variant FOR gr_alv_symb_ow  ACTIVATION abap_true. "+cockpit-294
-      CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
-        EXPORTING
-          i_structure_name   = '/CADAXO/SQLC_SYMBOL_OW'
-          i_bypassing_buffer = abap_true
-        CHANGING
-          ct_fieldcat        = lt_fieldcat
-        EXCEPTIONS
-          OTHERS             = 1.
-
-      LOOP AT lt_fieldcat ASSIGNING <lwa_fieldcat>.
-        CASE <lwa_fieldcat>-fieldname. "#3497 begin
-          WHEN 'VAR'.
-            <lwa_fieldcat>-icon       = abap_true.
-            <lwa_fieldcat>-hotspot    = abap_true.
-            <lwa_fieldcat>-outputlen  = 14.
-            <lwa_fieldcat>-fix_column = abap_true.
-          WHEN 'OWN'.
-            <lwa_fieldcat>-icon       = abap_true.
-            <lwa_fieldcat>-hotspot    = abap_true.
-            <lwa_fieldcat>-outputlen  = 14.
-            <lwa_fieldcat>-fix_column = abap_true.
-          WHEN 'SYMBOL_NAME'.
-            <lwa_fieldcat>-outputlen  = 16.
-            <lwa_fieldcat>-key       = abap_true.
-          WHEN 'SYMBOL_VALUE_USER'.
-            <lwa_fieldcat>-coltext   = TEXT-a01.
-            <lwa_fieldcat>-outputlen  = 20.
-          WHEN 'SYMBOL_DESC_USER'.
-            <lwa_fieldcat>-coltext   = TEXT-a02.
-            <lwa_fieldcat>-key       = abap_true.
-            <lwa_fieldcat>-outputlen  = 14.
-          WHEN 'SYMBOL_VALUE_VAR'.
-            <lwa_fieldcat>-coltext   = TEXT-a03.
-            <lwa_fieldcat>-outputlen  = 20.
-          WHEN 'SYMBOL_VAR'.
-            <lwa_fieldcat>-coltext   = TEXT-a04.
-            <lwa_fieldcat>-key       = abap_true.
-            <lwa_fieldcat>-outputlen  = 14.
-*            begin of insert cockpit-294
-          WHEN 'SYMBOL_TYPE_ICON_USER'.
-            <lwa_fieldcat>-coltext   = TEXT-a05.
-            <lwa_fieldcat>-outputlen  = 4.
-            <lwa_fieldcat>-style = cl_gui_alv_grid=>mc_style_button.
-          WHEN 'SYMBOL_DATATYPE_USER'.
-            <lwa_fieldcat>-coltext   = TEXT-a06.
-          WHEN 'SYMBOL_DATATYPE_VAR'.
-            <lwa_fieldcat>-coltext   = TEXT-a07.
-          WHEN 'SYMBOL_TYPE_ICON_VAR'.
-            <lwa_fieldcat>-coltext   = TEXT-a05.
-            <lwa_fieldcat>-outputlen  = 4.
-            <lwa_fieldcat>-style = cl_gui_alv_grid=>mc_style_button.
-*            end   of insert cockpit-294
-        ENDCASE.
-      ENDLOOP.                                              ""#3497 end
-
-      lwa_layout-zebra      = abap_false.
-      lwa_layout-sel_mode   = 'N'.
-      lwa_layout-no_toolbar = abap_true.
-      lwa_layout-cwidth_opt = abap_true.
-
-      gr_alv_symb_ow->set_table_for_first_display( EXPORTING  i_bypassing_buffer = abap_true
-                                                              is_layout          = lwa_layout
-                                                   CHANGING   it_outtab          = gt_symbol_ow
-                                                              it_fieldcatalog    = lt_fieldcat
-                                                   EXCEPTIONS OTHERS             = 1 ).
-
-    ENDIF.
   ENDMETHOD.
 
 
@@ -13171,220 +10729,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD save_symbols.
-****************************************************************************************************
-* Description             : save symbols                                                           *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.11.2010 | Domi Bigl            | I18N Messages                               | CDX001-0020    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 17.07.2017 | Harald Wiesinger     | Symbole prÃƒÂ¼fen vor dem speichern            | COCKPIT-204    *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA l_symbol LIKE LINE OF gt_symbol[].
-    DATA lt_symbol_create_compare LIKE TABLE OF l_symbol-symbol_name.
-    DATA l_tabix TYPE lvc_index.
-    DATA lt_symbol_db_create TYPE TABLE OF /cadaxo/sqlcusym.
-    DATA lt_symbol_db_update LIKE lt_symbol_db_create.
-    DATA l_symbol_db LIKE LINE OF lt_symbol_db_create.
-    DATA l_db_commit TYPE boolean.
-    DATA l_count TYPE i.
-    DATA l_curr_row TYPE i.                                          "CDX001-0020
-    DATA l_curr_col_id TYPE lvc_s_col.                                  "CDX001-0020
-    DATA l_values_count TYPE i.
-
-    FIELD-SYMBOLS: <l_symbol>     LIKE LINE OF gt_symbol,
-                   <l_cell_style> LIKE LINE OF <l_symbol>-cell_style.
-
-
-    gc_symbol_alv->get_current_cell( IMPORTING e_row     = l_curr_row            "CDX001-0020
-                                               es_col_id = l_curr_col_id ).      "CDX001-0020
-    READ TABLE gt_symbol ASSIGNING <l_symbol> INDEX l_curr_row.                  "CDX001-0020
-    IF sy-subrc = 0.                                                             "CDX001-0020
-      g_curr_col = l_curr_col_id-fieldname.                                      "CDX001-0020
-      g_curr_row = <l_symbol>-symbol_name.                                       "CDX001-0020
-    ENDIF.                                                                       "CDX001-0020
-
-* get each itab record by type
-* exclude program symbols
-    LOOP AT gt_symbol INTO l_symbol WHERE NOT type = cs_symbol_type-program.
-
-      l_tabix = sy-tabix.
-*   only dealed user symbols consider
-      CASE l_symbol-type.
-        WHEN cs_symbol_type-create.
-*       create check(4 point)
-*       1. obligatory check(symbol name and symbol value)
-*       symbol name
-          IF l_symbol-symbol_name IS INITIAL.
-*         focus the record
-            me->focus_symbol_alv_cell( i_row_id     = l_tabix
-                                       i_field_name = 'SYMBOL_NAME' ).
-
-            MESSAGE s050(/cadaxo/sqlc) DISPLAY LIKE 'E'.               "CDX001-0020
-            RETURN.
-          ENDIF.
-*       symbol value
-          IF l_symbol-symbol_value IS INITIAL.
-            MESSAGE s051(/cadaxo/sqlc) DISPLAY LIKE 'W'.
-          ENDIF.
-*       2. same name in create symbols check
-          READ TABLE lt_symbol_create_compare WITH KEY table_line = l_symbol-symbol_name
-                                              TRANSPORTING NO FIELDS.
-          IF sy-subrc = 0.
-*         focus the record
-            CALL METHOD me->focus_symbol_alv_cell
-              EXPORTING
-                i_row_id     = l_tabix
-                i_field_name = 'SYMBOL_NAME'.
-
-            MESSAGE s052(/cadaxo/sqlc) WITH l_symbol-symbol_name DISPLAY LIKE 'E'."CDX001-0020
-
-            RETURN.
-
-          ENDIF.
-
-          APPEND l_symbol-symbol_name TO lt_symbol_create_compare.
-*       3. same name in delete symbols
-          READ TABLE gt_symbol_delete WITH KEY symbol_name = l_symbol-symbol_name
-                                      TRANSPORTING NO FIELDS.
-          IF sy-subrc = 0.
-*         focus the record
-            CALL METHOD me->focus_symbol_alv_cell
-              EXPORTING
-                i_row_id     = l_tabix
-                i_field_name = 'SYMBOL_NAME'.
-
-            MESSAGE s053(/cadaxo/sqlc) WITH l_symbol-symbol_name DISPLAY LIKE 'E'."CDX001-0020
-
-            RETURN.
-
-          ENDIF.
-*       4. same name in exist symbols check( check backup )
-*       first check program symbol
-          SELECT SINGLE COUNT(*) FROM /cadaxo/sqlcsymb
-                                 INTO l_count
-                                 WHERE symbol = l_symbol-symbol_name . "#EC CI_BYPASS "#EC CI_SEL_NESTED "#EC CI_SROFC_NESTED
-          IF l_count = 1.
-
-            CLEAR l_count.
-*         focus the record
-            CALL METHOD me->focus_symbol_alv_cell
-              EXPORTING
-                i_row_id     = l_tabix
-                i_field_name = 'SYMBOL_NAME'.
-
-            MESSAGE s054(/cadaxo/sqlc) WITH l_symbol-symbol_name DISPLAY LIKE 'E'."CDX001-0020
-
-            RETURN.
-
-          ELSE.
-*         then check user symbol with username
-            SELECT SINGLE COUNT(*) FROM /cadaxo/sqlcusym
-                                 INTO l_count
-                                 WHERE symbol_name = l_symbol-symbol_name
-                                   AND username = sy-uname. "#EC CI_BYPASS "#EC CI_SEL_NESTED "#EC CI_SROFC_NESTED
-            IF l_count = 1.
-
-              CLEAR l_count.
-*           focus the record
-              CALL METHOD me->focus_symbol_alv_cell
-                EXPORTING
-                  i_row_id     = l_tabix
-                  i_field_name = 'SYMBOL_NAME'.
-
-              MESSAGE s054(/cadaxo/sqlc) WITH l_symbol-symbol_name DISPLAY LIKE 'E'."CDX001-0020
-
-              RETURN.
-
-            ENDIF.
-
-          ENDIF.
-
-          MOVE-CORRESPONDING l_symbol TO l_symbol_db.
-          l_symbol_db-username = sy-uname.
-
-          APPEND l_symbol_db TO lt_symbol_db_create.
-          CLEAR l_symbol_db.
-
-        WHEN cs_symbol_type-modify.
-*       check wheter symbol value is empty
-          IF l_symbol-symbol_value IS INITIAL.
-            MESSAGE s051(/cadaxo/sqlc) DISPLAY LIKE 'W'.
-          ENDIF.
-
-          IF l_symbol-symbol_multivalue IS NOT INITIAL.
-            l_values_count = get_user_symbol_count( i_symbol_multivalue = l_symbol-symbol_multivalue ).
-            l_symbol-symbol_value = '<' && l_values_count &&' VALUES' && '>'.
-          ENDIF.
-
-          MOVE-CORRESPONDING l_symbol TO l_symbol_db.
-          l_symbol_db-username = sy-uname.
-
-          APPEND l_symbol_db TO lt_symbol_db_update.
-          CLEAR l_symbol_db.
-
-      ENDCASE.
-
-    ENDLOOP.
-
-* start db change
-* delete
-    DATA(l_db_commit_del) = me->delete_symbol_db( ).                                                        "COCKPIT-204
-* update
-    DATA(l_db_commit_upd) = me->update_symbol_db( EXPORTING it_symbol_update = lt_symbol_db_update ).       "COCKPIT-204
-* create
-    DATA(l_db_commit_cre) = me->create_symbol_db( EXPORTING it_symbol_create = lt_symbol_db_create ).       "COCKPIT-204
-    IF l_db_commit_del IS NOT INITIAL OR l_db_commit_upd IS NOT INITIAL OR l_db_commit_cre IS NOT INITIAL.  "COCKPIT-204
-      l_db_commit = abap_true.                                                                              "COCKPIT-204
-    ENDIF.                                                                                                  "COCKPIT-204
-
-    IF l_db_commit = 'X'.
-*   change type of gt_symbol records
-      LOOP AT gt_symbol ASSIGNING <l_symbol> WHERE type = cs_symbol_type-create
-                                                OR type = cs_symbol_type-modify.
-
-        IF <l_symbol>-type = cs_symbol_type-create.
-*       change SYMBOL_NAME non-editable
-          READ TABLE <l_symbol>-cell_style WITH KEY fieldname = 'SYMBOL_NAME'
-                                            ASSIGNING <l_cell_style>.
-          IF sy-subrc = 0.
-
-            <l_cell_style>-style = cl_gui_alv_grid=>mc_style_disabled.
-
-          ENDIF.
-
-        ENDIF.
-
-        <l_symbol>-type = cs_symbol_type-user.
-
-      ENDLOOP.
-*   show successful message
-      MESSAGE s056(/cadaxo/sqlc).
-      e_success = abap_true.
-
-    ELSE.
-      CLEAR e_success.
-    ENDIF.
-
-  ENDMETHOD.
-
-
   METHOD select_jobdata.
 ****************************************************************************************************
 * Description             : SQL Cockpit - Select the jobs of the user                              *
@@ -13564,8 +10908,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     FIELD-SYMBOLS: <ls_error> TYPE /cadaxo/sqlcsyntaxerror.
 
 * get the sql content
-    me->get_sql_area( IMPORTING e_code_string = l_sql_string ).
-
+    l_sql_string = me->get_sql_area( ).
     /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value(
       EXPORTING
         i_parameter_id      = 'CADAXO_REV_VERSION'
@@ -13792,41 +11135,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD set_symbol_alv.
-
-    DATA: l_width TYPE i.
-
-    CASE me->g_user_settings-symbols_show.
-      WHEN abap_false.
-        gs_splitter_top->set_column_mode( 0 ).
-        me->g_user_settings-symbols_show = ' '.
-        l_width = toolbar_col_width.
-
-        gc_symbol_toolbar->set_button_info( EXPORTING  fcode            = c_okcode_symbols
-                                                       icon             = '@K1@'
-                                                       quickinfo        = TEXT-q10
-                                            EXCEPTIONS OTHERS           = 1 ).
-
-      WHEN abap_true.
-        gs_splitter_top->set_column_mode( 0 ).
-        me->g_user_settings-symbols_show = abap_true.
-        l_width = c_width_right_symbols.
-
-        gc_symbol_toolbar->set_button_info( EXPORTING  fcode            = c_okcode_symbols
-                                                       icon             = '@K2@'
-                                                       quickinfo        = TEXT-q11
-                                            EXCEPTIONS OTHERS           = 3 ).
-
-    ENDCASE.
-
-    gs_splitter_top->set_column_width( EXPORTING id    = 2
-                                                 width = l_width ).
-
-    cl_gui_cfw=>flush( ).
-
-  ENDMETHOD.
-
-
   METHOD set_user_settings.
 ****************************************************************************************************
 * Description             : set user settings                                                      *
@@ -14005,32 +11313,19 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 * refresh user symbols
       IF l_settings-symbols_program_show <> me->g_user_settings-symbols_program_show.
         IF NOT me->g_user_settings-symbols_program_show IS INITIAL.
-          me->g_user_settings-symbols_program_show = c_program_symbols_show.
-          me->get_symbols( ).
+          me->g_user_settings-symbols_program_show = /cadaxo/cl_sqlc_symbols=>c_program_symbols-show.
         ELSE.
-          me->g_user_settings-symbols_program_show = c_program_symbols_hide.
-          me->get_symbols( ).
+          me->g_user_settings-symbols_program_show = /cadaxo/cl_sqlc_symbols=>c_program_symbols-hide.
         ENDIF.
-        IF gc_symbol_alv IS BOUND.
-          gc_symbol_alv->refresh_table_display( EXPORTING i_soft_refresh = abap_true ).
-        ENDIF.
-
       ENDIF.
 
 * Only used symbols
       IF l_settings-only_used_symbols <> me->g_user_settings-only_used_symbols."CR22-002
         IF NOT me->g_user_settings-only_used_symbols IS INITIAL."CR22-002
           me->g_user_settings-only_used_symbols = abap_true.  "CR22-002
-          me->get_symbols( ).                                 "CR22-002
         ELSE.                                                 "CR22-002
           me->g_user_settings-only_used_symbols = space.      "CR22-002
-          me->get_symbols( ).                                 "CR22-002
         ENDIF.                                                "CR22-002
-
-        IF gc_symbol_alv IS BOUND.
-          gc_symbol_alv->refresh_table_display( EXPORTING i_soft_refresh = abap_true ).
-        ENDIF.
-
       ENDIF.
 
     ENDIF.
@@ -14397,7 +11692,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     free_result_controls( ).
 
 * create dragdrop behaviour
-    IF me->g_abap_editor_type = 'A' AND dragdrop_behaviour_log IS INITIAL.
+    IF me->g_abap_editor_type = editor_type-new AND dragdrop_behaviour_log IS INITIAL.
       CREATE OBJECT dragdrop_behaviour_log.
       dragdrop_behaviour_log->add( flavor = 'LOG_TO_EDITOR'
                                    dragsrc = 'X' droptarget = ' '
@@ -15257,127 +12552,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD show_symbolmulti_dialog.
-****************************************************************************************************
-* Description             : Show Smybol Multivalue Dialog                                                       *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Dusan Sacha              Company    : CADAXO GesmbH                    *
-* Date                    : 31.07.2017               Release    : WAS 7.40                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 15.03.2018 | Dusan Sacha          | Multivalue Include Ranges                   | COCKPIT-214    *
-*------------+----------------------+---------------------------------------------+----------------*
-****************************************************************************************************
-
-    DATA: ls_exl_opt TYPE rsoptions.
-
-    " Load Multivalue Data
-    IF i_symbol_multivalue IS NOT INITIAL.
-      /cadaxo/cl_sqlc_cockpit_assist=>decompress_symbol_multivalue(
-        EXPORTING
-          i_symbol_multivalue = i_symbol_multivalue
-        IMPORTING
-          e_symbol_multivalue = r_symbol_value
-      ).
-    ENDIF.
-
-
-*"     Exclude select options
-*    MOVE: abap_true TO ls_exl_opt-bt ,
-*          abap_true TO ls_exl_opt-cp ,
-*          abap_true TO ls_exl_opt-ge ,
-*          abap_true TO ls_exl_opt-gt ,
-*          abap_true TO ls_exl_opt-le ,
-*          abap_true TO ls_exl_opt-lt ,
-*          abap_true TO ls_exl_opt-nb ,
-*          abap_true TO ls_exl_opt-np ,
-*          abap_true TO ls_exl_opt-ne .
-*
-
-    " Prepare Data Structure Dynamically
-    DATA lr_data_struct TYPE REF TO data.
-    DATA lr_data TYPE REF TO data.
-
-    me->create_symbol_multival_tab_dyn(
-      EXPORTING i_symbol_datatype = i_symbol_datatype
-      IMPORTING e_data_struct     = lr_data_struct
-                e_data            = lr_data
-    ).
-
-*    FIELD-SYMBOLS <ls_table> TYPE STANDARD TABLE.
-*    ASSIGN lr_data_struct->* TO FIELD-SYMBOL(<ls_struct>).
-*    ASSIGN lr_data->* TO <ls_table>.
-*    ASSIGN ('<ls_struct>-low') TO FIELD-SYMBOL(<low>).
-*    ASSIGN ('<ls_struct>-sign') TO FIELD-SYMBOL(<sign>).
-*    ASSIGN ('<ls_struct>-option') TO FIELD-SYMBOL(<option>).
-*    <sign> = 'I'.
-*    <option> = 'EQ'.
-*
-*    LOOP AT r_symbol_value ASSIGNING FIELD-SYMBOL(<rs_symbol_value>).
-*      <low> = <rs_symbol_value>-low.
-*      APPEND <ls_struct> TO <ls_table>.
-*    ENDLOOP.
-
-    FIELD-SYMBOLS <ls_table> TYPE STANDARD TABLE.
-    ASSIGN lr_data_struct->* TO FIELD-SYMBOL(<ls_struct>).
-    ASSIGN lr_data->* TO <ls_table>.
-    ASSIGN ('<ls_struct>-low') TO FIELD-SYMBOL(<low>).
-    ASSIGN ('<ls_struct>-high') TO FIELD-SYMBOL(<high>).
-    ASSIGN ('<ls_struct>-sign') TO FIELD-SYMBOL(<sign>).
-    ASSIGN ('<ls_struct>-option') TO FIELD-SYMBOL(<option>).
-    "    <sign> = 'I'.
-    "    <option> = 'EQ'.
-
-    LOOP AT r_symbol_value ASSIGNING FIELD-SYMBOL(<rs_symbol_value>).
-      <low>    = <rs_symbol_value>-low.
-      <high>   = <rs_symbol_value>-high.
-      <sign>   = <rs_symbol_value>-sign.
-      <option> = <rs_symbol_value>-option.
-      APPEND <ls_struct> TO <ls_table>.
-    ENDLOOP.
-
-    " Show Multivalue Dialog
-    CALL FUNCTION 'COMPLEX_SELECTIONS_DIALOG'
-      EXPORTING
-        title             = TEXT-q54
-        text              = TEXT-q55
-        no_interval_check = abap_true
-        excluded_options  = ls_exl_opt
-      TABLES
-        range             = <ls_table>
-      EXCEPTIONS
-        no_range_tab      = 1
-        cancelled         = 2
-        internal_error    = 3
-        invalid_fieldname = 4
-        OTHERS            = 5.
-    IF sy-subrc <> 0.
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_symb_not_found.
-    ELSE.
-      r_symbol_value = CORRESPONDING #( <ls_table> ).
-    ENDIF.
-
-*" Symbol Multivalue Limit set to 5000
-*  IF lines( r_symbol_value ) > 5000.
-*    DELETE r_symbol_value FROM 5001.
-*    IF sy-subrc = 0.
-*      MESSAGE i124(/cadaxo/sqlc) with '5000' DISPLAY LIKE 'W'.
-*    ENDIF.
-*  ENDIF.
-
-  ENDMETHOD.
-
-
   METHOD sql_search.
     DATA search_string   TYPE string.
     DATA selected_row    TYPE lvc_s_row.
@@ -15492,7 +12666,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     IF me->g_user_settings-release_type EQ space.
       me->g_user_settings-release_type = /cadaxo/cl_sqlc_cockpit_main=>c_release_type_always.
-      me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
+      me->set_user_settings( me->g_user_settings ).
     ENDIF.
 
     IF me->g_user_settings-release_type   EQ /cadaxo/cl_sqlc_cockpit_main=>c_release_type_always
@@ -15510,7 +12684,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           me->g_user_settings-release_type = lv_release_type.
         ENDIF.
         me->g_user_settings-release_number = lv_version.
-        me->set_user_settings( EXPORTING i_settings = me->g_user_settings ).
+        me->set_user_settings( me->g_user_settings ).
       ENDIF.
 
     ENDIF.
@@ -15659,28 +12833,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD update_symbol_db.
-
-    IF NOT it_symbol_update IS INITIAL.
-
-      UPDATE /cadaxo/sqlcusym FROM TABLE it_symbol_update.
-      IF sy-subrc = 0.
-
-        rv_success = 'X'.
-
-      ELSE.
-
-        ROLLBACK WORK.
-        MESSAGE s055(/cadaxo/sqlc) WITH TEXT-deu DISPLAY LIKE 'E'.                      "CDX001-0020
-        RETURN.
-
-      ENDIF.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
   METHOD update_variant.
 ****************************************************************************************************
 * Description             : Save Variant Method                                              *
@@ -15700,7 +12852,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *------------+----------------------+---------------------------------------------+----------------*
 * 25.11.2020 | Attila Kajtar        | Feedback/Support 3.3.0                      | COCKPIT-321    *
 ****************************************************************************************************
-    DATA: l_string      TYPE string.
     DATA: lt_symbols     TYPE /cadaxo/sqlc_symbol_t.           "COCKPIT-288 Insert
 
     IF gs_sel_variant IS INITIAL.
@@ -15708,24 +12859,21 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    me->get_sql_area( IMPORTING e_code_string = l_string ).
+    DATA(l_string) = me->get_sql_area( ).
 
     IF NOT l_string IS INITIAL.
 
       gs_sel_variant-t_sql     = me->get_sql_area_lt_code( ).
 
-      me->get_user_symbol_from_sql(
-        EXPORTING
-          i_sql      = gs_sel_variant-t_sql
-          i_type     = 'U'
-        IMPORTING
-          e_symbols  = lt_symbols ).
-
-      LOOP AT lt_symbols ASSIGNING FIELD-SYMBOL(<ls_symbol>).
-
-        APPEND CORRESPONDING #( <ls_symbol> ) TO gs_sel_variant-t_symbol. "COCKPIT-288 Insert
-
-      ENDLOOP.
+      me->symbols_controller->get_user_symbol_from_sql( EXPORTING i_sql     = gs_sel_variant-t_sql
+                                                                  i_type    = /cadaxo/cl_sqlc_symbols=>cs_symbol_type-user
+                                                        IMPORTING e_symbols = lt_symbols ).
+      gs_sel_variant-t_symbol = CORRESPONDING #( lt_symbols ).
+*      LOOP AT lt_symbols ASSIGNING FIELD-SYMBOL(<ls_symbol>).
+*
+*        APPEND CORRESPONDING #( <ls_symbol> ) TO gs_sel_variant-t_symbol. "COCKPIT-288 Insert
+*
+*      ENDLOOP.
 
 * execute create variant popup
       CALL FUNCTION '/CADAXO/SQLC_CREATE_VARIANT_UI'
