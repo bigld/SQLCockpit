@@ -33,15 +33,15 @@ REPORT  /cadaxo/sqlc_authorization.
 **********************************************************************
 TYPES: item_table_type TYPE STANDARD TABLE OF mtreeitm WITH DEFAULT KEY.
 TYPES: BEGIN OF gts_role.
-        INCLUDE TYPE /cadaxo/sqlcrole.
-TYPES:  node_key TYPE mtreesnode-node_key,
-        END OF gts_role.
+         INCLUDE TYPE /cadaxo/sqlcrole.
+TYPES:   node_key TYPE mtreesnode-node_key,
+       END OF gts_role.
 
 TYPES: BEGIN OF gts_rolr.
-        INCLUDE TYPE /cadaxo/sqlcrolr.
+         INCLUDE TYPE /cadaxo/sqlcrolr.
 TYPES:
-  node_key TYPE mtreesnode-node_key,
-  END OF gts_rolr.
+         node_key TYPE mtreesnode-node_key,
+       END OF gts_rolr.
 
 *----------------------------------------------------------------------*
 *       CLASS lcl_application DEFINITION
@@ -179,58 +179,58 @@ CLASS lcl_application DEFINITION.
     METHODS: constructor
       IMPORTING i_initiator TYPE syucomm,
       handle_node_double_click
-      FOR EVENT node_double_click
-                    OF cl_gui_column_tree
+        FOR EVENT node_double_click
+        OF cl_gui_column_tree
         IMPORTING node_key,
       handle_item_double_click
-      FOR EVENT item_double_click
-                    OF cl_gui_column_tree
+        FOR EVENT item_double_click
+        OF cl_gui_column_tree
         IMPORTING node_key,
       handle_node_context_menu_req
-      FOR EVENT node_context_menu_request
-                    OF cl_gui_column_tree
+        FOR EVENT node_context_menu_request
+        OF cl_gui_column_tree
         IMPORTING node_key menu,
       handle_item_context_menu_req
-      FOR EVENT item_context_menu_request
-                    OF cl_gui_column_tree
+        FOR EVENT item_context_menu_request
+        OF cl_gui_column_tree
         IMPORTING node_key menu,
       handle_node_context_menu_sel
-      FOR EVENT node_context_menu_select
-                    OF cl_gui_column_tree
+        FOR EVENT node_context_menu_select
+        OF cl_gui_column_tree
         IMPORTING node_key fcode,
       handle_item_context_menu_sel
-      FOR EVENT item_context_menu_select
-                    OF cl_gui_column_tree
+        FOR EVENT item_context_menu_select
+        OF cl_gui_column_tree
         IMPORTING node_key fcode,
       flavor_select
-      FOR EVENT on_drop_get_flavor
-                    OF cl_gui_column_tree
+        FOR EVENT on_drop_get_flavor
+        OF cl_gui_column_tree
         IMPORTING node_key drag_drop_object,                "#EC NEEDED
       on_drag
-      FOR EVENT on_drag
-                    OF cl_gui_column_tree
+        FOR EVENT on_drag
+        OF cl_gui_column_tree
         IMPORTING node_key drag_drop_object,
       on_drop
-      FOR EVENT on_drop
-                    OF cl_gui_column_tree
+        FOR EVENT on_drop
+        OF cl_gui_column_tree
         IMPORTING node_key drag_drop_object,
       on_drop_complete
-      FOR EVENT on_drop_complete
-                    OF cl_gui_column_tree
+        FOR EVENT on_drop_complete
+        OF cl_gui_column_tree
         IMPORTING node_key drag_drop_object,                "#EC NEEDED
       on_data_changed
-      FOR EVENT data_changed
-                    OF cl_gui_alv_grid
+        FOR EVENT data_changed
+        OF cl_gui_alv_grid
         IMPORTING er_data_changed e_onf4 e_onf4_before e_onf4_after e_ucomm, "#EC NEEDED
       on_data_changed_finished
-      FOR EVENT data_changed_finished
-                    OF cl_gui_alv_grid
+        FOR EVENT data_changed_finished
+        OF cl_gui_alv_grid
         IMPORTING e_modified et_good_cells,                 "#EC NEEDED
       set_cleanup_errors
         IMPORTING i_cleanup TYPE c,
       on_link_click
-      FOR EVENT link_click
-                    OF cl_gui_column_tree
+        FOR EVENT link_click
+        OF cl_gui_column_tree
         IMPORTING node_key item_name.
   PROTECTED SECTION.
     DATA: wa_rolr_db TYPE /cadaxo/sqlcrolr.
@@ -246,8 +246,8 @@ CLASS lcl_application DEFINITION.
       remove_user IMPORTING node_key TYPE mtreesnode-node_key,
       delete_role IMPORTING node_key TYPE mtreesnode-node_key
                             i_type   TYPE symsgty,
-    append_to_gt_log
-      IMPORTING
+      append_to_gt_log
+        IMPORTING
           i_tabname TYPE tabname.
 ENDCLASS.                    "LCL_APPLICATION DEFINITION
 
@@ -313,10 +313,10 @@ CLASS lcl_application IMPLEMENTATION.
       WHEN cs_nodekey-root.
       WHEN cs_nodekey-delete.
       WHEN cs_nodekey-employee.
-        menu->add_function( EXPORTING text  = text-007
+        menu->add_function( EXPORTING text  = TEXT-007
                                       fcode = 'ADDUSER' ).
       WHEN cs_nodekey-role.
-        menu->add_function( EXPORTING text  = text-008
+        menu->add_function( EXPORTING text  = TEXT-008
                                       fcode = 'CRROLE' ).
       WHEN OTHERS.
         IF node_key(2) EQ 'RL'.
@@ -331,36 +331,36 @@ CLASS lcl_application IMPLEMENTATION.
               g_disabled_deldef = space.
             ENDIF.
 
-            menu->add_function( EXPORTING text     = text-003
+            menu->add_function( EXPORTING text     = TEXT-003
                                           disabled = g_disabled_setdef
                                           fcode    = 'SETDEF' ).
 
-            menu->add_function( EXPORTING text     = text-004
+            menu->add_function( EXPORTING text     = TEXT-004
                                           disabled = g_disabled_deldef
                                           fcode    = 'DELDEF' ).
 
             menu->add_separator( ).
 
             IF <wa_role>-role_default IS INITIAL.
-              menu->add_function( EXPORTING text  = text-001
+              menu->add_function( EXPORTING text  = TEXT-001
                                             fcode = 'DELETE' ).
             ELSE.
-              menu->add_function( EXPORTING text     = text-001
+              menu->add_function( EXPORTING text     = TEXT-001
                                             disabled = 'X'
                                             fcode    = 'DELETE' ).
             ENDIF.
             menu->add_separator( ).
-            menu->add_function(  EXPORTING text  = text-002
+            menu->add_function(  EXPORTING text  = TEXT-002
                                            fcode = 'TRANSPORT' ).
           ENDIF.
         ELSEIF node_key(2) EQ 'RU'.
-          menu->add_function( EXPORTING text  = text-011
+          menu->add_function( EXPORTING text  = TEXT-011
                                         fcode = 'REMOVEROLE' ).
         ELSE.
-          menu->add_function( EXPORTING text  = text-012
+          menu->add_function( EXPORTING text  = TEXT-012
                                         fcode = 'ADDROLETOUSER' ).
           menu->add_separator( ).
-          menu->add_function( EXPORTING text  = text-010
+          menu->add_function( EXPORTING text  = TEXT-010
                                         fcode = 'REMOVEUSER' ).
         ENDIF.
     ENDCASE.
@@ -390,13 +390,13 @@ CLASS lcl_application IMPLEMENTATION.
 
         ls_fields-tabname = '/CADAXO/SQLCROLE'.
         ls_fields-fieldname = 'ROLE'.
-        ls_fields-fieldtext = text-005.
+        ls_fields-fieldtext = TEXT-005.
 
         APPEND ls_fields TO lt_fields.
 
         CALL FUNCTION 'POPUP_GET_VALUES'
           EXPORTING
-            popup_title     = text-t05
+            popup_title     = TEXT-t05
           IMPORTING
             returncode      = l_return
           TABLES
@@ -563,8 +563,8 @@ CLASS lcl_application IMPLEMENTATION.
 
       CALL FUNCTION 'POPUP_TO_CONFIRM'                      "#EC *
         EXPORTING
-          titlebar              = text-t04
-          text_question         = text-q03
+          titlebar              = TEXT-t04
+          text_question         = TEXT-q03
           icon_button_1         = '@01@'
           icon_button_2         = '@02@'
           default_button        = '2'
@@ -610,8 +610,8 @@ CLASS lcl_application IMPLEMENTATION.
     IF sy-subrc = 0.
       CALL FUNCTION 'POPUP_TO_CONFIRM'                      "#EC *
         EXPORTING
-          titlebar              = text-t03
-          text_question         = text-q02
+          titlebar              = TEXT-t03
+          text_question         = TEXT-q02
           icon_button_1         = '@01@'
           icon_button_2         = '@02@'
           default_button        = '2'
@@ -664,8 +664,8 @@ CLASS lcl_application IMPLEMENTATION.
 
           CALL FUNCTION 'POPUP_TO_CONFIRM'                  "#EC *
             EXPORTING
-              titlebar              = text-t01
-              text_question         = text-q01
+              titlebar              = TEXT-t01
+              text_question         = TEXT-q01
               icon_button_1         = '@01@'
               icon_button_2         = '@02@'
               default_button        = '2'
@@ -1168,7 +1168,7 @@ FORM build_node_table  TABLES    p_node_table TYPE treev_ntab
   APPEND INITIAL LINE TO p_item_table ASSIGNING <wa_item>.
   MOVE-CORRESPONDING <wa_node> TO <wa_item>.
   <wa_item>-item_name = c_column-col1.
-  <wa_item>-text      = text-013.
+  <wa_item>-text      = TEXT-013.
 
   APPEND INITIAL LINE TO p_node_table ASSIGNING <wa_node>.
   <wa_node>-node_key  = cs_nodekey-role.
@@ -1177,7 +1177,7 @@ FORM build_node_table  TABLES    p_node_table TYPE treev_ntab
   APPEND INITIAL LINE TO p_item_table ASSIGNING <wa_item>.
   MOVE-CORRESPONDING <wa_node> TO <wa_item>.
   <wa_item>-item_name = c_column-col1.
-  <wa_item>-text      = text-005.
+  <wa_item>-text      = TEXT-005.
 
   APPEND INITIAL LINE TO p_node_table ASSIGNING <wa_node>.
   <wa_node>-node_key  = cs_nodekey-employee.
@@ -1186,7 +1186,7 @@ FORM build_node_table  TABLES    p_node_table TYPE treev_ntab
   APPEND INITIAL LINE TO p_item_table ASSIGNING <wa_item>.
   MOVE-CORRESPONDING <wa_node> TO <wa_item>.
   <wa_item>-item_name = c_column-col1.
-  <wa_item>-text      = text-006.
+  <wa_item>-text      = TEXT-006.
 
   APPEND INITIAL LINE TO p_item_table ASSIGNING <wa_item>.     "COCKPIT-248
   MOVE-CORRESPONDING <wa_node> TO <wa_item>.                   "COCKPIT-248
@@ -1194,10 +1194,10 @@ FORM build_node_table  TABLES    p_node_table TYPE treev_ntab
   <wa_item>-class     = cl_gui_column_tree=>item_class_link.   "COCKPIT-248
   IF gs_user_search IS INITIAL.                                "COCKPIT-248
     <wa_item>-t_image   = icon_filter.                         "COCKPIT-248
-    <wa_item>-text      = text-015.                            "COCKPIT-248
+    <wa_item>-text      = TEXT-015.                            "COCKPIT-248
   ELSE.                                                        "COCKPIT-248
     <wa_item>-t_image   = icon_filter_undo.                    "COCKPIT-248
-    <wa_item>-text      = text-016.                            "COCKPIT-248
+    <wa_item>-text      = TEXT-016.                            "COCKPIT-248
   ENDIF.                                                       "COCKPIT-248
   <wa_item>-style     = cl_gui_column_tree=>style_emphasized.  "COCKPIT-248
 
@@ -1209,7 +1209,7 @@ FORM build_node_table  TABLES    p_node_table TYPE treev_ntab
   APPEND INITIAL LINE TO p_item_table ASSIGNING <wa_item>.
   MOVE-CORRESPONDING <wa_node> TO <wa_item>.
   <wa_item>-item_name = c_column-col1.
-  <wa_item>-text      = text-014.
+  <wa_item>-text      = TEXT-014.
 
 
   LOOP AT gt_role ASSIGNING <wa_role>.
@@ -1374,7 +1374,7 @@ FORM enqueue USING    u_role  TYPE /cadaxo/sqlcrole_id
     uc_rc = sy-subrc.                                       "#EC *
     l_name = sy-msgv1.
     IF l_name = sy-uname.                                   "#EC *
-      l_name = text-you.
+      l_name = TEXT-you.
     ENDIF.
     IF uc_rc <> 0.                                          "#EC *
       MESSAGE s026(/cadaxo/sqlc) WITH l_name DISPLAY LIKE 'E'.
@@ -1395,14 +1395,14 @@ FORM dequeue USING u_role TYPE /cadaxo/sqlcrole_id.
 ENDFORM.                    "dequeue
 DEFINE check_namespace.
 
-  select single mtext from t000 into g_mtext where mandt = sy-mandt.
-  if wa_sqlcrole-role(8) eq '/CADAXO/'.
-    if g_mtext ne 'CADAXO'.
-      message e017(/cadaxo/sqlc).
-    else.
-      message w017(/cadaxo/sqlc).
-    endif.
-  endif.
+  SELECT SINGLE mtext FROM t000 INTO g_mtext WHERE mandt = sy-mandt.
+  IF wa_sqlcrole-role(8) EQ '/CADAXO/'.
+    IF g_mtext NE 'CADAXO'.
+      MESSAGE e017(/cadaxo/sqlc).
+    ELSE.
+      MESSAGE w017(/cadaxo/sqlc).
+    ENDIF.
+  ENDIF.
 END-OF-DEFINITION.
 
 *&---------------------------------------------------------------------*
@@ -1676,13 +1676,14 @@ FORM build_display_table USING    u_accept_space TYPE c
 
   LOOP AT ut_auth_tab ASSIGNING <lwa_sqlcdtable_auth>.
     CLEAR: lwa_table_ui.
-    MOVE <lwa_sqlcdtable_auth> TO lwa_table_ui-table_auth.
-
-    IF lwa_table_ui-table_auth IS INITIAL AND u_accept_space IS INITIAL.
+    IF <lwa_sqlcdtable_auth> IS INITIAL AND u_accept_space IS INITIAL.
       CONTINUE.
     ENDIF.
+
+    lwa_table_ui-table_auth = <lwa_sqlcdtable_auth>.
+
     FIND '*' IN lwa_table_ui-table_auth.
-    IF sy-subrc EQ 0.
+    IF sy-subrc = 0.
       IF lwa_table_ui-table_auth CO '* '.
         MESSAGE i028(/cadaxo/sqlc) INTO lwa_table_ui-table_description.
       ELSE.
@@ -1690,15 +1691,16 @@ FORM build_display_table USING    u_accept_space TYPE c
       ENDIF.
     ELSEIF NOT lwa_table_ui-table_auth IS INITIAL.
       SELECT SINGLE ddtext FROM dd02t INTO lwa_table_ui-table_description
-                                      WHERE tabname  = lwa_table_ui-table_auth
-                                      AND ddlanguage = sy-langu
-                                      AND as4local   = 'A'
-                                      AND as4vers    = space. "#EC CI_SEL_NESTED "#EC CI_SROFC_NESTED
-      IF sy-subrc NE 0.
+                                      WHERE tabname    = lwa_table_ui-table_auth
+                                        AND ddlanguage = sy-langu
+                                        AND as4local   = 'A'
+                                        AND as4vers    = space. "#EC CI_SEL_NESTED "#EC CI_SROFC_NESTED
+      IF sy-subrc <> 0.
         SELECT SINGLE ddtext FROM ddddlsrct INTO lwa_table_ui-table_description
-                                            WHERE ddlanguage = sy-langu
-                                            AND   as4local   = 'A'.
-        IF sy-subrc NE 0.
+                                            WHERE ddlname    = lwa_table_ui-table_auth
+                                              AND ddlanguage = sy-langu
+                                              AND as4local   = 'A'.
+        IF sy-subrc <> 0.
           MESSAGE i021(/cadaxo/sqlc) INTO lwa_table_ui-table_description WITH lwa_table_ui-table_auth.
         ENDIF.
       ENDIF.
@@ -1724,10 +1726,10 @@ FORM check_save CHANGING u_cancel TYPE c.
   IF g_data_changed = c_true.
     CALL FUNCTION 'POPUP_TO_CONFIRM'                        "#EC *
       EXPORTING
-        titlebar              = text-p00
-        text_question         = text-p01
-        text_button_1         = text-p02
-        text_button_2         = text-p03
+        titlebar              = TEXT-p00
+        text_question         = TEXT-p01
+        text_button_1         = TEXT-p02
+        text_button_2         = TEXT-p03
         display_cancel_button = c_true
       IMPORTING
         answer                = l_answer
@@ -1814,7 +1816,7 @@ FORM transport USING VALUE(u_role) TYPE /cadaxo/sqlcrole_id.
       OTHERS                  = 3.
 
   IF sy-subrc <> 0.
-    MESSAGE e241(57) WITH text-006 sy-subrc.
+    MESSAGE e241(57) WITH TEXT-006 sy-subrc.
   ENDIF.
 
   CALL FUNCTION 'TR_OBJECTS_INSERT'
@@ -1828,7 +1830,7 @@ FORM transport USING VALUE(u_role) TYPE /cadaxo/sqlcrole_id.
       OTHERS   = 1.
 
   IF sy-subrc <> 0.
-    MESSAGE e241(57) WITH text-005 sy-subrc.
+    MESSAGE e241(57) WITH TEXT-005 sy-subrc.
   ENDIF.
 ENDFORM.                    "transport
 *&---------------------------------------------------------------------*
@@ -1895,14 +1897,14 @@ FORM searchuser. "COCKPIT-248
 
     APPEND VALUE #( tabname   = '/CADAXO/SQLCROLU'
                     fieldname = 'UNAME'
-                    fieldtext = text-009 ) TO lt_fields.
+                    fieldtext = TEXT-009 ) TO lt_fields.
     APPEND VALUE #( tabname   = 'BAPIADDR3'
                     fieldname = 'FULLNAME'
-                    fieldtext = text-017 ) TO lt_fields.
+                    fieldtext = TEXT-017 ) TO lt_fields.
 
     CALL FUNCTION 'POPUP_GET_VALUES'
       EXPORTING
-        popup_title = text-t02
+        popup_title = TEXT-t02
       IMPORTING
         returncode  = l_return
       TABLES
@@ -1939,10 +1941,10 @@ FORM adduser.
 
   APPEND VALUE #( tabname   = '/CADAXO/SQLCROLU'
                   fieldname = 'UNAME'
-                  fieldtext = text-009 ) TO lt_fields.
+                  fieldtext = TEXT-009 ) TO lt_fields.
   CALL FUNCTION 'POPUP_GET_VALUES'
     EXPORTING
-      popup_title = text-t02
+      popup_title = TEXT-t02
     IMPORTING
       returncode  = l_return
     TABLES

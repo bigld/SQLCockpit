@@ -5644,9 +5644,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           WITH KEY symbol_name = <ls_symbols>-symbol_name
           INTO l_sqlcusym.
 
-          IF     sy-subrc = 0
-          AND ( l_sqlcusym-symbol_value <> <ls_symbols>-symbol_value
-          OR  l_sqlcusym-symbol_desc <> <ls_symbols>-symbol_desc ).
+          IF sy-subrc = 0
+          AND (   l_sqlcusym-symbol_value      <> <ls_symbols>-symbol_value
+               OR l_sqlcusym-symbol_desc       <> <ls_symbols>-symbol_desc
+               OR l_sqlcusym-symbol_multivalue <> <ls_symbols>-symbol_multivalue ).
             ls_symbol_ow-symbol_name       = <ls_symbols>-symbol_name.
             ls_symbol_ow-symbol_value_user = l_sqlcusym-symbol_value.
             ls_symbol_ow-symbol_desc_user  = l_sqlcusym-symbol_desc.

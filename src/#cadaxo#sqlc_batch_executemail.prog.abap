@@ -33,7 +33,7 @@ DATA gs_jobstart_conditions TYPE /cadaxo/sqlc_jobwiz_fields.
 DATA gv_xml                 TYPE string.
 
 SELECTION-SCREEN: BEGIN OF BLOCK bl1 WITH FRAME.
-PARAMETERS: pjobguid TYPE /cadaxo/sqlc_jobguid OBLIGATORY.
+  PARAMETERS: pjobguid TYPE /cadaxo/sqlc_jobguid OBLIGATORY.
 SELECTION-SCREEN: END OF BLOCK bl1.
 
 START-OF-SELECTION.
@@ -109,7 +109,7 @@ FORM email_notification .
     lr_send_request = cl_bcs=>create_persistent( ).
 
 * create subject
-    lv_subject = |{ sy-sysid }/{ sy-mandt }-{ text-001 }|.
+    lv_subject = |{ sy-sysid }/{ sy-mandt }-{ TEXT-001 }|.
 
     PERFORM get_number_of_lists USING l_cnt_lists.
 
@@ -119,12 +119,12 @@ FORM email_notification .
     APPEND '<title>SQL Cockpit Mailbenachrichtigung</title>' TO lt_htmltable.
     APPEND '</head>' TO lt_htmltable.
     APPEND '<body>' TO lt_htmltable.
-    CONCATENATE '<h3>' text-hdr '</h3>' INTO ls_htmlline.
+    CONCATENATE '<h3>' TEXT-hdr '</h3>' INTO ls_htmlline.
     APPEND ls_htmlline TO lt_htmltable.
-    CONCATENATE '<p><br />' text-l01 '</p>' INTO ls_htmlline.
+    CONCATENATE '<p><br />' TEXT-l01 '</p>' INTO ls_htmlline.
     APPEND ls_htmlline TO lt_htmltable.
     CONCATENATE '<p><br /><samp>'
-                text-l04
+                TEXT-l04
                 sy-sysid
                 '<br />' INTO ls_htmlline.
     APPEND ls_htmlline TO lt_htmltable.
@@ -132,23 +132,23 @@ FORM email_notification .
     lv_date = |{ sy-datum DATE = USER }|.
     lv_time = |{ sy-uzeit TIME = USER }|.
 
-    CONCATENATE text-l05
+    CONCATENATE TEXT-l05
                 lv_date '/' lv_time
                 '<br />' INTO ls_htmlline.
     APPEND ls_htmlline TO lt_htmltable.
-    CONCATENATE text-l02
+    CONCATENATE TEXT-l02
                 gs_sqlcsres-jobname
                 '<br />' INTO ls_htmlline.
     APPEND ls_htmlline TO lt_htmltable.
-    CONCATENATE text-l03
+    CONCATENATE TEXT-l03
                 lv_subject
                 '<br />' INTO ls_htmlline.
     APPEND ls_htmlline TO lt_htmltable.
 
-    ls_htmlline-tdline = text-l06 && l_cnt_lists && '</samp></p>'.
+    ls_htmlline-tdline = TEXT-l06 && l_cnt_lists && '</samp></p>'.
     APPEND ls_htmlline TO lt_htmltable.
 
-    CONCATENATE '<p><br />' text-ftr '</p>' INTO ls_htmlline.
+    CONCATENATE '<p><br />' TEXT-ftr '</p>' INTO ls_htmlline.
     APPEND ls_htmlline TO lt_htmltable.
     APPEND '</body></html>' TO lt_htmltable.
 
@@ -266,13 +266,12 @@ FORM attach_results  CHANGING pr_document TYPE REF TO cl_document_bcs.
         ASSIGN lr_cockpit_main->gt_lvc_t_fcat[ table_index ] TO FIELD-SYMBOL(<fieldcats>).
         ASSIGN <lr_dref_result>->* TO <lt_result_table>.
 
-        /cadaxo/cl_sqlc_csv_cust_util=>get_csv_from_itab( EXPORTING it_table      = <lt_result_table>
-                                                                    i_fieldcat    = <fieldcats>
-                                                                    i_csv_attr    = VALUE #( add_header      = abap_true
-                                                                                             field_separator = /cadaxo/cl_sqlc_csv_cust_util=>cseperators-semicolon
-                                                                                             date_format     = /cadaxo/cl_sqlc_csv_cust_util=>cdateformats-user
-                                                                                             time_format     = /cadaxo/cl_sqlc_csv_cust_util=>ctimeformats-user )
-                                                          IMPORTING ev_output_csv = DATA(csv_tab) ).
+        DATA(csv_tab) = /cadaxo/cl_sqlc_csv_cust_util=>get_csv_from_itab( it_table      = <lt_result_table>
+                                                                          i_fieldcat    = <fieldcats>
+                                                                          i_csv_attr    = VALUE #( add_header      = abap_true
+                                                                          field_separator = /cadaxo/cl_sqlc_csv_cust_util=>cseperators-semicolon
+                                                                          date_format     = /cadaxo/cl_sqlc_csv_cust_util=>cdateformats-user
+                                                                          time_format     = /cadaxo/cl_sqlc_csv_cust_util=>ctimeformats-user ) ).
 
         DATA(csv_string) = /cadaxo/cl_sqlc_csv_cust_util=>csv_tab_2_string( csv_tab ).
 
@@ -337,11 +336,11 @@ FORM get_job_status CHANGING cv_jobstate TYPE btcstatus
 
   CASE cv_jobstate.
     WHEN 'F'.
-      cv_jobstate_text   = text-stf.
+      cv_jobstate_text   = TEXT-stf.
     WHEN 'A'.
-      cv_jobstate_text   = text-stc.
+      cv_jobstate_text   = TEXT-stc.
     WHEN OTHERS.
-      cv_jobstate_text   = text-stu.
+      cv_jobstate_text   = TEXT-stu.
   ENDCASE.
 
 ENDFORM.                    " GET_JOB_STATUS
