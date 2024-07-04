@@ -50,28 +50,12 @@ CLASS /cadaxo/cl_sqlc_symbols DEFINITION
     METHODS pbo_0700 .
     METHODS pai_0700 IMPORTING i_ok_code TYPE sy-ucomm .
   PROTECTED SECTION.
-
-    METHODS set_symbol_alv .
-
-
-
-
+    TYPES: t_symbol_db TYPE TABLE OF /cadaxo/sqlcusym .
 
     DATA g_symbol_toolbar_excluding TYPE ui_functions .
-
     DATA dragdrop_behaviour_symbol TYPE REF TO cl_dragdrop .
     DATA gcont_grid_symbol_t TYPE /cadaxo/sqlcclguicontainer_t .
     DATA dragdrop_handle_symbol TYPE i .
-    TYPES:
-    t_symbol_db TYPE TABLE OF /cadaxo/sqlcusym .
-    METHODS create_symbol_db
-      IMPORTING
-        !it_symbol_create TYPE t_symbol_db
-      RETURNING
-        VALUE(rv_success) TYPE boolean .
-    METHODS save_symbols
-      EXPORTING
-        !e_success TYPE boolean .
     DATA g_curr_col TYPE lvc_fname .
     DATA g_curr_row TYPE /cadaxo/sqlcsymbol_name .
 
@@ -79,6 +63,32 @@ CLASS /cadaxo/cl_sqlc_symbols DEFINITION
     DATA gt_symbol TYPE /cadaxo/sqlc_symbol_t .
     DATA gt_symbol_delete TYPE /cadaxo/sqlc_symbol_t .
     DATA gt_symbol_selected TYPE /cadaxo/sqlc_symbol_t .
+
+    DATA: main_controller TYPE REF TO /cadaxo/cl_sqlc_cockpit_main.
+    DATA gcont_symbol TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar_btns TYPE REF TO cl_gui_container .
+    DATA gcont_symbol_toolbar_img TYPE REF TO cl_gui_container .
+    DATA gs_splitter_symbol TYPE REF TO cl_gui_splitter_container .
+
+    DATA gs_splitter_symbol_toolbar TYPE REF TO cl_gui_splitter_container .
+    DATA gc_symbol_alv TYPE REF TO cl_gui_alv_grid .
+    DATA gc_symbol_toolbar TYPE REF TO cl_gui_toolbar .
+    DATA gc_symbol_toolbar_img TYPE REF TO cl_gui_picture .
+    DATA user_settings TYPE REF TO /cadaxo/sqlcusrp_dyn.
+    DATA gt_symbol_ow TYPE /cadaxo/sqlc_symbol_ow_t .
+    DATA gr_alv_symb_ow TYPE REF TO cl_gui_alv_grid .
+    DATA gr_cc_alv_symb_ow TYPE REF TO cl_gui_custom_container .
+
+
+    METHODS set_symbol_alv .
+    METHODS create_symbol_db IMPORTING it_symbol_create  TYPE t_symbol_db
+                             RETURNING
+                                       VALUE(rv_success) TYPE boolean .
+    METHODS save_symbols
+      EXPORTING
+        !e_success TYPE boolean .
+
     METHODS get_symbols_selected
       EXPORTING
         VALUE(e_success) TYPE boolean .
@@ -168,14 +178,6 @@ CLASS /cadaxo/cl_sqlc_symbols DEFINITION
         !e_modified
         !et_good_cells .
 
-    DATA: main_controller TYPE REF TO /cadaxo/cl_sqlc_cockpit_main.
-    DATA gcont_symbol TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar_btns TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar_img TYPE REF TO cl_gui_container .
-    DATA gs_splitter_symbol TYPE REF TO cl_gui_splitter_container .
-
-    DATA gs_splitter_symbol_toolbar TYPE REF TO cl_gui_splitter_container .
     METHODS fill_used_symbols
       RETURNING
         VALUE(rt_symbols) TYPE /cadaxo/sqlcusedsymbols_t .
@@ -196,22 +198,15 @@ CLASS /cadaxo/cl_sqlc_symbols DEFINITION
         /cadaxo/cx_sqlc_symb_not_found .
     METHODS on_symbol_alv_user_command FOR EVENT user_command OF cl_gui_alv_grid
       IMPORTING e_ucomm .
+    CLASS-DATA gt_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
 
-    DATA gt_symbol_ow TYPE /cadaxo/sqlc_symbol_ow_t .
-    DATA gr_alv_symb_ow TYPE REF TO cl_gui_alv_grid .
-    DATA gr_cc_alv_symb_ow TYPE REF TO cl_gui_custom_container .
-    DATA: popup_size TYPE ty_popup_size.
     METHODS create_symbol_multival_tab_dyn
       IMPORTING
         !i_symbol_datatype TYPE /cadaxo/sqlcsymbol_datatype
       EXPORTING
         !e_data            TYPE data
         !e_data_struct     TYPE data .
-    CLASS-DATA gt_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
-    DATA gc_symbol_alv TYPE REF TO cl_gui_alv_grid .
-    DATA gc_symbol_toolbar TYPE REF TO cl_gui_toolbar .
-    DATA gc_symbol_toolbar_img TYPE REF TO cl_gui_picture .
-    DATA user_settings TYPE REF TO /cadaxo/sqlcusrp_dyn.
+
     METHODS refresh_symbol_alv.
 
 
@@ -977,7 +972,7 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
 
 
   METHOD confirm_symbol_overwrite.
-
+    DATA: popup_size TYPE ty_popup_size.
     popup_size-column = 10.
     popup_size-row = ( sy-srows / 2 ) - 10.
     popup_size-column_to = popup_size-column + 119.
@@ -998,7 +993,7 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
   ENDMETHOD.
   METHOD on_symbol_button_variant.
 
-    DATA: r_symbol_value TYPE rseloption.
+    DATA: symbol_value TYPE rseloption.
 
     TRY.
         DATA(ls_symbol_ow) = gt_symbol_ow[ es_row_no-row_id ].
@@ -1010,13 +1005,13 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
     TRY.
         IF es_col_id = 'SYMBOL_TYPE_ICON_VAR' AND ls_symbol_ow-symbol_multivalue_var IS NOT INITIAL.
 
-          r_symbol_value = me->show_symbolmulti_dialog( EXPORTING i_symbol_multivalue = ls_symbol_ow-symbol_multivalue_var
-                                                                  i_symbol_datatype   = ls_symbol_ow-symbol_datatype_var ).
+          symbol_value = me->show_symbolmulti_dialog( i_symbol_multivalue = ls_symbol_ow-symbol_multivalue_var
+                                                      i_symbol_datatype   = ls_symbol_ow-symbol_datatype_var ).
 
         ELSEIF es_col_id = 'SYMBOL_TYPE_ICON_USER' AND ls_symbol_ow-symbol_multivalue_user IS NOT INITIAL.
 
-          r_symbol_value = me->show_symbolmulti_dialog( EXPORTING i_symbol_multivalue = ls_symbol_ow-symbol_multivalue_user
-                                                                  i_symbol_datatype   = ls_symbol_ow-symbol_datatype_user ).
+          symbol_value = me->show_symbolmulti_dialog( i_symbol_multivalue = ls_symbol_ow-symbol_multivalue_user
+                                                      i_symbol_datatype   = ls_symbol_ow-symbol_datatype_user ).
 
         ENDIF.
       CATCH /cadaxo/cx_sqlc_symb_not_found.
@@ -2304,51 +2299,14 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
 
 
   METHOD on_symbol_drag.
-****************************************************************************************************
-* Description             : on symbol alv drag                                                     *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA: lr_drag_object         TYPE REF TO lcl_drag_object.
 
     DATA  l_fieldvalue TYPE string.
 
-    DATA  l_symbol LIKE LINE OF gt_symbol.
+    ASSIGN gt_symbol[ e_row-index ] TO FIELD-SYMBOL(<symbol>).
+    IF sy-subrc = 0
+    AND ( <symbol>-type = cs_symbol_type-program OR <symbol>-type = cs_symbol_type-user ).
 
-    READ TABLE gt_symbol INDEX e_row-index
-                         INTO l_symbol
-                         TRANSPORTING symbol_name
-                                      type.
-    IF sy-subrc = 0.
-*   only saved symbols can be dragged
-      CHECK l_symbol-type = cs_symbol_type-program OR l_symbol-type = cs_symbol_type-user.
-
-      CONCATENATE '&'
-                  l_symbol-symbol_name
-                  '&'
-             INTO l_fieldvalue.
-      CREATE OBJECT lr_drag_object.
-      lr_drag_object->fieldvalue = l_fieldvalue.
-      e_dragdropobj->object = lr_drag_object.
+      e_dragdropobj->object = NEW lcl_drag_object( |&{ <symbol>-symbol_name }&| ).
 
     ENDIF.
 

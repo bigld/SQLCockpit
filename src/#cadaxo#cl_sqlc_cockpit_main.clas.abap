@@ -6264,8 +6264,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *------------+----------------------+---------------------------------------------+----------------*
 ****************************************************************************************************
 
-    DATA: lr_drag_object      TYPE REF TO lcl_drag_object,
-          l_typ(1)            TYPE c,
+    DATA: l_typ(1)            TYPE c,
           l_fieldvalue        TYPE string,
           l_fieldvaluec(150)  TYPE c,
           lr_cl_gui_control   TYPE REF TO cl_gui_control,
@@ -6331,7 +6330,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           MOVE e_column-fieldname TO l_fieldname_txt.                 "CDX001-0026
         ENDIF.                                                        "CDX001-0026
 
-        CREATE OBJECT lr_drag_object.
         CASE e_dragdropobj->flavor.
           WHEN 'ALV_TO_CLIPBOARD'.
             IF strlen( l_fieldname_txt ) < 19.
@@ -6368,8 +6366,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
             ENDTRY.
 
         ENDCASE.
-        lr_drag_object->fieldvalue = l_fieldvalue.
-        e_dragdropobj->object = lr_drag_object.
+
+        e_dragdropobj->object = NEW lcl_drag_object( l_fieldvalue ).
       ENDIF.
     ENDIF.
 
@@ -6768,24 +6766,24 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
 
   METHOD on_clipboard_drop.
-    DATA lr_drag_object     TYPE REF TO lcl_drag_object.
+
     DATA l_text_line(256)   TYPE c.
     DATA l_text_string       TYPE string.
 
-    CATCH SYSTEM-EXCEPTIONS move_cast_error = 1.
-      lr_drag_object ?= dragdrop_object->object.
+    TRY.
+        DATA(drop_object) = CAST /cadaxo/if_editor_dragdrop( dragdrop_object->object ).
 
-      gc_clipboard_textedit->get_textstream( IMPORTING text = l_text_string ).
+        gc_clipboard_textedit->get_textstream( IMPORTING text = l_text_string ).
 
-      cl_gui_cfw=>flush( ).
+        cl_gui_cfw=>flush( ).
 
-      l_text_line = lr_drag_object->fieldvalue.
+        l_text_line = drop_object->get_string_to_insert( ).
 
-      CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
+        CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
 
-      gc_clipboard_textedit->set_textstream( EXPORTING text = l_text_string ).
-
-    ENDCATCH.
+        gc_clipboard_textedit->set_textstream( EXPORTING text = l_text_string ).
+      CATCH cx_sy_move_cast_error.
+    ENDTRY.
 
   ENDMETHOD.
 
@@ -7095,16 +7093,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-    DATA: lr_drag_object  TYPE REF TO lcl_drag_object.
+    DATA(drop_object) = CAST /cadaxo/if_editor_dragdrop( dragdrop_object->object ).
 
-    lr_drag_object ?= dragdrop_object->object.
-
-    me->insert_codeblock_at_position(
-       iv_line = line
-       iv_pos = pos
-       iv_sqlstring = lr_drag_object->fieldvalue
-       i_set_focus = abap_true
-    ).
+    me->insert_codeblock_at_position( iv_line = line iv_pos = pos
+                                      iv_sqlstring = drop_object->get_string_to_insert( )
+                                      i_set_focus = abap_true ).
 
   ENDMETHOD.
 
@@ -7558,21 +7551,15 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   METHOD on_elementinfo_drag.
 
-    DATA lr_drag_object TYPE REF TO lcl_drag_object.
     DATA l_fields TYPE string.
 
-    l_fields = get_selected_elem_inf_flds( EXPORTING i_index = e_row-index ).
+    l_fields = get_selected_elem_inf_flds( e_row-index ).
 
-    me->gc_elementinfo_alv->get_selected_rows(
-      IMPORTING
-        et_index_rows = DATA(selected_rows) ).
+    me->gc_elementinfo_alv->get_selected_rows( IMPORTING et_index_rows = DATA(selected_rows) ).
 
     IF l_fields IS NOT INITIAL.
 
-      CREATE OBJECT lr_drag_object.
-
-      lr_drag_object->fieldvalue = l_fields.
-      e_dragdropobj->object = lr_drag_object.
+      e_dragdropobj->object = NEW lcl_drag_object( l_fields ).
 
     ENDIF.
 
@@ -9110,7 +9097,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-    DATA lr_drag_object  TYPE REF TO lcl_drag_object.
     DATA lv_string_value TYPE string.
 
     FIELD-SYMBOLS: <lv_result_field> TYPE any.
@@ -9128,10 +9114,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           lv_string_value = <lv_result_field>.
         ENDIF.
 
-* create drag/drop object
-        lr_drag_object = NEW #( ).
-        lr_drag_object->fieldvalue = lv_string_value.
-        e_dragdropobj->object = lr_drag_object.
+        e_dragdropobj->object = NEW lcl_drag_object( lv_string_value ).
 
       ENDIF.
 

@@ -20,11 +20,15 @@ CLASS lcl_dragdrop_receiver DEFINITION.
                       IMPORTING e_dragdropobj.
 ENDCLASS.
 
+
 *----------------------------------------------------------------------*
 *       CLASS lcl_drag_object DEFINITION
 *----------------------------------------------------------------------*
 CLASS lcl_drag_object DEFINITION.
   PUBLIC SECTION.
-    DATA: fieldvalue TYPE string.
+    INTERFACES /cadaxo/if_editor_dragdrop.
+    METHODS constructor IMPORTING i_codestring TYPE string.
+  PROTECTED SECTION.
+    DATA codestring TYPE string.
 
 ENDCLASS.
