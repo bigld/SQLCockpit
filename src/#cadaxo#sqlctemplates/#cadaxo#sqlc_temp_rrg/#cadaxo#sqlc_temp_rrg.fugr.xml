@@ -637,7 +637,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>GS_TEMP_ATTR-STRUCTURE</NAME>
-       <TEXT>?_____________________________</TEXT>
+       <TEXT>______________________________</TEXT>
        <LINE>002</LINE>
        <COLUMN>027</COLUMN>
        <LENGTH>030</LENGTH>
@@ -668,7 +668,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>GS_TEMP_ATTR-STRUCTURE_DESCR</NAME>
-       <TEXT>?___________________________________________________________</TEXT>
+       <TEXT>____________________________________________________________</TEXT>
        <LINE>003</LINE>
        <COLUMN>027</COLUMN>
        <LENGTH>060</LENGTH>
@@ -696,8 +696,12 @@
       <RPY_DYFLOW>
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
+      <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  FIELD gs_temp_attr-structure MODULE structure ON INPUT.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
     </item>
@@ -739,7 +743,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>GS_TEMP_ATTR-CLASS</NAME>
-       <TEXT>?_____________________________</TEXT>
+       <TEXT>______________________________</TEXT>
        <LINE>002</LINE>
        <COLUMN>027</COLUMN>
        <LENGTH>030</LENGTH>
@@ -770,7 +774,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>GS_TEMP_ATTR-CLASS_DESCR</NAME>
-       <TEXT>?___________________________________________________________</TEXT>
+       <TEXT>____________________________________________________________</TEXT>
        <LINE>003</LINE>
        <COLUMN>027</COLUMN>
        <LENGTH>060</LENGTH>
@@ -798,8 +802,12 @@
       <RPY_DYFLOW>
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
+      <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  FIELD gs_temp_attr-class MODULE class ON INPUT.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
     </item>
