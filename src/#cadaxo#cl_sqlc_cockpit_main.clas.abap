@@ -741,7 +741,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -1366,6 +1366,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                                                          EXCEPTIONS OTHERS              = 2 ).
 
   ENDMETHOD.
+
 
   METHOD constructor.
 ****************************************************************************************************
@@ -8565,8 +8566,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         WHEN c_cmd_show_full_value.
           me->handle_command_show_full_value( EXPORTING i_grid_i = l_grid_name_i ).
         WHEN c_cmd_create_symbol.
+          DATA(parser) = gt_cl_sql_parse[ l_grid_name_i ].
           me->symbols_controller->create_symbol_from_result( i_result_data = dref_result_tab_t[ l_grid_name_i ]
-                                                             i_result_fieldcat = gt_cl_sql_parse[ l_grid_name_i ]->gt_lvc_t_fcat
+                                                             i_result_fieldcat = parser->gt_lvc_t_fcat
                                                            ).
         WHEN c_cmd_show_value_as_html_brow.
           me->handle_command_show_html_brow( EXPORTING i_grid_i = l_grid_name_i ).
@@ -8586,7 +8588,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           IF e_ucomm = 'EDIT'.
             SELECT SINGLE @abap_true FROM nriv INTO @DATA(lv_nr_exists) WHERE object = '/CADAXO/01'.
             IF sy-subrc NE 0.
-              MESSAGE TEXT-003 TYPE 'I'.
+              MESSAGE text-003 TYPE 'I'.
               RETURN.
             ENDIF.
           ENDIF.
