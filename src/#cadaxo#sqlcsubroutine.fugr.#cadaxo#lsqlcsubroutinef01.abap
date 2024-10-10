@@ -318,6 +318,9 @@ FORM process_version_2 CHANGING e_error_message TYPE string
               lsqlc_dfies-fieldtext   = l_dfies-fieldtext.
               lsqlc_dfies-reptext     = l_dfies-reptext.
               lsqlc_dfies-f4availabl  = l_dfies-f4availabl.
+              lsqlc_dfies-reffield    = l_dfies-reffield.
+              lsqlc_dfies-reftable    = l_dfies-reftable.
+              lsqlc_dfies-datatype    = l_dfies-datatype.
             ENDIF.
 
         ENDCASE.
