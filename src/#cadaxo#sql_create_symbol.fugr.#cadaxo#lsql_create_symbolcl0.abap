@@ -15,7 +15,6 @@ CLASS lcl_worker IMPLEMENTATION.
 
   METHOD execute.
 
-    DATA: cockpit_main        TYPE REF TO   /cadaxo/cl_sqlc_cockpit_main.
     DATA: lt_symbol_db_create TYPE TABLE OF /cadaxo/sqlcusym.
 
     IF  lcl_worker=>symbol_name_invalid( ) = abap_true.
@@ -25,8 +24,8 @@ CLASS lcl_worker IMPLEMENTATION.
     DATA(symbol_db_create) = lcl_worker=>fill_symbol( ).
     APPEND symbol_db_create TO lt_symbol_db_create.
 
-    cockpit_main = NEW #(  ).
-    DATA(l_db_commit_cre) = cockpit_main->create_symbol_db( EXPORTING it_symbol_create = lt_symbol_db_create ).
+    DATA(symbols_controller) = NEW /cadaxo/cl_sqlc_cockpit_main(  )->symbols_controller.
+    DATA(l_db_commit_cre) = symbols_controller->create_symbol_db( EXPORTING it_symbol_create = lt_symbol_db_create ).
     IF l_db_commit_cre IS NOT INITIAL.
       MESSAGE s056(/cadaxo/sqlc).
     ENDIF.

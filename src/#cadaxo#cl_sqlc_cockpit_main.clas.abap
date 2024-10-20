@@ -8934,7 +8934,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   METHOD on_home_sapevent.
     DATA: l_html_id TYPE /cadaxo/sqlcparameter_id.
 
-    IF action <> 'HTML'. RETURN. ENDIF.
+    IF to_upper( action ) <> 'HTML'. RETURN. ENDIF.
     l_html_id = getdata.
     show_html( l_html_id ).
 

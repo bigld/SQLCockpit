@@ -50,7 +50,7 @@ START-OF-SELECTION.
                  'Report /CADAXO/SQLC_MIG_20'
                  ''
                  'to'(001)
-                 '3.8.4'.
+                 '3.9'.
 
   PERFORM convert_user_sql_log.
   PERFORM convert_variants.
@@ -547,12 +547,12 @@ FORM set_rev_version.
                   '/CADAXO/SQLC_ULOG'
                    '010'
                    'Revision'
-                   '3.8.4'
+                   '3.9.0'
                    ''
                    ''.
 
   UPDATE /cadaxo/sqlcparv CLIENT SPECIFIED
-                          SET parameter_value = '3.8.4'
+                          SET parameter_value = '3.9.0'
                           WHERE parameter_id    = 'CADAXO_REV_VERSION'.
 ENDFORM.
 *&---------------------------------------------------------------------*
