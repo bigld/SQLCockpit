@@ -10315,7 +10315,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
       CREATE OBJECT lr_sqlc_cl_cockpit_parse.
 
-
       MOVE: ls_sqlcresultsave-parse-result_ddfields             TO lr_sqlc_cl_cockpit_parse->gt_result_ddfields,
             ls_sqlcresultsave-parse-column_syntax               TO lr_sqlc_cl_cockpit_parse->column_syntax,
             ls_sqlcresultsave-parse-source_syntax               TO lr_sqlc_cl_cockpit_parse->source_syntax,

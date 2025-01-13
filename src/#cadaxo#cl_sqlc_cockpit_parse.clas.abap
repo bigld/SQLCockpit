@@ -2015,10 +2015,9 @@ METHOD create_result_structures.
        p_components = me->result_component_t p_strict = ' ' ).
 
 * create result table
-    lcl_tabletype = cl_abap_tabledescr=>create(
-       p_line_type = lcl_structtype
-       p_table_kind = cl_abap_tabledescr=>tablekind_std
-       p_unique     = abap_false ).
+    lcl_tabletype = cl_abap_tabledescr=>create( p_line_type  = lcl_structtype
+                                                p_table_kind = cl_abap_tabledescr=>tablekind_std
+                                                p_unique     = abap_false ).
 
     CREATE DATA lr_data_tab TYPE HANDLE lcl_tabletype.
 

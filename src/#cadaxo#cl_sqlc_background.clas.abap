@@ -16,7 +16,50 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
+
+
+  METHOD add_record_next_job.
+
+    DATA variant TYPE btcvariant.
+    DATA tbtco   TYPE tbtco.
+
+    SELECT SINGLE variant FROM tbtcp INTO variant WHERE jobname = i_btcjob AND jobcount = i_btcjobcnt.
+    IF sy-subrc = 0.
+*   check for open periodic job -> create new initial line in sqlcsres
+      SELECT SINGLE a~jobcount
+        FROM tbtco AS a
+        INNER JOIN tbtcp AS b
+        ON a~jobname = b~jobname
+        AND a~jobcount = b~jobcount
+        INTO CORRESPONDING FIELDS OF tbtco
+          WHERE a~jobname = i_btcjob
+            AND b~variant = variant
+            AND ( strtdate = '' OR strttime = '' ).
+      IF sy-subrc = 0.
+        DATA(initial_guid) =  VALUE guid_16( ).
+        SELECT SINGLE @abap_true
+               FROM /cadaxo/sqlcsres
+               WHERE jobname        = @i_btcjob
+                 AND jobcount       = @tbtco-jobcount
+                 AND root_list_guid = @is_sqlcsres-root_list_guid
+                 AND ress_guid      = @initial_guid
+               INTO @DATA(exists).
+        IF exists = abap_false.
+          DATA(ls_sqlcsres_tmp) = is_sqlcsres.
+          CLEAR ls_sqlcsres_tmp-ress_guid.
+          CLEAR ls_sqlcsres_tmp-space_cons_zip.
+          ls_sqlcsres_tmp-jobcount       = tbtco-jobcount.
+          ls_sqlcsres_tmp-list_guid      = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
+          ls_sqlcsres_tmp-prev_list_guid = is_sqlcsres-list_guid.
+          GET TIME STAMP FIELD ls_sqlcsres_tmp-create_timestamp.
+          INSERT INTO /cadaxo/sqlcsres VALUES ls_sqlcsres_tmp.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+
+  ENDMETHOD.
+
 
   METHOD execute_sql_background.
 ****************************************************************************************************
@@ -95,7 +138,7 @@ CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
              FROM /cadaxo/sqlcsres
              WHERE root_list_guid = @i_list_guid OR list_guid = @i_list_guid
              ORDER BY ress_guid
-             INTO TABLE @DATA(all_sqlcsres).
+             into table @DATA(all_sqlcsres).
       IF sy-subrc <> 0.
         IF sy-batch IS NOT INITIAL.
           MESSAGE e143(/cadaxo/sqlc) WITH i_list_guid.
@@ -193,7 +236,12 @@ CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
           ls_sqlcresultsave-parse-dbhint_syntax            = <lr_cl_sql_parse>->dbhint_syntax.
           ls_sqlcresultsave-parse-connection_syntax        = <lr_cl_sql_parse>->connection_syntax.
           ls_sqlcresultsave-parse-sql_syntax               = <lr_cl_sql_parse>->sql_syntax.
-          ls_sqlcresultsave-parse-result_ddfields          = <lr_cl_sql_parse>->gt_result_ddfields.
+*          ls_sqlcresultsave-parse-result_ddfields          = <lr_cl_sql_parse>->gt_result_ddfields.
+          IF lines( <lr_cl_sql_parse>->gt_result_ddfields_all ) > lines( <lr_cl_sql_parse>->gt_result_ddfields ).
+            ls_sqlcresultsave-parse-result_ddfields = <lr_cl_sql_parse>->gt_result_ddfields_all.
+          ELSE.
+            ls_sqlcresultsave-parse-result_ddfields = <lr_cl_sql_parse>->gt_result_ddfields.
+          ENDIF.
           ls_sqlcresultsave-parse-result_source            = <lr_cl_sql_parse>->result_source_t.
           ls_sqlcresultsave-parse-up_to_x_rows             = <lr_cl_sql_parse>->g_up_to_x_rows.
           ls_sqlcresultsave-parse-select_single            = <lr_cl_sql_parse>->g_select_single.
@@ -276,47 +324,4 @@ CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
       RAISE EXCEPTION exception.
     ENDIF.
   ENDMETHOD.
-
-
-  METHOD add_record_next_job.
-
-    DATA variant TYPE btcvariant.
-    DATA tbtco   TYPE tbtco.
-
-    SELECT SINGLE variant FROM tbtcp INTO variant WHERE jobname = i_btcjob AND jobcount = i_btcjobcnt.
-    IF sy-subrc = 0.
-*   check for open periodic job -> create new initial line in sqlcsres
-      SELECT SINGLE a~jobcount
-        FROM tbtco AS a
-        INNER JOIN tbtcp AS b
-        ON a~jobname = b~jobname
-        AND a~jobcount = b~jobcount
-        INTO CORRESPONDING FIELDS OF tbtco
-          WHERE a~jobname = i_btcjob
-            AND b~variant = variant
-            AND ( strtdate = '' OR strttime = '' ).
-      IF sy-subrc = 0.
-        DATA(initial_guid) =  VALUE guid_16( ).
-        SELECT SINGLE @abap_true
-               FROM /cadaxo/sqlcsres
-               WHERE jobname        = @i_btcjob
-                 AND jobcount       = @tbtco-jobcount
-                 AND root_list_guid = @is_sqlcsres-root_list_guid
-                 AND ress_guid      = @initial_guid
-               INTO @DATA(exists).
-        IF exists = abap_false.
-          DATA(ls_sqlcsres_tmp) = is_sqlcsres.
-          CLEAR ls_sqlcsres_tmp-ress_guid.
-          CLEAR ls_sqlcsres_tmp-space_cons_zip.
-          ls_sqlcsres_tmp-jobcount       = tbtco-jobcount.
-          ls_sqlcsres_tmp-list_guid      = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
-          ls_sqlcsres_tmp-prev_list_guid = is_sqlcsres-list_guid.
-          GET TIME STAMP FIELD ls_sqlcsres_tmp-create_timestamp.
-          INSERT INTO /cadaxo/sqlcsres VALUES ls_sqlcsres_tmp.
-        ENDIF.
-      ENDIF.
-    ENDIF.
-
-  ENDMETHOD.
-
 ENDCLASS.
