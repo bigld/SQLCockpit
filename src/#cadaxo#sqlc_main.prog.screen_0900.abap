@@ -1,0 +1,10 @@
+
+PROCESS BEFORE OUTPUT.
+  MODULE pbo_0900.
+  MODULE hide_tab.
+  CALL SUBSCREEN sub_admin INCLUDING g_report g_subscreen.
+
+PROCESS AFTER INPUT.
+  MODULE pai_0900 AT EXIT-COMMAND.
+  CALL SUBSCREEN sub_admin.
+  MODULE pai_0900.

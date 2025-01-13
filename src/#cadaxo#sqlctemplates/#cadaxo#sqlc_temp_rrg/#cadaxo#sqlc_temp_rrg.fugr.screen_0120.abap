@@ -1,0 +1,5 @@
+PROCESS BEFORE OUTPUT.
+   module pbo_0120.
+*
+PROCESS AFTER INPUT.
+   module pai_0120.
