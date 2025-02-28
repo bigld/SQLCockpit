@@ -741,7 +741,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -4117,7 +4117,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * no selection, get the whole text
         gc_abap_editor->get_text( IMPORTING table = lt_code ).
       ENDIF.
-    ELSE.
+    ELSEIF NOT gc_abap_editor_text IS INITIAL.
 
 * get the current selection
       gc_abap_editor_text->get_selection_pos(
@@ -8588,7 +8588,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           IF e_ucomm = 'EDIT'.
             SELECT SINGLE @abap_true FROM nriv INTO @DATA(lv_nr_exists) WHERE object = '/CADAXO/01'.
             IF sy-subrc NE 0.
-              MESSAGE text-003 TYPE 'I'.
+              MESSAGE TEXT-003 TYPE 'I'.
               RETURN.
             ENDIF.
           ENDIF.
