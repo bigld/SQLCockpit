@@ -2237,6 +2237,8 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
             es_meta_data-datatype = 'd34d'.
           WHEN '8'.
             es_meta_data-datatype = 'i8b'.
+          WHEN 'p'.
+            es_meta_data-datatype = 'dec'.
           WHEN OTHERS.
             es_meta_data-datatype =  to_lower( is_dfies-inttype ).
         ENDCASE.

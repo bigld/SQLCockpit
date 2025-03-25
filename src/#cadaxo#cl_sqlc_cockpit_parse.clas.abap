@@ -6394,6 +6394,10 @@ ENDMETHOD.
               CALL METHOD cl_abap_elemdescr=>('GET_INT8')
                 RECEIVING
                   p_result = l_sql_abap_componentdescr-type.
+            WHEN 'p'.
+              CALL METHOD cl_abap_elemdescr=>('GET_UTCLONG')
+                RECEIVING
+                  p_result = l_sql_abap_componentdescr-type.
             WHEN OTHERS.
               mr_arfc_exception = NEW /cadaxo/cx_sqlc_type_not_found( type = CONV #( <l_fields>-inttype ) ).
           ENDCASE.
