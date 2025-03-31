@@ -1989,55 +1989,44 @@ METHOD create_result_structures.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-  DATA: lr_data_tab TYPE REF TO data,
-        lr_data_str TYPE REF TO data,
-        l_tab       TYPE string,
-        l_alias     TYPE string,
-        l_lines     TYPE i.
+  DATA lr_data_tab    TYPE REF TO data.
+  DATA lr_data_str    TYPE REF TO data.
+  DATA l_tab          TYPE string.
+  DATA l_alias        TYPE string.
+  DATA lcl_structtype TYPE REF TO cl_abap_structdescr.
+  DATA lcl_tabletype  TYPE REF TO cl_abap_tabledescr.
 
-  DATA: lcl_structtype                   TYPE REF TO cl_abap_structdescr.
-  DATA: lcl_tabletype                    TYPE REF TO cl_abap_tabledescr.
-
-  DESCRIBE TABLE me->result_source_t LINES l_lines.
+  DATA(lines) = lines( me->result_source_t ).
 
 * for "select * from xyz" we use a more direct way to generate the result structures
-  IF me->column_syntax EQ '*' AND l_lines EQ 1 AND i_mode <> 'S'
+  IF     me->column_syntax = '*'
+     AND lines = 1
+     AND i_mode <> 'S'
      AND find( val = me->source_syntax sub = '\' ) < 1.
+
     SPLIT me->source_syntax AT space INTO l_tab l_alias.
-
     CREATE DATA lr_data_tab TYPE STANDARD TABLE OF (l_tab).
-
     CREATE DATA lr_data_str TYPE (l_tab).
+
   ELSE.
 
-* create result structure
-    lcl_structtype = cl_abap_structdescr=>create(
-       p_components = me->result_component_t p_strict = ' ' ).
-
-* create result table
-    lcl_tabletype = cl_abap_tabledescr=>create(
-       p_line_type = lcl_structtype
-       p_table_kind = cl_abap_tabledescr=>tablekind_std
-       p_unique     = abap_false ).
+    lcl_structtype = cl_abap_structdescr=>create( p_components = me->result_component_t p_strict = ' ' ).
+    lcl_tabletype = cl_abap_tabledescr=>create( p_line_type  = lcl_structtype
+                                                p_table_kind = cl_abap_tabledescr=>tablekind_std
+                                                p_unique     = abap_false ).
 
     CREATE DATA lr_data_tab TYPE HANDLE lcl_tabletype.
-
     CREATE DATA lr_data_str TYPE HANDLE lcl_structtype.
 
   ENDIF.
 
-*
-  MOVE lr_data_tab TO me->result_table.
-  MOVE lr_data_str TO me->result_structure.
-
-* we want to save memory
+  me->result_table = lr_data_tab.
+  me->result_structure = lr_data_str.
 
   FREE: lcl_structtype,
         lcl_tabletype,
         lr_data_tab,
         lr_data_str.
-
-
 
 ENDMETHOD.
 
