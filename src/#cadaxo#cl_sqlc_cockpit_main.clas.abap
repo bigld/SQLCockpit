@@ -741,7 +741,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -4117,7 +4117,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 * no selection, get the whole text
         gc_abap_editor->get_text( IMPORTING table = lt_code ).
       ENDIF.
-    ELSEIF NOT gc_abap_editor_text IS INITIAL.
+    ELSE.
 
 * get the current selection
       gc_abap_editor_text->get_selection_pos(
@@ -8588,7 +8588,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           IF e_ucomm = 'EDIT'.
             SELECT SINGLE @abap_true FROM nriv INTO @DATA(lv_nr_exists) WHERE object = '/CADAXO/01'.
             IF sy-subrc NE 0.
-              MESSAGE TEXT-003 TYPE 'I'.
+              MESSAGE text-003 TYPE 'I'.
               RETURN.
             ENDIF.
           ENDIF.
@@ -10314,7 +10314,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       READ TABLE lt_result_list_raw INDEX sy-tabix INTO ls_result_list_raw.
 
       CREATE OBJECT lr_sqlc_cl_cockpit_parse.
-
 
       MOVE: ls_sqlcresultsave-parse-result_ddfields             TO lr_sqlc_cl_cockpit_parse->gt_result_ddfields,
             ls_sqlcresultsave-parse-column_syntax               TO lr_sqlc_cl_cockpit_parse->column_syntax,

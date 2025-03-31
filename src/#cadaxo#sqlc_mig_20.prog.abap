@@ -547,12 +547,12 @@ FORM set_rev_version.
                   '/CADAXO/SQLC_ULOG'
                    '010'
                    'Revision'
-                   '3.9.0'
+                   '3.9.1'
                    ''
                    ''.
 
   UPDATE /cadaxo/sqlcparv CLIENT SPECIFIED
-                          SET parameter_value = '3.9.0'
+                          SET parameter_value = '3.9.1'
                           WHERE parameter_id    = 'CADAXO_REV_VERSION'.
 ENDFORM.
 *&---------------------------------------------------------------------*
