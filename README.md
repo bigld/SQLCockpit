@@ -2,6 +2,12 @@
 
 Install the latest version from transports (https://www.cadaxo.com/public_doc/cockpit/dl/?dl=cockpit.latest)
 
+This commands copy all NPS tranport files in current folder(s recursivly) to you docker container a4h:
+```
+FOR /R %I IN (K*.NSP) DO docker cp "%I" "a4h:/usr/sap/trans/cofiles/%~nxI"
+FOR /R %I IN (R*.NSP) DO docker cp "%I" "a4h:/usr/sap/trans/data/%~nxI"
+```
+
 If you only need the Development Version make sure that the main Package **must be** named **/CADAXO/SQLC**
 
 ## Original System
@@ -17,5 +23,5 @@ To avoid tons of popups when deleteing onjects from a transport request you can 
    - 5. Set the Original System and delete the Repair Flag
 3. Check you TMS setting
    - 1. TX STMS - Button Transport Routes (Shift+F7)
-   - 2. Switch to Chnage Mode and choose: Edit->Transport Layer->Create: ZNWV - ZNWV 
+   - 2. Switch to Change Mode and choose: Edit->Transport Layer->Create: ZNWV - ZNWV 
 
