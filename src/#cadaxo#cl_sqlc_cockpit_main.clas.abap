@@ -741,7 +741,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -10368,20 +10368,26 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           ENDCASE.
         ELSE.
 * End RT145
-          "COCKPIT-468
-          lr_data = /cadaxo/cl_sqlc_cockpit_assist=>create_data_reference(
-            EXPORTING
-              iv_inttype           = l_result_ddfields-inttype
-              iv_leng              = l_result_ddfields-leng
-              iv_decimals          = l_result_ddfields-decimals
-              iv_intlen            = l_result_ddfields-intlen
-              iv_stru_name         = l_result_ddfields-stru_name
-              iv_tabix             = tabix
-              iv_domaintext        = me->g_user_settings-domaintext
-              it_components_domval = lt_components_domval
-              it_comp              = lt_comp
-              it_domval            = lt_domval  ).
-          "COCKPIT-468
+          IF l_result_ddfields-datatype = 'UTCL'.
+            CALL METHOD cl_abap_elemdescr=>('GET_UTCLONG')
+              RECEIVING
+                p_result = l_sql_abap_componentdescr-type.
+          ELSE.
+            "COCKPIT-468
+            lr_data = /cadaxo/cl_sqlc_cockpit_assist=>create_data_reference(
+               EXPORTING
+                 iv_inttype           = l_result_ddfields-inttype
+                 iv_leng              = l_result_ddfields-leng
+                 iv_decimals          = l_result_ddfields-decimals
+                 iv_intlen            = l_result_ddfields-intlen
+                 iv_stru_name         = l_result_ddfields-stru_name
+                 iv_tabix             = tabix
+                 iv_domaintext        = me->g_user_settings-domaintext
+                 it_components_domval = lt_components_domval
+                 it_comp              = lt_comp
+                 it_domval            = lt_domval  ).
+            "COCKPIT-468
+          ENDIF.
           IF lr_data IS NOT INITIAL.
             l_sql_abap_componentdescr-type ?= cl_abap_typedescr=>describe_by_data_ref( lr_data )."RT145
           ENDIF.
