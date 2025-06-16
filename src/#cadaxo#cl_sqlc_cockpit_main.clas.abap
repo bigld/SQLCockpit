@@ -10301,6 +10301,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     ENDIF.
 
+    REPLACE '<RUNTIME>6865</RUNTIME>' IN l_xml WITH ''.
     CALL TRANSFORMATION id
       SOURCE XML l_xml
       RESULT result_save = lt_sqlcresultsave.
