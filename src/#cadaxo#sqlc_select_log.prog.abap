@@ -1,35 +1,30 @@
 REPORT /cadaxo/sqlc_select_log.
+INCLUDE /cadaxo/sqlc_select_log_c01.
 
 SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-t01.
-PARAMETERS puser TYPE uname.
+*PARAMETERS puser TYPE uname.
+*PARAMETERS puser TYPE /cadaxo/sqlclog-uname.
+*PARAMETERS date TYPE /cadaxo/sqlclogalv-execute_date.
+SELECTION-SCREEN ULINE.
+DATA: puser TYPE /cadaxo/sqlclog-uname,
+      date TYPE /cadaxo/sqlclogalv-execute_date,
+      runtime TYPE /cadaxo/sqlclogalv-result_runtime,
+      rows TYPE /cadaxo/sqlclogalv-result_rows.
+
+SELECT-OPTIONS: sel_user FOR puser NO INTERVALS NO-EXTENSION,
+                sel_date FOR date NO-EXTENSION.
+*                sel_runt FOR runtime NO INTERVALS NO-EXTENSION,
+*                sel_rows for rows NO-EXTENSION.
+SELECTION-SCREEN ULINE.
+
+SELECT-OPTIONS:
+* sel_user FOR puser NO INTERVALS NO-EXTENSION,
+*                sel_date FOR date NO-EXTENSION,
+                sel_runt FOR runtime NO INTERVALS NO-EXTENSION,
+                sel_rows for rows NO-EXTENSION.
 SELECTION-SCREEN END OF BLOCK sel.
 
+
+
 START-OF-SELECTION.
-AUTHORITY-CHECK OBJECT 'ZCADXOSQ05' ID 'ACTVT' FIELD '02'.
-IF sy-subrc <> 0.
-MESSAGE e036(/cadaxo/sqlc).
-ENDIF.
-
-*SELECT * FROM /cadaxo/sqlclog PACKAGE SIZE 1000
-*       INTO TABLE gt_sqlclog WHERE uname IN so_uname
-*                               AND timestamp      NOT BETWEEN gt_sel_timestamp-low AND gt_sel_timestamp-high
-*                               AND result_runtime IN so_runt
-*                               AND result_rows    IN so_rrows.
-*      APPEND LINES OF /cadaxo/cl_sqlc_user_hist_log=>convert_to_alv( gt_sqlclog ) TO gt_sqlclogalv.
-*    ENDSELECT.
-
-SELECT FROM /cadaxo/sqlclog FIELDS * WHERE uname = @puser INTO TABLE @DATA(selects).
-
-cl_salv_table=>factory(
-*  EXPORTING
-*    list_display   = if_salv_c_bool_sap=>false
-*    r_container    =
-*    container_name =
-  IMPORTING
-    r_salv_table   = DATA(selects_alv)
-  CHANGING
-    t_table        = selects
-).
-*CATCH cx_salv_msg.
-
-selects_alv->display( ).
+NEW lcl_local_runner( )->run( i_username = puser ).
