@@ -741,7 +741,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -7398,9 +7398,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *\              dd03ndv_tab    = lt_dd03ndvtab ).
 
 
-          DATA dd08bv_tab	TYPE dd08bvtab.
-          DATA dd05bv_tab	TYPE dd05bvtab.
-          DATA dd05fv_tab	TYPE dd05fvtab.
+          DATA dd08bv_tab TYPE dd08bvtab.
+          DATA dd05bv_tab TYPE dd05bvtab.
+          DATA dd05fv_tab TYPE dd05fvtab.
 
 
 
@@ -10301,7 +10301,22 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     ENDIF.
 
-    REPLACE '<RUNTIME>6865</RUNTIME>' IN l_xml WITH ''.
+    " SQL-79
+    " Replace old RUNTIME structure with the new one
+    DATA runtime_regex TYPE string VALUE '<RUNTIME>(\d+)</RUNTIME>'.
+    FIND FIRST OCCURRENCE OF REGEX runtime_regex IN l_xml SUBMATCHES DATA(runtime_value).
+
+    DATA(target_string) = |<RUNTIME><RUNTIME>{ runtime_value }</RUNTIME><UNIT>µs</UNIT></RUNTIME>|.
+
+    IF runtime_value IS NOT INITIAL AND NOT l_xml CS target_string.
+
+      l_xml = replace( val   = l_xml
+                       regex = runtime_regex
+                       with  = target_string ).
+    ENDIF.
+
+
+
     CALL TRANSFORMATION id
       SOURCE XML l_xml
       RESULT result_save = lt_sqlcresultsave.
