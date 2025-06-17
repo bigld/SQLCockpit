@@ -13,7 +13,10 @@ CLASS /cadaxo/tc_sqlc_cockpit_main DEFINITION FOR TESTING
     METHODS: setup.
     METHODS: teardown.
     METHODS: get_link FOR TESTING.
-
+    METHODS:
+      test_no_runtime_element FOR TESTING,
+      test_one_runtime_element FOR TESTING,
+      test_two_runtime_elements FOR TESTING.
 ENDCLASS.       "/cadaxo/tc_Sqlc_Cockpit_Main
 
 
@@ -70,6 +73,44 @@ CLASS /cadaxo/tc_sqlc_cockpit_main IMPLEMENTATION.
 
   ENDMETHOD.
 
+  METHOD test_no_runtime_element.
+    DATA xml TYPE string.
+    xml = '<root><OTHER>abc</OTHER></root>'.
+
+    f_cut->replace_old_runtime_structure( CHANGING xml = xml ).
+
+    cl_abap_unit_assert=>assert_equals( exp = '<root><OTHER>abc</OTHER></root>'
+                                        act = xml
+                                        msg = 'XML stays same witout changes' ).
+  ENDMETHOD.
+
+  METHOD test_one_runtime_element.
+    DATA xml TYPE string.
+    xml = '<root><RUNTIME>123</RUNTIME></root>'.
+    DATA(expected) = '<root><RUNTIME><RUNTIME>123</RUNTIME><UNIT>µs</UNIT></RUNTIME></root>'.
+
+    f_cut->replace_old_runtime_structure( CHANGING xml = xml ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = xml
+      exp = expected
+      msg = '<RUNTIME> was replaced correctly'
+    ).
+  ENDMETHOD.
+
+  METHOD test_two_runtime_elements.
+    DATA xml TYPE string.
+    xml = '<root><RUNTIME>111</RUNTIME><DATA>x</DATA><RUNTIME>222</RUNTIME></root>'.
+    DATA(expected) = '<root><RUNTIME><RUNTIME>111</RUNTIME><UNIT>µs</UNIT></RUNTIME><DATA>x</DATA><RUNTIME><RUNTIME>222</RUNTIME><UNIT>µs</UNIT></RUNTIME></root>'.
+
+    f_cut->replace_old_runtime_structure( CHANGING xml = xml ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = xml
+      exp = expected
+      msg = 'Both different <RUNTIME> were replaced correctly.'
+    ).
+  ENDMETHOD.
 
 
 ENDCLASS.
