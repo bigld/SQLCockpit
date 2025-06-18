@@ -688,7 +688,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     METHODS usr_action_pretty_printer .
     METHODS usr_action_show_abap_docu .
     METHODS usr_action_sql_trace_onoff .
-
+    METHODS replace_old_runtime_structure
+        CHANGING xml TYPE csequence.
   PRIVATE SECTION.
 
     CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
@@ -741,7 +742,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -7398,9 +7399,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *\              dd03ndv_tab    = lt_dd03ndvtab ).
 
 
-          DATA dd08bv_tab	TYPE dd08bvtab.
-          DATA dd05bv_tab	TYPE dd05bvtab.
-          DATA dd05fv_tab	TYPE dd05fvtab.
+          DATA dd08bv_tab TYPE dd08bvtab.
+          DATA dd05bv_tab TYPE dd05bvtab.
+          DATA dd05fv_tab TYPE dd05fvtab.
 
 
 
@@ -10301,6 +10302,16 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     ENDIF.
 
+    " SQL-79
+    me->replace_old_runtime_structure(
+        CHANGING xml = l_xml
+    ).
+
+
+
+
+
+
     CALL TRANSFORMATION id
       SOURCE XML l_xml
       RESULT result_save = lt_sqlcresultsave.
@@ -13133,6 +13144,37 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     ls_error_add-text = is_error-text+lv_pos.
     APPEND ls_error_add TO ct_errors.
+
+  ENDMETHOD.
+
+  METHOD replace_old_runtime_structure.
+
+    DATA runtime_regex     TYPE string VALUE '<RUNTIME>(\d+)</RUNTIME>'.
+    DATA target_string     TYPE string.
+    DATA runtime_regex_tab TYPE match_result_tab.
+    DATA l_xml_output      TYPE string.
+
+    l_xml_output = xml.
+
+    FIND ALL OCCURRENCES OF REGEX runtime_regex IN xml RESULTS runtime_regex_tab.
+
+    LOOP AT runtime_regex_tab INTO DATA(runtime_element).
+
+      DATA(runtime_element_submatch) = runtime_element-submatches[ 1 ].
+
+      DATA(runtime_value) = xml+runtime_element_submatch-offset(runtime_element_submatch-length).
+
+      target_string = |<RUNTIME><RUNTIME>{ runtime_value }</RUNTIME><UNIT>µs</UNIT></RUNTIME>|.
+      runtime_regex = |<RUNTIME>{ runtime_value }</RUNTIME>|.
+
+      IF NOT l_xml_output CS target_string.
+        l_xml_output = replace( val   = l_xml_output
+                         regex = runtime_regex
+                         with  = target_string ).
+      ENDIF.
+    ENDLOOP.
+
+    xml = l_xml_output.
 
   ENDMETHOD.
 ENDCLASS.
