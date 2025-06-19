@@ -5590,616 +5590,6 @@ METHOD parse_sql_ii_2.
 ENDMETHOD.
 
 
-  METHOD parse_sql_where_columns.
-    " ---------------------------------------------------------------------------------------------------
-    "  Description             : PARSE SQL WHERE COLUMNS                                                -
-    " ---------------------------------------------------------------------------------------------------
-    "  Additional informations :                                                                        -
-    "                                                                                                   -
-    " ---------------------------------------------------------------------------------------------------
-    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
-    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
-    " ---------------------------------------------------------------------------------------------------
-    "  Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        -
-    "  Date                    : xx.xx.xxxx                                                             -
-    " ---------------------------------------------------------------------------------------------------
-    "                                                                                                   -
-    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
-    "                                                                                                   -
-    "  Date       | Developer            | Description                                 |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  04.01.2012 | Fößleitner Johann    | add '=>, =<, ><'                            | CDX001-0031    -
-    "             |                      |                                             |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  24.05.2012 | Fößleitner Johann    | Bugfixing symbolname used in like           | "CDX130-008    -
-    "             |                      |                                             |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  01.06.2012 | Ana Lekic            |format value in where (for timestamps)       | CDX130-018     -
-    "             |                      |                                             |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  09.05.2014 | Domi Bigl            | no decimal . for P decimals 0               | RT229          -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  10.06.2016 | Ana Lekic            | Fehler beim replace vom wert                | Cockpit-65     -
-    " ---------------------------------------------------------------------------------------------------
-
-    DATA l_space_string       TYPE string.
-    DATA l_offset             TYPE i.
-    DATA l_from               TYPE i.
-    DATA l_string             TYPE string.
-    DATA l_match              TYPE i.
-    DATA lr_abap_type         TYPE REF TO cl_abap_elemdescr.
-    DATA l_where_col          LIKE LINE OF me->gt_sql_where_col_tab_t.
-    DATA l_wc_nr              TYPE n LENGTH 3.
-    DATA l_wildcard_operator  TYPE c LENGTH 6.
-    DATA l_wildcard_condition TYPE c LENGTH 6.
-    DATA l_total_len          TYPE i.
-    DATA lt_stringtab         TYPE stringtab.
-    DATA l_symbol             TYPE /cadaxo/sqlcsymbol_name.
-    DATA l_is_subsel          TYPE char1.
-    DATA l_length_check       TYPE i.
-    DATA l_length_check_2     TYPE i.
-    DATA l_message            TYPE string.
-    DATA l_from_save          TYPE i.
-    DATA l_symbol_value       TYPE /cadaxo/sqlcsymbol_value.
-    DATA l_spc_replaced       TYPE flag. " RT229
-    DATA l_added              TYPE i.
-    DATA lr_field             TYPE REF TO data.
-    DATA l_fieldname          TYPE string.
-    DATA l_strlen             TYPE i.
-    DATA l_string2            TYPE string.
-    DATA lt_result_source_tmp LIKE me->result_source_t.     " CDX3301
-    DATA l_off_f              TYPE i.
-    DATA l_off_w              TYPE i.
-    DATA l_len                TYPE i.
-    DATA l_str                TYPE string.
-    DATA lt_source_split      TYPE TABLE OF string.
-    DATA l_skip               TYPE i.
-    DATA l_tabix_next         TYPE i.
-    DATA ls_result_source     LIKE LINE OF me->result_source_t.
-    DATA l_do_times           TYPE i.
-    DATA l_open               TYPE c LENGTH 1.
-    DATA l_open_string        TYPE c LENGTH 1.
-    DATA l_open_symbol        TYPE c LENGTH 1.
-    DATA l_from_symbol        TYPE i.
-    DATA l_to_symbol          TYPE i.
-    FIELD-SYMBOLS <l_field>             TYPE any.
-    FIELD-SYMBOLS <ls_string>           TYPE string.
-    FIELD-SYMBOLS <l_source_split>      TYPE string.
-    FIELD-SYMBOLS <l_source_split_next> TYPE string.
-
-    CONCATENATE '' '' INTO l_space_string SEPARATED BY space.
-
-    CLEAR: l_from,
-           me->gt_sql_where_col_tab_t,
-           me->where_syntax_wildcard.
-
-    " condense the string
-    /cadaxo/cl_sqlc_cockpit_assist=>condense( CHANGING c_string = me->where_syntax ).
-
-    l_total_len = strlen( me->where_syntax ).
-
-    lt_result_source_tmp = me->result_source_t.             " CDX3301
-
-    WHILE l_from < l_total_len.
-
-      FIND FIRST OCCURRENCE OF l_space_string IN SECTION OFFSET l_from OF me->where_syntax MATCH OFFSET l_match.
-      IF sy-subrc = 0.
-        l_offset = l_match - l_from.
-        l_string = me->where_syntax+l_from(l_offset).
-
-        l_from_save = l_from.
-
-        l_from = l_match + 1.
-
-        CASE l_string.
-          WHEN '=' OR 'EQ' OR '<>' OR 'NE' OR '<' OR 'LT' OR '>' OR 'GT' OR '<=' OR 'LE' OR '>=' OR 'GE' OR '=>' OR '=<' OR '><'. " CDX001-0031
-            CASE l_string.
-              WHEN '='.
-                l_where_col-operator = 'EQ'.
-              WHEN '<>'.
-                l_where_col-operator = 'NE'.
-              WHEN '><'.                         " CDX001-0031
-                l_where_col-operator = 'NE'.
-                REPLACE SECTION OFFSET l_from_save LENGTH l_offset OF me->where_syntax WITH '<>'.
-              WHEN '<'.
-                l_where_col-operator = 'LT'.
-              WHEN '>'.
-                l_where_col-operator = 'GT'.
-              WHEN '<='.
-                l_where_col-operator = 'LE'.
-              WHEN '=<'.                         " CDX001-0031
-                l_where_col-operator = 'LE'.
-                REPLACE SECTION OFFSET l_from_save LENGTH l_offset OF me->where_syntax WITH '<='.
-              WHEN '>='.
-                l_where_col-operator = 'GE'.
-              WHEN '=>'.
-                l_where_col-operator = 'GE'.
-                REPLACE SECTION OFFSET l_from_save LENGTH l_offset OF me->where_syntax WITH '>='.
-              WHEN OTHERS.
-                l_where_col-operator = l_string.
-            ENDCASE.
-
-            /cadaxo/cl_sqlc_cockpit_assist=>get_where_value_match_offset( EXPORTING i_from         = l_from
-                                                                                    i_total_length = l_total_len
-                                                                          CHANGING  c_where_syntax = me->where_syntax
-                                                                                    c_offset       = l_match ).
-
-            l_offset = l_match - l_from.
-
-            IF sy-subrc = 0 AND l_offset <> 0.
-              l_where_col-value = me->where_syntax+l_from(l_offset).
-            ELSE.
-              l_where_col-value = me->where_syntax+l_from.
-            ENDIF.
-
-            " replace SPACE with ''
-            CLEAR l_spc_replaced.
-            IF l_where_col-value = 'SPACE'.
-              l_where_col-value = ''''''.
-              l_spc_replaced = abap_true.
-            ENDIF.
-
-            " bring the value in right format CDX130-018
-            IF lr_abap_type IS NOT INITIAL.
-              CLEAR l_added.                                  " RT229
-              format_value( EXPORTING i_abap_type = lr_abap_type           " CDX130-018 Begin
-                            IMPORTING e_added     = l_added  " RT229
-                            CHANGING  c_where_col = l_where_col ).
-            ENDIF.
-
-            IF l_where_col-type_kind CA 'bsI' AND l_where_col-value CO '-0123456789 '.
-              IF    ( l_where_col-type_kind = 'b' AND l_where_col-value > 255 )
-                 OR ( l_where_col-type_kind = 's' AND ( l_where_col-value > 32767      OR l_where_col-value < -32767 ) )
-                 OR ( l_where_col-type_kind = 'I' AND ( l_where_col-value > 2147483647 OR l_where_col-value < -2147483648 ) ).
-                RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value
-                  EXPORTING
-                    value = l_where_col-value
-                    field = CONV #( l_where_col-fieldname ).
-              ENDIF.
-            ENDIF.
-
-            " check value of "P" fields
-            IF l_where_col-type_kind = 'P' AND l_where_col-value CO '0123456789.,'''' '.
-              CREATE DATA lr_field TYPE HANDLE lr_abap_type.
-              ASSIGN lr_field->* TO <l_field>.
-
-              l_strlen = strlen( l_where_col-value ) - 1.
-
-              l_string2 = l_where_col-value.
-
-              IF l_string2+l_strlen(1) = `'`.
-                l_string2 = l_string2(l_strlen).
-              ENDIF.
-
-              IF l_string2(1) = `'`.
-                l_strlen = l_strlen - 1.
-                l_string2 = l_string2+1.
-              ENDIF.
-              TRY.
-                  <l_field> = l_string2.
-                CATCH cx_sy_conversion_no_number.
-                  l_fieldname = l_where_col-fieldname.
-                  RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value
-                    EXPORTING
-                      value = l_where_col-value
-                      field = l_fieldname.
-              ENDTRY.
-            ENDIF.
-
-            IF l_offset <> 0.
-              REPLACE ALL OCCURRENCES OF me->where_syntax+l_from(l_offset)
-                      IN SECTION OFFSET l_from LENGTH l_offset OF me->where_syntax WITH l_where_col-value. " cockpit-65
-            ELSE.
-              REPLACE ALL OCCURRENCES OF me->where_syntax+l_from
-                      IN SECTION OFFSET l_from LENGTH l_offset OF me->where_syntax WITH l_where_col-value. " cockpit-65
-            ENDIF.                                                          " CDX130-018 End
-
-            IF l_spc_replaced = abap_true.
-              l_offset = 2.
-              l_match = l_match - 3.
-              l_total_len = strlen( me->where_syntax ).
-            ENDIF.
-
-            IF l_added > 0.                                   " RT229
-              l_offset = l_offset + l_added.                  " RT229
-              l_match = l_match + l_added.                    " RT229
-              l_total_len = strlen( me->where_syntax ).       " RT229
-            ENDIF.                                            " RT229
-
-            " wildcard
-            l_wc_nr = l_wc_nr + 1.
-
-            CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
-            CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
-
-            l_where_col-wildcard_operator  = l_wildcard_operator.
-            l_where_col-wildcard_condition = l_wildcard_condition.
-
-            CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
-
-            APPEND l_where_col TO me->gt_sql_where_col_tab_t.
-            CLEAR l_where_col.
-
-            IF l_match > l_from.
-              l_from = l_match + 1.
-            ENDIF.
-
-          WHEN 'NOT'. " BETWEEN, LIKE, IN, IS NULL'
-*          CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-            IF l_where_col-fieldname = space.
-              l_where_col-not = 'X'.
-            ELSE.
-              l_where_col-operator_pre = 'NOT'.
-            ENDIF.
-          WHEN 'BETWEEN'. " BETWEEN a AND b"
-
-            l_where_col-operator = l_string.
-
-            " split the string at space
-            lt_stringtab = /cadaxo/cl_sqlc_cockpit_assist=>split( i_sql_string    = me->where_syntax
-                                                                  i_position_from = l_from ).
-
-            LOOP AT lt_stringtab FROM 1 TO 3 ASSIGNING <ls_string>.
-              CONCATENATE l_where_col-value <ls_string> INTO l_where_col-value SEPARATED BY space.
-            ENDLOOP.
-
-            SHIFT l_where_col-value LEFT DELETING LEADING l_space_string.
-
-            l_match = l_from + strlen( l_where_col-value ).
-
-            l_wc_nr = l_wc_nr + 1.
-
-            CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
-            CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
-
-            l_where_col-wildcard_operator  = l_wildcard_operator.
-            l_where_col-wildcard_condition = l_wildcard_condition.
-
-            CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
-
-            APPEND l_where_col TO me->gt_sql_where_col_tab_t.
-            CLEAR l_where_col.
-
-            IF l_match > l_from.
-              l_from = l_match + 1.
-            ENDIF.
-
-          WHEN 'LIKE'.
-
-            l_where_col-operator = l_string.
-
-            /cadaxo/cl_sqlc_cockpit_assist=>get_where_value_match_offset( EXPORTING i_from         = l_from
-                                                                                    i_total_length = l_total_len
-                                                                          CHANGING  c_where_syntax = me->where_syntax
-                                                                                    c_offset       = l_match ).
-
-            l_offset = l_match - l_from.
-
-            l_where_col-value = me->where_syntax+l_from(l_offset).
-
-            " get symbol value
-            FIND REGEX '&(\w|/)+&' IN l_where_col-value.      " CDX130-008
-            IF sy-subrc = 0.                                 " CDX130-008
-              l_symbol = l_where_col-value.              " CDX130-008
-              /cadaxo/cl_sqlc_cockpit_assist=>get_global_symbol_value( " CDX130-008
-                                                                       EXPORTING                                   " CDX130-008
-                                                                                 i_symbol       = l_symbol                " CDX130-008
-                                                                                 i_field_type   = l_where_col-type_kind   " CDX130-008
-                                                                       IMPORTING                                   " CDX130-008
-                                                                                 e_symbol_value = l_symbol_value ).       " CDX130-008
-              l_length_check = strlen( l_symbol_value ).      " CDX130-008
-
-              IF l_symbol_value CP '''*'.                     " CDX130-008
-                l_length_check = l_length_check - 1.          " CDX130-008
-              ENDIF.                                          " CDX130-008
-
-              IF l_symbol_value CP '*'''.                     " CDX130-008
-                l_length_check = l_length_check - 1.          " CDX130-008
-              ENDIF.                                          " CDX130-008
-
-            ELSE.
-              l_length_check = l_offset.
-
-              IF l_where_col-value CP '''*'.
-                l_length_check = l_length_check - 1.
-              ENDIF.
-
-              IF l_where_col-value CP '*'''.
-                l_length_check = l_length_check - 1.
-              ENDIF.
-
-            ENDIF.
-
-            l_length_check_2 = l_where_col-fieldlength * 2.
-
-            IF l_length_check > l_length_check_2.
-              MESSAGE e071(/cadaxo/sqlc) WITH l_where_col-tablefield l_length_check_2 INTO l_message.
-              RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-                EXPORTING
-                  message = l_message.
-            ENDIF.
-
-            " wildcard
-            l_wc_nr = l_wc_nr + 1.
-
-            CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
-            CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
-
-            l_where_col-wildcard_operator  = l_wildcard_operator.
-            l_where_col-wildcard_condition = l_wildcard_condition.
-
-            CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
-
-            APPEND l_where_col TO me->gt_sql_where_col_tab_t.
-            CLEAR l_where_col.
-
-            IF l_match > l_from.
-              l_from = l_match + 1.
-            ENDIF.
-
-          WHEN 'IN' OR 'EXISTS'.   "(x, y, ... )
-            l_is_subsel = abap_false.
-            FIND 'SELECT' IN SECTION OFFSET l_from OF me->where_syntax.
-            IF sy-subrc = 0.
-              l_is_subsel = abap_true.
-            ENDIF.
-
-            IF l_is_subsel = abap_true.
-
-              IF l_where_col-operator_pre = 'NOT' OR l_where_col-not = 'X'.
-                CONCATENATE me->where_syntax_wildcard 'NOT' l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-              ELSE.
-                CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-              ENDIF.
-
-              " CDX3301 Begin
-
-              " CLEAR l_where_col. "DB
-              " find in subselect the tables
-              FIND 'FROM' IN SECTION OFFSET l_from OF me->where_syntax MATCH OFFSET l_off_f MATCH LENGTH l_len.
-              IF sy-subrc = 0.
-                l_off_f = l_off_f + l_len.
-                FIND 'WHERE' IN SECTION OFFSET l_from OF me->where_syntax MATCH OFFSET l_off_w MATCH LENGTH l_len.
-                IF sy-subrc = 0.
-                  l_off_w = l_off_w - l_off_f.
-
-                  l_str = me->where_syntax+l_off_f(l_off_w).
-                  l_str = condense( l_str ).
-                  SPLIT l_str AT space INTO TABLE lt_source_split.
-                  LOOP AT lt_source_split ASSIGNING <l_source_split>.
-                    IF l_skip > 0.
-                      l_skip = l_skip - 1.
-                      CONTINUE.
-                    ENDIF.
-                    IF    <l_source_split> = 'INNER'
-                       OR <l_source_split> = 'JOIN'
-                       OR <l_source_split> = 'LEFT'
-                       OR <l_source_split> = 'OUTER'.
-                      CONTINUE.
-                    ELSEIF    <l_source_split> = 'ON'
-                           OR <l_source_split> = 'AND'.
-                      l_skip = 3.
-                      CONTINUE.
-                    ELSE.
-                      ls_result_source-table = <l_source_split>.
-                      " MOVE <l_source_split> TO l_where_col-tablename."DB
-                      l_tabix_next = sy-tabix + 1.
-                      ASSIGN lt_source_split[ l_tabix_next ] TO <l_source_split_next>.
-                      IF sy-subrc = 0 AND <l_source_split_next> = 'AS'.
-                        l_tabix_next = l_tabix_next + 1.
-                        ASSIGN lt_source_split[ l_tabix_next ] TO <l_source_split_next>.
-                        IF sy-subrc = 0.
-                          ls_result_source-alias = <l_source_split_next>.
-                          APPEND ls_result_source TO me->result_source_t.
-                          CLEAR ls_result_source.
-                          l_skip = 2.
-                        ENDIF.
-                      ELSE.
-                        IF ls_result_source IS NOT INITIAL.
-                          APPEND ls_result_source TO me->result_source_t.
-                          CLEAR ls_result_source.
-                        ENDIF.
-                      ENDIF.
-                    ENDIF.
-                  ENDLOOP.
-
-                  DATA l_offs TYPE i.
-                  l_offs = l_off_w + l_off_f - l_from + l_len.
-                  CONCATENATE me->where_syntax_wildcard me->where_syntax+l_from(l_offs) INTO me->where_syntax_wildcard SEPARATED BY space.
-
-                ELSE. " no where condition
-
-                ENDIF.
-              ENDIF.
-              " CDX3301 End
-              " begin of insert-429
-            ELSEIF l_string = 'IN'.
-              l_where_col-operator = 'IN'.
-
-              /cadaxo/cl_sqlc_cockpit_assist=>get_where_value_match_offset( EXPORTING i_from         = l_from
-                                                                                      i_total_length = l_total_len
-                                                                            CHANGING  c_where_syntax = me->where_syntax
-                                                                                      c_offset       = l_match ).
-
-              l_offset = l_match - l_from.
-
-              l_where_col-value = me->where_syntax+l_from(l_offset).
-
-              l_wc_nr = l_wc_nr + 1.
-              CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
-              CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
-
-              l_where_col-wildcard_operator  = l_wildcard_operator.
-              l_where_col-wildcard_condition = l_wildcard_condition.
-              CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
-
-              APPEND l_where_col TO me->gt_sql_where_col_tab_t.
-              CLEAR l_where_col.
-
-              IF l_match > l_from.
-                l_from = l_match + 1.
-              ENDIF.
-              CONTINUE.
-              " end   of insert-429
-
-            ENDIF.
-
-            l_where_col-operator = l_string.
-
-
-
-            CLEAR l_open.
-            CLEAR l_open_string.
-            CLEAR l_open_symbol.
-            CLEAR l_from_symbol.
-            CLEAR l_to_symbol.
-
-            l_do_times = l_total_len - l_from.
-
-            l_offset = l_from.
-
-            DO l_do_times TIMES.
-
-              CASE me->where_syntax+l_offset(1).
-                WHEN '('.
-                  IF l_open_string IS INITIAL AND l_open_symbol IS INITIAL.
-                    l_open = translate( val  = l_open
-                                        from = ` X`
-                                        to   = `X ` ).
-                    l_offset = l_offset + 1.
-                    CONTINUE.
-                  ENDIF.
-                WHEN ')'.
-                  IF l_open_string IS INITIAL AND l_open_symbol IS INITIAL AND l_open IS NOT INITIAL.
-                    l_open = translate( val  = l_open
-                                        from = ` X`
-                                        to   = `X ` ).
-                    EXIT.
-                  ENDIF.
-                WHEN ''''.
-                  l_open_string = translate( val  = l_open_string
-                                             from = ` X`
-                                             to   = `X ` ).
-                  l_offset = l_offset + 1.
-                  CONTINUE.
-                WHEN '&'.
-                  IF l_open_string IS INITIAL.
-                    IF l_open_symbol = 'X'.
-                      l_to_symbol = l_offset - l_from_symbol + 1.
-                      l_symbol = me->where_syntax+l_from_symbol(l_to_symbol).
-
-*                    /cadaxo/cl_sqlc_cockpit_assist=>replace_one_symbol_with_value(
-*                      EXPORTING
-*                        i_where_column = l_where_col
-*                        i_symbol_name  = l_symbol
-*                        i_from         = l_from_symbol
-*                        i_length       = l_to_symbol
-*                      CHANGING
-*                        c_where_syntax = me->where_syntax
-*                        c_offset       = l_offset
-*                        c_total        = l_total_len ).
-
-                    ELSE.
-                      l_from_symbol = l_offset.
-                    ENDIF.
-
-                    l_open_symbol = translate( val  = l_open_symbol
-                                               from = ` X`
-                                               to   = `X ` ).
-                    l_offset = l_offset + 1.
-                    CONTINUE.
-                  ENDIF.
-              ENDCASE.
-
-              l_offset = l_offset + 1.
-
-            ENDDO.
-
-            IF l_open IS INITIAL AND l_open_string IS INITIAL AND l_open_symbol IS INITIAL AND l_is_subsel = abap_false.
-              l_offset = l_offset - l_from + 1.
-
-              TRY.
-                  l_where_col-value = me->where_syntax+l_from(l_offset).
-                CATCH cx_sy_range_out_of_bounds.
-                  l_where_col-value = me->where_syntax+l_from.
-              ENDTRY.
-
-              l_wc_nr = l_wc_nr + 1.
-
-              CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
-              CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
-
-              l_where_col-wildcard_operator  = l_wildcard_operator.
-              l_where_col-wildcard_condition = l_wildcard_condition.
-
-              CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
-
-              APPEND l_where_col TO me->gt_sql_where_col_tab_t.
-              CLEAR l_where_col.
-
-              l_from = l_from + l_offset.
-            ENDIF.
-            IF l_off_w > 0 AND l_off_f > 0.
-              l_off_w = l_off_w + l_len + 1.                " CDX3301
-              l_from = l_off_w + l_off_f.                   " CDX3301
-            ENDIF.
-            CLEAR: l_off_f,
-                   l_off_w,
-                   l_str,
-                   lt_source_split,
-                   ls_result_source.
-          WHEN 'IS'.   " IS [NOT] NULL
-            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-          WHEN 'AND'.  " AND
-            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-            l_where_col-andor = 'A'.
-          WHEN 'OR'.   " OR
-            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-            l_where_col-andor = 'O'.
-          WHEN ')'.                                         " CDX3301
-            CLEAR l_is_subsel.
-            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-*          l_from = l_from + 2.
-          WHEN OTHERS. " Field
-            " split field into field, table and alias
-            split_field( EXPORTING i_field  = l_string
-                         IMPORTING e_field  = l_where_col-fieldname
-                                   e_table  = l_where_col-tablename
-                                   e_alias  = l_where_col-aliasname
-                                   e_tabfld = l_where_col-tablefield ).
-
-            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-
-            " get type of the tablefield
-            TRY.
-                lr_abap_type ?= get_abap_typedescr( i_name = l_where_col-tablefield ).
-                l_where_col-type_kind   = lr_abap_type->type_kind.
-                l_where_col-fieldlength = lr_abap_type->output_length.
-                IF l_where_col-type_kind = 'g' AND l_where_col-fieldlength = 0. "SSTRING
-                  l_where_col-fieldlength = 1333.
-                ENDIF.
-              CATCH /cadaxo/cx_sqlc_type_not_found.
-            ENDTRY.
-
-        ENDCASE.
-      ELSE.
-        IF l_total_len > l_from AND me->where_syntax+l_from IS NOT INITIAL AND me->where_syntax+l_from CO ' )'.            " CDX001-0028
-          CONCATENATE me->where_syntax_wildcard me->where_syntax+l_from INTO me->where_syntax_wildcard SEPARATED BY space. " CDX001-0028
-        ENDIF.                                                                                                             " CDX001-0028
-        EXIT.
-      ENDIF.
-
-    ENDWHILE.
-
-    CONDENSE me->where_syntax_wildcard.
-
-    IF lt_result_source_tmp IS NOT INITIAL.
-*  IF l_is_subsel = abap_true AND lt_result_source_tmp IS NOT INITIAL.
-      me->result_source_t = lt_result_source_tmp.
-    ENDIF.
-  ENDMETHOD.
-
-
   METHOD process_subpool_result.
 ****************************************************************************************************
 * Description             : Subpool Result                                                         *
@@ -6675,4 +6065,615 @@ METHOD update_alv_field_catalog_sl.
   ENDLOOP.
 
 ENDMETHOD.
+
+
+  METHOD parse_sql_where_columns.
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             : PARSE SQL WHERE COLUMNS                                                -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        -
+    "  Date                    : xx.xx.xxxx                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  04.01.2012 | Fößleitner Johann    | add '=>, =<, ><'                            | CDX001-0031    -
+    "             |                      |                                             |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.05.2012 | Fößleitner Johann    | Bugfixing symbolname used in like           | "CDX130-008    -
+    "             |                      |                                             |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  01.06.2012 | Ana Lekic            |format value in where (for timestamps)       | CDX130-018     -
+    "             |                      |                                             |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  09.05.2014 | Domi Bigl            | no decimal . for P decimals 0               | RT229          -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  10.06.2016 | Ana Lekic            | Fehler beim replace vom wert                | Cockpit-65     -
+    " ---------------------------------------------------------------------------------------------------
+
+    DATA l_space_string       TYPE string.
+    DATA l_offset             TYPE i.
+    DATA l_from               TYPE i.
+    DATA l_string             TYPE string.
+    DATA l_match              TYPE i.
+    DATA lr_abap_type         TYPE REF TO cl_abap_elemdescr.
+    DATA where_col            TYPE /cadaxo/sqlcwherecol_str.
+    DATA l_wc_nr              TYPE n LENGTH 3.
+    DATA l_wildcard_operator  TYPE c LENGTH 6.
+    DATA l_wildcard_condition TYPE c LENGTH 6.
+    DATA l_total_len          TYPE i.
+    DATA lt_stringtab         TYPE stringtab.
+    DATA l_symbol             TYPE /cadaxo/sqlcsymbol_name.
+    DATA l_is_subsel          TYPE char1.
+    DATA l_length_check       TYPE i.
+    DATA l_length_check_2     TYPE i.
+    DATA l_message            TYPE string.
+    DATA l_from_save          TYPE i.
+    DATA l_symbol_value       TYPE /cadaxo/sqlcsymbol_value.
+    DATA l_spc_replaced       TYPE flag. " RT229
+    DATA l_added              TYPE i.
+    DATA lr_field             TYPE REF TO data.
+    DATA l_fieldname          TYPE string.
+    DATA l_strlen             TYPE i.
+    DATA l_string2            TYPE string.
+    DATA lt_result_source_tmp LIKE me->result_source_t.     " CDX3301
+    DATA l_off_f              TYPE i.
+    DATA l_off_w              TYPE i.
+    DATA l_len                TYPE i.
+    DATA l_str                TYPE string.
+    DATA lt_source_split      TYPE TABLE OF string.
+    DATA l_skip               TYPE i.
+    DATA l_tabix_next         TYPE i.
+    DATA ls_result_source     LIKE LINE OF me->result_source_t.
+    DATA l_do_times           TYPE i.
+    DATA l_open               TYPE c LENGTH 1.
+    DATA l_open_string        TYPE c LENGTH 1.
+    DATA l_open_symbol        TYPE c LENGTH 1.
+    DATA l_from_symbol        TYPE i.
+    DATA l_to_symbol          TYPE i.
+    FIELD-SYMBOLS <l_field>             TYPE any.
+    FIELD-SYMBOLS <ls_string>           TYPE string.
+    FIELD-SYMBOLS <l_source_split>      TYPE string.
+    FIELD-SYMBOLS <l_source_split_next> TYPE string.
+
+    CONCATENATE '' '' INTO l_space_string SEPARATED BY space.
+
+    CLEAR: l_from,
+           me->gt_sql_where_col_tab_t,
+           me->where_syntax_wildcard.
+
+    " condense the string
+    /cadaxo/cl_sqlc_cockpit_assist=>condense( CHANGING c_string = me->where_syntax ).
+
+    l_total_len = strlen( me->where_syntax ).
+
+    lt_result_source_tmp = me->result_source_t.             " CDX3301
+
+    WHILE l_from < l_total_len.
+
+      FIND FIRST OCCURRENCE OF l_space_string IN SECTION OFFSET l_from OF me->where_syntax MATCH OFFSET l_match.
+      IF sy-subrc = 0.
+        l_offset = l_match - l_from.
+        l_string = me->where_syntax+l_from(l_offset).
+
+        l_from_save = l_from.
+
+        l_from = l_match + 1.
+
+        CASE l_string.
+          WHEN '=' OR 'EQ' OR '<>' OR 'NE' OR '<' OR 'LT' OR '>' OR 'GT' OR '<=' OR 'LE' OR '>=' OR 'GE' OR '=>' OR '=<' OR '><'. " CDX001-0031
+            CASE l_string.
+              WHEN '='.
+                where_col-operator = 'EQ'.
+              WHEN '<>'.
+                where_col-operator = 'NE'.
+              WHEN '><'.                         " CDX001-0031
+                where_col-operator = 'NE'.
+                REPLACE SECTION OFFSET l_from_save LENGTH l_offset OF me->where_syntax WITH '<>'.
+              WHEN '<'.
+                where_col-operator = 'LT'.
+              WHEN '>'.
+                where_col-operator = 'GT'.
+              WHEN '<='.
+                where_col-operator = 'LE'.
+              WHEN '=<'.                         " CDX001-0031
+                where_col-operator = 'LE'.
+                REPLACE SECTION OFFSET l_from_save LENGTH l_offset OF me->where_syntax WITH '<='.
+              WHEN '>='.
+                where_col-operator = 'GE'.
+              WHEN '=>'.
+                where_col-operator = 'GE'.
+                REPLACE SECTION OFFSET l_from_save LENGTH l_offset OF me->where_syntax WITH '>='.
+              WHEN OTHERS.
+                where_col-operator = l_string.
+            ENDCASE.
+
+            /cadaxo/cl_sqlc_cockpit_assist=>get_where_value_match_offset( EXPORTING i_from         = l_from
+                                                                                    i_total_length = l_total_len
+                                                                          CHANGING  c_where_syntax = me->where_syntax
+                                                                                    c_offset       = l_match ).
+
+            l_offset = l_match - l_from.
+
+            IF sy-subrc = 0 AND l_offset <> 0.
+              where_col-value = me->where_syntax+l_from(l_offset).
+            ELSE.
+              where_col-value = me->where_syntax+l_from.
+            ENDIF.
+
+            " replace SPACE with ''
+            CLEAR l_spc_replaced.
+            IF where_col-value = 'SPACE'.
+              where_col-value = ''''''.
+              l_spc_replaced = abap_true.
+            ENDIF.
+
+            " bring the value in right format CDX130-018
+            IF lr_abap_type IS NOT INITIAL.
+              CLEAR l_added.                                  " RT229
+              format_value( EXPORTING i_abap_type = lr_abap_type           " CDX130-018 Begin
+                            IMPORTING e_added     = l_added  " RT229
+                            CHANGING  c_where_col = where_col ).
+            ENDIF.
+
+            IF where_col-type_kind CA 'bsI' AND where_col-value CO '-0123456789 '.
+              IF    ( where_col-type_kind = 'b' AND where_col-value > 255 )
+                 OR ( where_col-type_kind = 's' AND ( where_col-value > 32767      OR where_col-value < -32767 ) )
+                 OR ( where_col-type_kind = 'I' AND ( where_col-value > 2147483647 OR where_col-value < -2147483648 ) ).
+                RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value
+                  EXPORTING
+                    value = where_col-value
+                    field = CONV #( where_col-fieldname ).
+              ENDIF.
+            ENDIF.
+
+            " check value of "P" fields
+            IF where_col-type_kind = 'P' AND where_col-value CO '0123456789.,'''' '.
+              CREATE DATA lr_field TYPE HANDLE lr_abap_type.
+              ASSIGN lr_field->* TO <l_field>.
+
+              l_strlen = strlen( where_col-value ) - 1.
+
+              l_string2 = where_col-value.
+
+              IF l_string2+l_strlen(1) = `'`.
+                l_string2 = l_string2(l_strlen).
+              ENDIF.
+
+              IF l_string2(1) = `'`.
+                l_strlen = l_strlen - 1.
+                l_string2 = l_string2+1.
+              ENDIF.
+              TRY.
+                  <l_field> = l_string2.
+                CATCH cx_sy_conversion_no_number.
+                  l_fieldname = where_col-fieldname.
+                  RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value
+                    EXPORTING
+                      value = where_col-value
+                      field = l_fieldname.
+              ENDTRY.
+            ENDIF.
+
+            IF l_offset <> 0.
+              REPLACE ALL OCCURRENCES OF me->where_syntax+l_from(l_offset)
+                      IN SECTION OFFSET l_from LENGTH l_offset OF me->where_syntax WITH where_col-value. " cockpit-65
+            ELSE.
+              REPLACE ALL OCCURRENCES OF me->where_syntax+l_from
+                      IN SECTION OFFSET l_from LENGTH l_offset OF me->where_syntax WITH where_col-value. " cockpit-65
+            ENDIF.                                                          " CDX130-018 End
+
+            IF l_spc_replaced = abap_true.
+              l_offset = 2.
+              l_match = l_match - 3.
+              l_total_len = strlen( me->where_syntax ).
+            ENDIF.
+
+            IF l_added > 0.                                   " RT229
+              l_offset = l_offset + l_added.                  " RT229
+              l_match = l_match + l_added.                    " RT229
+              l_total_len = strlen( me->where_syntax ).       " RT229
+            ENDIF.                                            " RT229
+
+            " wildcard
+            l_wc_nr = l_wc_nr + 1.
+
+            CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
+            CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
+
+            where_col-wildcard_operator  = l_wildcard_operator.
+            where_col-wildcard_condition = l_wildcard_condition.
+
+            CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
+
+            APPEND where_col TO me->gt_sql_where_col_tab_t.
+            CLEAR where_col.
+
+            IF l_match > l_from.
+              l_from = l_match + 1.
+            ENDIF.
+
+          WHEN 'NOT'. " BETWEEN, LIKE, IN, IS NULL'
+*          CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+            IF where_col-fieldname = space.
+              where_col-not = 'X'.
+            ELSE.
+              where_col-operator_pre = 'NOT'.
+            ENDIF.
+          WHEN 'BETWEEN'. " BETWEEN a AND b"
+
+            where_col-operator = l_string.
+
+            " split the string at space
+            lt_stringtab = /cadaxo/cl_sqlc_cockpit_assist=>split( i_sql_string    = me->where_syntax
+                                                                  i_position_from = l_from ).
+
+            LOOP AT lt_stringtab FROM 1 TO 3 ASSIGNING <ls_string>.
+              CONCATENATE where_col-value <ls_string> INTO where_col-value SEPARATED BY space.
+            ENDLOOP.
+
+            SHIFT where_col-value LEFT DELETING LEADING l_space_string.
+
+            l_match = l_from + strlen( where_col-value ).
+
+            l_wc_nr = l_wc_nr + 1.
+
+            CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
+            CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
+
+            where_col-wildcard_operator  = l_wildcard_operator.
+            where_col-wildcard_condition = l_wildcard_condition.
+
+            CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
+
+            APPEND where_col TO me->gt_sql_where_col_tab_t.
+            CLEAR where_col.
+
+            IF l_match > l_from.
+              l_from = l_match + 1.
+            ENDIF.
+
+          WHEN 'LIKE'.
+
+            where_col-operator = l_string.
+
+            /cadaxo/cl_sqlc_cockpit_assist=>get_where_value_match_offset( EXPORTING i_from         = l_from
+                                                                                    i_total_length = l_total_len
+                                                                          CHANGING  c_where_syntax = me->where_syntax
+                                                                                    c_offset       = l_match ).
+
+            l_offset = l_match - l_from.
+
+            where_col-value = me->where_syntax+l_from(l_offset).
+
+            " get symbol value
+            FIND REGEX '&(\w|/)+&' IN where_col-value.      " CDX130-008
+            IF sy-subrc = 0.                                 " CDX130-008
+              l_symbol = where_col-value.              " CDX130-008
+              /cadaxo/cl_sqlc_cockpit_assist=>get_global_symbol_value( " CDX130-008
+                                                                       EXPORTING                                   " CDX130-008
+                                                                                 i_symbol       = l_symbol                " CDX130-008
+                                                                                 i_field_type   = where_col-type_kind   " CDX130-008
+                                                                       IMPORTING                                   " CDX130-008
+                                                                                 e_symbol_value = l_symbol_value ).       " CDX130-008
+              l_length_check = strlen( l_symbol_value ).      " CDX130-008
+
+              IF l_symbol_value CP '''*'.                     " CDX130-008
+                l_length_check = l_length_check - 1.          " CDX130-008
+              ENDIF.                                          " CDX130-008
+
+              IF l_symbol_value CP '*'''.                     " CDX130-008
+                l_length_check = l_length_check - 1.          " CDX130-008
+              ENDIF.                                          " CDX130-008
+
+            ELSE.
+              l_length_check = l_offset.
+
+              IF where_col-value CP '''*'.
+                l_length_check = l_length_check - 1.
+              ENDIF.
+
+              IF where_col-value CP '*'''.
+                l_length_check = l_length_check - 1.
+              ENDIF.
+
+            ENDIF.
+
+            l_length_check_2 = where_col-fieldlength * 2.
+
+            IF l_length_check > l_length_check_2.
+              MESSAGE e071(/cadaxo/sqlc) WITH where_col-tablefield l_length_check_2 INTO l_message.
+              RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
+                EXPORTING
+                  message = l_message.
+            ENDIF.
+
+            " wildcard
+            l_wc_nr = l_wc_nr + 1.
+
+            CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
+            CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
+
+            where_col-wildcard_operator  = l_wildcard_operator.
+            where_col-wildcard_condition = l_wildcard_condition.
+
+            CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
+
+            APPEND where_col TO me->gt_sql_where_col_tab_t.
+            CLEAR where_col.
+
+            IF l_match > l_from.
+              l_from = l_match + 1.
+            ENDIF.
+
+          WHEN 'IN' OR 'EXISTS'.   "(x, y, ... )
+            l_is_subsel = abap_false.
+            FIND 'SELECT' IN SECTION OFFSET l_from OF me->where_syntax.
+            IF sy-subrc = 0.
+              l_is_subsel = abap_true.
+            ENDIF.
+
+            IF l_is_subsel = abap_true.
+
+              IF where_col-operator_pre = 'NOT' OR where_col-not = 'X'.
+                CONCATENATE me->where_syntax_wildcard 'NOT' l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+              ELSE.
+                CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+              ENDIF.
+
+              " CDX3301 Begin
+
+              " CLEAR where_col. "DB
+              " find in subselect the tables
+              FIND 'FROM' IN SECTION OFFSET l_from OF me->where_syntax MATCH OFFSET l_off_f MATCH LENGTH l_len.
+              IF sy-subrc = 0.
+                l_off_f = l_off_f + l_len.
+                FIND 'WHERE' IN SECTION OFFSET l_from OF me->where_syntax MATCH OFFSET l_off_w MATCH LENGTH l_len.
+                IF sy-subrc = 0.
+                  l_off_w = l_off_w - l_off_f.
+
+                  l_str = me->where_syntax+l_off_f(l_off_w).
+                  l_str = condense( l_str ).
+                  SPLIT l_str AT space INTO TABLE lt_source_split.
+                  LOOP AT lt_source_split ASSIGNING <l_source_split>.
+                    IF l_skip > 0.
+                      l_skip = l_skip - 1.
+                      CONTINUE.
+                    ENDIF.
+                    IF    <l_source_split> = 'INNER'
+                       OR <l_source_split> = 'JOIN'
+                       OR <l_source_split> = 'LEFT'
+                       OR <l_source_split> = 'OUTER'.
+                      CONTINUE.
+                    ELSEIF    <l_source_split> = 'ON'
+                           OR <l_source_split> = 'AND'.
+                      l_skip = 3.
+                      CONTINUE.
+                    ELSE.
+                      ls_result_source-table = <l_source_split>.
+                      " MOVE <l_source_split> TO where_col-tablename."DB
+                      l_tabix_next = sy-tabix + 1.
+                      ASSIGN lt_source_split[ l_tabix_next ] TO <l_source_split_next>.
+                      IF sy-subrc = 0 AND <l_source_split_next> = 'AS'.
+                        l_tabix_next = l_tabix_next + 1.
+                        ASSIGN lt_source_split[ l_tabix_next ] TO <l_source_split_next>.
+                        IF sy-subrc = 0.
+                          ls_result_source-alias = <l_source_split_next>.
+                          APPEND ls_result_source TO me->result_source_t.
+                          CLEAR ls_result_source.
+                          l_skip = 2.
+                        ENDIF.
+                      ELSE.
+                        IF ls_result_source IS NOT INITIAL.
+                          APPEND ls_result_source TO me->result_source_t.
+                          CLEAR ls_result_source.
+                        ENDIF.
+                      ENDIF.
+                    ENDIF.
+                  ENDLOOP.
+
+                  DATA l_offs TYPE i.
+                  l_offs = l_off_w + l_off_f - l_from + l_len.
+                  CONCATENATE me->where_syntax_wildcard me->where_syntax+l_from(l_offs) INTO me->where_syntax_wildcard SEPARATED BY space.
+
+                ELSE. " no where condition
+
+                ENDIF.
+              ENDIF.
+              " CDX3301 End
+              " begin of insert-429
+            ELSEIF l_string = 'IN'.
+              where_col-operator = 'IN'.
+
+              /cadaxo/cl_sqlc_cockpit_assist=>get_where_value_match_offset( EXPORTING i_from         = l_from
+                                                                                      i_total_length = l_total_len
+                                                                            CHANGING  c_where_syntax = me->where_syntax
+                                                                                      c_offset       = l_match ).
+
+              l_offset = l_match - l_from.
+
+              where_col-value = me->where_syntax+l_from(l_offset).
+
+              l_wc_nr = l_wc_nr + 1.
+              CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
+              CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
+
+              where_col-wildcard_operator  = l_wildcard_operator.
+              where_col-wildcard_condition = l_wildcard_condition.
+              CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
+
+              APPEND where_col TO me->gt_sql_where_col_tab_t.
+              CLEAR where_col.
+
+              IF l_match > l_from.
+                l_from = l_match + 1.
+              ENDIF.
+              CONTINUE.
+              " end   of insert-429
+
+            ENDIF.
+
+            where_col-operator = l_string.
+
+
+
+            CLEAR l_open.
+            CLEAR l_open_string.
+            CLEAR l_open_symbol.
+            CLEAR l_from_symbol.
+            CLEAR l_to_symbol.
+
+            l_do_times = l_total_len - l_from.
+
+            l_offset = l_from.
+
+            DO l_do_times TIMES.
+
+              CASE me->where_syntax+l_offset(1).
+                WHEN '('.
+                  IF l_open_string IS INITIAL AND l_open_symbol IS INITIAL.
+                    l_open = translate( val  = l_open
+                                        from = ` X`
+                                        to   = `X ` ).
+                    l_offset = l_offset + 1.
+                    CONTINUE.
+                  ENDIF.
+                WHEN ')'.
+                  IF l_open_string IS INITIAL AND l_open_symbol IS INITIAL AND l_open IS NOT INITIAL.
+                    l_open = translate( val  = l_open
+                                        from = ` X`
+                                        to   = `X ` ).
+                    EXIT.
+                  ENDIF.
+                WHEN ''''.
+                  l_open_string = translate( val  = l_open_string
+                                             from = ` X`
+                                             to   = `X ` ).
+                  l_offset = l_offset + 1.
+                  CONTINUE.
+                WHEN '&'.
+                  IF l_open_string IS INITIAL.
+                    IF l_open_symbol = 'X'.
+                      l_to_symbol = l_offset - l_from_symbol + 1.
+                      l_symbol = me->where_syntax+l_from_symbol(l_to_symbol).
+
+*                    /cadaxo/cl_sqlc_cockpit_assist=>replace_one_symbol_with_value(
+*                      EXPORTING
+*                        i_where_column = where_col
+*                        i_symbol_name  = l_symbol
+*                        i_from         = l_from_symbol
+*                        i_length       = l_to_symbol
+*                      CHANGING
+*                        c_where_syntax = me->where_syntax
+*                        c_offset       = l_offset
+*                        c_total        = l_total_len ).
+
+                    ELSE.
+                      l_from_symbol = l_offset.
+                    ENDIF.
+
+                    l_open_symbol = translate( val  = l_open_symbol
+                                               from = ` X`
+                                               to   = `X ` ).
+                    l_offset = l_offset + 1.
+                    CONTINUE.
+                  ENDIF.
+              ENDCASE.
+
+              l_offset = l_offset + 1.
+
+            ENDDO.
+
+            IF l_open IS INITIAL AND l_open_string IS INITIAL AND l_open_symbol IS INITIAL AND l_is_subsel = abap_false.
+              l_offset = l_offset - l_from + 1.
+
+              TRY.
+                  where_col-value = me->where_syntax+l_from(l_offset).
+                CATCH cx_sy_range_out_of_bounds.
+                  where_col-value = me->where_syntax+l_from.
+              ENDTRY.
+
+              l_wc_nr = l_wc_nr + 1.
+
+              CONCATENATE '@O' l_wc_nr '@' INTO l_wildcard_operator.
+              CONCATENATE '@C' l_wc_nr '@' INTO l_wildcard_condition.
+
+              where_col-wildcard_operator  = l_wildcard_operator.
+              where_col-wildcard_condition = l_wildcard_condition.
+
+              CONCATENATE me->where_syntax_wildcard l_wildcard_operator l_wildcard_condition INTO me->where_syntax_wildcard SEPARATED BY space.
+
+              APPEND where_col TO me->gt_sql_where_col_tab_t.
+              CLEAR where_col.
+
+              l_from = l_from + l_offset.
+            ENDIF.
+            IF l_off_w > 0 AND l_off_f > 0.
+              l_off_w = l_off_w + l_len + 1.                " CDX3301
+              l_from = l_off_w + l_off_f.                   " CDX3301
+            ENDIF.
+            CLEAR: l_off_f,
+                   l_off_w,
+                   l_str,
+                   lt_source_split,
+                   ls_result_source.
+          WHEN 'IS'.   " IS [NOT] NULL
+            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+          WHEN 'AND'.  " AND
+            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+            where_col-andor = 'A'.
+          WHEN 'OR'.   " OR
+            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+            where_col-andor = 'O'.
+          WHEN ')'.                                         " CDX3301
+            CLEAR l_is_subsel.
+            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+*          l_from = l_from + 2.
+          WHEN OTHERS. " Field
+            " split field into field, table and alias
+            DATA: tablename TYPE string.
+            split_field( EXPORTING i_field  = l_string
+                         IMPORTING e_field  = where_col-fieldname
+                                   e_table  = tablename
+                                   e_alias  = where_col-aliasname
+                                   e_tabfld = where_col-tablefield ).
+            where_col-tablename = tablename.
+            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+
+            " get type of the tablefield
+            TRY.
+                lr_abap_type ?= get_abap_typedescr( i_name = where_col-tablefield ).
+                where_col-type_kind   = lr_abap_type->type_kind.
+                where_col-fieldlength = lr_abap_type->output_length.
+                IF where_col-type_kind = 'g' AND where_col-fieldlength = 0. "SSTRING
+                  where_col-fieldlength = 1333.
+                ENDIF.
+              CATCH /cadaxo/cx_sqlc_type_not_found.
+            ENDTRY.
+
+        ENDCASE.
+      ELSE.
+        IF l_total_len > l_from AND me->where_syntax+l_from IS NOT INITIAL AND me->where_syntax+l_from CO ' )'.            " CDX001-0028
+          CONCATENATE me->where_syntax_wildcard me->where_syntax+l_from INTO me->where_syntax_wildcard SEPARATED BY space. " CDX001-0028
+        ENDIF.                                                                                                             " CDX001-0028
+        EXIT.
+      ENDIF.
+
+    ENDWHILE.
+
+    CONDENSE me->where_syntax_wildcard.
+
+    IF lt_result_source_tmp IS NOT INITIAL.
+*  IF l_is_subsel = abap_true AND lt_result_source_tmp IS NOT INITIAL.
+      me->result_source_t = lt_result_source_tmp.
+    ENDIF.
+  ENDMETHOD.
 ENDCLASS.
