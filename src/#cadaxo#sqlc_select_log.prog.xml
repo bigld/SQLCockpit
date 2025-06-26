@@ -25,29 +25,29 @@
     <item>
      <ID>S</ID>
      <KEY>SEL_DATE</KEY>
-     <ENTRY>Execution Date</ENTRY>
+     <ENTRY>.</ENTRY>
      <LENGTH>22</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
     <item>
      <ID>S</ID>
      <KEY>SEL_ROWS</KEY>
-     <ENTRY>Result Rows</ENTRY>
+     <ENTRY>.</ENTRY>
      <LENGTH>19</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
     <item>
      <ID>S</ID>
      <KEY>SEL_RUNT</KEY>
-     <ENTRY>Result Runtime</ENTRY>
+     <ENTRY>.</ENTRY>
      <LENGTH>22</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
     <item>
      <ID>S</ID>
      <KEY>SEL_USER</KEY>
-     <ENTRY>User Name</ENTRY>
-     <LENGTH>17</LENGTH>
+     <ENTRY>.</ENTRY>
+     <LENGTH>9</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
    </TPOOL>
