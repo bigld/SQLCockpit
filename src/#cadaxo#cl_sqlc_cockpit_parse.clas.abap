@@ -3738,28 +3738,31 @@ ENDMETHOD.
   endmethod.
 
 
-method get_code_dbhints.
+METHOD get_code_dbhints.
 
-  data l_line           type string.
+  DATA l_line           TYPE string.
 
-  if not me->dbhint_syntax is initial.
-    concatenate ' %_HINTS MSSQLNT' me->dbhint_syntax into l_line separated by space.
-    append l_line to ct_code.
-    concatenate '         DB6     ' me->dbhint_syntax into l_line separated by space.
-    append l_line to ct_code.
-    concatenate '         DB2     ' me->dbhint_syntax into l_line separated by space.
-    append l_line to ct_code.
-    concatenate '         AS400   ' me->dbhint_syntax into l_line separated by space.
-    append l_line to ct_code.
-    concatenate '         INFORMIX' me->dbhint_syntax into l_line separated by space.
-    append l_line to ct_code.
-    concatenate '         ORACLE  ' me->dbhint_syntax into l_line separated by space.
-    append l_line to ct_code.
-    concatenate '         ADABAS  ' me->dbhint_syntax into l_line separated by space.
-    append l_line to ct_code.
-  endif.
+  IF NOT me->dbhint_syntax IS INITIAL.
+    CONCATENATE ' %_HINTS MSSQLNT' me->dbhint_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO ct_code.
+    CONCATENATE '         DB6     ' me->dbhint_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO ct_code.
+    CONCATENATE '         DB2     ' me->dbhint_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO ct_code.
+    CONCATENATE '         AS400   ' me->dbhint_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO ct_code.
+    CONCATENATE '         INFORMIX' me->dbhint_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO ct_code.
+    CONCATENATE '         ORACLE  ' me->dbhint_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO ct_code.
+    CONCATENATE '         ADABAS  ' me->dbhint_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO ct_code.
+    CONCATENATE '         HDB     ' me->dbhint_syntax INTO l_line SEPARATED BY space.
+    APPEND l_line TO ct_code.
 
-endmethod.
+  ENDIF.
+
+ENDMETHOD.
 
 
   METHOD get_code_fields.
