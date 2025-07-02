@@ -793,6 +793,8 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
       APPEND l_line TO ct_code.
       CONCATENATE '         ADABAS  ' gr_parser->dbhint_syntax INTO l_line SEPARATED BY space.
       APPEND l_line TO ct_code.
+      CONCATENATE '         HDB     ' gr_parser->dbhint_syntax INTO l_line SEPARATED BY space.
+      APPEND l_line TO ct_code.
     ENDIF.
 
   ENDMETHOD.
