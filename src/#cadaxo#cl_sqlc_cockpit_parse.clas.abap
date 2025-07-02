@@ -2733,8 +2733,8 @@ END-ENHANCEMENT-SECTION.
                           AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
-
+                          ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                          HDB      me->dbhint_syntax. "
             APPEND <l_result_struct> TO <l_result_table>.
           ENDSELECT.
           e_result_details-runtime = runtime->end( ).
@@ -2753,7 +2753,8 @@ END-ENHANCEMENT-SECTION.
                           AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                           ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                          ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                          HDB      me->dbhint_syntax. "
             APPEND <l_result_struct> TO <l_result_table>.
           ENDSELECT.
           e_result_details-runtime = runtime->end( ).
@@ -2816,7 +2817,8 @@ END-ENHANCEMENT-SECTION.
                          AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                         ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                         ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                         HDB      me->dbhint_syntax. "
               e_result_details-runtime = runtime->end( ).
             ELSE.
               ASSERT lc_cs_active = abap_true.
@@ -2835,7 +2837,8 @@ END-ENHANCEMENT-SECTION.
                          AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                          ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                         ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                         ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                         HDB      me->dbhint_syntax. "
               e_result_details-runtime = runtime->end( ).
             ENDIF.
 
@@ -2865,7 +2868,8 @@ END-ENHANCEMENT-SECTION.
                               AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                               INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                               ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                              ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                              ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                              HDB      me->dbhint_syntax. "
               l_package_size = l_total_rows / 100 * 5.
 
             ENDIF.
@@ -2892,7 +2896,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
 
                     l_percentage = l_percentage + 5.
 
@@ -2919,7 +2924,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
                 ENDIF.
 
               WHEN 'X  '.
@@ -2941,8 +2947,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
-
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
                     l_percentage = l_percentage + 5.
 
                     CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
@@ -2967,7 +2973,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
                 ENDIF.
               WHEN ' X '.
                 ASSERT lc_cs_active = abap_true.
@@ -2990,7 +2997,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
 
                     l_percentage = l_percentage + 5.
 
@@ -3017,7 +3025,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
                 ENDIF.
               WHEN '  X'.
                 IF i_progress_indicator NE space.
@@ -3039,7 +3048,8 @@ END-ENHANCEMENT-SECTION.
                                     AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                     INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                     ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                    ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                                    ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                    HDB      me->dbhint_syntax. "
 
                     l_percentage = l_percentage + 5.
 
@@ -3066,7 +3076,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
                 ENDIF.
               WHEN 'XX '.
                 ASSERT lc_cs_active = abap_true.
@@ -3089,7 +3100,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
 
                     l_percentage = l_percentage + 5.
 
@@ -3116,7 +3128,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011   "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
                 ENDIF.
               WHEN 'X X'.
                 IF i_progress_indicator NE space.
@@ -3138,7 +3151,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
 
                     l_percentage = l_percentage + 5.
 
@@ -3165,7 +3179,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011  "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
                 ENDIF.
               WHEN ' XX'.
                 ASSERT lc_cs_active = abap_true.
@@ -3189,7 +3204,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
 
                     l_percentage = l_percentage + 5.
 
@@ -3217,7 +3233,8 @@ END-ENHANCEMENT-SECTION.
                                   AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                   ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                  ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                  HDB      me->dbhint_syntax. "
 
                 ENDIF.
               WHEN 'XXX'.
@@ -3242,7 +3259,8 @@ END-ENHANCEMENT-SECTION.
                                           AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                          ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                          HDB      me->dbhint_syntax. "
 
                     l_percentage = l_percentage + 5.
 
@@ -3270,8 +3288,9 @@ END-ENHANCEMENT-SECTION.
                                           AS400    me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           INFORMIX me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
                                           ORACLE   me->dbhint_syntax "CDX001-0011  "#EC CI_HINTS
-                                          ADABAS   me->dbhint_syntax. "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
-                ENDIF.
+                                          ADABAS   me->dbhint_syntax "#EC CI_DYNWHERE "#EC CI_DYNTAB "CDX001-0011 "#EC CI_HINTS
+                                          HDB      me->dbhint_syntax. "
+                    ENDIF.
             ENDCASE.
 
             e_result_details-runtime = runtime->end( ).
