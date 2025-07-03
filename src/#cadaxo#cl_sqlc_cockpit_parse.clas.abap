@@ -2599,7 +2599,7 @@ END-ENHANCEMENT-SECTION.
       IF sy-subrc = 0.
         CLEAR g_error_message.
         WAIT FOR ASYNCHRONOUS TASKS UNTIL g_async_calls = 0.
-        IF sy-subrc <> 0.
+        IF sy-subrc <> 0 OR g_error_message IS NOT INITIAL.
           RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
             EXPORTING
               message = g_error_message.
