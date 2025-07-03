@@ -8004,6 +8004,23 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
     l_grid_name = lcl_gui_control->get_name( ).
 
+    IF l_grid_name IS INITIAL OR lcl_gui_control IS INITIAL.
+        RETURN.
+    ENDIF.
+
+    IF l_grid_name CP 'GC_GRID_RESULT_*'.
+
+        DATA(l_suffix) = l_grid_name+15.
+
+        IF l_suffix CO '01234567890'.
+
+        ELSE.
+          RETURN.
+        ENDIF.
+    ELSE.
+      RETURN.
+    ENDIF.
+
     TRY.
 
         lcl_cl_gui_alv_grid ?= lcl_gui_control.
