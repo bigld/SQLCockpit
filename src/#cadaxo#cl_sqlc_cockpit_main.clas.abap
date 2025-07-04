@@ -689,7 +689,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     METHODS usr_action_show_abap_docu .
     METHODS usr_action_sql_trace_onoff .
     METHODS replace_old_runtime_structure
-        CHANGING xml TYPE csequence.
+      CHANGING xml TYPE csequence.
   PRIVATE SECTION.
 
     CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
@@ -3091,7 +3091,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           ENDIF.
           "COCKPIT-458 END
 
-          APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t.
+          APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t. "Todo Dävid Icons
 
           /cadaxo/cl_sqlc_log=>update_sql_to_log( i_timestamp      = l_timestamp
                                                   i_sql_string     = <lr_cl_sql_parse>->sql_syntax
@@ -5454,7 +5454,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      | to prevent dump by 255                      |                *
 ****************************************************************************************************
 
-    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline.
+    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline. "TODO Umbauen auf String
     DATA: lv_pos        TYPE i.
     DATA: lv_string     TYPE string.
     DATA: lt_string     TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
@@ -6771,10 +6771,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     DATA l_text_line(256)   TYPE c.
     DATA l_text_string       TYPE string.
-    DATA l_strlen           TYPE i.
-    DATA l_diff             TYPE i.
-    DATA l_padding          TYPE string.
-
 
     TRY.
         DATA(drop_object) = CAST /cadaxo/if_editor_dragdrop( dragdrop_object->object ).
@@ -6785,17 +6781,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
         l_text_line = drop_object->get_string_to_insert( ).
 
-        l_strlen = strlen( l_text_string ).
+        IF index > strlen( l_text_string ).
+          DATA(padding) = | |.
 
-        IF index > l_strlen.
-            l_diff = index - l_strlen.
-            DO l_diff TIMES.                "for keeping spaces in clipboard
-            l_padding = l_padding && | |.
-            ENDDO.
-
-            CONCATENATE l_text_string l_padding l_text_line INTO l_text_string.
+          CONCATENATE l_text_string padding l_text_line INTO l_text_string.
         ELSE.
-            CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
+          CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
         ENDIF.
         gc_clipboard_textedit->set_textstream( EXPORTING text = l_text_string ).
       CATCH cx_sy_move_cast_error.
@@ -8003,6 +7994,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
     l_grid_name = lcl_gui_control->get_name( ).
+
+    FIND REGEX '^GC_GRID_RESULT_\d+$' IN l_grid_name MATCH COUNT DATA(match).
+
+    IF lcl_gui_control IS INITIAL OR match = 0.
+      RETURN.
+    ENDIF.
 
     TRY.
 
@@ -11854,7 +11851,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 * 14.11.2014 | Ana Lekic            | no refresh button for a saved list          | RT244          *
 *            |                      |                                             |                *
 ****************************************************************************************************
-
 * data definition
     DATA: l_lines     TYPE i,
           l_grid_name TYPE string,
@@ -12063,6 +12059,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           CASE <fcat>-fieldname.
             WHEN 'CDXLINECOLOR'.
               <fcat>-no_out = abap_true.
+            WHEN 'CDXICON'.
+              <fcat>-icon = abap_true. "added by Dävid
+              <fcat>-no_sign = abap_false.
+              <fcat>-no_out = abap_false.
           ENDCASE.
         ENDLOOP.
 
@@ -12439,6 +12439,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       CASE <fcat>-fieldname.
         WHEN 'CDXLINECOLOR'.
           <fcat>-no_out = abap_true.
+        WHEN 'CDXICON'.
+          <fcat>-icon = abap_true. "added by Dävid
+          <fcat>-no_sign = abap_false.
+          <fcat>-no_out = abap_false.
       ENDCASE.
     ENDLOOP.
 
