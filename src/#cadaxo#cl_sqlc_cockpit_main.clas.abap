@@ -3091,7 +3091,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           ENDIF.
           "COCKPIT-458 END
 
-          APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t.
+          APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t. "Todo Dävid Icons
 
           /cadaxo/cl_sqlc_log=>update_sql_to_log( i_timestamp      = l_timestamp
                                                   i_sql_string     = <lr_cl_sql_parse>->sql_syntax
@@ -5454,7 +5454,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      | to prevent dump by 255                      |                *
 ****************************************************************************************************
 
-    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline.
+    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline. "TODO Umbauen auf String
     DATA: lv_pos        TYPE i.
     DATA: lv_string     TYPE string.
     DATA: lt_string     TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
@@ -8004,11 +8004,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
     l_grid_name = lcl_gui_control->get_name( ).
 
+    FIND REGEX '^GC_GRID_RESULT_\d+$' IN l_grid_name MATCH COUNT DATA(match).
 
-    IF l_grid_name IS INITIAL OR strlen( l_grid_name ) < 15 OR
-       lcl_gui_control IS INITIAL OR
-       l_grid_name+0(15) <> 'GC_GRID_RESULT_' OR NOT
-       l_grid_name+15 CO '0123456789'.
+    IF lcl_gui_control IS INITIAL OR match = 0.
       RETURN.
     ENDIF.
 
