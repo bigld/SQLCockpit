@@ -3091,7 +3091,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           ENDIF.
           "COCKPIT-458 END
 
-          APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t.
+          APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t. "Todo Dävid Icons
 
           /cadaxo/cl_sqlc_log=>update_sql_to_log( i_timestamp      = l_timestamp
                                                   i_sql_string     = <lr_cl_sql_parse>->sql_syntax
@@ -5454,7 +5454,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      | to prevent dump by 255                      |                *
 ****************************************************************************************************
 
-    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline.
+    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline. "TODO Umbauen auf String
     DATA: lv_pos        TYPE i.
     DATA: lv_string     TYPE string.
     DATA: lt_string     TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
@@ -8004,20 +8004,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
     l_grid_name = lcl_gui_control->get_name( ).
 
-    IF l_grid_name IS INITIAL OR lcl_gui_control IS INITIAL.
-        RETURN.
-    ENDIF.
+    FIND REGEX '^GC_GRID_RESULT_\d+$' IN l_grid_name MATCH COUNT DATA(match).
 
-    IF l_grid_name CP 'GC_GRID_RESULT_*'.
-
-        DATA(l_suffix) = l_grid_name+15.
-
-        IF l_suffix CO '01234567890'.
-
-        ELSE.
-          RETURN.
-        ENDIF.
-    ELSE.
+    IF lcl_gui_control IS INITIAL OR match = 0.
       RETURN.
     ENDIF.
 
@@ -11871,7 +11860,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 * 14.11.2014 | Ana Lekic            | no refresh button for a saved list          | RT244          *
 *            |                      |                                             |                *
 ****************************************************************************************************
-
 * data definition
     DATA: l_lines     TYPE i,
           l_grid_name TYPE string,
@@ -12080,6 +12068,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           CASE <fcat>-fieldname.
             WHEN 'CDXLINECOLOR'.
               <fcat>-no_out = abap_true.
+            WHEN 'CDXICON'.
+              <fcat>-icon = abap_true. "added by Dävid
+              <fcat>-no_sign = abap_false.
+              <fcat>-no_out = abap_false.
           ENDCASE.
         ENDLOOP.
 
@@ -12456,6 +12448,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       CASE <fcat>-fieldname.
         WHEN 'CDXLINECOLOR'.
           <fcat>-no_out = abap_true.
+        WHEN 'CDXICON'.
+          <fcat>-icon = abap_true. "added by Dävid
+          <fcat>-no_sign = abap_false.
+          <fcat>-no_out = abap_false.
       ENDCASE.
     ENDLOOP.
 
