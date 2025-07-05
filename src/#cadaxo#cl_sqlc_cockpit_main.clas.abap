@@ -689,7 +689,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     METHODS usr_action_show_abap_docu .
     METHODS usr_action_sql_trace_onoff .
     METHODS replace_old_runtime_structure
-        CHANGING xml TYPE csequence.
+      CHANGING xml TYPE csequence.
   PRIVATE SECTION.
 
     CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
@@ -6771,10 +6771,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     DATA l_text_line(256)   TYPE c.
     DATA l_text_string       TYPE string.
-    DATA l_strlen           TYPE i.
-    DATA l_diff             TYPE i.
-    DATA l_padding          TYPE string.
-
 
     TRY.
         DATA(drop_object) = CAST /cadaxo/if_editor_dragdrop( dragdrop_object->object ).
@@ -6785,17 +6781,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
         l_text_line = drop_object->get_string_to_insert( ).
 
-        l_strlen = strlen( l_text_string ).
+        IF index > strlen( l_text_string ).
+          DATA(padding) = | |.
 
-        IF index > l_strlen.
-            l_diff = index - l_strlen.
-            DO l_diff TIMES.                "for keeping spaces in clipboard
-            l_padding = l_padding && | |.
-            ENDDO.
-
-            CONCATENATE l_text_string l_padding l_text_line INTO l_text_string.
+          CONCATENATE l_text_string padding l_text_line INTO l_text_string.
         ELSE.
-            CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
+          CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
         ENDIF.
         gc_clipboard_textedit->set_textstream( EXPORTING text = l_text_string ).
       CATCH cx_sy_move_cast_error.
