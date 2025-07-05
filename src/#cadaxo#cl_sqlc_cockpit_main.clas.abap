@@ -6766,32 +6766,27 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD on_clipboard_drop.
-
-    DATA l_text_line(256)   TYPE c.
-    DATA l_text_string       TYPE string.
+    DATA text_line   TYPE c LENGTH 256.
+    DATA text_string TYPE string.
 
     TRY.
         DATA(drop_object) = CAST /cadaxo/if_editor_dragdrop( dragdrop_object->object ).
 
-        gc_clipboard_textedit->get_textstream( IMPORTING text = l_text_string ).
+        gc_clipboard_textedit->get_textstream( IMPORTING text = text_string ).
 
         cl_gui_cfw=>flush( ).
 
-        l_text_line = drop_object->get_string_to_insert( ).
+        text_line = drop_object->get_string_to_insert( ).
 
-        IF index > strlen( l_text_string ).
-          DATA(padding) = | |.
-
-          CONCATENATE l_text_string padding l_text_line INTO l_text_string.
+        IF index > strlen( text_string ).
+          text_string = |{ text_string } { text_line }|.
         ELSE.
-          CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
+          text_string = text_string(index) && text_line && text_string+index.
         ENDIF.
-        gc_clipboard_textedit->set_textstream( EXPORTING text = l_text_string ).
+        gc_clipboard_textedit->set_textstream( text = text_string ).
       CATCH cx_sy_move_cast_error.
     ENDTRY.
-
   ENDMETHOD.
 
 
