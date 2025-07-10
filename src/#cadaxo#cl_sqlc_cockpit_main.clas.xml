@@ -1095,6 +1095,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>Q66</KEY>
+     <ENTRY>JSON Browser</ENTRY>
+     <LENGTH>21</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>S01</KEY>
      <ENTRY>Deleting jobs ...</ENTRY>
      <LENGTH>30</LENGTH>
@@ -1206,6 +1212,12 @@
      <KEY>T17</KEY>
      <ENTRY>Add SQL query to editor</ENTRY>
      <LENGTH>104</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>T18</KEY>
+     <ENTRY>Display value in JSON browser</ENTRY>
+     <LENGTH>56</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -2336,6 +2348,12 @@
       </item>
       <item>
        <ID>I</ID>
+       <KEY>Q66</KEY>
+       <ENTRY>JSON Browser</ENTRY>
+       <LENGTH>21</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
        <KEY>S01</KEY>
        <ENTRY>Jobs werden gelöscht ...</ENTRY>
        <LENGTH>30</LENGTH>
@@ -2447,6 +2465,12 @@
        <KEY>T17</KEY>
        <ENTRY>SQL-Abfrage zum Editor hinzufügen</ENTRY>
        <LENGTH>104</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>T18</KEY>
+       <ENTRY>Anzeige in JSON Browser</ENTRY>
+       <LENGTH>56</LENGTH>
       </item>
       <item>
        <ID>I</ID>

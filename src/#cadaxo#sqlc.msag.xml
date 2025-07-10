@@ -1004,6 +1004,12 @@
      <MSGNR>165</MSGNR>
      <TEXT>Error writing file &amp;1 (&amp;2)</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>166</MSGNR>
+     <TEXT>Selected field does not contain JSON data</TEXT>
+    </T100>
    </T100>
    <LONGTEXTS>
     <item>
@@ -3149,6 +3155,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>165</MSGNR>
      <TEXT>Fehler beim Erstellen der Datei &amp;1 (&amp;2)</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>166</MSGNR>
+     <TEXT>Das ausgewählte Feld enthält keine JSON-Daten</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>
