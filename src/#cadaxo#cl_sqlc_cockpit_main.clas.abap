@@ -39,6 +39,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     CONSTANTS c_cmd_show_value_as TYPE ui_func VALUE 'SHOW_VALUE_AS' ##NO_TEXT.
     CONSTANTS c_cmd_show_value_as_html_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_HTML_BROW' ##NO_TEXT.
     CONSTANTS c_cmd_show_value_as_xml_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_XML_BROW' ##NO_TEXT.
+    CONSTANTS c_cmd_show_value_as_json_brow TYPE ui_func VALUE 'SHOW_VALUE_AS_JSON_BROW' ##NO_TEXT.
     CONSTANTS c_okcode_clipboard TYPE syucomm VALUE 'CLIPBOARD' ##NO_TEXT.
     CONSTANTS c_saved_list_share TYPE stb_button-function VALUE 'SAVED_LIST_SHARE' ##NO_TEXT.
     CONSTANTS c_saved_list_share_oth TYPE stb_button-function VALUE 'SAVED_LIST_SHARE_OTH' ##NO_TEXT.     "+COCKPIT420
@@ -370,6 +371,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       IMPORTING
         !i_grid_i TYPE i OPTIONAL
         !i_log    TYPE abap_bool OPTIONAL .
+    METHODS handle_command_show_json_brow
+      IMPORTING
+        !i_grid_i TYPE i OPTIONAL
+        !i_log    TYPE abap_bool OPTIONAL .
     METHODS handle_delete_saved_lists .
     METHODS handle_export_saved_list .
     METHODS handle_result_command_cdxexp
@@ -689,7 +694,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     METHODS usr_action_show_abap_docu .
     METHODS usr_action_sql_trace_onoff .
     METHODS replace_old_runtime_structure
-        CHANGING xml TYPE csequence.
+      CHANGING xml TYPE csequence.
+    METHODS replace_icon_names_in_sql
+      CHANGING VALUE(c_sql_string) TYPE string.
+
   PRIVATE SECTION.
 
     CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
@@ -3078,6 +3086,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
           DATA(l_timestamp) = /cadaxo/cl_sqlc_log=>insert_sql_to_log( i_sql_string = <lr_cl_sql_parse>->sql_syntax ).
 
+          me->replace_icon_names_in_sql( CHANGING c_sql_string = <lr_cl_sql_parse>->column_syntax ).
+
           <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings      = me->ms_user_settings_xml
                                                        i_progress_indicator = i_progress_indicator
                                              IMPORTING e_result_details     = l_result_details ).
@@ -5454,7 +5464,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      | to prevent dump by 255                      |                *
 ****************************************************************************************************
 
-    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline.
+    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline. "TODO Umbauen auf String
     DATA: lv_pos        TYPE i.
     DATA: lv_string     TYPE string.
     DATA: lt_string     TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
@@ -5463,6 +5473,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     lv_line = iv_line.   "COCKPIT-315
 
     lv_string = iv_sqlstring.
+
+
 
     gc_abap_editor->get_line_text( EXPORTING line_number = lv_line
                                    IMPORTING text        = lv_codeline ).
@@ -6771,10 +6783,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     DATA l_text_line(256)   TYPE c.
     DATA l_text_string       TYPE string.
-    DATA l_strlen           TYPE i.
-    DATA l_diff             TYPE i.
-    DATA l_padding          TYPE string.
-
 
     TRY.
         DATA(drop_object) = CAST /cadaxo/if_editor_dragdrop( dragdrop_object->object ).
@@ -6785,17 +6793,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
         l_text_line = drop_object->get_string_to_insert( ).
 
-        l_strlen = strlen( l_text_string ).
+        IF index > strlen( l_text_string ).
+          DATA(padding) = | |.
 
-        IF index > l_strlen.
-            l_diff = index - l_strlen.
-            DO l_diff TIMES.                "for keeping spaces in clipboard
-            l_padding = l_padding && | |.
-            ENDDO.
-
-            CONCATENATE l_text_string l_padding l_text_line INTO l_text_string.
+          CONCATENATE l_text_string padding l_text_line INTO l_text_string.
         ELSE.
-            CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
+          CONCATENATE l_text_string(index) l_text_line l_text_string+index INTO l_text_string.
         ENDIF.
         gc_clipboard_textedit->set_textstream( EXPORTING text = l_text_string ).
       CATCH cx_sy_move_cast_error.
@@ -8004,11 +8007,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
     l_grid_name = lcl_gui_control->get_name( ).
 
+    FIND REGEX '^GC_GRID_RESULT_\d+$' IN l_grid_name MATCH COUNT DATA(match).
 
-    IF l_grid_name IS INITIAL OR strlen( l_grid_name ) < 15 OR
-       lcl_gui_control IS INITIAL OR
-       l_grid_name+0(15) <> 'GC_GRID_RESULT_' OR NOT
-       l_grid_name+15 CO '0123456789'.
+    IF lcl_gui_control IS INITIAL OR match = 0.
       RETURN.
     ENDIF.
 
@@ -8056,6 +8057,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           fcode             = c_cmd_show_value_as_xml_brow
           text              = TEXT-q62
       ).
+      l_show_as_submenu->add_function(
+        EXPORTING
+          fcode             = c_cmd_show_value_as_json_brow
+          text              = TEXT-q66
+).
 
       e_object->add_submenu(
         EXPORTING
@@ -8597,6 +8603,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           me->handle_command_show_html_brow( EXPORTING i_grid_i = l_grid_name_i ).
         WHEN c_cmd_show_value_as_xml_brow.
           me->handle_command_show_xml_brow( EXPORTING i_grid_i = l_grid_name_i ).
+        WHEN c_cmd_show_value_as_json_brow.
+          me->handle_command_show_json_brow( EXPORTING i_grid_i = l_grid_name_i ).
+
         WHEN OTHERS.
 
           DATA lr_badi            TYPE REF TO /cadaxo/sqlc_badi_res_ctxm.
@@ -13206,4 +13215,125 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     xml = l_xml_output.
 
   ENDMETHOD.
+
+  METHOD handle_command_show_json_brow.
+    DATA gui_control  TYPE REF TO cl_gui_control.
+    DATA gui_alv_grid TYPE REF TO cl_gui_alv_grid.
+    DATA selected_row TYPE lvc_s_row.
+    DATA selected_col TYPE lvc_s_col.
+
+    FIELD-SYMBOLS <result_tab>   TYPE STANDARD TABLE.
+    FIELD-SYMBOLS <result_line>  TYPE any.
+    FIELD-SYMBOLS <result_field> TYPE any.
+    FIELD-SYMBOLS <dref_line>    TYPE REF TO data.
+
+    cl_gui_alv_grid=>get_focus( IMPORTING control = gui_control ).
+
+    TRY.
+        gui_alv_grid ?= gui_control.
+        gui_alv_grid->get_current_cell( IMPORTING es_row_id = selected_row
+                                                  es_col_id = selected_col ).
+      CATCH cx_sy_move_cast_error ##NO_HANDLER.
+        RETURN.
+    ENDTRY.
+
+    IF i_log = abap_true.
+      ASSIGN gt_history_log[ selected_row-index ] TO <result_line>.
+    ELSE.
+      ASSIGN dref_result_tab_t[ i_grid_i ] TO <dref_line>.
+      ASSIGN <dref_line>->* TO <result_tab>.
+      ASSIGN <result_tab>[ selected_row-index ] TO <result_line>.
+    ENDIF.
+
+    IF sy-subrc = 0.
+      ASSIGN COMPONENT selected_col-fieldname OF STRUCTURE <result_line> TO <result_field>.
+      IF <result_field> IS ASSIGNED.
+
+        DATA(data_to_string) = CONV string( <result_field> ).
+        IF data_to_string CP '{*' OR data_to_string CP '[*'.
+
+          " Perform transformation from JSON → HTML
+          TRY.
+              CALL TRANSFORMATION sjson2html
+                   SOURCE XML <result_field>
+                   RESULT XML DATA(result_html).
+
+              cl_abap_browser=>show_html( html_string  = cl_abap_codepage=>convert_from( result_html )
+                                          title        = TEXT-t18
+                                          size         = cl_abap_browser=>large
+                                          modal        = abap_true
+                                          printing     = abap_true
+                                          buttons      = abap_true
+                                          context_menu = abap_true ).
+            CATCH cx_transformation_error INTO DATA(lx_transform).
+              MESSAGE lx_transform->get_text( ) TYPE 'E'.
+          ENDTRY.
+
+        ELSE.
+          MESSAGE i166(/cadaxo/sqlc) DISPLAY LIKE cl_abap_docu_constants=>msg-e.
+        ENDIF.
+
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD replace_icon_names_in_sql.
+
+    DATA: matches       TYPE match_result_tab,
+          match         TYPE match_result,
+          icon_name     TYPE string,
+          icon_id       TYPE icon_d,
+          left_part     TYPE string,
+          right_part    TYPE string,
+          sql_len       TYPE i,
+          remaining_len TYPE i,
+          idx           TYPE i,
+          pos           TYPE i.
+
+    FIND ALL OCCURRENCES OF REGEX 'ICON_[A-Za-z0-9_]+' IN c_sql_string IGNORING CASE RESULTS matches.
+
+    IF lines( matches ) = 0.
+      RETURN.
+    ENDIF.
+
+    sql_len = strlen( c_sql_string ).
+
+    idx = lines( matches ).
+    WHILE idx > 0.
+      READ TABLE matches INDEX idx INTO match.
+      IF sy-subrc <> 0.
+        idx = idx - 1.
+        CONTINUE.
+      ENDIF.
+
+      icon_name = to_upper( c_sql_string+match-offset(match-length) ).
+
+      SELECT SINGLE id INTO @icon_id FROM icon WHERE name = @icon_name.
+      IF sy-subrc = 0.
+
+        IF match-offset > 0.
+          left_part = c_sql_string+0(match-offset).
+        ELSE.
+          left_part = ''.
+        ENDIF.
+
+        pos = match-offset + match-length.
+        remaining_len = sql_len - pos.
+
+        IF remaining_len > 0.
+          right_part = c_sql_string+pos(remaining_len).
+        ELSE.
+          right_part = ''.
+        ENDIF.
+
+        CONCATENATE left_part icon_id right_part INTO c_sql_string.
+
+        sql_len = strlen( c_sql_string ).
+      ENDIF.
+
+      idx = idx - 1.
+    ENDWHILE.
+
+  ENDMETHOD.
+
 ENDCLASS.
