@@ -5459,7 +5459,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      | to prevent dump by 255                      |                *
 ****************************************************************************************************
 
-    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline. "TODO Umbauen auf String
+    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline.
     DATA: lv_pos        TYPE i.
     DATA: lv_string     TYPE string.
     DATA: lt_string     TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
@@ -5469,8 +5469,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     lv_string = iv_sqlstring.
 
-
-
     gc_abap_editor->get_line_text( EXPORTING line_number = lv_line
                                    IMPORTING text        = lv_codeline ).
 
@@ -5478,7 +5476,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       lv_pos = iv_pos - 2.
     ENDIF.
 
-    IF lv_pos GE 1.
+    IF lv_pos >= 1 AND lv_pos < strlen( lv_codeline ).
 * is there a leading space? if not, add a space
       IF lv_codeline+lv_pos(1) CN ' /"(~`'''.                             "CDX001-0022 "COCKPIT-308 '`
         CONCATENATE ' ' lv_string INTO lv_string RESPECTING BLANKS.
@@ -5489,13 +5487,13 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       lv_pos = iv_pos - 1.                                              "CDX001-0006
     ENDIF.                                                              "CDX001-0006
 
-    IF lv_pos GE 1.                                                     "CDX001-0006
+    IF lv_pos >= 1 AND lv_pos < strlen( lv_codeline ).                                                    "CDX001-0006
       IF lv_codeline+lv_pos(1) CN ' /")~`'''.                           "CDX001-0006
         CONCATENATE lv_string ' ' INTO lv_string RESPECTING BLANKS.     "CDX001-0006 "COCKPIT-308 '`
       ENDIF.                                                            "CDX001-0006
     ENDIF.                                                              "CDX001-0006
 
-    IF lv_pos GE 220.                                                     "COCKPIT-315
+    IF lv_pos >= 220.                                                     "COCKPIT-315
       lv_string = space && cl_abap_char_utilities=>cr_lf && lv_string.    "COCKPIT-315
     ENDIF.                                                                "COCKPIT-315
 
@@ -5515,7 +5513,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                                              to_line   = 0
                                   EXCEPTIONS OTHERS    = 2 ).
 
-    IF lv_pos GE 220.                       "COCKPIT-315
+    IF lv_pos >= 220.                       "COCKPIT-315
       lv_pos = strlen( iv_sqlstring ) + 1.  "COCKPIT-315
       lv_line = lv_line + 1.                "COCKPIT-315
     ELSE.                                   "COCKPIT-315
