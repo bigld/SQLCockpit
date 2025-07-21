@@ -7008,20 +7008,31 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     READ TABLE lt_code INDEX l_from_line ASSIGNING <l_code>.
     IF sy-subrc = 0.
       MOVE <l_code> TO l_stringc.
+
+      IF l_from_pos >= 0 AND l_from_pos < strlen( l_stringc ). "Offset Check
       IF l_stringc+l_from_pos <> space.
-        WHILE l_from_pos <> 0 AND l_stringc+l_from_pos(1) <> space.
+
+        WHILE l_from_pos > 0 AND l_from_pos < strlen( l_stringc ) AND l_stringc+l_from_pos(1) <> space.
           l_from_pos = l_from_pos - 1.
         ENDWHILE.
-        l_from_pos = l_from_pos + 1.
-        WHILE l_to_pos <> 0 AND l_stringc+l_to_pos(1) <> space AND l_stringc+l_to_pos(1) <> '(' AND l_stringc+l_to_pos(1) <> '.'.
+
+        IF l_from_pos > 0 AND l_stringc+l_from_pos(1) = space.
+             l_from_pos = l_from_pos + 1.
+        ENDIF.
+
+          WHILE l_to_pos < strlen( l_stringc ) AND
+              l_stringc+l_to_pos(1) <> space AND
+              l_stringc+l_to_pos(1) <> '(' AND
+              l_stringc+l_to_pos(1) <> '.'.
           l_to_pos = l_to_pos + 1.
         ENDWHILE.
-      ENDIF.
 
       l_len = l_to_pos - l_from_pos.
       IF l_len GT 0.
 
         l_ddobjname = to_upper( l_stringc+l_from_pos(l_len) ).
+        SHIFT l_ddobjname LEFT DELETING LEADING SPACE.
+
 
         IF l_ddobjname CA '\'.
           SPLIT l_ddobjname AT '\' INTO TABLE DATA(lt_views).
@@ -7076,11 +7087,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         ENDIF.
 
       ENDIF.
-
+     ENDIF.
+    ENDIF.
     ENDIF.
 
   ENDMETHOD.
-
 
   METHOD on_editor_drop.
 ****************************************************************************************************
