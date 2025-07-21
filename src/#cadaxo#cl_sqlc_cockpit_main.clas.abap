@@ -2003,9 +2003,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       me->create_result_ui_controls( ).
 
-      me->symbols_controller->create_symbol_ui_control( gs_splitter_top->get_container( row = 1 column = 2 )  ).
-
       me->create_editor_ui_control( ).
+
+      me->symbols_controller->create_symbol_ui_control( i_container         = gs_splitter_top->get_container( row = 1 column = 2 )
+                                                        i_appllog_container = gcont_abap_error ).
 
       me->create_clipboard_ui_control( ).
 
