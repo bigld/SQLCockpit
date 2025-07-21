@@ -5427,45 +5427,44 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD insert_codeblock_at_position.
-****************************************************************************************************
-* Description             : Insert a codeblock at a specific position                              *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxxxxx                 *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 04.08.2010 | Fößleitner Johann    | After the insert, set the cursor to the     | CDX001-0006    *
-*            |                      | new position                                |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 09.09.2010 | Fößleitner Johann    | Split String at CR/LF                       | CDX001-0014    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 08.03.2011 | Fößleitner Johann    | Add '~'                                     | CDX001-0022    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.02.2018 | Domi Bigl            | Insert after/between ' or `                 | COCKPIT-308    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 14.03.2018 | Dusan Sacha          | Split insert longer than 220 characters     | COCKPIT-315    *
-*            |                      | to prevent dump by 255                      |                *
-****************************************************************************************************
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             : Insert a codeblock at a specific position                              -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxxxxx                 -
+    "  Date                    : xx.xx.xxxx                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  04.08.2010 | Fößleitner Johann    | After the insert, set the cursor to the     | CDX001-0006    -
+    "             |                      | new position                                |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  09.09.2010 | Fößleitner Johann    | Split String at CR/LF                       | CDX001-0014    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  08.03.2011 | Fößleitner Johann    | Add '~'                                     | CDX001-0022    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.02.2018 | Domi Bigl            | Insert after/between ' or `                 | COCKPIT-308    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  14.03.2018 | Dusan Sacha          | Split insert longer than 220 characters     | COCKPIT-315    -
+    "             |                      | to prevent dump by 255                      |                -
+    " ---------------------------------------------------------------------------------------------------
 
-    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline.
-    DATA: lv_pos        TYPE i.
-    DATA: lv_string     TYPE string.
-    DATA: lt_string     TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
-    DATA: lv_line       TYPE i.  "COCKPIT-315
+    DATA lv_codeline TYPE /cadaxo/sqlccodeline.
+    DATA lv_pos      TYPE i.
+    DATA lv_string   TYPE string.
+    DATA lt_string   TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
+    DATA lv_line     TYPE i. " COCKPIT-315
 
-    lv_line = iv_line.   "COCKPIT-315
+    lv_line = iv_line.   " COCKPIT-315
 
     lv_string = iv_sqlstring.
 
@@ -5477,30 +5476,30 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ENDIF.
 
     IF lv_pos >= 1 AND lv_pos < strlen( lv_codeline ).
-* is there a leading space? if not, add a space
-      IF lv_codeline+lv_pos(1) CN ' /"(~`'''.                             "CDX001-0022 "COCKPIT-308 '`
+      " is there a leading space? if not, add a space
+      IF lv_codeline+lv_pos(1) CN ' /"(~`'''.                             " CDX001-0022 "COCKPIT-308 '`
         CONCATENATE ' ' lv_string INTO lv_string RESPECTING BLANKS.
       ENDIF.
     ENDIF.
 
-    IF iv_pos <> 1.                                                     "CDX001-0006
-      lv_pos = iv_pos - 1.                                              "CDX001-0006
-    ENDIF.                                                              "CDX001-0006
+    IF iv_pos <> 1.                                                     " CDX001-0006
+      lv_pos = iv_pos - 1.                                              " CDX001-0006
+    ENDIF.                                                              " CDX001-0006
 
-    IF lv_pos >= 1 AND lv_pos < strlen( lv_codeline ).                                                    "CDX001-0006
-      IF lv_codeline+lv_pos(1) CN ' /")~`'''.                           "CDX001-0006
-        CONCATENATE lv_string ' ' INTO lv_string RESPECTING BLANKS.     "CDX001-0006 "COCKPIT-308 '`
-      ENDIF.                                                            "CDX001-0006
-    ENDIF.                                                              "CDX001-0006
+    IF lv_pos >= 1 AND lv_pos < strlen( lv_codeline ).                                                    " CDX001-0006
+      IF lv_codeline+lv_pos(1) CN ' /")~`'''.                           " CDX001-0006
+        CONCATENATE lv_string ' ' INTO lv_string RESPECTING BLANKS.     " CDX001-0006 "COCKPIT-308 '`
+      ENDIF.                                                            " CDX001-0006
+    ENDIF.                                                              " CDX001-0006
 
-    IF lv_pos >= 220.                                                     "COCKPIT-315
-      lv_string = space && cl_abap_char_utilities=>cr_lf && lv_string.    "COCKPIT-315
-    ENDIF.                                                                "COCKPIT-315
+    IF lv_pos >= 220.                                                     " COCKPIT-315
+      lv_string = space && cl_abap_char_utilities=>cr_lf && lv_string.    " COCKPIT-315
+    ENDIF.                                                                " COCKPIT-315
 
-* split the string at cr/lf into table
-    SPLIT lv_string AT cl_abap_char_utilities=>cr_lf INTO TABLE lt_string. "CDX001-0014
+    " split the string at cr/lf into table
+    SPLIT lv_string AT cl_abap_char_utilities=>cr_lf INTO TABLE lt_string. " CDX001-0014
 
-* insert the sql string
+    " insert the sql string
     gc_abap_editor->insert_block_at_position( EXPORTING  line     = lv_line
                                                          pos      = iv_pos
                                                          text_tab = lt_string
@@ -5513,24 +5512,21 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                                              to_line   = 0
                                   EXCEPTIONS OTHERS    = 2 ).
 
-    IF lv_pos >= 220.                       "COCKPIT-315
-      lv_pos = strlen( iv_sqlstring ) + 1.  "COCKPIT-315
-      lv_line = lv_line + 1.                "COCKPIT-315
-    ELSE.                                   "COCKPIT-315
-      lv_pos = iv_pos + strlen( iv_sqlstring ) + 1.           "CDX001-0006
-    ENDIF.                                  "COCKPIT-315
+    IF lv_pos >= 220.                       " COCKPIT-315
+      lv_pos = strlen( iv_sqlstring ) + 1.  " COCKPIT-315
+      lv_line = lv_line + 1.                " COCKPIT-315
+    ELSE.                                   " COCKPIT-315
+      lv_pos = iv_pos + strlen( iv_sqlstring ) + 1.           " CDX001-0006
+    ENDIF.                                  " COCKPIT-315
 
-
-    gc_abap_editor->set_selection_pos_in_line( EXPORTING line = lv_line                                   "CDX001-0006
-                                                         pos  = lv_pos ).                                 "CDX001-0006
+    gc_abap_editor->set_selection_pos_in_line( line = lv_line                                   " CDX001-0006
+                                               pos  = lv_pos ).                                 " CDX001-0006
 
     IF i_set_focus = abap_true.
-      gc_abap_editor->set_focus(
-         control = gc_abap_editor ).
+      gc_abap_editor->set_focus( control = gc_abap_editor ).
     ENDIF.
 
     FREE lt_string[].
-
   ENDMETHOD.
 
 
