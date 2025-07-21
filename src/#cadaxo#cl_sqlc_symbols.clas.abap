@@ -1520,30 +1520,26 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-    DATA: l_mod_cell      TYPE lvc_s_modi,
-          lt_mod_cell     LIKE TABLE OF l_mod_cell,
-          duplicate_entry TYPE abap_bool VALUE abap_false,
-          tabix           TYPE lvc_index.
+    DATA l_mod_cell  TYPE lvc_s_modi.
+    DATA lt_mod_cell LIKE TABLE OF l_mod_cell.
 
     FIELD-SYMBOLS <l_symbol> LIKE LINE OF gt_symbol.
     FIELD-SYMBOLS <mod_cell> LIKE LINE OF lt_mod_cell.
 
     lt_mod_cell = er_data_changed->mt_mod_cells.
 
-    IF NOT lt_mod_cell IS INITIAL.
-*   get distinct records by rowid
+    IF lt_mod_cell IS NOT INITIAL.
+      " get distinct records by rowid
       SORT lt_mod_cell BY row_id.
       DELETE ADJACENT DUPLICATES FROM lt_mod_cell
-                                 COMPARING row_id.
+             COMPARING row_id.
       LOOP AT lt_mod_cell INTO l_mod_cell.
 
 *      "Check Symbol Datatype
 
-
         IF l_mod_cell-fieldname = 'SYMBOL_DATATYPE'.
           IF l_mod_cell-value IS INITIAL.
-            READ TABLE gt_symbol INDEX l_mod_cell-row_id
-                             ASSIGNING <l_symbol>.
+            ASSIGN gt_symbol[ l_mod_cell-row_id ] TO <l_symbol>.
             IF <l_symbol>-symbol_multivalue IS NOT INITIAL.
               MESSAGE s122(/cadaxo/sqlc) WITH <l_symbol>-symbol_name DISPLAY LIKE 'E'.
               RETURN.
@@ -1551,7 +1547,7 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
           ELSE.
             l_mod_cell-value = to_upper( val = l_mod_cell-value ).
             TRY.
-                me->check_symbol_datatype( i_value = l_mod_cell-value ).
+                check_symbol_datatype( i_value = l_mod_cell-value ).
 
               CATCH /cadaxo/cx_sqlc_symb_not_found INTO DATA(lr_exception).
 
@@ -1563,11 +1559,10 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
           ENDIF.
         ENDIF.
 
-        READ TABLE gt_symbol INDEX l_mod_cell-row_id
-                             ASSIGNING <l_symbol>.
+        ASSIGN gt_symbol[ l_mod_cell-row_id ] TO <l_symbol>.
         IF sy-subrc = 0.
           IF <l_symbol>-type = cs_symbol_type-user.
-*         mark modify type
+            " mark modify type
             <l_symbol>-type = cs_symbol_type-modify.
 
           ENDIF.
@@ -1577,69 +1572,61 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
 
     ENDIF.
 
-*    IF e_ucomm <> functions-symbol_delete.
-*Wenn dieser Check aktiv ist, wird im Falle eines nocht nicht gespeicherten
-*Symbol-Duplikats und dem Versuch gleichzeitig ein Symbol zu löschen,
-*versucht das Duplikat zu persistieren -> Dump
+    "     IF e_ucomm <> functions-symbol_delete.
+    " Wenn dieser Check aktiv ist, wird im Falle eines nocht nicht gespeicherten
+    " Symbol-Duplikats und dem Versuch gleichzeitig ein Symbol zu löschen,
+    " versucht das Duplikat zu persistieren -> Dump
 
-    "Prüfen ob Dublette innerhalb ModCells oder innerhalb GT_SYMBOL
+    " Prüfen ob Dublette innerhalb ModCells oder innerhalb GT_SYMBOL
     LOOP AT gt_symbol ASSIGNING <l_symbol>.
 
       IF to_upper( <l_symbol>-symbol_name ) = to_upper( l_mod_cell-value ).
-        CALL METHOD me->mark_cell_when_error
-          EXPORTING
-            i_row_id      = l_mod_cell-row_id
-            i_fieldname   = 'SYMBOL_NAME'
-            i_msgid       = '/CADAXO/SQLC'
-            i_msgno       = '054'
-            i_msgty       = 'E'
-            i_msgv1       = <l_symbol>-symbol_name
-          CHANGING
-            ct_cell_style = <l_symbol>-cell_style.
+        me->mark_cell_when_error( EXPORTING i_row_id      = l_mod_cell-row_id
+                                            i_fieldname   = 'SYMBOL_NAME'
+                                            i_msgid       = '/CADAXO/SQLC'
+                                            i_msgno       = '054'
+                                            i_msgty       = 'E'
+                                            i_msgv1       = <l_symbol>-symbol_name
+                                  CHANGING  ct_cell_style = <l_symbol>-cell_style ).
         EXIT.
       ELSE.
         CLEAR symbol_alv_error.
       ENDIF.
     ENDLOOP.
 
-    DATA: lv_count TYPE i VALUE 0.
-*Für spätere Entwicklung, wenn mehrere Symbole auf einmal hinzugefügt werden können, bevor persistiert wird. Im Moment noch nicht möglich.
+    DATA lv_count TYPE i VALUE 0.
+    " Für spätere Entwicklung, wenn mehrere Symbole auf einmal hinzugefügt werden können, bevor persistiert wird. Im Moment noch nicht möglich.
     LOOP AT lt_mod_cell ASSIGNING <mod_cell>.
-      IF to_upper( <mod_cell>-value ) = to_upper( l_mod_cell-value ).
-        lv_count += 1.
+      IF to_upper( <mod_cell>-value ) <> to_upper( l_mod_cell-value ).
+        CONTINUE.
+      ENDIF.
 
-        IF lv_count > 1.
-          CALL METHOD me->mark_cell_when_error
-            EXPORTING
-              i_row_id      = <mod_cell>-row_id
-              i_fieldname   = 'SYMBOL_NAME'
-              i_msgid       = '/CADAXO/SQLC'
-              i_msgno       = '054'
-              i_msgty       = 'E'
-              i_msgv1       = <mod_cell>-value
-            CHANGING
-              ct_cell_style = <l_symbol>-cell_style.
-          EXIT.
-        ENDIF.
+      lv_count += 1.
+
+      IF lv_count > 1.
+        me->mark_cell_when_error( EXPORTING i_row_id      = <mod_cell>-row_id
+                                            i_fieldname   = 'SYMBOL_NAME'
+                                            i_msgid       = '/CADAXO/SQLC'
+                                            i_msgno       = '054'
+                                            i_msgty       = 'E'
+                                            i_msgv1       = <mod_cell>-value
+                                  CHANGING  ct_cell_style = <l_symbol>-cell_style ).
+        EXIT.
       ENDIF.
     ENDLOOP.
 
     IF symbol_alv_error IS NOT INITIAL.
-      DATA: lv_row_id TYPE lvc_index.
+      DATA lv_row_id TYPE lvc_index.
       WRITE symbol_alv_error-row TO lv_row_id.
 
-      CALL METHOD me->focus_symbol_alv_cell
-        EXPORTING
-          i_row_id     = lv_row_id
-          i_field_name = 'SYMBOL_NAME'.
+      me->focus_symbol_alv_cell( i_row_id     = lv_row_id
+                                 i_field_name = 'SYMBOL_NAME' ).
 
-      er_data_changed->add_protocol_entry(
-        i_msgid     = symbol_alv_error-id
-        i_msgty     = symbol_alv_error-type
-        i_msgno     = symbol_alv_error-number
-        i_fieldname = symbol_alv_error-field
-        i_row_id    = symbol_alv_error-row
-      ).
+      er_data_changed->add_protocol_entry( i_msgid     = symbol_alv_error-id
+                                           i_msgty     = symbol_alv_error-type
+                                           i_msgno     = symbol_alv_error-number
+                                           i_fieldname = symbol_alv_error-field
+                                           i_row_id    = symbol_alv_error-row ).
     ENDIF.
 *    ENDIF.
   ENDMETHOD.
