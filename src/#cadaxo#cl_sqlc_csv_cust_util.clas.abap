@@ -49,9 +49,9 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util DEFINITION
         VALUE(rv_converted_time) TYPE char8 .
     CLASS-METHODS get_csv_from_itab
       IMPORTING
-        it_table       TYPE ANY TABLE
-        i_fieldcat     TYPE lvc_t_fcat
-        i_csv_attr     TYPE /cadaxo/sqlc_csv_cust
+                it_table             TYPE ANY TABLE
+                i_fieldcat           TYPE lvc_t_fcat
+                i_csv_attr           TYPE /cadaxo/sqlc_csv_cust
       RETURNING VALUE(ev_output_csv) TYPE ty_strings.
     CLASS-METHODS csv_tab_2_string
       IMPORTING
@@ -119,20 +119,15 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD get_separator.
+  METHOD csv_tab_2_string.
 
-    CASE i_separator_setting.
-      WHEN cseperators-tab.
-        e_separator = cl_abap_char_utilities=>horizontal_tab.
-      WHEN cseperators-comma.
-        e_separator = ','.
-      WHEN cseperators-semicolon.
-        e_separator = ';'.
-      WHEN cseperators-cspace.
-        e_separator = abap_false.
-      WHEN cseperators-others.
-        e_separator = i_separator_others.
-    ENDCASE.
+    LOOP AT it_csv_tab ASSIGNING FIELD-SYMBOL(<tab_line>).
+      IF sy-tabix = 1.
+        e_csv_string = <tab_line>.
+      ELSE.
+        e_csv_string = e_csv_string && cl_abap_char_utilities=>cr_lf && <tab_line>.
+      ENDIF.
+    ENDLOOP.
 
   ENDMETHOD.
 
@@ -179,7 +174,12 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
           lv_tmp_out = '"' && lv_tmp_out && '"'.
           lv_output_line = lv_output_line && lv_separator && lv_tmp_out.
         ELSE.
-          lv_output_line = lv_output_line && lv_separator && <ls_line>.
+          IF ( <ls_field>-inttype = 'C' OR <ls_field>-inttype = 'g' )
+             AND ( <ls_line> CS cl_abap_char_utilities=>cr_lf OR <ls_line> CS cl_abap_char_utilities=>newline ).
+            lv_output_line = lv_output_line && lv_separator && '"' && <ls_line> && '"'.
+          ELSE.
+            lv_output_line = lv_output_line && lv_separator && <ls_line>.
+          ENDIF.
         ENDIF.
       ENDLOOP.
 
@@ -189,6 +189,7 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
+
 
   METHOD get_csv_parameter_from_user.
 
@@ -214,17 +215,20 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD get_separator.
 
-
-  METHOD csv_tab_2_string.
-
-    LOOP AT it_csv_tab ASSIGNING FIELD-SYMBOL(<tab_line>).
-      IF sy-tabix = 1.
-        e_csv_string = <tab_line>.
-      ELSE.
-        e_csv_string = e_csv_string && cl_abap_char_utilities=>cr_lf && <tab_line>.
-      ENDIF.
-    ENDLOOP.
+    CASE i_separator_setting.
+      WHEN cseperators-tab.
+        e_separator = cl_abap_char_utilities=>horizontal_tab.
+      WHEN cseperators-comma.
+        e_separator = ','.
+      WHEN cseperators-semicolon.
+        e_separator = ';'.
+      WHEN cseperators-cspace.
+        e_separator = abap_false.
+      WHEN cseperators-others.
+        e_separator = i_separator_others.
+    ENDCASE.
 
   ENDMETHOD.
 ENDCLASS.
