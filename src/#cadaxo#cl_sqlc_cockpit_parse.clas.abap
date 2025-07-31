@@ -5189,6 +5189,8 @@ ENDMETHOD.
 
 METHOD parse_sql_ii_2.
 
+  CONSTANTS: join_alias_regex TYPE string VALUE '^([[:word:]/]+)(?:\s+AS\s+([[:word:]/]+)|[[:word:]/]+|.*).*$'.
+
   TYPES: BEGIN OF t_tab_field,
            table       TYPE string,
            field       TYPE string,
@@ -5203,28 +5205,28 @@ METHOD parse_sql_ii_2.
            ddfields TYPE ddfields,
          END OF typ_source_ddfields.
 
-  DATA: l_skip          TYPE i,
-        l_tabix_next    TYPE i,
-        l_tab_field     TYPE t_tab_field,
-        lt_tab_field    TYPE TABLE OF t_tab_field,
-        l_field_dfies   TYPE dfies,
-        ls_result_field TYPE /cadaxo/sqlcdfies,
-        lcl_structtype  TYPE REF TO cl_abap_structdescr,
-        lcl_elemdescr   TYPE REF TO cl_abap_elemdescr,
-        lt_fields       TYPE ddfields.
-  DATA lt_column_split TYPE TABLE OF string.
-  DATA lr_ref_data TYPE REF TO data.
-  DATA l_string TYPE string.
-  DATA l_lines TYPE i.
-  DATA l_cols TYPE string.
-  DATA lr_struct TYPE REF TO cl_abap_structdescr.
+  DATA l_skip             TYPE i.
+  DATA l_tabix_next       TYPE i.
+  DATA l_tab_field        TYPE t_tab_field.
+  DATA lt_tab_field       TYPE TABLE OF t_tab_field.
+  DATA l_field_dfies      TYPE dfies.
+  DATA ls_result_field    TYPE /cadaxo/sqlcdfies.
+  DATA lcl_structtype     TYPE REF TO cl_abap_structdescr.
+  DATA lcl_elemdescr      TYPE REF TO cl_abap_elemdescr.
+  DATA lt_fields          TYPE ddfields.
+  DATA lt_column_split    TYPE TABLE OF string.
+  DATA lr_ref_data        TYPE REF TO data.
+  DATA l_string           TYPE string.
+  DATA l_lines            TYPE i.
+  DATA l_cols             TYPE string.
+  DATA lr_struct          TYPE REF TO cl_abap_structdescr.
   DATA lt_source_ddfields TYPE TABLE OF typ_source_ddfields.
 
-  FIELD-SYMBOLS: <l_source_split_next> TYPE string,
-                 <l_column_split>      TYPE string,
-                 <l_column_split_next> TYPE string,
-                 <l_dfies>             TYPE dfies,
-                 <l_result_source>     LIKE LINE OF me->result_source_t.
+  FIELD-SYMBOLS <l_source_split_next> TYPE string.
+  FIELD-SYMBOLS <l_column_split>      TYPE string.
+  FIELD-SYMBOLS <l_column_split_next> TYPE string.
+  FIELD-SYMBOLS <l_dfies>             TYPE dfies.
+  FIELD-SYMBOLS <l_result_source>     LIKE LINE OF me->result_source_t.
 
   CLEAR: l_skip,
          me->gt_result_ddfields,
@@ -5237,7 +5239,16 @@ METHOD parse_sql_ii_2.
   SPLIT l_string AT | JOIN | INTO TABLE DATA(lt_joins).
 
   LOOP AT lt_joins ASSIGNING FIELD-SYMBOL(<join>).
-    FIND REGEX '^([[:word:]/]+)(?:\s+AS\s+([[:word:]/]+)|[[:word:]/]+|.*).*$' IN <join> SUBMATCHES DATA(l_table) DATA(l_alias). "FOE $002
+    TRY.
+        FIND REGEX join_alias_regex IN <join> SUBMATCHES DATA(l_table) DATA(l_alias). "FOE $002
+      CATCH cx_sy_regex_too_complex INTO DATA(regex_ex).
+        SPLIT <join> AT | ON | INTO DATA(table) DATA(onclause).
+        IF sy-subrc <> 0.
+          FIND REGEX join_alias_regex IN <join> SUBMATCHES l_table l_alias. "Exception!
+        ELSE.
+          FIND REGEX join_alias_regex IN table SUBMATCHES l_table l_alias.
+        ENDIF.
+    ENDTRY.
     IF sy-subrc = 0.
       APPEND VALUE #( table = l_table alias = l_alias ) TO me->result_source_t.
     ENDIF.
@@ -5449,7 +5460,7 @@ METHOD parse_sql_ii_2.
     LOOP AT lt_tab_field ASSIGNING <l_tab_field>.
 
       CLEAR l_field_dfies.
-      clear ls_result_field.
+      CLEAR ls_result_field.
 
       IF <l_tab_field>-field EQ '*' OR <l_tab_field>-field EQ 'COUNT(*)' OR <l_tab_field>-field EQ 'COUNT( * )'.
 
@@ -5491,7 +5502,7 @@ METHOD parse_sql_ii_2.
                   ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
                   ls_result_field-/cadaxo/alias_value = <l_tab_field>-field.
                   APPEND ls_result_field TO me->gt_result_ddfields.
-                  exit.
+                  EXIT.
                 ENDIF.
               ENDLOOP.
 
@@ -5584,483 +5595,6 @@ METHOD parse_sql_ii_2.
     READ TABLE me->gt_result_ddfields WITH KEY tabname = <result_ddfield_ref>-reftable fieldname = <result_ddfield_ref>-reffield ASSIGNING FIELD-SYMBOL(<result_ddfield>).
     IF sy-subrc = 0 AND <result_ddfield>-/cadaxo/alias_field IS NOT INITIAL.
       <result_ddfield_ref>-reffield = <result_ddfield>-/cadaxo/alias_field.
-    ENDIF.
-  ENDLOOP.
-
-ENDMETHOD.
-
-
-  METHOD process_subpool_result.
-****************************************************************************************************
-* Description             : Subpool Result                                                         *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 31.05.2016 | Ana Lekic            | error message from subpool                  | COCKPIT-61     *
-*            |                      |                                             | $001           *
-*------------+----------------------+---------------------------------------------+----------------*
-* 05.10.2016 | Domi Bigl            | String,XString,DecFloat16/34                |$002 COCKPIT-117*
-*------------+----------------------+---------------------------------------------+----------------*
-* 28.12.2016 | Domi Bigl            | INT8                                        |$003 COCKPIT-148*
-*------------+----------------------+---------------------------------------------+----------------*
-* 19.02.2017 | Domi Bigl            | Runtime errors                              | COCKPIT-103    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 20.07.2017 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-236    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 01.05.2020 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-437    *
-****************************************************************************************************
-
-
-    DATA l_sql_abap_componentdescr  TYPE abap_componentdescr.
-    DATA lt_result_ddfields         TYPE /cadaxo/sqlcdfies_t.
-    DATA l_decimals                 TYPE i.
-    DATA l_intlen                   TYPE i.
-
-    FIELD-SYMBOLS: <lt_result_table> TYPE STANDARD TABLE,
-                   <ls_ddfields>     TYPE /cadaxo/sqlcdfies,
-                   <ls_ddfieldsg>    TYPE /cadaxo/sqlcdfies.
-
-    IF i_error_message IS NOT INITIAL.
-
-      CLEAR me->g_main_ref->gt_errors.
-      g_error_message = me->check_runtime_error( i_error_message ).
-      RETURN.
-    ENDIF. "$001
-
-    lt_result_ddfields = me->gt_result_ddfields.
-
-    IF me->gt_result_ddfields IS INITIAL                                            "COCKPIT-236
-       AND me->g_select_version = /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_1 "COCKPIT-236
-      AND lt_result_ddfields IS NOT INITIAL.                                        "COCKPIT-236
-      me->gt_result_ddfields = lt_result_ddfields.                                  "COCKPIT-236
-    ENDIF.                                                                          "COCKPIT-236
-
-*          IF me->gt_result_ddfields IS INITIAL.  "+COCKPIT-372
-*            me->gt_result_ddfields = lt_dflies.  "+COCKPIT-372 failsafe - in case there was some scenario where gt_result_ddfield is blank and needs to be filled from rfc '/CADAXO/SQLCSUBROUTINEPOOL'
-*          ENDIF.                                 "+COCKPIT-372
-
-    LOOP AT me->gt_result_ddfields ASSIGNING <ls_ddfields>.
-      UNASSIGN <ls_ddfieldsg>.
-      READ TABLE lt_result_ddfields WITH KEY /cadaxo/alias_field = <ls_ddfields>-fieldname ASSIGNING <ls_ddfieldsg>.
-      IF sy-subrc = 0.
-        <ls_ddfields>-/cadaxo/alias_field = <ls_ddfields>-fieldname.
-      ELSE.
-        LOOP AT lt_result_ddfields ASSIGNING <ls_ddfieldsg> WHERE fieldname = <ls_ddfields>-fieldname AND /cadaxo/alias_field = space.
-          IF <ls_ddfieldsg>-/cadaxo/alias IS NOT INITIAL.
-            DATA(l_name) = <ls_ddfieldsg>-/cadaxo/alias && '~' && <ls_ddfieldsg>-fieldname && ','.
-            READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
-            IF sy-subrc <> 0.
-              l_name = <ls_ddfieldsg>-/cadaxo/alias && '~' && <ls_ddfieldsg>-fieldname.
-              READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
-              IF sy-subrc <> 0.
-                l_name = <ls_ddfieldsg>-/cadaxo/alias && '~*'.
-                READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
-              ENDIF.
-            ENDIF.
-            IF sy-subrc = 0.
-              EXIT. "LOOP
-            ENDIF.
-          ENDIF.
-        ENDLOOP.
-      ENDIF.
-      IF <ls_ddfieldsg> IS ASSIGNED.
-        <ls_ddfields>-reffield            = <ls_ddfieldsg>-reffield.
-        <ls_ddfields>-datatype            = <ls_ddfieldsg>-datatype.
-        <ls_ddfields>-keyflag             = <ls_ddfieldsg>-keyflag.
-        <ls_ddfields>-/cadaxo/alias       = <ls_ddfieldsg>-/cadaxo/alias.
-        <ls_ddfields>-/cadaxo/alias_value = <ls_ddfieldsg>-/cadaxo/alias_value.
-      ENDIF.
-    ENDLOOP.
-
-    ASSIGN me->result_table->* TO <lt_result_table>.
-    IF <lt_result_table> IS NOT ASSIGNED.
-
-      CLEAR me->result_component_t.
-
-      LOOP AT me->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<l_fields>).
-
-        IF <l_fields>-stru_name NE space.
-
-          CLEAR l_sql_abap_componentdescr.
-          l_sql_abap_componentdescr-name = <l_fields>-fieldname.
-          l_sql_abap_componentdescr-as_include = <l_fields>-as_include.
-          l_sql_abap_componentdescr-type ?= cl_abap_structdescr=>describe_by_name( <l_fields>-stru_name ).
-          APPEND l_sql_abap_componentdescr TO me->result_component_t.
-
-          CAST cl_abap_structdescr( l_sql_abap_componentdescr-type )->get_components( ).
-        ELSE.
-
-          CLEAR l_sql_abap_componentdescr.
-
-          l_sql_abap_componentdescr-name = <l_fields>-fieldname.
-
-          l_decimals = <l_fields>-decimals.
-          l_intlen   = <l_fields>-intlen.
-
-          CASE <l_fields>-inttype.
-            WHEN 'P'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_p( p_length = l_intlen p_decimals = l_decimals ).
-            WHEN 'I'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_i( ).
-            WHEN 'T'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_t( ).
-            WHEN 'D'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_d( ).
-            WHEN 'N'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_n( p_length = l_intlen ).
-            WHEN 'F'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_f( ).
-            WHEN 'X'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_x( p_length = l_intlen ).
-            WHEN 'C'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_c( p_length = l_intlen ).
-            WHEN 'b'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>describe_by_name( '/CADAXO/SQLC_REFERENCE_TYPES-INT1' ).
-            WHEN 's'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>describe_by_name( '/CADAXO/SQLC_REFERENCE_TYPES-INT2' ).
-            WHEN 'g'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_string( ).
-            WHEN 'y'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_xstring( ).
-            WHEN 'a'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_decfloat16( ).
-            WHEN 'e'.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_decfloat34( ).
-            WHEN '8'.
-              CALL METHOD cl_abap_elemdescr=>('GET_INT8')
-                RECEIVING
-                  p_result = l_sql_abap_componentdescr-type.
-            WHEN 'p'.
-              CALL METHOD cl_abap_elemdescr=>('GET_UTCLONG')
-                RECEIVING
-                  p_result = l_sql_abap_componentdescr-type.
-            WHEN OTHERS.
-              mr_arfc_exception = NEW /cadaxo/cx_sqlc_type_not_found( type = CONV #( <l_fields>-inttype ) ).
-          ENDCASE.
-
-          APPEND l_sql_abap_componentdescr TO me->result_component_t.
-
-        ENDIF.
-      ENDLOOP.
-
-      me->create_result_structures( ).
-
-      ASSIGN me->result_table->* TO <lt_result_table>.
-
-    ENDIF.
-
-    IMPORT data = <lt_result_table> FROM DATA BUFFER i_data.
-
-    DELETE me->gt_result_ddfields WHERE fieldname IS INITIAL
-                                    AND rollname  <> '/CADAXO/SQLCAGGRCOUNT'. "COCKPIT-437
-
-  ENDMETHOD.
-
-
-METHOD serialize.
-  FREE result_table.
-  FREE result_structure.
-ENDMETHOD.
-
-
-  METHOD set_bachground_mode.
-    background_mode = i_background_mode.
-  ENDMETHOD.
-
-
-METHOD split_field.
-****************************************************************************************************
-* Description             : Split Field into field, table and alias                                *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations : This Method splits a field into field, talbe and alias                 *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.03.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 | Correction Nr. *
-*------------+----------------------+---------------------------------------------+----------------*
-* 03.08.2010 | Fößleitner Johann    | Try to find the right table, in case of     | CDX001-0001    *
-*            |                      | join select without alias                   |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 29.08.2010 | Bigl Dominik         | Check, if the table name is used instead    | CDX001-0009    *
-*            |                      | of the alias name                           |                *
-****************************************************************************************************
-
-  DATA: l_lines TYPE i.                                     "CDX001-0001
-
-  FIELD-SYMBOLS: <l_sql_source_line> LIKE LINE OF me->result_source_t.
-
-  IF i_field CA '~'.         "alias~field
-    SPLIT i_field AT '~' INTO e_alias e_field.
-    READ TABLE me->result_source_t WITH KEY alias = e_alias ASSIGNING <l_sql_source_line>.
-    IF sy-subrc <> 0.                                                                        "CDX001-0009
-      READ TABLE me->result_source_t WITH KEY table = e_alias ASSIGNING <l_sql_source_line>. "CDX001-0009
-    ENDIF.                                                                                   "CDX001-0009
-    IF sy-subrc EQ 0.
-      MOVE <l_sql_source_line>-table TO e_table.
-    ENDIF.
-  ELSEIF i_field CA '-'.     "table-field
-    SPLIT i_field AT '-' INTO e_table e_field.
-  ELSE.
-    MOVE i_field TO e_field. "only field
-
-    DESCRIBE TABLE me->result_source_t LINES l_lines.                                  "CDX001-0001
-
-* only one table, then take the first one                                              "CDX001-0001
-    IF l_lines EQ 1.                                                                   "CDX001-0001
-      READ TABLE me->result_source_t INDEX 1 ASSIGNING <l_sql_source_line>.
-      IF sy-subrc EQ 0.
-        MOVE <l_sql_source_line>-table TO e_table.
-      ENDIF.
-    ELSE.                                                                              "CDX001-0001
-
-* in other cases, try to find the right table                                          "CDX001-0001
-      LOOP AT me->result_source_t ASSIGNING <l_sql_source_line>.                       "CDX001-0001
-        SELECT SINGLE COUNT( * ) FROM dd03l WHERE tabname EQ <l_sql_source_line>-table "CDX001-0001
-                                              AND fieldname EQ e_field                 "CDX001-0001
-                                              AND as4local EQ 'A'. "#EC CI_SROFC_NESTED "#EC CI_SEL_NESTED "CDX001-0001
-        IF sy-subrc EQ 0.                                                              "CDX001-0001
-          IF e_table EQ space.                                                         "CDX001-0001
-            MOVE <l_sql_source_line>-table TO e_table.                                 "CDX001-0001
-          ENDIF.                                                                       "CDX001-0001
-        ENDIF.                                                                         "CDX001-0001
-      ENDLOOP.                                                                         "CDX001-0001
-    ENDIF.                                                                             "CDX001-0001
-  ENDIF.
-
-* concatenate table and field into output field, separated by '-'                      "CDX001-0001
-  CONCATENATE e_table '-' e_field INTO e_tabfld.
-
-ENDMETHOD.
-
-
-method SPLIT_FIELD_V_2.
-
-  DATA l_field TYPE string.
-
-  FIELD-SYMBOLS: <l_sql_source_line> LIKE LINE OF me->result_source_t.
-
-  l_field = i_value.
-
-* get alias
-  FIND REGEX '^(.+) AS ([a-zA-Z0-9_]+)[ ,]*$' IN i_value SUBMATCHES l_field e_alias_field.
-
-* get field
-  FIND REGEX '^([a-zA-Z0-9_]+)~([a-zA-Z0-9_]+)$' IN l_field SUBMATCHES e_alias e_field.
-  IF sy-subrc <> 0.
-    FIND REGEX '^([a-zA-Z0-9_]+)[ ,]*$' IN l_field SUBMATCHES e_field.
-  ENDIF.
-
-  IF e_alias IS NOT INITIAL.
-    READ TABLE me->result_source_t WITH KEY alias = e_alias ASSIGNING <l_sql_source_line>.
-    IF sy-subrc = 0.
-      e_table = <l_sql_source_line>-table.
-    ELSE.
-      READ TABLE me->result_source_t WITH KEY table = e_alias ASSIGNING <l_sql_source_line>.
-      IF sy-subrc = 0.
-        e_table = <l_sql_source_line>-table.
-      ENDIF.
-    ENDIF.
-  ELSEIF e_field IS NOT INITIAL AND lines( me->result_source_t ) = 1.
-    READ TABLE me->result_source_t INDEX 1 ASSIGNING <l_sql_source_line>.
-    IF sy-subrc = 0.
-      e_table = <l_sql_source_line>-table.
-    ENDIF.
-  ENDIF.
-
-  IF e_field IS INITIAL.
-    e_field = l_field.
-  ENDIF.
-
-endmethod.
-
-
-  METHOD subpool_result.
-****************************************************************************************************
-* Description             : Subpool Result                                                         *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 31.05.2016 | Ana Lekic            | error message from subpool                  | COCKPIT-61     *
-*            |                      |                                             | $001           *
-*------------+----------------------+---------------------------------------------+----------------*
-* 05.10.2016 | Domi Bigl            | String,XString,DecFloat16/34                |$002 COCKPIT-117*
-*------------+----------------------+---------------------------------------------+----------------*
-* 28.12.2016 | Domi Bigl            | INT8                                        |$003 COCKPIT-148*
-*------------+----------------------+---------------------------------------------+----------------*
-* 19.02.2017 | Domi Bigl            | Runtime errors                              | COCKPIT-103    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 20.07.2017 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-236    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 01.05.2020 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-437    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 01.05.2024 | Domi Bigl            | no aRFC in Background Mode + CC             | SQL-26         *
-****************************************************************************************************
-
-    DATA l_data                     TYPE xstring.
-    DATA lv_sys_error_message       TYPE char128.
-    DATA lv_error_message           TYPE string.
-
-    TRY.
-*        lwa_result-task = p_task.
-        g_async_calls = g_async_calls - 1.
-        RECEIVE RESULTS FROM FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
-           IMPORTING
-             e_error_message       = lv_error_message                 "COCKPIT-103
-             e_runtime             = g_tmp_result_details-runtime
-             e_result_lines        = g_tmp_result_details-lines
-             et_dfies              = me->gt_result_ddfields          "-COCKPIT-372
-*             et_dfies              = lt_dflies                        "+COCKPIT-372
-             et_dfies_all          = me->gt_result_ddfields_all
-          CHANGING
-             ic_data                = l_data
-          EXCEPTIONS
-             system_failure        = 1 MESSAGE lv_sys_error_message "$001 "COCKPIT-103
-             communication_failure = 2 MESSAGE lv_sys_error_message "$001 "COCKPIT-103
-             resource_failure      = 3
-             OTHERS                = 4.
-        IF sy-subrc <> 0 OR lv_error_message IS NOT INITIAL. "$001                "COCKPIT-103
-
-          IF lv_sys_error_message IS NOT INITIAL.                                 "COCKPIT-103
-            lv_error_message = lv_sys_error_message.                              "COCKPIT-103
-          ENDIF.                                                                  "COCKPIT-103
-        ENDIF. "$001
-
-        me->process_subpool_result( i_data          = l_data
-                                    i_error_message = lv_error_message
-                                  ).
-      CATCH cx_root INTO mr_arfc_exception.
-    ENDTRY.
-  ENDMETHOD.
-
-
-METHOD update_alv_field_catalog_sl.
-****************************************************************************************************
-* Description             : Update ALV Field Catalog - Saved Lists                                 *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Cadaxo GmbH              Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2015               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-  DATA l_component TYPE string.
-
-  FIELD-SYMBOLS: <l_fields>       LIKE LINE OF me->gt_result_ddfields,
-                 <ls_lvc_t_fcat>  TYPE lvc_s_fcat.
-
-  LOOP AT me->gt_result_ddfields ASSIGNING <l_fields>.
-
-    UNASSIGN <ls_lvc_t_fcat>.
-
-    CONCATENATE <l_fields>-tabname
-                <l_fields>-fieldname
-                INTO l_component
-                SEPARATED BY '-'.
-
-    READ TABLE c_lvc_t_fcat ASSIGNING <ls_lvc_t_fcat> WITH KEY fieldname = <l_fields>-map_fieldname.
-    IF sy-subrc NE 0.
-      READ TABLE c_lvc_t_fcat ASSIGNING <ls_lvc_t_fcat> WITH KEY fieldname = <l_fields>-fieldname.
-      IF sy-subrc NE 0.
-        READ TABLE c_lvc_t_fcat ASSIGNING <ls_lvc_t_fcat> WITH KEY fieldname = l_component.
-      ENDIF.
-    ENDIF.
-
-    IF <ls_lvc_t_fcat> IS ASSIGNED.
-
-      <ls_lvc_t_fcat>-reptext   = <l_fields>-reptext.
-      <ls_lvc_t_fcat>-scrtext_s = <l_fields>-scrtext_s.
-      <ls_lvc_t_fcat>-scrtext_m = <l_fields>-scrtext_m.
-      <ls_lvc_t_fcat>-scrtext_l = <l_fields>-scrtext_l.
-
-      CLEAR: <ls_lvc_t_fcat>-coltext.
-
-      IF i_user_settings-hd_fieldname EQ 'X'.
-        <ls_lvc_t_fcat>-coltext     =  <l_fields>-colhd_fieldname.
-        IF NOT <l_fields>-/cadaxo/alias IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
-          CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-coltext   INTO <ls_lvc_t_fcat>-coltext.
-        ENDIF.
-      ELSE.
-        IF NOT <l_fields>-/cadaxo/alias_field IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
-          MOVE <l_fields>-/cadaxo/alias_field TO <ls_lvc_t_fcat>-coltext.
-        ELSE.
-          IF NOT <l_fields>-/cadaxo/alias IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
-            IF NOT <ls_lvc_t_fcat>-scrtext_l IS INITIAL.
-              CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-scrtext_l INTO <ls_lvc_t_fcat>-scrtext_l.
-            ENDIF.
-            IF NOT <ls_lvc_t_fcat>-scrtext_m IS INITIAL.
-              CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-scrtext_m INTO <ls_lvc_t_fcat>-scrtext_m.
-            ENDIF.
-            IF NOT <ls_lvc_t_fcat>-scrtext_m IS INITIAL.
-              CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-scrtext_s INTO <ls_lvc_t_fcat>-scrtext_s.
-            ENDIF.
-            IF NOT <ls_lvc_t_fcat>-reptext IS INITIAL.
-              CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-reptext INTO <ls_lvc_t_fcat>-reptext.
-            ENDIF.
-          ENDIF.
-
-          CASE 'X'.
-            WHEN i_user_settings-hd_fieldtext_s.
-              MOVE <ls_lvc_t_fcat>-scrtext_s TO <ls_lvc_t_fcat>-coltext.
-            WHEN i_user_settings-hd_fieldtext_m.
-              MOVE <ls_lvc_t_fcat>-scrtext_m TO <ls_lvc_t_fcat>-coltext.
-            WHEN i_user_settings-hd_fieldtext_l.
-              MOVE <ls_lvc_t_fcat>-scrtext_l TO <ls_lvc_t_fcat>-coltext.
-          ENDCASE.
-        ENDIF.
-
-        IF <ls_lvc_t_fcat>-coltext IS INITIAL AND i_user_settings-hd_fieldtext_a IS INITIAL.
-          <ls_lvc_t_fcat>-coltext = <l_fields>-fieldname.
-        ENDIF.
-      ENDIF.
     ENDIF.
   ENDLOOP.
 
@@ -6676,4 +6210,481 @@ ENDMETHOD.
       me->result_source_t = lt_result_source_tmp.
     ENDIF.
   ENDMETHOD.
+
+
+  METHOD process_subpool_result.
+****************************************************************************************************
+* Description             : Subpool Result                                                         *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
+* Date                    : 01.01.2010               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
+* Date                    : xx.xx.xxxx                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 31.05.2016 | Ana Lekic            | error message from subpool                  | COCKPIT-61     *
+*            |                      |                                             | $001           *
+*------------+----------------------+---------------------------------------------+----------------*
+* 05.10.2016 | Domi Bigl            | String,XString,DecFloat16/34                |$002 COCKPIT-117*
+*------------+----------------------+---------------------------------------------+----------------*
+* 28.12.2016 | Domi Bigl            | INT8                                        |$003 COCKPIT-148*
+*------------+----------------------+---------------------------------------------+----------------*
+* 19.02.2017 | Domi Bigl            | Runtime errors                              | COCKPIT-103    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 20.07.2017 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-236    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 01.05.2020 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-437    *
+****************************************************************************************************
+
+
+    DATA l_sql_abap_componentdescr  TYPE abap_componentdescr.
+    DATA lt_result_ddfields         TYPE /cadaxo/sqlcdfies_t.
+    DATA l_decimals                 TYPE i.
+    DATA l_intlen                   TYPE i.
+
+    FIELD-SYMBOLS: <lt_result_table> TYPE STANDARD TABLE,
+                   <ls_ddfields>     TYPE /cadaxo/sqlcdfies,
+                   <ls_ddfieldsg>    TYPE /cadaxo/sqlcdfies.
+
+    IF i_error_message IS NOT INITIAL.
+
+      CLEAR me->g_main_ref->gt_errors.
+      g_error_message = me->check_runtime_error( i_error_message ).
+      RETURN.
+    ENDIF. "$001
+
+    lt_result_ddfields = me->gt_result_ddfields.
+
+    IF me->gt_result_ddfields IS INITIAL                                            "COCKPIT-236
+       AND me->g_select_version = /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_1 "COCKPIT-236
+      AND lt_result_ddfields IS NOT INITIAL.                                        "COCKPIT-236
+      me->gt_result_ddfields = lt_result_ddfields.                                  "COCKPIT-236
+    ENDIF.                                                                          "COCKPIT-236
+
+*          IF me->gt_result_ddfields IS INITIAL.  "+COCKPIT-372
+*            me->gt_result_ddfields = lt_dflies.  "+COCKPIT-372 failsafe - in case there was some scenario where gt_result_ddfield is blank and needs to be filled from rfc '/CADAXO/SQLCSUBROUTINEPOOL'
+*          ENDIF.                                 "+COCKPIT-372
+
+    LOOP AT me->gt_result_ddfields ASSIGNING <ls_ddfields>.
+      UNASSIGN <ls_ddfieldsg>.
+      READ TABLE lt_result_ddfields WITH KEY /cadaxo/alias_field = <ls_ddfields>-fieldname ASSIGNING <ls_ddfieldsg>.
+      IF sy-subrc = 0.
+        <ls_ddfields>-/cadaxo/alias_field = <ls_ddfields>-fieldname.
+      ELSE.
+        LOOP AT lt_result_ddfields ASSIGNING <ls_ddfieldsg> WHERE fieldname = <ls_ddfields>-fieldname AND /cadaxo/alias_field = space.
+          IF <ls_ddfieldsg>-/cadaxo/alias IS NOT INITIAL.
+            DATA(l_name) = <ls_ddfieldsg>-/cadaxo/alias && '~' && <ls_ddfieldsg>-fieldname && ','.
+            READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
+            IF sy-subrc <> 0.
+              l_name = <ls_ddfieldsg>-/cadaxo/alias && '~' && <ls_ddfieldsg>-fieldname.
+              READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
+              IF sy-subrc <> 0.
+                l_name = <ls_ddfieldsg>-/cadaxo/alias && '~*'.
+                READ TABLE me->column_words_t WITH KEY table_line = l_name TRANSPORTING NO FIELDS.
+              ENDIF.
+            ENDIF.
+            IF sy-subrc = 0.
+              EXIT. "LOOP
+            ENDIF.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+      IF <ls_ddfieldsg> IS ASSIGNED.
+        <ls_ddfields>-reffield            = <ls_ddfieldsg>-reffield.
+        <ls_ddfields>-datatype            = <ls_ddfieldsg>-datatype.
+        <ls_ddfields>-keyflag             = <ls_ddfieldsg>-keyflag.
+        <ls_ddfields>-/cadaxo/alias       = <ls_ddfieldsg>-/cadaxo/alias.
+        <ls_ddfields>-/cadaxo/alias_value = <ls_ddfieldsg>-/cadaxo/alias_value.
+      ENDIF.
+    ENDLOOP.
+
+    ASSIGN me->result_table->* TO <lt_result_table>.
+    IF <lt_result_table> IS NOT ASSIGNED.
+
+      CLEAR me->result_component_t.
+
+      LOOP AT me->gt_result_ddfields ASSIGNING FIELD-SYMBOL(<l_fields>).
+
+        IF <l_fields>-stru_name NE space.
+
+          CLEAR l_sql_abap_componentdescr.
+          l_sql_abap_componentdescr-name = <l_fields>-fieldname.
+          l_sql_abap_componentdescr-as_include = <l_fields>-as_include.
+          l_sql_abap_componentdescr-type ?= cl_abap_structdescr=>describe_by_name( <l_fields>-stru_name ).
+          APPEND l_sql_abap_componentdescr TO me->result_component_t.
+
+          CAST cl_abap_structdescr( l_sql_abap_componentdescr-type )->get_components( ).
+        ELSE.
+
+          CLEAR l_sql_abap_componentdescr.
+
+          l_sql_abap_componentdescr-name = <l_fields>-fieldname.
+
+          l_decimals = <l_fields>-decimals.
+          l_intlen   = <l_fields>-intlen.
+
+          CASE <l_fields>-inttype.
+            WHEN 'P'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_p( p_length = l_intlen p_decimals = l_decimals ).
+            WHEN 'I'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_i( ).
+            WHEN 'T'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_t( ).
+            WHEN 'D'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_d( ).
+            WHEN 'N'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_n( p_length = l_intlen ).
+            WHEN 'F'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_f( ).
+            WHEN 'X'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_x( p_length = l_intlen ).
+            WHEN 'C'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_c( p_length = l_intlen ).
+            WHEN 'b'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>describe_by_name( '/CADAXO/SQLC_REFERENCE_TYPES-INT1' ).
+            WHEN 's'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>describe_by_name( '/CADAXO/SQLC_REFERENCE_TYPES-INT2' ).
+            WHEN 'g'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_string( ).
+            WHEN 'y'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_xstring( ).
+            WHEN 'a'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_decfloat16( ).
+            WHEN 'e'.
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_decfloat34( ).
+            WHEN '8'.
+              CALL METHOD cl_abap_elemdescr=>('GET_INT8')
+                RECEIVING
+                  p_result = l_sql_abap_componentdescr-type.
+            WHEN 'p'.
+              CALL METHOD cl_abap_elemdescr=>('GET_UTCLONG')
+                RECEIVING
+                  p_result = l_sql_abap_componentdescr-type.
+            WHEN OTHERS.
+              mr_arfc_exception = NEW /cadaxo/cx_sqlc_type_not_found( type = CONV #( <l_fields>-inttype ) ).
+          ENDCASE.
+
+          APPEND l_sql_abap_componentdescr TO me->result_component_t.
+
+        ENDIF.
+      ENDLOOP.
+
+      me->create_result_structures( ).
+
+      ASSIGN me->result_table->* TO <lt_result_table>.
+
+    ENDIF.
+
+    IMPORT data = <lt_result_table> FROM DATA BUFFER i_data.
+
+    DELETE me->gt_result_ddfields WHERE fieldname IS INITIAL
+                                    AND rollname  <> '/CADAXO/SQLCAGGRCOUNT'. "COCKPIT-437
+
+  ENDMETHOD.
+
+
+METHOD serialize.
+  FREE result_table.
+  FREE result_structure.
+ENDMETHOD.
+
+
+  METHOD set_bachground_mode.
+    background_mode = i_background_mode.
+  ENDMETHOD.
+
+
+METHOD split_field.
+****************************************************************************************************
+* Description             : Split Field into field, table and alias                                *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations : This Method splits a field into field, talbe and alias                 *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
+* Date                    : 01.01.2010               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
+* Date                    : 01.03.2010                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 | Correction Nr. *
+*------------+----------------------+---------------------------------------------+----------------*
+* 03.08.2010 | Fößleitner Johann    | Try to find the right table, in case of     | CDX001-0001    *
+*            |                      | join select without alias                   |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 29.08.2010 | Bigl Dominik         | Check, if the table name is used instead    | CDX001-0009    *
+*            |                      | of the alias name                           |                *
+****************************************************************************************************
+
+  DATA: l_lines TYPE i.                                     "CDX001-0001
+
+  FIELD-SYMBOLS: <l_sql_source_line> LIKE LINE OF me->result_source_t.
+
+  IF i_field CA '~'.         "alias~field
+    SPLIT i_field AT '~' INTO e_alias e_field.
+    READ TABLE me->result_source_t WITH KEY alias = e_alias ASSIGNING <l_sql_source_line>.
+    IF sy-subrc <> 0.                                                                        "CDX001-0009
+      READ TABLE me->result_source_t WITH KEY table = e_alias ASSIGNING <l_sql_source_line>. "CDX001-0009
+    ENDIF.                                                                                   "CDX001-0009
+    IF sy-subrc EQ 0.
+      MOVE <l_sql_source_line>-table TO e_table.
+    ENDIF.
+  ELSEIF i_field CA '-'.     "table-field
+    SPLIT i_field AT '-' INTO e_table e_field.
+  ELSE.
+    MOVE i_field TO e_field. "only field
+
+    DESCRIBE TABLE me->result_source_t LINES l_lines.                                  "CDX001-0001
+
+* only one table, then take the first one                                              "CDX001-0001
+    IF l_lines EQ 1.                                                                   "CDX001-0001
+      READ TABLE me->result_source_t INDEX 1 ASSIGNING <l_sql_source_line>.
+      IF sy-subrc EQ 0.
+        MOVE <l_sql_source_line>-table TO e_table.
+      ENDIF.
+    ELSE.                                                                              "CDX001-0001
+
+* in other cases, try to find the right table                                          "CDX001-0001
+      LOOP AT me->result_source_t ASSIGNING <l_sql_source_line>.                       "CDX001-0001
+        SELECT SINGLE COUNT( * ) FROM dd03l WHERE tabname EQ <l_sql_source_line>-table "CDX001-0001
+                                              AND fieldname EQ e_field                 "CDX001-0001
+                                              AND as4local EQ 'A'. "#EC CI_SROFC_NESTED "#EC CI_SEL_NESTED "CDX001-0001
+        IF sy-subrc EQ 0.                                                              "CDX001-0001
+          IF e_table EQ space.                                                         "CDX001-0001
+            MOVE <l_sql_source_line>-table TO e_table.                                 "CDX001-0001
+          ENDIF.                                                                       "CDX001-0001
+        ENDIF.                                                                         "CDX001-0001
+      ENDLOOP.                                                                         "CDX001-0001
+    ENDIF.                                                                             "CDX001-0001
+  ENDIF.
+
+* concatenate table and field into output field, separated by '-'                      "CDX001-0001
+  CONCATENATE e_table '-' e_field INTO e_tabfld.
+
+ENDMETHOD.
+
+
+method SPLIT_FIELD_V_2.
+
+  DATA l_field TYPE string.
+
+  FIELD-SYMBOLS: <l_sql_source_line> LIKE LINE OF me->result_source_t.
+
+  l_field = i_value.
+
+* get alias
+  FIND REGEX '^(.+) AS ([a-zA-Z0-9_]+)[ ,]*$' IN i_value SUBMATCHES l_field e_alias_field.
+
+* get field
+  FIND REGEX '^([a-zA-Z0-9_]+)~([a-zA-Z0-9_]+)$' IN l_field SUBMATCHES e_alias e_field.
+  IF sy-subrc <> 0.
+    FIND REGEX '^([a-zA-Z0-9_]+)[ ,]*$' IN l_field SUBMATCHES e_field.
+  ENDIF.
+
+  IF e_alias IS NOT INITIAL.
+    READ TABLE me->result_source_t WITH KEY alias = e_alias ASSIGNING <l_sql_source_line>.
+    IF sy-subrc = 0.
+      e_table = <l_sql_source_line>-table.
+    ELSE.
+      READ TABLE me->result_source_t WITH KEY table = e_alias ASSIGNING <l_sql_source_line>.
+      IF sy-subrc = 0.
+        e_table = <l_sql_source_line>-table.
+      ENDIF.
+    ENDIF.
+  ELSEIF e_field IS NOT INITIAL AND lines( me->result_source_t ) = 1.
+    READ TABLE me->result_source_t INDEX 1 ASSIGNING <l_sql_source_line>.
+    IF sy-subrc = 0.
+      e_table = <l_sql_source_line>-table.
+    ENDIF.
+  ENDIF.
+
+  IF e_field IS INITIAL.
+    e_field = l_field.
+  ENDIF.
+
+endmethod.
+
+
+  METHOD subpool_result.
+****************************************************************************************************
+* Description             : Subpool Result                                                         *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
+* Date                    : 01.01.2010               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
+* Date                    : xx.xx.xxxx                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 31.05.2016 | Ana Lekic            | error message from subpool                  | COCKPIT-61     *
+*            |                      |                                             | $001           *
+*------------+----------------------+---------------------------------------------+----------------*
+* 05.10.2016 | Domi Bigl            | String,XString,DecFloat16/34                |$002 COCKPIT-117*
+*------------+----------------------+---------------------------------------------+----------------*
+* 28.12.2016 | Domi Bigl            | INT8                                        |$003 COCKPIT-148*
+*------------+----------------------+---------------------------------------------+----------------*
+* 19.02.2017 | Domi Bigl            | Runtime errors                              | COCKPIT-103    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 20.07.2017 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-236    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 01.05.2020 | Johann Fößleitner    | Bugfixing                                   | COCKPIT-437    *
+*------------+----------------------+---------------------------------------------+----------------*
+* 01.05.2024 | Domi Bigl            | no aRFC in Background Mode + CC             | SQL-26         *
+****************************************************************************************************
+
+    DATA l_data                     TYPE xstring.
+    DATA lv_sys_error_message       TYPE char128.
+    DATA lv_error_message           TYPE string.
+
+    TRY.
+*        lwa_result-task = p_task.
+        g_async_calls = g_async_calls - 1.
+        RECEIVE RESULTS FROM FUNCTION '/CADAXO/SQLCSUBROUTINEPOOL'
+           IMPORTING
+             e_error_message       = lv_error_message                 "COCKPIT-103
+             e_runtime             = g_tmp_result_details-runtime
+             e_result_lines        = g_tmp_result_details-lines
+             et_dfies              = me->gt_result_ddfields          "-COCKPIT-372
+*             et_dfies              = lt_dflies                        "+COCKPIT-372
+             et_dfies_all          = me->gt_result_ddfields_all
+          CHANGING
+             ic_data                = l_data
+          EXCEPTIONS
+             system_failure        = 1 MESSAGE lv_sys_error_message "$001 "COCKPIT-103
+             communication_failure = 2 MESSAGE lv_sys_error_message "$001 "COCKPIT-103
+             resource_failure      = 3
+             OTHERS                = 4.
+        IF sy-subrc <> 0 OR lv_error_message IS NOT INITIAL. "$001                "COCKPIT-103
+
+          IF lv_sys_error_message IS NOT INITIAL.                                 "COCKPIT-103
+            lv_error_message = lv_sys_error_message.                              "COCKPIT-103
+          ENDIF.                                                                  "COCKPIT-103
+        ENDIF. "$001
+
+        me->process_subpool_result( i_data          = l_data
+                                    i_error_message = lv_error_message
+                                  ).
+      CATCH cx_root INTO mr_arfc_exception.
+    ENDTRY.
+  ENDMETHOD.
+
+
+METHOD update_alv_field_catalog_sl.
+****************************************************************************************************
+* Description             : Update ALV Field Catalog - Saved Lists                                 *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : Cadaxo GmbH              Company    : CADAXO GesmbH                    *
+* Date                    : 01.01.2015               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       :                          Company    :                                  *
+* Date                    :                                                                        *
+*--------------------------------------------------------------------------------------------------
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+*            |                      |                                             |                *
+*            |                      |                                             |                *
+*------------+----------------------+---------------------------------------------+----------------*
+*            |                      |                                             |                *
+*            |                      |                                             |                *
+*            |                      |                                             |                *
+****************************************************************************************************
+
+  DATA l_component TYPE string.
+
+  FIELD-SYMBOLS: <l_fields>       LIKE LINE OF me->gt_result_ddfields,
+                 <ls_lvc_t_fcat>  TYPE lvc_s_fcat.
+
+  LOOP AT me->gt_result_ddfields ASSIGNING <l_fields>.
+
+    UNASSIGN <ls_lvc_t_fcat>.
+
+    CONCATENATE <l_fields>-tabname
+                <l_fields>-fieldname
+                INTO l_component
+                SEPARATED BY '-'.
+
+    READ TABLE c_lvc_t_fcat ASSIGNING <ls_lvc_t_fcat> WITH KEY fieldname = <l_fields>-map_fieldname.
+    IF sy-subrc NE 0.
+      READ TABLE c_lvc_t_fcat ASSIGNING <ls_lvc_t_fcat> WITH KEY fieldname = <l_fields>-fieldname.
+      IF sy-subrc NE 0.
+        READ TABLE c_lvc_t_fcat ASSIGNING <ls_lvc_t_fcat> WITH KEY fieldname = l_component.
+      ENDIF.
+    ENDIF.
+
+    IF <ls_lvc_t_fcat> IS ASSIGNED.
+
+      <ls_lvc_t_fcat>-reptext   = <l_fields>-reptext.
+      <ls_lvc_t_fcat>-scrtext_s = <l_fields>-scrtext_s.
+      <ls_lvc_t_fcat>-scrtext_m = <l_fields>-scrtext_m.
+      <ls_lvc_t_fcat>-scrtext_l = <l_fields>-scrtext_l.
+
+      CLEAR: <ls_lvc_t_fcat>-coltext.
+
+      IF i_user_settings-hd_fieldname EQ 'X'.
+        <ls_lvc_t_fcat>-coltext     =  <l_fields>-colhd_fieldname.
+        IF NOT <l_fields>-/cadaxo/alias IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
+          CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-coltext   INTO <ls_lvc_t_fcat>-coltext.
+        ENDIF.
+      ELSE.
+        IF NOT <l_fields>-/cadaxo/alias_field IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
+          MOVE <l_fields>-/cadaxo/alias_field TO <ls_lvc_t_fcat>-coltext.
+        ELSE.
+          IF NOT <l_fields>-/cadaxo/alias IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
+            IF NOT <ls_lvc_t_fcat>-scrtext_l IS INITIAL.
+              CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-scrtext_l INTO <ls_lvc_t_fcat>-scrtext_l.
+            ENDIF.
+            IF NOT <ls_lvc_t_fcat>-scrtext_m IS INITIAL.
+              CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-scrtext_m INTO <ls_lvc_t_fcat>-scrtext_m.
+            ENDIF.
+            IF NOT <ls_lvc_t_fcat>-scrtext_m IS INITIAL.
+              CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-scrtext_s INTO <ls_lvc_t_fcat>-scrtext_s.
+            ENDIF.
+            IF NOT <ls_lvc_t_fcat>-reptext IS INITIAL.
+              CONCATENATE <l_fields>-/cadaxo/alias '~' <ls_lvc_t_fcat>-reptext INTO <ls_lvc_t_fcat>-reptext.
+            ENDIF.
+          ENDIF.
+
+          CASE 'X'.
+            WHEN i_user_settings-hd_fieldtext_s.
+              MOVE <ls_lvc_t_fcat>-scrtext_s TO <ls_lvc_t_fcat>-coltext.
+            WHEN i_user_settings-hd_fieldtext_m.
+              MOVE <ls_lvc_t_fcat>-scrtext_m TO <ls_lvc_t_fcat>-coltext.
+            WHEN i_user_settings-hd_fieldtext_l.
+              MOVE <ls_lvc_t_fcat>-scrtext_l TO <ls_lvc_t_fcat>-coltext.
+          ENDCASE.
+        ENDIF.
+
+        IF <ls_lvc_t_fcat>-coltext IS INITIAL AND i_user_settings-hd_fieldtext_a IS INITIAL.
+          <ls_lvc_t_fcat>-coltext = <l_fields>-fieldname.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+
+ENDMETHOD.
 ENDCLASS.
