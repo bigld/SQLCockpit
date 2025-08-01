@@ -371,7 +371,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       IMPORTING
         !i_grid_i TYPE i OPTIONAL
         !i_log    TYPE abap_bool OPTIONAL .
-     METHODS handle_command_show_json_brow
+    METHODS handle_command_show_json_brow
       IMPORTING
         !i_grid_i TYPE i OPTIONAL
         !i_log    TYPE abap_bool OPTIONAL .
@@ -695,6 +695,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
     METHODS usr_action_sql_trace_onoff .
     METHODS replace_old_runtime_structure
       CHANGING xml TYPE csequence.
+    METHODS replace_icon_names_in_sql
+      CHANGING VALUE(c_sql_string) TYPE string.
+
   PRIVATE SECTION.
 
     CONSTANTS c_cmd_show_log TYPE string VALUE 'SHOW_LOG ' ##NO_TEXT.
@@ -3083,6 +3086,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
           DATA(l_timestamp) = /cadaxo/cl_sqlc_log=>insert_sql_to_log( i_sql_string = <lr_cl_sql_parse>->sql_syntax ).
 
+          me->replace_icon_names_in_sql( CHANGING c_sql_string = <lr_cl_sql_parse>->column_syntax ).
+
           <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings      = me->ms_user_settings_xml
                                                        i_progress_indicator = i_progress_indicator
                                              IMPORTING e_result_details     = l_result_details ).
@@ -3096,7 +3101,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           ENDIF.
           "COCKPIT-458 END
 
-          APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t. "Todo Dävid Icons
+          APPEND <lr_cl_sql_parse>->result_table TO dref_result_tab_t.
 
           /cadaxo/cl_sqlc_log=>update_sql_to_log( i_timestamp      = l_timestamp
                                                   i_sql_string     = <lr_cl_sql_parse>->sql_syntax
@@ -13270,6 +13275,65 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       ENDIF.
     ENDIF.
+  ENDMETHOD.
+
+  METHOD replace_icon_names_in_sql.
+
+    DATA: matches       TYPE match_result_tab,
+          match         TYPE match_result,
+          icon_name     TYPE string,
+          icon_id       TYPE icon_d,
+          left_part     TYPE string,
+          right_part    TYPE string,
+          sql_len       TYPE i,
+          remaining_len TYPE i,
+          idx           TYPE i,
+          pos           TYPE i.
+
+    FIND ALL OCCURRENCES OF REGEX 'ICON_[A-Za-z0-9_]+' IN c_sql_string IGNORING CASE RESULTS matches.
+
+    IF lines( matches ) = 0.
+      RETURN.
+    ENDIF.
+
+    sql_len = strlen( c_sql_string ).
+
+    idx = lines( matches ).
+    WHILE idx > 0.
+      READ TABLE matches INDEX idx INTO match.
+      IF sy-subrc <> 0.
+        idx = idx - 1.
+        CONTINUE.
+      ENDIF.
+
+      icon_name = to_upper( c_sql_string+match-offset(match-length) ).
+
+      SELECT SINGLE id INTO @icon_id FROM icon WHERE name = @icon_name.
+      IF sy-subrc = 0.
+
+        IF match-offset > 0.
+          left_part = c_sql_string+0(match-offset).
+        ELSE.
+          left_part = ''.
+        ENDIF.
+
+        pos = match-offset + match-length.
+        remaining_len = sql_len - pos.
+
+        IF remaining_len > 0.
+          right_part = c_sql_string+pos(remaining_len).
+        ELSE.
+          right_part = ''.
+        ENDIF.
+
+        CONCATENATE left_part icon_id right_part INTO c_sql_string.
+
+        sql_len = strlen( c_sql_string ).
+      ENDIF.
+
+      idx = idx - 1.
+    ENDWHILE.
+
   ENDMETHOD.
 
 ENDCLASS.
