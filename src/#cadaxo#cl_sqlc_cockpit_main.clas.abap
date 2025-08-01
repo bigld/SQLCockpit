@@ -7013,71 +7013,85 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     READ TABLE lt_code INDEX l_from_line ASSIGNING <l_code>.
     IF sy-subrc = 0.
       MOVE <l_code> TO l_stringc.
-      IF l_stringc+l_from_pos <> space.
-        WHILE l_from_pos <> 0 AND l_stringc+l_from_pos(1) <> space.
-          l_from_pos = l_from_pos - 1.
-        ENDWHILE.
-        l_from_pos = l_from_pos + 1.
-        WHILE l_to_pos <> 0 AND l_stringc+l_to_pos(1) <> space AND l_stringc+l_to_pos(1) <> '(' AND l_stringc+l_to_pos(1) <> '.'.
-          l_to_pos = l_to_pos + 1.
-        ENDWHILE.
-      ENDIF.
 
-      l_len = l_to_pos - l_from_pos.
-      IF l_len GT 0.
+      IF l_from_pos >= 0 AND l_from_pos < strlen( l_stringc ). "Offset Check
+        IF l_stringc+l_from_pos <> space.
 
-        l_ddobjname = to_upper( l_stringc+l_from_pos(l_len) ).
+          WHILE l_from_pos > 0 AND l_from_pos < strlen( l_stringc ) AND l_stringc+l_from_pos(1) <> space.
+            l_from_pos = l_from_pos - 1.
+          ENDWHILE.
 
-        IF l_ddobjname CA '\'.
-          SPLIT l_ddobjname AT '\' INTO TABLE DATA(lt_views).
-          l_ddobjname = lt_views[ 1 ].
+          IF l_from_pos > 0 AND l_stringc+l_from_pos(1) = space.
+            l_from_pos = l_from_pos + 1.
+          ENDIF.
+
+          WHILE l_to_pos < strlen( l_stringc ) AND
+              l_stringc+l_to_pos(1) <> space AND
+              l_stringc+l_to_pos(1) <> '(' AND
+              l_stringc+l_to_pos(1) <> '.'.
+            l_to_pos = l_to_pos + 1.
+          ENDWHILE.
         ENDIF.
+        l_len = l_to_pos - l_from_pos.
+        IF l_len GT 0.
 
-        CLEAR l_ddtypekind.
+          l_ddobjname = to_upper( l_stringc+l_from_pos(l_len) ).
+          SHIFT l_ddobjname LEFT DELETING LEADING space.
+*
 
-        CALL FUNCTION 'DDIF_TYPEINFO_GET'
-          EXPORTING
-            typename = l_ddobjname
-          IMPORTING
-            typekind = l_ddtypekind.
 
-        IF l_ddtypekind <> space.
-          CASE l_ddtypekind.
-            WHEN 'STOB'.
-              IF g_user_settings-forwnavddleclipse = abap_true.
-                /cadaxo/cl_sqlc_cockpit_assist=>foreward_navigation_adt_stob( i_ddobjname = l_ddobjname ).
-              ELSE.
+          IF l_ddobjname CA '\'.
+            SPLIT l_ddobjname AT '\' INTO TABLE DATA(lt_views).
+            l_ddobjname = lt_views[ 1 ].
+          ENDIF.
 
-                gc_abap_editor->get_first_visible_line( IMPORTING line = l_first_line ).
+          CLEAR l_ddtypekind.
 
-                l_row = l_from_line - l_first_line.
-                l_col = l_from_pos.
-                l_ddlname = l_ddobjname.
+          CALL FUNCTION 'DDIF_TYPEINFO_GET'
+            EXPORTING
+              typename = l_ddobjname
+            IMPORTING
+              typekind = l_ddtypekind.
 
-                CALL FUNCTION '/CADAXO/SQLC_CDS_VIEW_DISPLAY'
-                  EXPORTING
-                    i_ddlname = l_ddlname
-                    i_col     = l_col
-                    i_row     = l_row.
+          IF l_ddtypekind <> space.
+            CASE l_ddtypekind.
+              WHEN 'STOB'.
+                IF g_user_settings-forwnavddleclipse = abap_true.
+                  /cadaxo/cl_sqlc_cockpit_assist=>foreward_navigation_adt_stob( i_ddobjname = l_ddobjname ).
+                ELSE.
 
-              ENDIF.
-            WHEN space.
-            WHEN OTHERS.
-              IF g_user_settings-forwnavdicteclipse = abap_true.
-                /cadaxo/cl_sqlc_cockpit_assist=>foreward_navigation_adt_others( i_ddobjname = l_ddobjname ).
-              ELSE.
-                CALL FUNCTION 'RS_DD_SHOW'
-                  EXPORTING
-                    objname              = l_ddobjname
-                    objtype              = 'T'
-                  EXCEPTIONS
-                    object_not_found     = 1
-                    object_not_specified = 2
-                    permission_failure   = 3
-                    type_not_valid       = 4
-                    OTHERS               = 5.
-              ENDIF.
-          ENDCASE.
+                  gc_abap_editor->get_first_visible_line( IMPORTING line = l_first_line ).
+
+                  l_row = l_from_line - l_first_line.
+                  l_col = l_from_pos.
+                  l_ddlname = l_ddobjname.
+
+                  CALL FUNCTION '/CADAXO/SQLC_CDS_VIEW_DISPLAY'
+                    EXPORTING
+                      i_ddlname = l_ddlname
+                      i_col     = l_col
+                      i_row     = l_row.
+
+                ENDIF.
+              WHEN space.
+              WHEN OTHERS.
+                IF g_user_settings-forwnavdicteclipse = abap_true.
+                  /cadaxo/cl_sqlc_cockpit_assist=>foreward_navigation_adt_others( i_ddobjname = l_ddobjname ).
+                ELSE.
+                  CALL FUNCTION 'RS_DD_SHOW'
+                    EXPORTING
+                      objname              = l_ddobjname
+                      objtype              = 'T'
+                    EXCEPTIONS
+                      object_not_found     = 1
+                      object_not_specified = 2
+                      permission_failure   = 3
+                      type_not_valid       = 4
+                      OTHERS               = 5.
+                ENDIF.
+            ENDCASE.
+          ENDIF.
+
         ENDIF.
 
       ENDIF.
