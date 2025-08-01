@@ -7974,49 +7974,48 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD on_handle_result_context_menu.
-****************************************************************************************************
-* Description             : Result List Context Menu                                               *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2013               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 08.12.2014 | Ana Lekic            | No Update-Popup for saved lists             | RT281          *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             : Result List Context Menu                                               -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               : Cadaxo                   Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.01.2013               Release    : WAS 7.00                         -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    -
+    "  Date                    : xx.xx.xxxx                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  08.12.2014 | Ana Lekic            | No Update-Popup for saved lists             | RT281          -
+    "             |                      |                                             |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "             |                      |                                             |                -
+    "             |                      |                                             |                -
+    " ---------------------------------------------------------------------------------------------------
 
-    DATA lr_badi TYPE REF TO /cadaxo/sqlc_badi_res_ctxm.
-    DATA lcl_gui_control TYPE REF TO cl_gui_control.
-    DATA l_grid_name TYPE string.
+    DATA lr_badi             TYPE REF TO /cadaxo/sqlc_badi_res_ctxm.
+    DATA lcl_gui_control     TYPE REF TO cl_gui_control.
+    DATA l_grid_name         TYPE string.
     DATA lcl_cl_gui_alv_grid TYPE REF TO cl_gui_alv_grid.
-    DATA ls_row TYPE lvc_s_row.
-    DATA ls_col TYPE lvc_s_col.
-    DATA lt_lvc_t_row TYPE lvc_t_row.
-    DATA length  TYPE i.
-    DATA l_grid_name_i TYPE i.
-    DATA l_index TYPE i.
-    DATA l_show_as_submenu TYPE REF TO cl_ctmenu.
+    DATA ls_row              TYPE lvc_s_row.
+    DATA ls_col              TYPE lvc_s_col.
+    DATA lt_lvc_t_row        TYPE lvc_t_row.
+    DATA length              TYPE i.
+    DATA l_grid_name_i       TYPE i.
+    DATA l_index             TYPE i.
+    DATA l_show_as_submenu   TYPE REF TO cl_ctmenu.
 
-    FIELD-SYMBOLS <lr_dref>         TYPE any. "RT281
-    FIELD-SYMBOLS <lr_cl_sql_parse> LIKE LINE OF gt_cl_sql_parse. "RT281
-    FIELD-SYMBOLS: <lt_result_tab>  TYPE STANDARD TABLE,
-                   <l_result_line>  TYPE any,
-                   <l_result_field> TYPE any.
+    FIELD-SYMBOLS <lr_dref>         TYPE any.                     " RT281
+    FIELD-SYMBOLS <lr_cl_sql_parse> LIKE LINE OF gt_cl_sql_parse. " RT281
+    FIELD-SYMBOLS <lt_result_tab>   TYPE STANDARD TABLE.
+    FIELD-SYMBOLS <l_result_line>   TYPE any.
+    FIELD-SYMBOLS <l_result_field>  TYPE any.
 
     cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
     l_grid_name = lcl_gui_control->get_name( ).
@@ -8031,20 +8030,21 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
         lcl_cl_gui_alv_grid ?= lcl_gui_control.
 
-        lcl_cl_gui_alv_grid->get_current_cell( IMPORTING es_row_id = ls_row es_col_id = ls_col ).
+        lcl_cl_gui_alv_grid->get_current_cell( IMPORTING es_row_id = ls_row
+                                                         es_col_id = ls_col ).
 
         lcl_cl_gui_alv_grid->get_selected_rows( IMPORTING et_index_rows = lt_lvc_t_row ).
 
-      CATCH cx_sy_move_cast_error ##no_handler.
+      CATCH cx_sy_move_cast_error ##NO_HANDLER.
     ENDTRY.
 
-    IF ls_col-fieldname IS NOT INITIAL. "cockpit-454
+    IF ls_col-fieldname IS NOT INITIAL. " cockpit-454
 
       l_grid_name_i = l_grid_name+15.
 
-      READ TABLE dref_result_tab_t INDEX l_grid_name_i ASSIGNING <lr_dref>.
+      ASSIGN dref_result_tab_t[ l_grid_name_i ] TO <lr_dref>.
       ASSIGN <lr_dref>->* TO <lt_result_tab>.
-      READ TABLE <lt_result_tab> INDEX ls_row-index ASSIGNING <l_result_line>.
+      ASSIGN <lt_result_tab>[ ls_row-index ] TO <l_result_line>.
 
       IF sy-subrc = 0.
         ASSIGN COMPONENT ls_col-fieldname OF STRUCTURE <l_result_line> TO <l_result_field>.
@@ -8053,65 +8053,52 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           length = strlen( <l_result_field> ).
           IF length >= 128.
             e_object->add_separator( ).
-            e_object->add_function( fcode = c_cmd_show_full_value text = TEXT-q56 ).
+            e_object->add_function( fcode = c_cmd_show_full_value
+                                    text  = TEXT-q56 ).
           ENDIF.
         ENDIF.
       ENDIF.
 
-
       l_show_as_submenu = NEW cl_ctmenu( ).
 
-      l_show_as_submenu->add_function(
-        EXPORTING
-          fcode             = c_cmd_show_value_as_html_brow
-          text              = TEXT-q61
-      ).
-      l_show_as_submenu->add_function(
-        EXPORTING
-          fcode             = c_cmd_show_value_as_xml_brow
-          text              = TEXT-q62
-      ).
-      l_show_as_submenu->add_function(
-        EXPORTING
-          fcode             = c_cmd_show_value_as_json_brow
-          text              = TEXT-q66
-).
+      l_show_as_submenu->add_function( fcode = c_cmd_show_value_as_html_brow
+                                       text  = TEXT-q61 ).
+      l_show_as_submenu->add_function( fcode = c_cmd_show_value_as_xml_brow
+                                       text  = TEXT-q62 ).
+      l_show_as_submenu->add_function( fcode = c_cmd_show_value_as_json_brow
+                                       text  = TEXT-q66 ).
 
-      e_object->add_submenu(
-        EXPORTING
-          menu        = l_show_as_submenu
-          text        = TEXT-q60
-      ).
+      e_object->add_submenu( menu = l_show_as_submenu
+                             text = TEXT-q60 ).
 
       e_object->add_separator( ).
-      e_object->add_function( fcode = c_cmd_create_symbol text = 'Create Symbols'(002) ).
+      e_object->add_function( fcode = c_cmd_create_symbol
+                              text  = 'Create Symbols'(002) ).
       e_object->add_separator( ).
 
-* RT281 Begin
+      " RT281 Begin
       IF strlen( l_grid_name ) > 15.
         l_grid_name_i = l_grid_name+15.
-        ASSIGN dref_result_tab_t[ l_grid_name_i ] TO <lr_dref>. "get reference of the partse
+        ASSIGN dref_result_tab_t[ l_grid_name_i ] TO <lr_dref>. " get reference of the partse
         IF sy-subrc = 0.
           l_index = sy-tabix.
-          READ TABLE gt_cl_sql_parse INDEX l_index ASSIGNING <lr_cl_sql_parse>.
-          IF sy-subrc = 0 AND <lr_cl_sql_parse>->g_saved_list = abap_true. "if it is a saved list, no edit function
+          ASSIGN gt_cl_sql_parse[ l_index ] TO <lr_cl_sql_parse>.
+          IF sy-subrc = 0 AND <lr_cl_sql_parse>->g_saved_list = abap_true. " if it is a saved list, no edit function
             RETURN.
           ENDIF.
         ENDIF.
       ENDIF.
-* RR281 End
+      " RR281 End
 
       GET BADI lr_badi.
 
       CALL BADI lr_badi->create
-        EXPORTING
-          i_object     = e_object
-          it_lvc_t_row = lt_lvc_t_row
-          i_row        = ls_row
-          i_col        = ls_col.
+        EXPORTING i_object     = e_object
+                  it_lvc_t_row = lt_lvc_t_row
+                  i_row        = ls_row
+                  i_col        = ls_col.
 
     ENDIF. "+ cockpit-454
-
   ENDMETHOD.
 
 
