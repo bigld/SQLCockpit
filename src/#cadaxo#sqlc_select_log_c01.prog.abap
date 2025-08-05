@@ -36,6 +36,18 @@ CLASS lcl_local_runner DEFINITION.
                 cx_sy_conversion_codepage
                 cx_sy_compression_error
                 cx_salv_msg.
+    METHODS conv_date_to_timestamp
+      IMPORTING i_dates             TYPE date_range
+      RETURNING VALUE(r_timestamps) TYPE timestamp_ranges
+      RAISING
+                cx_abap_invalid_value.
+    METHODS get_start_of_day_timestamp
+      IMPORTING i_date          TYPE d
+      RETURNING VALUE(r_ts_low) TYPE timestamp.
+
+    METHODS get_end_of_day_timestamp
+      IMPORTING i_date           TYPE d
+      RETURNING VALUE(r_ts_high) TYPE timestamp.
 
   PRIVATE SECTION.
     TYPES ty_selects TYPE STANDARD TABLE OF /cadaxo/sqlclog WITH DEFAULT KEY.
@@ -54,11 +66,7 @@ CLASS lcl_local_runner DEFINITION.
 
     METHODS auth_check.
 
-    METHODS conv_date_to_timestamp
-      IMPORTING i_dates             TYPE date_range
-      RETURNING VALUE(r_timestamps) TYPE timestamp_ranges
-      RAISING
-                cx_abap_invalid_value.
+
 
     METHODS db_query
       IMPORTING i_timestamps     TYPE timestamp_ranges OPTIONAL
@@ -70,13 +78,7 @@ CLASS lcl_local_runner DEFINITION.
       CHANGING c_output_table TYPE /cadaxo/cl_sqlc_user_hist_log=>ty_sqlclogalvs.
 
 
-    METHODS get_start_of_day_timestamp
-      IMPORTING i_date          TYPE d
-      RETURNING VALUE(r_ts_low) TYPE timestamp.
 
-    METHODS get_end_of_day_timestamp
-      IMPORTING i_date           TYPE d
-      RETURNING VALUE(r_ts_high) TYPE timestamp.
 
     METHODS on_double_click
       IMPORTING
