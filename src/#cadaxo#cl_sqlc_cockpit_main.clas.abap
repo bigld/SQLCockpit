@@ -282,32 +282,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
 
 
 
-    CLASS-METHODS build_result_grid_footer
-      IMPORTING
-        !iv_syst             TYPE sysysid
-        !iv_mandant          TYPE /cadaxo/sqlc_mandt
-        !iv_uname            TYPE uname
-        !iv_create_timestamp TYPE timestampl
-      RETURNING
-        VALUE(r_grid_footer) TYPE /cadaxo/sqlcresult_footer .
-    CLASS-METHODS build_result_grid_title
-      IMPORTING
-        !i_runtime          TYPE /cadaxo/sqlcruntime
-        !i_lines            TYPE i
-        !i_message          TYPE string OPTIONAL
-      RETURNING
-        VALUE(r_grid_title) TYPE lvc_title .
     METHODS add_hold_lists .
     METHODS api_saved_list_import
       IMPORTING
         !ir_api   TYPE REF TO /cadaxo/cl_sqlc_cockpit_api
         !is_items TYPE /cadaxo/sqlcapip .
-    METHODS calc_result_rows_and_cols
-      IMPORTING
-        !i_lines TYPE i
-      EXPORTING
-        !e_rows  TYPE i
-        !e_cols  TYPE i .
+
     METHODS check_dbtable_modification
       RETURNING
         VALUE(r_answer) TYPE char1 .
@@ -826,7 +806,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
         ENDLOOP.
 
-        /cadaxo/cl_sqlc_cockpit_parse=>check_sql_syntax( i_sql_parsed = lt_cl_sql_parse ).
+        /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( i_sql_parsed = lt_cl_sql_parse ).
 
         LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
 
@@ -880,179 +860,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   ENDMETHOD.
 
-
-  METHOD build_result_grid_footer.
-****************************************************************************************************
-* Description             : Build the result grid title                                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Harald Wiesinger         Company    : CADAXO GesmbH                    *
-* Date                    : 10.12.2013               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 19.04.2016 | Ana Lekic            | change footer length from 70 to 255         | Jira COCKPIT-4 *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-    DATA lv_timestamp             TYPE timestamp.
-    DATA lv_date                  TYPE sy-datum.
-    DATA lv_time                  TYPE sy-uzeit.
-    DATA lv_date_out              TYPE c LENGTH 10.
-    DATA lv_time_out              TYPE c LENGTH 8.
-
-    IF iv_syst IS NOT INITIAL.
-      CONCATENATE r_grid_footer 'System:'(f02) iv_syst INTO r_grid_footer SEPARATED BY space.
-    ENDIF.
-    IF iv_mandant IS NOT INITIAL.
-      CONCATENATE r_grid_footer 'Client:'(f01) iv_mandant INTO r_grid_footer SEPARATED BY space.
-    ENDIF.
-    IF iv_uname IS NOT INITIAL.
-      CONCATENATE r_grid_footer 'User:'(f05) iv_uname INTO r_grid_footer SEPARATED BY space.
-    ENDIF.
-
-    IF iv_create_timestamp IS NOT INITIAL.
-      MOVE iv_create_timestamp TO lv_timestamp.
-      CONVERT TIME STAMP lv_timestamp TIME ZONE sy-zonlo INTO DATE lv_date TIME lv_time.
-      WRITE lv_date TO lv_date_out.
-      WRITE lv_time TO lv_time_out.
-      CONCATENATE r_grid_footer 'Date:'(f03) lv_date_out 'Time:'(f04) lv_time_out INTO r_grid_footer SEPARATED BY space.
-    ENDIF.
-
-    IF r_grid_footer IS INITIAL.
-      GET TIME STAMP FIELD lv_timestamp.
-      CONVERT TIME STAMP lv_timestamp TIME ZONE sy-zonlo INTO DATE lv_date TIME lv_time.
-      WRITE lv_date TO lv_date_out.
-      WRITE lv_time TO lv_time_out.
-
-      CONCATENATE 'System:'(f02) sy-sysid 'Client:'(f01) sy-mandt
-                  'Date:'(f03) lv_date_out 'Time:'(f04) lv_time_out INTO r_grid_footer SEPARATED BY space.
-    ENDIF.
-
-    FREE: lv_timestamp, lv_date, lv_time, lv_date_out, lv_time_out.
-
-  ENDMETHOD.
-
-
-  METHOD build_result_grid_title.
-****************************************************************************************************
-* Description             : Build the result grit title                                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.06.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-* build the header: x records ( y microseconds )
-    IF i_lines = 1.
-      r_grid_title = |{ i_lines NUMBER = USER } { TEXT-i03 }|.
-    ELSEIF i_lines > 1.
-      r_grid_title = |{ i_lines NUMBER = USER } { TEXT-i01 }|.
-    ELSE.
-      r_grid_title = TEXT-i02.
-    ENDIF.
-
-    IF i_runtime-unit = /cadaxo/cl_sqlc_rt_measurement=>c_unit-second.
-      r_grid_title = |{ r_grid_title } ( { i_runtime-runtime NUMBER = USER } { TEXT-008 } )|.
-    ELSE.
-      r_grid_title = |{ r_grid_title } ( { i_runtime-runtime NUMBER = USER } { TEXT-001 } )|.
-    ENDIF.
-
-    IF i_message IS NOT INITIAL.
-      CONCATENATE r_grid_title '-' i_message INTO r_grid_title RESPECTING BLANKS.
-    ENDIF.
-
-    CONDENSE r_grid_title.
-
-  ENDMETHOD.
-
-
-  METHOD calc_result_rows_and_cols.
-****************************************************************************************************
-* Description             : Calculate result rows/cols                                             *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : xxxxxxxxxxxxx                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 04.08.2010 | Fößleitner Johann    | Defaultvalue 'V' for Result Views           | CDX001-0002    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 16.07.2012 | Fößleitner Johann    | New calculation of rows/columns in matrix   | CDX130-011     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 17.04.2017 | Domi Bigl            | max row/col for splitter                    | COCKPIT-185    *
-****************************************************************************************************
-
-
-    CONSTANTS: lc_max_rowcol TYPE i VALUE 15.
-    DATA: l_calc TYPE p DECIMALS 2.
-
-    IF i_lines > lc_max_rowcol.
-      ms_user_settings_xml-reswindoworientation = cs_windowresolution-matrix.
-    ENDIF.
-
-    CASE ms_user_settings_xml-reswindoworientation.
-      WHEN cs_windowresolution-horizontal.
-        e_rows = 1.
-        e_cols = i_lines.
-      WHEN cs_windowresolution-vertical.
-        e_rows = i_lines.
-        e_cols = 1.
-      WHEN OTHERS.
-
-        l_calc = sqrt( i_lines ).
-
-        CALL FUNCTION 'ROUND'
-          EXPORTING
-            input  = l_calc
-            sign   = 'X'
-          IMPORTING
-            output = e_rows.
-
-        CALL FUNCTION 'ROUND'
-          EXPORTING
-            input  = l_calc
-            sign   = '+'
-          IMPORTING
-            output = e_cols.
-    ENDCASE.
-
-  ENDMETHOD.
 
 
   METHOD call_admin.
@@ -1226,11 +1033,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
             IMPORTING
               e_sql_parsed                = <lt_cl_sql_parse> ).
 
-          /cadaxo/cl_sqlc_cockpit_parse=>check_sql_syntax(
-            EXPORTING
-              i_sql_parsed = <lt_cl_sql_parse>
-            IMPORTING
-              et_rest      = lt_rest ).
+          /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( EXPORTING i_sql_parsed = <lt_cl_sql_parse>
+                                                        IMPORTING et_rest      = lt_rest ).
 
           LOOP AT <lt_cl_sql_parse> ASSIGNING <l_cl_sql_parse>.
             <l_cl_sql_parse>->parse_sql_ii( ).
@@ -1372,79 +1176,82 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     /cadaxo/cl_sqlc_cockpit_assist=>get_parameter_value( EXPORTING i_parameter_id      = /cadaxo/cl_sqlc_cockpit_assist=>c_param_version
                                                          RECEIVING r_parameter_value    = g_version_nr
-                                                         EXCEPTIONS OTHERS              = 2 ).
+                                                         EXCEPTIONS OTHERS              = 1 ).
 
   ENDMETHOD.
 
-
   METHOD constructor.
-****************************************************************************************************
-* Description             : Constructor                                                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 03.02.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.03.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
-* Date                    : 17.11.2014                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 04.08.2010 | Fößleitner Johann    | Defaultvalue 'V' for Result Views           | CDX001-0002    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 29.08.2010 | Fößleitner Johann    | Use the trace user settings                 | CDX001-0008    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 01.06.2011 | Fößleitner Johann    | Defautlvalue 2 for Job and Hiostry Days     | CDX001-0023    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | Fößleitner Johann    | Editor type (new, old or like se80 setting) | CDX130-005     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
-*            |                      |                                             | RT235          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 28.03.2017 | Domi Bigl            | Role Auth Bug                               |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.07.2017 | Harald Wiesinger     | Check reference user for roles              | COCKPIT-172    *
-****************************************************************************************************
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             : Constructor                                                            -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
+    "  Date                    : 03.02.2010               Release    : WAS 7.00                         -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.03.2010                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    -
+    "  Date                    : 17.11.2014                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  04.08.2010 | Fößleitner Johann    | Defaultvalue 'V' for Result Views           | CDX001-0002    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  29.08.2010 | Fößleitner Johann    | Use the trace user settings                 | CDX001-0008    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  01.06.2011 | Fößleitner Johann    | Defautlvalue 2 for Job and Hiostry Days     | CDX001-0023    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  27.03.2012 | Fößleitner Johann    | Editor type (new, old or like se80 setting) | CDX130-005     -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       -
+    "             |                      |                                             | RT235          -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  28.03.2017 | Domi Bigl            | Role Auth Bug                               |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  06.07.2017 | Harald Wiesinger     | Check reference user for roles              | COCKPIT-172    -
+    " ---------------------------------------------------------------------------------------------------
 
-    DATA: l_sqlcusrp  TYPE /cadaxo/sqlcusrp,
-          ls_auth     TYPE /cadaxo/sqlcrole_auth_xml,
-          ls_table_ui TYPE /cadaxo/sqlcroled_tab_ui,
-          l_xml       TYPE string,
-          lt_roles    TYPE TABLE OF /cadaxo/sqlcrole INITIAL SIZE 0.
-    DATA: l_rseumod          TYPE rseumod.
+    DATA l_sqlcusrp  TYPE /cadaxo/sqlcusrp.
+    DATA ls_auth     TYPE /cadaxo/sqlcrole_auth_xml.
+    DATA ls_table_ui TYPE /cadaxo/sqlcroled_tab_ui.
+    DATA l_xml       TYPE string.
+    DATA lt_roles    TYPE TABLE OF /cadaxo/sqlcrole INITIAL SIZE 0.
+    DATA l_rseumod   TYPE rseumod.
 
-    DATA: lwa_main           LIKE LINE OF gt_main_classes.
+    DATA lwa_main    LIKE LINE OF gt_main_classes.
 
-    DATA ls_refuser TYPE bapirefus.                     "COCKPIT-172
-    DATA lt_return  TYPE TABLE OF bapiret2.             "COCKPIT-172
-    DATA l_user     TYPE xubname.                       "COCKPIT-172
+    DATA ls_refuser  TYPE bapirefus.                 " COCKPIT-172
+    DATA lt_return   TYPE TABLE OF bapiret2.             " COCKPIT-172
+    DATA l_user      TYPE xubname.                   " COCKPIT-172
 
-    FIELD-SYMBOLS: <ls_roles> LIKE LINE OF lt_roles.
+    FIELD-SYMBOLS <ls_roles>          LIKE LINE OF lt_roles.
 
-    FIELD-SYMBOLS: <l_sqlcdtable_auth>     TYPE /cadaxo/sqlctable_auth.
+    FIELD-SYMBOLS <l_sqlcdtable_auth> TYPE /cadaxo/sqlctable_auth.
 
-* get client information
+    " get client information
     SELECT SINGLE logsys cccategory
-                  FROM t000 INTO (me->g_client_logsys,
-                                  me->g_client_category) WHERE mandt = sy-mandt.
+      FROM t000
+      INTO ( me->g_client_logsys,
+             me->g_client_category )
+      WHERE mandt = sy-mandt.
 
-* get wizard templates
-    SELECT a~template_name b~template_desc
-           FROM /cadaxo/sqlctemp AS a LEFT OUTER JOIN
-                /cadaxo/sqlctemt AS b ON  b~template_name = a~template_name
-                                      AND b~language = sy-langu
-                                      INTO TABLE gt_templates
-                                      WHERE a~flag_active = abap_true. "#EC CI_BUFFJOIN
+    " get wizard templates
+    SELECT a~template_name
+           b~template_desc
+      FROM /cadaxo/sqlctemp AS a
+             LEFT OUTER JOIN
+               /cadaxo/sqlctemt AS b ON  b~template_name = a~template_name
+                                     AND b~language      = sy-langu
+      INTO TABLE gt_templates
+      WHERE a~flag_active = abap_true. "#EC CI_BUFFJOIN
 
-* get user preferences
+    " get user preferences
     SELECT SINGLE * FROM /cadaxo/sqlcusrp INTO l_sqlcusrp WHERE uname = sy-uname.
     IF sy-subrc = 0.
 
@@ -1454,118 +1261,113 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         CATCH cx_parameter_invalid_range
               cx_sy_buffer_overflow
               cx_sy_conversion_codepage
-              cx_sy_compression_error .                 "#EC NO_HANDLER
+              cx_sy_compression_error.                 "#EC NO_HANDLER
       ENDTRY.
 
-* call simple transformation DB -> XML
+      " call simple transformation DB -> XML
       TRY.
           CALL TRANSFORMATION id
-             SOURCE XML l_xml
-             RESULT settings = me->ms_user_settings_xml.
+               SOURCE XML l_xml
+               RESULT settings = ms_user_settings_xml.
 
-          MOVE: me->ms_user_settings_xml-use_convexit         TO me->g_user_settings-use_convexit,        "Convers Routine
-                me->ms_user_settings_xml-show_footer          TO me->g_user_settings-show_footer,         "Show ALV Footer #4093
-                me->ms_user_settings_xml-maxsel               TO me->g_user_settings-maxsel,              "Max Rows
-                me->ms_user_settings_xml-result_buttons       TO me->g_user_settings-result_buttons,      "Show Result Buttons
-                me->ms_user_settings_xml-save_clipboard       TO me->g_user_settings-save_clipboard,      "Save Clipboard
-                me->ms_user_settings_xml-result_doubleclick   TO me->g_user_settings-result_doubleclick,  "Result Doubleclick
-                me->ms_user_settings_xml-sql_trace            TO me->g_user_settings-sql_trace,           "SQL Trace           "CDX001-0008
-                me->ms_user_settings_xml-tablebuffer_trace    TO me->g_user_settings-tablebuffer_trace,   "Tablebuffer Trace   "CDX001-0008
-                me->ms_user_settings_xml-symbols_show         TO me->g_user_settings-symbols_show,        "Symbols ALV "CDX001-0020
-                me->ms_user_settings_xml-symbols_program_show TO me->g_user_settings-symbols_program_show,"Programsymbols show "CDX001-0020
-                me->ms_user_settings_xml-only_used_symbols    TO me->g_user_settings-only_used_symbols,   "CR22-002
-                me->ms_user_settings_xml-history_last_x_days  TO me->g_user_settings-history_last_x_days,
-                me->ms_user_settings_xml-job_last_x_days      TO me->g_user_settings-job_last_x_days,
-                me->ms_user_settings_xml-hd_show_alias        TO me->g_user_settings-hd_show_alias,        "Show alias in header
-                me->ms_user_settings_xml-hd_fieldtext_s       TO me->g_user_settings-hd_fieldtext_l,
-                me->ms_user_settings_xml-hd_fieldtext_m       TO me->g_user_settings-hd_fieldtext_m,
-                me->ms_user_settings_xml-hd_fieldtext_l       TO me->g_user_settings-hd_fieldtext_l,
-                me->ms_user_settings_xml-hd_fieldtext_a       TO me->g_user_settings-hd_fieldtext_a,
-                me->ms_user_settings_xml-editor_type          TO me->g_user_settings-editor_type,
-                me->ms_user_settings_xml-forwnavddleclipse    TO me->g_user_settings-forwnavddleclipse,
-                me->ms_user_settings_xml-forwnavdicteclipse   TO me->g_user_settings-forwnavdicteclipse,
-                me->ms_user_settings_xml-domaintext           TO me->g_user_settings-domaintext,           "COCKPIT-458
-                me->ms_user_settings_xml-release_type         TO me->g_user_settings-release_type,         "COCKPIT-98
-                me->ms_user_settings_xml-release_number       TO me->g_user_settings-release_number.       "COCKPIT-98
+          g_user_settings-use_convexit         = ms_user_settings_xml-use_convexit.        " Convers Routine
+          g_user_settings-show_footer          = ms_user_settings_xml-show_footer.         " Show ALV Footer #4093
+          g_user_settings-maxsel               = ms_user_settings_xml-maxsel.              " Max Rows
+          g_user_settings-result_buttons       = ms_user_settings_xml-result_buttons.      " Show Result Buttons
+          g_user_settings-save_clipboard       = ms_user_settings_xml-save_clipboard.      " Save Clipboard
+          g_user_settings-result_doubleclick   = ms_user_settings_xml-result_doubleclick.  " Result Doubleclick
+          g_user_settings-sql_trace            = ms_user_settings_xml-sql_trace.           " SQL Trace           "CDX001-0008
+          g_user_settings-tablebuffer_trace    = ms_user_settings_xml-tablebuffer_trace.   " Tablebuffer Trace   "CDX001-0008
+          g_user_settings-symbols_show         = ms_user_settings_xml-symbols_show.        " Symbols ALV "CDX001-0020
+          g_user_settings-symbols_program_show = ms_user_settings_xml-symbols_program_show. " Programsymbols show "CDX001-0020
+          g_user_settings-only_used_symbols    = ms_user_settings_xml-only_used_symbols.   " CR22-002
+          g_user_settings-history_last_x_days  = ms_user_settings_xml-history_last_x_days.
+          g_user_settings-job_last_x_days      = ms_user_settings_xml-job_last_x_days.
+          g_user_settings-hd_show_alias        = ms_user_settings_xml-hd_show_alias.        " Show alias in header
+          g_user_settings-hd_fieldtext_l       = ms_user_settings_xml-hd_fieldtext_s.
+          g_user_settings-hd_fieldtext_m       = ms_user_settings_xml-hd_fieldtext_m.
+          g_user_settings-hd_fieldtext_l       = ms_user_settings_xml-hd_fieldtext_l.
+          g_user_settings-hd_fieldtext_a       = ms_user_settings_xml-hd_fieldtext_a.
+          g_user_settings-editor_type          = ms_user_settings_xml-editor_type.
+          g_user_settings-forwnavddleclipse    = ms_user_settings_xml-forwnavddleclipse.
+          g_user_settings-forwnavdicteclipse   = ms_user_settings_xml-forwnavdicteclipse.
+          g_user_settings-domaintext           = ms_user_settings_xml-domaintext.           " COCKPIT-458
+          g_user_settings-release_type         = ms_user_settings_xml-release_type.         " COCKPIT-98
+          g_user_settings-release_number       = ms_user_settings_xml-release_number.       " COCKPIT-98
 
-* Column Header - Fieldname or Fieldtext
+          IF l_xml NS 'STRICT_MODE'.
+            ms_user_settings_xml-strict_mode = abap_true.
+          ENDIF.
+          g_user_settings-strict_mode = ms_user_settings_xml-strict_mode.
+
+          " Column Header - Fieldname or Fieldtext
           CASE me->ms_user_settings_xml-colhd_type.
             WHEN '1' OR space.
-              MOVE abap_true TO me->g_user_settings-hd_fieldname.
+              g_user_settings-hd_fieldname = abap_true.
             WHEN '2'.
-              MOVE abap_true TO me->g_user_settings-hd_fieldtext.
+              g_user_settings-hd_fieldtext = abap_true.
           ENDCASE.
 
-* Result Window Orientation
+          " Result Window Orientation
           CASE me->ms_user_settings_xml-reswindoworientation.
             WHEN cs_windowresolution-vertical OR space.
-              me->g_user_settings-result_window_vertical   = abap_true.
+              g_user_settings-result_window_vertical   = abap_true.
             WHEN cs_windowresolution-horizontal.
-              me->g_user_settings-result_window_horizontal = abap_true.
+              g_user_settings-result_window_horizontal = abap_true.
             WHEN cs_windowresolution-tab.
-              me->g_user_settings-result_window_tab = abap_true.
+              g_user_settings-result_window_tab = abap_true.
             WHEN OTHERS.
-              me->g_user_settings-result_window_matrix     = abap_true.
+              g_user_settings-result_window_matrix = abap_true.
           ENDCASE.
 
         CATCH cx_xslt_runtime_error.
-* fill default values
-          MOVE: abap_true  TO me->g_user_settings-use_convexit,          "Convers Routine
-                200        TO me->g_user_settings-maxsel,                "Max Rows
-                200        TO me->ms_user_settings_xml-maxsel,            "Max Rows
-                abap_true  TO me->g_user_settings-result_buttons,        "Show Result Buttons
-                abap_true  TO me->g_user_settings-hd_fieldname,          "Column Header Fieldname
-                abap_true  TO me->g_user_settings-result_window_vertical,"Result Views Vertical            "CDX001-0002
-                abap_true  TO me->g_user_settings-sql_trace,             "SQL Trace.                       "CDX001-0008
-                abap_false TO me->g_user_settings-symbols_show,          "SymbolALV show                   "CDX001-0020
-                abap_true  TO me->g_user_settings-symbols_program_show,  "Show Program symbols             "CDX001-0020
-                abap_false TO me->g_user_settings-only_used_symbols,     "Show only symbols used in Editor "CR22-002
-                abap_true  TO me->g_user_settings-hd_fieldtext_a,
-                2          TO me->g_user_settings-history_last_x_days,                                     "CDX001-0023
-                2          TO me->g_user_settings-job_last_x_days,                                         "CDX001-0023
-                space      TO me->g_user_settings-editor_type.                                             "CDX130-005
+          DATA(set_defaults) = abap_true.
       ENDTRY.
     ELSE.
-* fill default values
-      MOVE: abap_true  TO me->g_user_settings-use_convexit,          "Convers Routine
-            200        TO me->g_user_settings-maxsel,                "Max Rows
-            200        TO me->ms_user_settings_xml-maxsel,            "Max Rows
-            abap_true  TO me->g_user_settings-result_buttons,        "Show Result Buttons
-            abap_true  TO me->g_user_settings-hd_fieldname,          "Column Header Fieldname
-            abap_true  TO me->g_user_settings-result_window_vertical,"Result Views Vertical       "CDX001-0002
-            cs_windowresolution-vertical        TO me->ms_user_settings_xml-reswindoworientation,
-            abap_true  TO me->g_user_settings-sql_trace,             "SQL Trace.                  "CDX001-0008
-            abap_false TO me->g_user_settings-symbols_show,          "SymbolALV show           "CDX001-0020
-            abap_true  TO me->g_user_settings-symbols_program_show,  "Show Program symbols     "CDX001-0020
-            abap_false TO me->g_user_settings-only_used_symbols,     "Show only symbols used in Editor "CR22-002
-            abap_true  TO me->g_user_settings-hd_fieldtext_a,
-            2          TO me->g_user_settings-history_last_x_days,                             "CDX001-0023
-            2          TO me->g_user_settings-job_last_x_days,                                 "CDX001-0023
-            space      TO me->g_user_settings-editor_type.    "CDX130-005
+      set_defaults = abap_true.
     ENDIF.
 
-* Special logic editor
-    IF me->g_user_settings-editor_type <> space AND
-       me->g_user_settings-editor_type <> '01' AND
-      me->g_user_settings-editor_type  <> '02'.
-      me->g_user_settings-editor_type = space.
+    IF set_defaults = abap_true.
+      g_user_settings-use_convexit           = abap_true.
+      g_user_settings-maxsel                 = 200.
+      g_user_settings-result_buttons         = abap_true.
+      g_user_settings-hd_fieldname           = abap_true.
+      g_user_settings-result_window_vertical = abap_true.
+      g_user_settings-sql_trace              = abap_true.
+      g_user_settings-symbols_show           = abap_false.
+      g_user_settings-symbols_program_show   = abap_true.
+      g_user_settings-only_used_symbols      = abap_false.
+      g_user_settings-hd_fieldtext_a         = abap_true.
+      g_user_settings-history_last_x_days    = 2.
+      g_user_settings-job_last_x_days        = 2.
+      g_user_settings-editor_type            = space.
+
+      ms_user_settings_xml-maxsel               = g_user_settings-maxsel.
+      ms_user_settings_xml-reswindoworientation = cs_windowresolution-vertical.
     ENDIF.
 
-* set result layout parameters
+    " Special logic editor
+    IF     me->g_user_settings-editor_type <> space
+       AND me->g_user_settings-editor_type <> '01'
+       AND me->g_user_settings-editor_type <> '02'.
+      g_user_settings-editor_type = space.
+    ENDIF.
+
+    " set result layout parameters
     IF me->g_user_settings-result_buttons = space.
-      me->g_result_layout-no_toolbar = abap_true.
+      g_result_layout-no_toolbar = abap_true.
     ELSE.
-      me->g_result_layout-no_toolbar = abap_false.
+      g_result_layout-no_toolbar = abap_false.
     ENDIF.
 
-* Set default values for result layout (alv)
-    me->g_result_layout-cwidth_opt = abap_true.
-    me->g_result_layout-sel_mode   = 'D'.
-    me->g_result_layout-smalltitle = abap_true.
-    me->g_result_layout-detailinit = abap_true.
+    " Set default values for result layout (alv)
+    g_result_layout-cwidth_opt = abap_true.
+    g_result_layout-sel_mode   = 'D'.
+    g_result_layout-smalltitle = abap_true.
+    g_result_layout-detailinit = abap_true.
 
-* Clipboard Off
-    me->g_show_clipboard = ' '.
+    " Clipboard Off
+    g_show_clipboard = ' '.
 
     APPEND cl_gui_alv_grid=>mc_mb_variant    TO me->g_result_toolbar_excluding.
     APPEND cl_gui_alv_grid=>mc_fc_view_excel TO me->g_result_toolbar_excluding.
@@ -1602,35 +1404,37 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     APPEND cl_gui_alv_grid=>mc_mb_view       TO me->g_jobmonitor_toolbar_ex.
     APPEND cl_gui_alv_grid=>mc_fc_print      TO me->g_jobmonitor_toolbar_ex.
 
-* authority checks
+    " authority checks
     AUTHORITY-CHECK OBJECT 'ZCADXOSQ01' ID 'ACTVT' FIELD '23'.
     IF sy-subrc = 0.
-      me->g_auth_sql_cockpit_actvt = '02'. "Change.
+      g_auth_sql_cockpit_actvt = '02'. " Change.
     ELSE.
       AUTHORITY-CHECK OBJECT 'ZCADXOSQ01' ID 'ACTVT' FIELD '16'.
       IF sy-subrc = 0.
-        me->g_auth_sql_cockpit_actvt = '03'. "Display
+        g_auth_sql_cockpit_actvt = '03'. " Display
         MESSAGE s031(/cadaxo/sqlc).
       ELSE.
-        MESSAGE s030(/cadaxo/sqlc).          "No authorization
+        MESSAGE s030(/cadaxo/sqlc).          " No authorization
         SET SCREEN 0. LEAVE SCREEN.
       ENDIF.
     ENDIF.
 
-    CALL FUNCTION 'BAPI_USER_GET_DETAIL'                    "COCKPIT-172
-      EXPORTING                                             "COCKPIT-172
-        username = cl_abap_syst=>get_user_name( )           "COCKPIT-172
-      IMPORTING                                             "COCKPIT-172
-        ref_user = ls_refuser                               "COCKPIT-172
-      TABLES                                                "COCKPIT-172
-        return   = lt_return.                               "COCKPIT-172
+    CALL FUNCTION 'BAPI_USER_GET_DETAIL'                    " COCKPIT-172
+      EXPORTING                                             " COCKPIT-172
+                username = cl_abap_syst=>get_user_name( )           " COCKPIT-172
+      IMPORTING                                             " COCKPIT-172
+                ref_user = ls_refuser                               " COCKPIT-172
+      TABLES                                                " COCKPIT-172
+                return   = lt_return.                               " COCKPIT-172
 
     l_user = cl_abap_syst=>get_user_name( ).
-    SELECT b~role b~auth_xml INTO CORRESPONDING FIELDS OF TABLE lt_roles
-           FROM /cadaxo/sqlcrolr AS a
-                INNER JOIN /cadaxo/sqlcrole AS b
-                ON b~role = a~role
-           WHERE ( a~uname = l_user OR a~uname = ls_refuser-ref_user ). "#EC CI_BYPASS  "COCKPIT-172
+    SELECT b~role
+           b~auth_xml
+      INTO CORRESPONDING FIELDS OF TABLE lt_roles
+      FROM /cadaxo/sqlcrolr AS a
+             INNER JOIN
+               /cadaxo/sqlcrole AS b ON b~role = a~role
+      WHERE a~uname = l_user OR a~uname = ls_refuser-ref_user. "#EC CI_BYPASS  "COCKPIT-172
     IF sy-subrc <> 0.
       SELECT * FROM /cadaxo/sqlcrole INTO CORRESPONDING FIELDS OF TABLE lt_roles WHERE role_default <> space.
     ENDIF.
@@ -1639,17 +1443,17 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       CLEAR ls_auth.
       TRY.
           CALL TRANSFORMATION id
-             SOURCE XML <ls_roles>-auth_xml
-             RESULT auth = ls_auth.
+               SOURCE XML <ls_roles>-auth_xml
+               RESULT auth = ls_auth.
 
           LOOP AT ls_auth-included ASSIGNING <l_sqlcdtable_auth>.
             CLEAR ls_table_ui.
-            MOVE <l_sqlcdtable_auth> TO ls_table_ui-table_auth.
+            ls_table_ui-table_auth = <l_sqlcdtable_auth>.
             APPEND ls_table_ui-table_auth TO me->g_auth-included.
           ENDLOOP.
           LOOP AT ls_auth-excluded ASSIGNING <l_sqlcdtable_auth>.
             CLEAR ls_table_ui.
-            MOVE <l_sqlcdtable_auth> TO ls_table_ui-table_auth.
+            ls_table_ui-table_auth = <l_sqlcdtable_auth>.
             APPEND ls_table_ui-table_auth TO me->g_auth-excluded.
           ENDLOOP.
         CATCH cx_transformation_error.                  "#EC NO_HANDLER
@@ -1664,59 +1468,55 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     CASE me->g_user_settings-editor_type.
       WHEN space.
-* get abap editor type
+        " get abap editor type
         CALL FUNCTION 'RS_WORKBENCH_CUSTOMIZING_RESET'.
 
         CALL FUNCTION 'RS_WORKBENCH_CUSTOMIZING'
-          EXPORTING
-            choice          = 'WB'
-            suppress_dialog = abap_true
-          IMPORTING
-            setting         = l_rseumod.
+          EXPORTING choice          = 'WB'
+                    suppress_dialog = abap_true
+          IMPORTING setting         = l_rseumod.
 
         IF l_rseumod-editcntrl <> editor_type-new.
-          me->g_abap_editor_type = editor_type-old.
+          g_abap_editor_type = editor_type-old.
         ENDIF.
       WHEN '01'.
-        me->g_abap_editor_type = editor_type-new.
+        g_abap_editor_type = editor_type-new.
       WHEN '02'.
-        me->g_abap_editor_type = editor_type-old.
+        g_abap_editor_type = editor_type-old.
       WHEN OTHERS.
-        me->g_abap_editor_type = editor_type-new.
+        g_abap_editor_type = editor_type-new.
     ENDCASE.
     CALL FUNCTION 'GUI_IS_ITS'
-      IMPORTING
-        return = g_is_its.
+      IMPORTING return = g_is_its.
     IF g_is_its = abap_true OR cl_gui_frontend_services=>activex <> gfw_true.
-      me->g_abap_editor_type = editor_type-old.
+      g_abap_editor_type = editor_type-old.
     ENDIF.
 
-    ADD 1 TO g_main_counter.
+    g_main_counter = g_main_counter + 1.
     lwa_main-nr  = g_main_counter.
     lwa_main-ref = me.
     g_my_main_id = g_main_counter.
     APPEND lwa_main TO gt_main_classes.
 
-* set initial dates
-    me->g_sel_hist_timestamp_from = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_from( me->g_user_settings-history_last_x_days ).
-    me->g_sel_hist_timestamp_to   = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_to( ).
-    me->set_initial_date_jobmonitor( ).
+    " set initial dates
+    g_sel_hist_timestamp_from = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_from(
+                                    me->g_user_settings-history_last_x_days ).
+    g_sel_hist_timestamp_to   = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_to( ).
+    set_initial_date_jobmonitor( ).
 
     gr_user_log = NEW #( ).
 
     ms_additional_functions-uptomenu = NEW #( me->ms_user_settings_xml-maxsel ).
     SET HANDLER ms_additional_functions-uptomenu->on_usersettings_changed FOR me.
 
-*   begin of COCKPIT-371
-    me->g_trstart_uzeit = sy-uzeit.
-    me->g_trstart_datum = sy-datum.
+    " begin of COCKPIT-371
+    g_trstart_uzeit = sy-uzeit.
+    g_trstart_datum = sy-datum.
     GET TIME STAMP FIELD me->g_trstart_timestamp.
-*   end   of COCKPIT-371
+    " end   of COCKPIT-371
 
-
-    me->symbols_controller = NEW /cadaxo/cl_sqlc_symbols( i_user_settings = REF #( me->g_user_settings )
-                                                          i_main          = me
-                                                        ).
+    symbols_controller = NEW /cadaxo/cl_sqlc_symbols( i_user_settings = REF #( me->g_user_settings )
+                                                      i_main          = me ).
   ENDMETHOD.
 
 
@@ -3113,8 +2913,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
               text = TEXT-p02. "The data are formatted for output
 
           IF l_error_message IS INITIAL.
-            me->g_result_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = l_result_details-runtime
-                                                                                                    i_lines   = l_result_details-lines ).
+            me->g_result_layout-grid_title = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_title( i_runtime        = l_result_details-runtime
+                                                                                                i_result_lines   = l_result_details-lines
+                                                                                                i_select_version = <lr_cl_sql_parse>->g_select_version ).
           ELSE.
             me->g_result_layout-grid_title = l_error_message.
 
@@ -5149,51 +4950,26 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD handle_result_command_refrlst.
-****************************************************************************************************
-* Description             : handle result command REFRESH_LIST                                     *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : CADAXO GmbH              Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2014               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
-* Date                    : 17.11.2014                                                             *
-*--------------------------------------------------------------------------------------------------
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 19.09.2014 | RenÃƒÂ© Rammer          | Bug Fix: ALV Refresh Sum                    | CR22-032       *
-*            |                      |                                             | RT#244         *
-*------------+----------------------+---------------------------------------------+----------------*
-* 20.03.2015 | Bigl Domi            | Bug Fix: List refresh                       | RT#314         *
-*            |                      |                                             |                *
-****************************************************************************************************
+    DATA l_index          TYPE i.
+    DATA l_result_details TYPE /cadaxo/sqlcresult_details.
+    DATA ls_row_no        TYPE lvc_s_roid.
+    DATA ls_row_info      TYPE lvc_s_row.
+    DATA ls_col_info      TYPE lvc_s_col.
+    DATA ls_layout_tmp    TYPE lvc_s_layo.
+    DATA ls_layout        TYPE lvc_s_layo.
+    DATA lv_footer        TYPE string.
 
-    DATA l_index            TYPE i.
-    DATA l_result_details   TYPE /cadaxo/sqlcresult_details.
-    DATA ls_row_no          TYPE lvc_s_roid.
-    DATA ls_row_info        TYPE lvc_s_row.
-    DATA ls_col_info        TYPE lvc_s_col.
-    DATA ls_layout_tmp      TYPE lvc_s_layo.
-    DATA ls_layout          TYPE lvc_s_layo.
-    DATA lv_footer          TYPE string.
+    FIELD-SYMBOLS <lr_dref>            LIKE LINE OF dref_result_tab_t.
+    FIELD-SYMBOLS <lr_cl_sql_parse>    LIKE LINE OF gt_cl_sql_parse.
+    FIELD-SYMBOLS <ls_result_details>  LIKE LINE OF me->gt_result_details.
+    FIELD-SYMBOLS <l_cont_grid_result> LIKE LINE OF me->gcont_grid_result_t.
 
-    FIELD-SYMBOLS: <lr_dref>            LIKE LINE OF dref_result_tab_t,
-                   <lr_cl_sql_parse>    LIKE LINE OF gt_cl_sql_parse,
-                   <ls_result_details>  LIKE LINE OF me->gt_result_details,
-                   <l_cont_grid_result> LIKE LINE OF me->gcont_grid_result_t.
-
-    FIELD-SYMBOLS: <lt_result_tab>    TYPE STANDARD TABLE.
-    FIELD-SYMBOLS <lt_result_old> TYPE STANDARD TABLE.
-    FIELD-SYMBOLS <lt_result_new> TYPE STANDARD TABLE.
-    "  FIELD-SYMBOLS <fcat> LIKE LINE OF gt_lvc_t_fcat.
-
+*    " TODO: variable is assigned but only used in commented-out code (ABAP cleaner)
+*    FIELD-SYMBOLS <lt_result_old>      TYPE STANDARD TABLE.
+*    " TODO: variable is assigned but only used in commented-out code (ABAP cleaner)
+*    FIELD-SYMBOLS <lt_result_new>      TYPE STANDARD TABLE.
+*    "  FIELD-SYMBOLS <fcat> LIKE LINE OF gt_lvc_t_fcat.
 
     READ TABLE dref_result_tab_t INDEX i_grid_i ASSIGNING <lr_dref>.
     IF sy-subrc = 0.
@@ -5203,66 +4979,68 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
         <lr_cl_sql_parse>->create_result_structures( ).
 
-* execute select
-        <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings  = me->ms_user_settings_xml
+        " execute select
+        <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings  = ms_user_settings_xml
                                            IMPORTING e_result_details = l_result_details ).
 
-* get result details
+        " get result details
         READ TABLE me->gt_result_details INDEX l_index ASSIGNING <ls_result_details>.
         IF sy-subrc = 0.
-          MOVE l_result_details TO <ls_result_details>.
+          <ls_result_details> = l_result_details.
 
           READ TABLE me->gcont_grid_result_t INDEX l_index ASSIGNING <l_cont_grid_result>.
           IF sy-subrc = 0.
 
-* get current position in alv
-            <l_cont_grid_result>-gui_alv_grid->get_scroll_info_via_id( IMPORTING es_row_no = ls_row_no
+            " get current position in alv
+            <l_cont_grid_result>-gui_alv_grid->get_scroll_info_via_id( IMPORTING es_row_no   = ls_row_no
                                                                                  es_row_info = ls_row_info
                                                                                  es_col_info = ls_col_info ).
 
-* update frontend layout (title)
+            " update frontend layout (title)
             <l_cont_grid_result>-gui_alv_grid->get_frontend_layout( IMPORTING es_layout = ls_layout_tmp ).
 
-            ls_layout            = me->g_result_layout.
+            ls_layout            = g_result_layout.
             ls_layout-frontend   = ls_layout_tmp-frontend.
-            ls_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = <ls_result_details>-runtime
-                                                                                          i_lines   = <ls_result_details>-lines ).
+            ls_layout-grid_title = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_title(
+                                       i_runtime        = <ls_result_details>-runtime
+                                       i_result_lines   = <ls_result_details>-lines
+                                       i_select_version = <lr_cl_sql_parse>->g_select_version ).
 
-            lv_footer = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_footer( iv_mandant           = <ls_result_details>-mandant
-                                                                                iv_syst              = <ls_result_details>-syst
-                                                                                iv_create_timestamp  = <ls_result_details>-create_timestamp
-                                                                                iv_uname             = <ls_result_details>-uname ).
+            lv_footer = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_footer(
+                            iv_mandant          = <ls_result_details>-mandant
+                            iv_syst             = <ls_result_details>-syst
+                            iv_create_timestamp = <ls_result_details>-create_timestamp
+                            iv_uname            = <ls_result_details>-uname ).
 
-* refresh footer
+            " refresh footer
             IF <l_cont_grid_result>-cl_document_footer IS BOUND.
-              create_dyn_document(
-                EXPORTING
-                  i_parent    = <l_cont_grid_result>-cl_document_footer->custom_container
-                  i_sql       = lv_footer
-                CHANGING
-                  ic_document = <l_cont_grid_result>-cl_document_footer ).
+              create_dyn_document( EXPORTING i_parent    = <l_cont_grid_result>-cl_document_footer->custom_container
+                                             i_sql       = lv_footer
+                                   CHANGING  ic_document = <l_cont_grid_result>-cl_document_footer ).
             ENDIF.
 
             <l_cont_grid_result>-gui_alv_grid->set_frontend_layout( is_layout = ls_layout ).
 
-* refresh display
-* gets the new (refreshed) values from <lr_cl_sql_parse>->result_table and writes it (ultimately) into mt_outtab of <l_cont_grid_result>-gui_alv_grid
-            ASSIGN <lr_dref>->* TO <lt_result_old>.           "CR22-032
-            ASSIGN <lr_cl_sql_parse>->result_table->* TO <lt_result_new>."CR22-032
-            <lr_cl_sql_parse>->result_table = <lr_dref>.       "COCKPIT-464
+            " refresh display
+            " gets the new (refreshed) values from <lr_cl_sql_parse>->result_table and writes it (ultimately) into mt_outtab of <l_cont_grid_result>-gui_alv_grid
+*            ASSIGN <lr_dref>->* TO <lt_result_old>.           " CR22-032
+*            ASSIGN <lr_cl_sql_parse>->result_table->* TO <lt_result_new>. " CR22-032
+            <lr_cl_sql_parse>->result_table = <lr_dref>.       " COCKPIT-464
 *            <lt_result_old> = <lt_result_new>.                "CR22-032
 
             <l_cont_grid_result>-gui_alv_grid->refresh_table_display( ).
 
-*RT#314 DELETE
-**** set new frontend field catalog
-***          CALL METHOD <l_cont_grid_result>-gui_alv_grid->set_frontend_fieldcatalog "frontend_fieldcatalog
-***            EXPORTING
-***              it_fieldcatalog = lt_lvc_t_fcat.
-*RT#314 DELETE END
+            " RT#314 DELETE
+            " set new frontend field catalog
+            " CALL METHOD <l_cont_grid_result>-gui_alv_grid->set_frontend_fieldcatalog "frontend_fieldcatalog
+            " EXPORTING
+            " it_fieldcatalog = lt_lvc_t_fcat.
+            " RT#314 DELETE END
 
-* set current position in alv
-            <l_cont_grid_result>-gui_alv_grid->set_scroll_info_via_id( EXPORTING is_row_no = ls_row_no is_row_info = ls_row_info is_col_info = ls_col_info ).
+            " set current position in alv
+            <l_cont_grid_result>-gui_alv_grid->set_scroll_info_via_id( is_row_no   = ls_row_no
+                                                                       is_row_info = ls_row_info
+                                                                       is_col_info = ls_col_info ).
 
           ENDIF.
         ENDIF.
@@ -5278,7 +5056,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           ls_layout_tmp,
           ls_layout,
           lv_footer.
-
   ENDMETHOD.
 
 
@@ -8512,57 +8289,56 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                     disabled  = space ) INTO TABLE e_object->mt_toolbar.
   ENDMETHOD.
 
-
   METHOD on_handle_result_user_command.
-****************************************************************************************************
-* Description             :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               :                          Company    : CADAXO GesmbH                    *
-* Date                    :                          Release    :                                  *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 27.04.2016 | Ana Lekic            | check result_struc assigned                 | COCKPIT-30     *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 12.03.2018 | Dusan Sacha          | Add CSV Export                              | COCKPIT-271    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 08.10.2019 | Pat                  | Result share                                | Cockpit-401    *
-*------------+----------------------+---------------------------------------------+----------------*
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             :                                                                        -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               :                          Company    : CADAXO GesmbH                    -
+    "  Date                    :                          Release    :                                  -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    -
+    "  Date                    : xx.xx.xxxx                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  27.04.2016 | Ana Lekic            | check result_struc assigned                 | COCKPIT-30     -
+    "             |                      |                                             |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  12.03.2018 | Dusan Sacha          | Add CSV Export                              | COCKPIT-271    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  08.10.2019 | Pat                  | Result share                                | Cockpit-401    -
+    " ------------+----------------------+---------------------------------------------+-----------------
 
-    DATA lcl_gui_control TYPE REF TO cl_gui_control.
-    DATA lcl_cl_gui_alv_grid TYPE REF TO cl_gui_alv_grid.
-    DATA l_grid_name TYPE string.
-    DATA l_grid_name_i TYPE i.
-    DATA ls_layout TYPE lvc_s_layo.
-    DATA ls_layout_tmp TYPE lvc_s_layo.
-    DATA l_result_details TYPE /cadaxo/sqlcresult_details.
-    DATA l_index TYPE i.
-    DATA ls_row_no TYPE lvc_s_roid.
-    DATA ls_row_info TYPE lvc_s_row.
-    DATA ls_col_info TYPE lvc_s_col.
-    DATA l_refresh_list TYPE c LENGTH 1.
+    DATA lcl_gui_control       TYPE REF TO cl_gui_control.
+    DATA lcl_cl_gui_alv_grid   TYPE REF TO cl_gui_alv_grid.
+    DATA l_grid_name           TYPE string.
+    DATA l_grid_name_i         TYPE i.
+    DATA ls_layout             TYPE lvc_s_layo.
+    DATA ls_layout_tmp         TYPE lvc_s_layo.
+    DATA l_result_details      TYPE /cadaxo/sqlcresult_details.
+    DATA l_index               TYPE i.
+    DATA ls_row_no             TYPE lvc_s_roid.
+    DATA ls_row_info           TYPE lvc_s_row.
+    DATA ls_col_info           TYPE lvc_s_col.
+    DATA l_refresh_list        TYPE c LENGTH 1.
     DATA l_result_compare_with TYPE i.
 
-    FIELD-SYMBOLS: "<lt_result_tab>      TYPE STANDARD TABLE,
-      <ls_result_line>     TYPE any,
-      <ls_result_details>  LIKE LINE OF me->gt_result_details,
-      <l_cont_grid_result> TYPE /cadaxo/sqlcclguicontainer.
+    "<lt_result_tab>      TYPE STANDARD TABLE,
+    FIELD-SYMBOLS <ls_result_line>     TYPE any.
+    FIELD-SYMBOLS <ls_result_details>  LIKE LINE OF me->gt_result_details.
+    FIELD-SYMBOLS <l_cont_grid_result> TYPE /cadaxo/sqlcclguicontainer.
 
-* get focus object
-    CALL METHOD cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
+    " get focus object
+    cl_gui_alv_grid=>get_focus( IMPORTING control = lcl_gui_control ).
     l_grid_name = lcl_gui_control->get_name( ).
 
-* get gui control
+    " get gui control
     lcl_cl_gui_alv_grid ?= lcl_gui_control.
 
     l_grid_name_i = l_grid_name+15.
@@ -8570,57 +8346,57 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     /cadaxo/cl_sqlc_functrace=>add_trace( |ON_HANDLE_RESULT_USER_COMMAND:| && e_ucomm ).
 
     IF e_ucomm(13) = 'COMPARE_WITH_'.
-      MOVE e_ucomm+13 TO l_result_compare_with.
+      l_result_compare_with = e_ucomm+13.
 
-      me->handle_result_command_compare( EXPORTING i_source = l_grid_name_i
-                                                   i_target = l_result_compare_with ).
+      handle_result_command_compare( i_source = l_grid_name_i
+                                     i_target = l_result_compare_with ).
     ELSE.
       CASE e_ucomm.
 *    WHEN 'CADAXO_EXPORT'.
 * function is still in development and not released in the current release - Cadaxo 1.1.2014/Rel 2.1
 *      me->handle_result_command_cdxexp( EXPORTING i_grid_i = l_grid_name_i ).
         WHEN 'REFRESHLIST'.
-          me->handle_result_command_refrlst( EXPORTING i_grid_i = l_grid_name_i ).
+          handle_result_command_refrlst( i_grid_i = l_grid_name_i ).
         WHEN 'CLOSE'.
-          me->handle_result_command_close( EXPORTING i_grid_i = l_grid_name_i ).
+          handle_result_command_close( i_grid_i = l_grid_name_i ).
         WHEN 'HOLD'.
-          me->handle_result_command_hold( EXPORTING i_grid_i = l_grid_name_i ).
+          handle_result_command_hold( i_grid_i = l_grid_name_i ).
         WHEN 'KEYFIX'.
-          me->handle_result_command_keyfix( EXPORTING i_grid_i = l_grid_name_i ).
+          handle_result_command_keyfix( i_grid_i = l_grid_name_i ).
         WHEN 'RESFULLDISP'.
-          me->handle_result_command_fulldisp( EXPORTING i_grid_i = l_grid_name_i ).
-        WHEN c_button_fcode-export_csv_frontent.                                       "COCKPIT-271
-          me->hdlcmd_export_csv_frontend( l_grid_name_i ).                             "COCKPIT-271
+          handle_result_command_fulldisp( i_grid_i = l_grid_name_i ).
+        WHEN c_button_fcode-export_csv_frontent.                                       " COCKPIT-271
+          hdlcmd_export_csv_frontend( l_grid_name_i ).                             " COCKPIT-271
         WHEN c_button_fcode-export_csv_backend.
-          me->hdlcmd_export_csv_backend( l_grid_name_i ).
+          hdlcmd_export_csv_backend( l_grid_name_i ).
         WHEN c_cmd_show_full_value.
-          me->handle_command_show_full_value( EXPORTING i_grid_i = l_grid_name_i ).
+          handle_command_show_full_value( i_grid_i = l_grid_name_i ).
         WHEN c_cmd_create_symbol.
           DATA(parser) = gt_cl_sql_parse[ l_grid_name_i ].
-          me->symbols_controller->create_symbol_from_result( i_result_data = dref_result_tab_t[ l_grid_name_i ]
-                                                             i_result_fieldcat = parser->gt_lvc_t_fcat
-                                                           ).
+          symbols_controller->create_symbol_from_result( i_result_data     = dref_result_tab_t[ l_grid_name_i ]
+                                                         i_result_fieldcat = parser->gt_lvc_t_fcat ).
         WHEN c_cmd_show_value_as_html_brow.
-          me->handle_command_show_html_brow( EXPORTING i_grid_i = l_grid_name_i ).
+          handle_command_show_html_brow( i_grid_i = l_grid_name_i ).
         WHEN c_cmd_show_value_as_xml_brow.
-          me->handle_command_show_xml_brow( EXPORTING i_grid_i = l_grid_name_i ).
+          handle_command_show_xml_brow( i_grid_i = l_grid_name_i ).
         WHEN c_cmd_show_value_as_json_brow.
-          me->handle_command_show_json_brow( EXPORTING i_grid_i = l_grid_name_i ).
+          handle_command_show_json_brow( i_grid_i = l_grid_name_i ).
 
         WHEN OTHERS.
 
-          DATA lr_badi            TYPE REF TO /cadaxo/sqlc_badi_res_ctxm.
-          DATA l_dref_result_tab  TYPE REF TO data.
-          DATA lr_cl_sql_parse    TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
-          DATA ls_row    TYPE lvc_s_row.
-          DATA ls_col    TYPE lvc_s_col.
-          DATA lt_lvc_t_fcat TYPE lvc_t_fcat.
+          DATA lr_badi           TYPE REF TO /cadaxo/sqlc_badi_res_ctxm.
+          DATA l_dref_result_tab TYPE REF TO data.
+          DATA lr_cl_sql_parse   TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
+          DATA ls_row            TYPE lvc_s_row.
+          DATA ls_col            TYPE lvc_s_col.
+          DATA lt_lvc_t_fcat     TYPE lvc_t_fcat.
 
 *     field-symbols: <ls_result_line> type any.
 
           IF e_ucomm = 'EDIT'.
+            " TODO: variable is assigned but never used (ABAP cleaner)
             SELECT SINGLE @abap_true FROM nriv INTO @DATA(lv_nr_exists) WHERE object = '/CADAXO/01'.
-            IF sy-subrc NE 0.
+            IF sy-subrc <> 0.
               MESSAGE TEXT-003 TYPE 'I'.
               RETURN.
             ENDIF.
@@ -8634,12 +8410,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
               ASSIGN lr_cl_sql_parse->result_structure->* TO <ls_result_line>.
               IF <ls_result_line> IS ASSIGNED.
                 READ TABLE gt_lvc_t_fcat INTO lt_lvc_t_fcat INDEX l_grid_name_i.
-* get current cell/line
+                " get current cell/line
 
-                CALL METHOD lcl_cl_gui_alv_grid->get_current_cell
-                  IMPORTING
-                    es_row_id = ls_row
-                    es_col_id = ls_col.
+                lcl_cl_gui_alv_grid->get_current_cell( IMPORTING es_row_id = ls_row
+                                                                 es_col_id = ls_col ).
 
                 DATA lt_lvc_t_row TYPE lvc_t_row.
 
@@ -8653,32 +8427,29 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
                 ENDIF.
 
-
                 GET BADI lr_badi.
 
                 CALL BADI lr_badi->execute
-                  EXPORTING
-                    i_ucomm              = e_ucomm
-                    i_dref_result_tab    = l_dref_result_tab
-                    is_current_row       = ls_row
-                    is_current_col       = ls_col
-                    is_result_line       = <ls_result_line>
-                    it_result_components = lr_cl_sql_parse->result_component_t
-                    it_result_ddfields   = lr_cl_sql_parse->gt_result_ddfields
-                    i_column_syntax      = lr_cl_sql_parse->column_syntax
-                    i_connection_syntax  = lr_cl_sql_parse->connection_syntax
-                    it_result_source     = lr_cl_sql_parse->result_source_t
-                    ir_result_structure  = lr_cl_sql_parse->result_structure
-                    it_lvc_t_fcat        = lt_lvc_t_fcat
-                    it_lvc_t_row         = lt_lvc_t_row
-                    iv_client_handling   = lr_cl_sql_parse->gs_client_handling
-                    i_select_version     = lr_cl_sql_parse->g_select_version
-                  CHANGING
-                    c_refresh_list       = l_refresh_list.
+                  EXPORTING i_ucomm              = e_ucomm
+                            i_dref_result_tab    = l_dref_result_tab
+                            is_current_row       = ls_row
+                            is_current_col       = ls_col
+                            is_result_line       = <ls_result_line>
+                            it_result_components = lr_cl_sql_parse->result_component_t
+                            it_result_ddfields   = lr_cl_sql_parse->gt_result_ddfields
+                            i_column_syntax      = lr_cl_sql_parse->column_syntax
+                            i_connection_syntax  = lr_cl_sql_parse->connection_syntax
+                            it_result_source     = lr_cl_sql_parse->result_source_t
+                            ir_result_structure  = lr_cl_sql_parse->result_structure
+                            it_lvc_t_fcat        = lt_lvc_t_fcat
+                            it_lvc_t_row         = lt_lvc_t_row
+                            iv_client_handling   = lr_cl_sql_parse->gs_client_handling
+                            i_select_version     = lr_cl_sql_parse->g_select_version
+                  CHANGING  c_refresh_list       = l_refresh_list.
 
                 IF l_refresh_list <> space.
 
-                  lr_cl_sql_parse->execute_select( EXPORTING i_user_settings  = me->ms_user_settings_xml
+                  lr_cl_sql_parse->execute_select( EXPORTING i_user_settings  = ms_user_settings_xml
                                                    IMPORTING e_result_details = l_result_details ).
 
                   READ TABLE me->gt_result_details INDEX l_index ASSIGNING <ls_result_details>.
@@ -8689,21 +8460,26 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                     READ TABLE me->gcont_grid_result_t INDEX l_index ASSIGNING <l_cont_grid_result>.
                     IF sy-subrc = 0.
 
-                      <l_cont_grid_result>-gui_alv_grid->get_scroll_info_via_id( IMPORTING es_row_no = ls_row_no es_row_info = ls_row_info es_col_info = ls_col_info ).
+                      <l_cont_grid_result>-gui_alv_grid->get_scroll_info_via_id( IMPORTING es_row_no   = ls_row_no
+                                                                                           es_row_info = ls_row_info
+                                                                                           es_col_info = ls_col_info ).
 
                       <l_cont_grid_result>-gui_alv_grid->get_frontend_layout( IMPORTING es_layout = ls_layout_tmp ).
 
-                      ls_layout            = me->g_result_layout.
+                      ls_layout            = g_result_layout.
                       ls_layout-frontend   = ls_layout_tmp-frontend.
-                      ls_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title(
-                                                                         i_runtime = <ls_result_details>-runtime
-                                                                         i_lines   = <ls_result_details>-lines ).
+                      ls_layout-grid_title = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_title(
+                                                 i_runtime        = <ls_result_details>-runtime
+                                                 i_result_lines   = <ls_result_details>-lines
+                                                 i_select_version = lr_cl_sql_parse->g_select_version ).
 
                       <l_cont_grid_result>-gui_alv_grid->set_frontend_layout( is_layout = ls_layout ).
 
                       <l_cont_grid_result>-gui_alv_grid->refresh_table_display( i_soft_refresh = abap_true ).
 
-                      <l_cont_grid_result>-gui_alv_grid->set_scroll_info_via_id( EXPORTING is_row_no = ls_row_no is_row_info = ls_row_info is_col_info = ls_col_info ).
+                      <l_cont_grid_result>-gui_alv_grid->set_scroll_info_via_id( is_row_no   = ls_row_no
+                                                                                 is_row_info = ls_row_info
+                                                                                 is_col_info = ls_col_info ).
 
                     ENDIF.
 
@@ -8711,19 +8487,16 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
                 ENDIF.
 
-              ELSE.                                                                                  "COCKPIT-30
-                MESSAGE i108(/cadaxo/sqlc).                                                          "COCKPIT-30
-              ENDIF.                                                                                 "COCKPIT-30
-            ELSE.                                                                                    "COCKPIT-30
-              MESSAGE i108(/cadaxo/sqlc).                                                            "COCKPIT-30
+              ELSE.                                                                                  " COCKPIT-30
+                MESSAGE i108(/cadaxo/sqlc).                                                          " COCKPIT-30
+              ENDIF.                                                                                 " COCKPIT-30
+            ELSE.                                                                                    " COCKPIT-30
+              MESSAGE i108(/cadaxo/sqlc).                                                            " COCKPIT-30
             ENDIF.
           ENDIF.
 
       ENDCASE.
     ENDIF.
-
-
-
   ENDMETHOD.
 
 
@@ -11168,52 +10941,49 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD set_user_settings.
-****************************************************************************************************
-* Description             : set user settings                                                      *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.03.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
-* Date                    : 17.11.2014                                                             *
-*--------------------------------------------------------------------------------------------------
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 29.08.2010 | Fößleitner Johann    | Use the trace user settings                 | CDX001-0008    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 17.07.2012 | Fößleitner Johann    | Show "Restart Message"                      | CDX130-029     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
-*            |                      |                                             | RT235          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.07.2018 | Domi Bigl            | UP TO event, CC                             | COCKPIT-326    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.10.2020 | Attila Kajtar        | Domain Text  checkbox                       | COCKPIT-458    *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             : set user settings                                                      -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.03.2010                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    -
+    "  Date                    : 17.11.2014                                                             -
+    " --------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  29.08.2010 | Fößleitner Johann    | Use the trace user settings                 | CDX001-0008    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  17.07.2012 | Fößleitner Johann    | Show "Restart Message"                      | CDX130-029     -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       -
+    "             |                      |                                             | RT235          -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  25.07.2018 | Domi Bigl            | UP TO event, CC                             | COCKPIT-326    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  06.10.2020 | Attila Kajtar        | Domain Text  checkbox                       | COCKPIT-458    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "             |                      |                                             |                -
+    " ---------------------------------------------------------------------------------------------------
 
-    DATA: l_sqlcusrp         TYPE /cadaxo/sqlcusrp.
-    DATA: l_settings         TYPE /cadaxo/sqlcusrp_dyn.
-    DATA: l_xml              TYPE string.
-    DATA: lr_exception       TYPE REF TO cx_root.
-    DATA: l_message          TYPE string.
-    DATA l_restart_message   TYPE c    LENGTH 1.
+    DATA l_sqlcusrp        TYPE /cadaxo/sqlcusrp.
+    DATA l_settings        TYPE /cadaxo/sqlcusrp_dyn.
+    DATA l_xml             TYPE string.
+    DATA lr_exception      TYPE REF TO cx_root.
+    DATA l_message         TYPE string.
+    DATA l_restart_message TYPE c LENGTH 1.
 
-    CLEAR l_restart_message.
-
-    l_settings = me->g_user_settings.
+    l_settings = g_user_settings.
 
     l_sqlcusrp-uname = cl_abap_syst=>get_user_name( ).
 
@@ -11222,16 +10992,16 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ENDIF.
 
     ms_user_settings_xml-maxsel               = i_settings-maxsel.
-    ms_user_settings_xml-show_footer          = i_settings-show_footer.           "Show Footer #4093
+    ms_user_settings_xml-show_footer          = i_settings-show_footer.           " Show Footer #4093
     ms_user_settings_xml-result_buttons       = i_settings-result_buttons.
     ms_user_settings_xml-save_clipboard       = i_settings-save_clipboard.
     ms_user_settings_xml-result_doubleclick   = i_settings-result_doubleclick.
     ms_user_settings_xml-use_convexit         = i_settings-use_convexit.
-    ms_user_settings_xml-sql_trace            = i_settings-sql_trace.             "CDX001-0008
-    ms_user_settings_xml-tablebuffer_trace    = i_settings-tablebuffer_trace.     "CDX001-0008
-    ms_user_settings_xml-symbols_show         = i_settings-symbols_show.          "CDX001-0020
-    ms_user_settings_xml-symbols_program_show = i_settings-symbols_program_show.  "CDX001-0020
-    ms_user_settings_xml-only_used_symbols    = i_settings-only_used_symbols.     "CR22-002
+    ms_user_settings_xml-sql_trace            = i_settings-sql_trace.             " CDX001-0008
+    ms_user_settings_xml-tablebuffer_trace    = i_settings-tablebuffer_trace.     " CDX001-0008
+    ms_user_settings_xml-symbols_show         = i_settings-symbols_show.          " CDX001-0020
+    ms_user_settings_xml-symbols_program_show = i_settings-symbols_program_show.  " CDX001-0020
+    ms_user_settings_xml-only_used_symbols    = i_settings-only_used_symbols.     " CR22-002
     ms_user_settings_xml-history_last_x_days  = i_settings-history_last_x_days.
     ms_user_settings_xml-job_last_x_days      = i_settings-job_last_x_days.
     ms_user_settings_xml-hd_show_alias        = i_settings-hd_show_alias.
@@ -11242,10 +11012,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ms_user_settings_xml-editor_type          = i_settings-editor_type.
     ms_user_settings_xml-forwnavddleclipse    = i_settings-forwnavddleclipse.
     ms_user_settings_xml-forwnavdicteclipse   = i_settings-forwnavdicteclipse.
-    ms_user_settings_xml-domaintext           = i_settings-domaintext.             "COCKPIT-458
-    ms_user_settings_xml-release_type         = i_settings-release_type.           "COCKPIT-98
-    ms_user_settings_xml-release_number       = i_settings-release_number.         "COCKPIT-98
-
+    ms_user_settings_xml-domaintext           = i_settings-domaintext.             " COCKPIT-458
+    ms_user_settings_xml-release_type         = i_settings-release_type.           " COCKPIT-98
+    ms_user_settings_xml-release_number       = i_settings-release_number.         " COCKPIT-98
+    ms_user_settings_xml-strict_mode          = i_settings-strict_mode.
     CASE abap_true.
       WHEN i_settings-hd_fieldname.
         ms_user_settings_xml-colhd_type = '1'.
@@ -11264,20 +11034,22 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         ms_user_settings_xml-reswindoworientation = cs_windowresolution-matrix.
     ENDCASE.
 
-* convert usersettings to xml
+    " convert usersettings to xml
     CALL TRANSFORMATION id
-       SOURCE settings = me->ms_user_settings_xml
-       RESULT XML l_xml .
+         SOURCE settings = ms_user_settings_xml
+         RESULT XML l_xml.
 
     TRY.
         cl_abap_gzip=>compress_text( EXPORTING text_in  = l_xml
                                      IMPORTING gzip_out = l_sqlcusrp-usrpref ).
-      CATCH cx_parameter_invalid_range cx_sy_buffer_overflow cx_sy_conversion_codepage INTO lr_exception.
+      CATCH cx_parameter_invalid_range
+            cx_sy_buffer_overflow
+            cx_sy_conversion_codepage INTO lr_exception.
         l_message = lr_exception->get_text( ).
         MESSAGE e027(/cadaxo/sqlc) WITH l_message.
     ENDTRY.
 
-* store usersetings to database
+    " store usersetings to database
     SELECT SINGLE clipboard FROM /cadaxo/sqlcusrp INTO l_sqlcusrp-clipboard WHERE uname = sy-uname.
     IF sy-subrc = 0.
       UPDATE /cadaxo/sqlcusrp FROM l_sqlcusrp.
@@ -11285,85 +11057,87 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       INSERT /cadaxo/sqlcusrp FROM l_sqlcusrp.
     ENDIF.
 
-* show restart message
-    IF NOT l_restart_message IS INITIAL.
+    " show restart message
+    IF l_restart_message IS NOT INITIAL.
       MESSAGE i078(/cadaxo/sqlc).
     ENDIF.
 
-* refresh result list
+    " refresh result list
     IF sy-subrc = 0.
 
-      gc_result_toolbar->set_button_state( checked = ''  fcode = c_cmd_show_result_table ).
+      gc_result_toolbar->set_button_state( checked = ''
+                                           fcode   = c_cmd_show_result_table ).
 
-      me->g_user_settings = i_settings.
+      g_user_settings = i_settings.
 
       IF me->g_user_settings-result_buttons = space.
-        me->g_result_layout-no_toolbar = abap_true.
+        g_result_layout-no_toolbar = abap_true.
       ELSE.
-        me->g_result_layout-no_toolbar = abap_false.
+        g_result_layout-no_toolbar = abap_false.
       ENDIF.
 
-      IF l_settings-maxsel <> me->g_user_settings-maxsel.                                    "COCKPIT-326
-        RAISE EVENT settings_changed_upto EXPORTING i_new_upto = me->g_user_settings-maxsel. "COCKPIT-326
-      ENDIF.                                                                                 "COCKPIT-326
+      IF l_settings-maxsel <> g_user_settings-maxsel.                                    " COCKPIT-326
+        RAISE EVENT settings_changed_upto
+          EXPORTING i_new_upto = g_user_settings-maxsel. " COCKPIT-326
+      ENDIF.                                                                                 " COCKPIT-326
 
-* update the field catalog
-      IF ( l_settings-hd_fieldname   <> me->g_user_settings-hd_fieldname OR
-           l_settings-result_buttons <> me->g_user_settings-result_buttons OR
-           l_settings-use_convexit   <> me->g_user_settings-use_convexit  OR
-           l_settings-hd_show_alias  <> me->g_user_settings-hd_show_alias OR
-           l_settings-hd_fieldtext_a <> me->g_user_settings-hd_fieldtext_a OR
-           l_settings-hd_fieldtext_l <> me->g_user_settings-hd_fieldtext_l OR
-           l_settings-hd_fieldtext_m <> me->g_user_settings-hd_fieldtext_m OR
-           l_settings-hd_fieldtext_s <> me->g_user_settings-hd_fieldtext_s ).
+      " update the field catalog
+      IF    l_settings-hd_fieldname   <> g_user_settings-hd_fieldname
+         OR l_settings-result_buttons <> g_user_settings-result_buttons
+         OR l_settings-use_convexit   <> g_user_settings-use_convexit
+         OR l_settings-hd_show_alias  <> g_user_settings-hd_show_alias
+         OR l_settings-hd_fieldtext_a <> g_user_settings-hd_fieldtext_a
+         OR l_settings-hd_fieldtext_l <> g_user_settings-hd_fieldtext_l
+         OR l_settings-hd_fieldtext_m <> g_user_settings-hd_fieldtext_m
+         OR l_settings-hd_fieldtext_s <> g_user_settings-hd_fieldtext_s.
 
-        me->update_field_catalog_alv( ).
+        update_field_catalog_alv( ).
 
       ENDIF.
 
-* refresh result list, if the user changed the window orientation
-      IF l_settings-result_window_horizontal <> me->g_user_settings-result_window_horizontal OR
-         l_settings-result_window_vertical   <> me->g_user_settings-result_window_vertical OR
-         l_settings-result_window_matrix     <> me->g_user_settings-result_window_matrix OR
-         l_settings-result_window_tab        <> me->g_user_settings-result_window_tab.
-        me->show_result( ).
+      " refresh result list, if the user changed the window orientation
+      IF    l_settings-result_window_horizontal <> g_user_settings-result_window_horizontal
+         OR l_settings-result_window_vertical   <> g_user_settings-result_window_vertical
+         OR l_settings-result_window_matrix     <> g_user_settings-result_window_matrix
+         OR l_settings-result_window_tab        <> g_user_settings-result_window_tab.
+        show_result( ).
       ENDIF.
 
-      IF l_settings-history_last_x_days <> me->g_user_settings-history_last_x_days.
-        me->g_sel_hist_timestamp_from = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_from( me->g_user_settings-history_last_x_days ).
-        me->g_sel_hist_timestamp_to   = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_to( ).
+      IF l_settings-history_last_x_days <> g_user_settings-history_last_x_days.
+        g_sel_hist_timestamp_from = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_from(
+                                        me->g_user_settings-history_last_x_days ).
+        g_sel_hist_timestamp_to   = /cadaxo/cl_sqlc_user_hist_log=>get_default_timestamp_to( ).
         IF me->mv_toolbar_result_active = 'SHOW_LOG'.
-          me->show_log( ).
+          show_log( ).
         ENDIF.
       ENDIF.
 
-      IF l_settings-job_last_x_days <> me->g_user_settings-job_last_x_days.
-        me->set_initial_date_jobmonitor( ).
+      IF l_settings-job_last_x_days <> g_user_settings-job_last_x_days.
+        set_initial_date_jobmonitor( ).
         IF me->mv_toolbar_result_active = c_cmd_jobmonitor.
-          me->show_jobmonitor( ).
+          show_jobmonitor( ).
         ENDIF.
       ENDIF.
 
-* refresh user symbols
-      IF l_settings-symbols_program_show <> me->g_user_settings-symbols_program_show.
-        IF NOT me->g_user_settings-symbols_program_show IS INITIAL.
-          me->g_user_settings-symbols_program_show = /cadaxo/cl_sqlc_symbols=>c_program_symbols-show.
+      " refresh user symbols
+      IF l_settings-symbols_program_show <> g_user_settings-symbols_program_show.
+        IF me->g_user_settings-symbols_program_show IS NOT INITIAL.
+          g_user_settings-symbols_program_show = /cadaxo/cl_sqlc_symbols=>c_program_symbols-show.
         ELSE.
-          me->g_user_settings-symbols_program_show = /cadaxo/cl_sqlc_symbols=>c_program_symbols-hide.
+          g_user_settings-symbols_program_show = /cadaxo/cl_sqlc_symbols=>c_program_symbols-hide.
         ENDIF.
       ENDIF.
 
-* Only used symbols
-      IF l_settings-only_used_symbols <> me->g_user_settings-only_used_symbols."CR22-002
-        IF NOT me->g_user_settings-only_used_symbols IS INITIAL."CR22-002
-          me->g_user_settings-only_used_symbols = abap_true.  "CR22-002
-        ELSE.                                                 "CR22-002
-          me->g_user_settings-only_used_symbols = space.      "CR22-002
-        ENDIF.                                                "CR22-002
+      " Only used symbols
+      IF l_settings-only_used_symbols <> g_user_settings-only_used_symbols. " CR22-002
+        IF me->g_user_settings-only_used_symbols IS NOT INITIAL. " CR22-002
+          g_user_settings-only_used_symbols = abap_true.  " CR22-002
+        ELSE.                                                 " CR22-002
+          g_user_settings-only_used_symbols = space.      " CR22-002
+        ENDIF.                                                " CR22-002
       ENDIF.
 
     ENDIF.
-
   ENDMETHOD.
 
 
@@ -11873,13 +11647,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 * data definition
-    DATA: l_lines     TYPE i,
-          l_grid_name TYPE string,
+    DATA: l_grid_name TYPE string,
           l_cont_name TYPE string,
           l_tabix     TYPE i,
           l_num2(2)   TYPE n,
-          l_rows      TYPE i,
-          l_cols      TYPE i,
           lv_alv_rows TYPE i,
           l_act_col   TYPE i,
           l_act_row   TYPE i,
@@ -11916,17 +11687,17 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     ELSE.
 
 * create splitter rows
-      DESCRIBE TABLE gt_cl_sql_parse LINES l_lines.
+      data(number_of_selects) = lines( gt_cl_sql_parse ).
 
 * set rows & columns
-      me->calc_result_rows_and_cols( EXPORTING i_lines = l_lines
-                                     IMPORTING e_rows = l_rows
-                                               e_cols = l_cols ).
+*if ms_user_settings_xml-reswindoworientation
+     data(rows_cols) = /cadaxo/cl_sqlc_ui_utils=>calc_result_rows_and_cols( i_number_of_selects = number_of_selects
+                                                                            i_orientation       = ms_user_settings_xml-reswindoworientation ).
 
       gs_splitter_results->is_alive( ).
       gs_splitter_results->is_valid( ).
       IF g_is_its IS INITIAL.
-        gs_splitter_results->set_grid( EXPORTING rows = l_rows columns = l_cols ).
+        gs_splitter_results->set_grid( EXPORTING rows = rows_cols-rows columns = rows_cols-cols ).
       ENDIF.
 
       LOOP AT dref_result_tab_t ASSIGNING <lr_dref_result>.
@@ -11948,7 +11719,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
               l_act_col = 1.
             WHEN cs_windowresolution-matrix.
               l_act_col = l_act_col + 1.
-              IF l_act_col GT l_cols.
+              IF l_act_col GT rows_cols-cols.
                 l_act_col = 1.
                 l_act_row = l_act_row + 1.
               ENDIF.
@@ -11958,8 +11729,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           l_act_row = 1.
         ENDIF.
 
-        gs_splitter_results->get_container( EXPORTING row = l_act_row column = l_act_col
-                                            RECEIVING container = <l_cont_grid_result>-gui_container ).
+        <l_cont_grid_result>-gui_container = gs_splitter_results->get_container( row = l_act_row column = l_act_col  ).
 
         MOVE l_tabix TO l_num2.
 
@@ -12025,11 +11795,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         READ TABLE gt_result_details INDEX l_tabix ASSIGNING <l_result_details>.
         IF sy-subrc = 0.
 
-          l_result_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = <l_result_details>-runtime
-                                                                                              i_lines   = <l_result_details>-lines ).
+          l_result_layout-grid_title = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_title( i_runtime        = <l_result_details>-runtime
+                                                                                          i_result_lines   = <l_result_details>-lines
+                                                                                          i_select_version = <lr_sql>->g_select_version ).
 * create footer line
-          lv_footer = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_footer("#4093
-                                                                          iv_mandant           = <l_result_details>-mandant"#4093
+          lv_footer = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_footer( iv_mandant           = <l_result_details>-mandant"#4093
                                                                           iv_syst              = <l_result_details>-syst"#4093
                                                                           iv_create_timestamp  = <l_result_details>-create_timestamp"#4093
                                                                           iv_uname             = <l_result_details>-uname )."#4093
@@ -12398,11 +12168,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     IF sy-subrc = 0.
 
 * create grid title (xx records ( y.yyyy Microseconds )
-      l_result_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title( i_runtime = <l_result_details>-runtime
-                                                                                          i_lines   = <l_result_details>-lines ).
+      l_result_layout-grid_title = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_title( i_runtime        = <l_result_details>-runtime
+                                                                                      i_result_lines   = <l_result_details>-lines
+                                                                                      i_select_version = <lr_sql>->g_select_version ).
 * create footer line
-      lv_footer = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_footer("#4093
-                                                                      iv_mandant           = <l_result_details>-mandant"#4093
+      lv_footer = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_footer( iv_mandant           = <l_result_details>-mandant"#4093
                                                                       iv_syst              = <l_result_details>-syst"#4093
                                                                       iv_create_timestamp  = <l_result_details>-create_timestamp"#4093
                                                                       iv_uname             = <l_result_details>-uname )."#4093
@@ -12530,9 +12300,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                                                     IMPORTING e_saved_lists = me->gt_saved_lists
                                                               e_free_space_kb = me->g_free_space_kb ).
 
-    l_lvc_s_layo-zebra      = 'X'.
+    l_lvc_s_layo-zebra      = abap_true.
     l_lvc_s_layo-sel_mode   = 'C'.
-    l_lvc_s_layo-smalltitle = 'X'.
+    l_lvc_s_layo-smalltitle = abap_true.
 
     IF gt_saved_list_fieldcat IS INITIAL.
       gt_saved_list_fieldcat =  get_saved_list_fieldcat( ).
@@ -12846,9 +12616,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
 * create grid title
         IF <l_cl_sql_parse>->g_saved_list IS INITIAL.
-          ls_layout-grid_title = /cadaxo/cl_sqlc_cockpit_main=>build_result_grid_title(
-                                                   i_runtime = <l_cl_sql_parse>->result_runtime
-                                                   i_lines   = <l_cl_sql_parse>->result_lines ).
+          ls_layout-grid_title = /cadaxo/cl_sqlc_ui_utils=>build_result_grid_title( i_runtime        = <l_cl_sql_parse>->result_runtime
+                                                                                    i_result_lines   = <l_cl_sql_parse>->result_lines
+                                                                                    i_select_version = <l_cl_sql_parse>->g_select_version ).
         ENDIF. "$002
 
 * set new frontend layout

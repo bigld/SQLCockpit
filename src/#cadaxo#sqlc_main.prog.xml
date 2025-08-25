@@ -53,7 +53,7 @@
       <TYPE>M</TYPE>
       <NEXTSCREEN>0500</NEXTSCREEN>
       <LINES>026</LINES>
-      <COLUMNS>115</COLUMNS>
+      <COLUMNS>116</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -522,7 +522,7 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>FRAME</TYPE>
        <NAME>ADT_FRAME</NAME>
-       <TEXT>ABAP_Development_Tool_for_SAP_NetWeaver___________________________________________________________________</TEXT>
+       <TEXT>ABAP_Development_Tools_for_Eclipse_(ADT)__________________________________________________________________</TEXT>
        <LINE>020</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>107</LENGTH>
