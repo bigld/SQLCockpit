@@ -12,7 +12,7 @@ CLASS /cadaxo/cl_sqlc_sql_syntax DEFINITION
     CLASS-METHODS check_sql_syntax
       IMPORTING i_sql_parsed     TYPE /cadaxo/sqlc_cl_cockpit_parset
                 i_select_version TYPE /cadaxo/sqlc_select_version DEFAULT /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1
-      EXPORTING et_rest          TYPE scit_rest
+      EXPORTING e_sci_results    TYPE scit_rest
                 e_select_version TYPE /cadaxo/sqlc_select_version
       RAISING   /cadaxo/cx_sqlc_syntax_error.
 
@@ -30,25 +30,23 @@ ENDCLASS.
 
 CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
   METHOD check_sql_syntax.
-    " TODO: parameter E_SELECT_VERSION is never cleared or assigned (ABAP cleaner)
+
 
     DATA lt_line               TYPE sedi_source.
-    DATA check_message                TYPE edmessage.                   " string,                                 "#EC NEEDED
-    DATA check_line                 TYPE i.                           "#EC NEEDED
-    " TODO: variable is assigned but never used (ABAP cleaner)
-    DATA check_word                 TYPE tdbaustein.                  " string,                         "#EC NEEDED
-    DATA check_tadir                 TYPE trdir.                       "#EC NEEDED
+    DATA check_message                TYPE edmessage.
+    DATA check_line                 TYPE i.
+    DATA check_word                 TYPE tdbaustein.
+    DATA check_tadir                 TYPE trdir.
     DATA lt_abap_code_data     TYPE /cadaxo/sqlcstring_t.
     DATA lt_abap_code_prog     TYPE /cadaxo/sqlcstring_t.
     DATA lr_cl_ci_check_result TYPE REF TO cl_ci_check_result.
     DATA lr_cl_ci_inspection   TYPE REF TO cl_ci_inspection.
-    DATA lt_rest               TYPE scit_rest.
-    " TODO: variable is assigned but never used (ABAP cleaner)
+    DATA sci_results               TYPE scit_rest.
     DATA lr_cl_ci_test_root    TYPE REF TO cl_ci_test_root.
     DATA ls_adm_cust           TYPE /cadaxo/sqlc_admin_cust.
     DATA message_detail               TYPE trmsg_key.
-    DATA lt_results            TYPE match_result_tab.            " COCKPIT-214
-    DATA lv_select_version     TYPE /cadaxo/sqlc_select_version. " COCKPIT-214
+    DATA lt_results            TYPE match_result_tab.
+    DATA lv_select_version     TYPE /cadaxo/sqlc_select_version.
 
     FIELD-SYMBOLS <l_cl_sql_parse> TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
 
@@ -116,7 +114,7 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
         IF lv_loop IS INITIAL.
           check_sql_syntax( EXPORTING i_sql_parsed     = VALUE #( ( <l_cl_sql_parse> ) )
                                       i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2
-                            IMPORTING et_rest          = et_rest
+                            IMPORTING e_sci_results          = e_sci_results
                                       e_select_version = <l_cl_sql_parse>->g_select_version ).
           CLEAR check_message.
           CLEAR message_detail.
@@ -136,18 +134,21 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
 
 *    RAISE syntax_error.
         RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-          EXPORTING message = CONV #( check_message ).
+          EXPORTING
+            message = CONV #( check_message ).
       ELSE.
 
-        CLEAR lt_rest.
+        CLEAR sci_results.
 
         /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing( IMPORTING e_customizing = ls_adm_cust ).
         IF ls_adm_cust-sci_chkv <> space.
 
           CALL FUNCTION 'PRETTY_PRINTER'
-            EXPORTING inctoo = space
-            TABLES    ntext  = lt_line
-                      otext  = lt_line.
+            EXPORTING
+              inctoo = space
+            TABLES
+              ntext  = lt_line
+              otext  = lt_line.
 
           TRY.
 
@@ -185,21 +186,23 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
                   CALL METHOD cl_ci_check=>('SOURCE_CODE') PARAMETER-TABLE parmas_new.
 
                   CALL FUNCTION 'RS_DELETE_PROGRAM'
-                    EXPORTING  program         = program_name
-                               suppress_checks = abap_true
-                               suppress_popup  = abap_true
-                    EXCEPTIONS OTHERS          = 1.
+                    EXPORTING
+                      program         = program_name
+                      suppress_checks = abap_true
+                      suppress_popup  = abap_true
+                    EXCEPTIONS
+                      OTHERS          = 1.
 
               ENDTRY.
               " COCKPIT-502 replace end
 
               lr_cl_ci_inspection = lr_cl_ci_check_result->get_inspection( ).
-              lt_rest = lr_cl_ci_inspection->scirestps.
+              sci_results = lr_cl_ci_inspection->scirestps.
 
-              DELETE lt_rest WHERE kind <> 'E' AND kind <> 'W'.
-              DELETE lt_rest WHERE test = 'CL_CI_TEST_EXTENDED_CHECK'.
+              DELETE sci_results WHERE kind <> 'E' AND kind <> 'W'.
+              DELETE sci_results WHERE test = 'CL_CI_TEST_EXTENDED_CHECK'.
 
-              et_rest = lt_rest.
+              e_sci_results = sci_results.
 
             CATCH cx_ci_invalid_variant
                   cx_ci_check_error
@@ -207,10 +210,12 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
                   cx_root ##NO_HANLDER.
               IF program_name IS NOT INITIAL.
                 CALL FUNCTION 'RS_DELETE_PROGRAM'
-                  EXPORTING  program         = program_name
-                             suppress_checks = abap_true
-                             suppress_popup  = abap_true
-                  EXCEPTIONS OTHERS          = 1.
+                  EXPORTING
+                    program         = program_name
+                    suppress_checks = abap_true
+                    suppress_popup  = abap_true
+                  EXCEPTIONS
+                    OTHERS          = 1.
               ENDIF.
           ENDTRY.
         ENDIF.
@@ -260,9 +265,9 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
     " ENDENHANCEMENT.
     " $*$-End:   /CADAXO/SQLC_EHN_S_CLS_SE_002-------------------------------------------------------$*$-
 
-    ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_002 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001.
-      " ...
-    END-ENHANCEMENT-SECTION.
+ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_002 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001.
+" ...
+END-ENHANCEMENT-SECTION.
 
     APPEND l_line TO e_abap_code.
 

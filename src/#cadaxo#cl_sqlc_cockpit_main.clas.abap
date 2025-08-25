@@ -944,57 +944,22 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD check_sql_syntax.
-****************************************************************************************************
-* Description             : Check SQL Syntax                                                       *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 02.05.2011 | Fößleitner Johann    | Check empty SQL string                      | FOE02052011    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 22.10.2013 | Fößleitner Johann    | Check Authorization after syntax check!     | RT164          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 09.05.2014 | Domi Bigl            | Check prev message on cx_root catch         | RT229          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002, RT235*
-*------------+----------------------+---------------------------------------------+----------------*
-* 05.08.2017 | Domi Bigl            | Empty Editor Check expanded                 | COCKPIT-235    *
-*------------+----------------------+---------------------------------------------+----------------*
-****************************************************************************************************
+    DATA lt_cl_sql_parse           TYPE /cadaxo/sqlc_cl_cockpit_parset.
+    DATA lr_cl_ci_test_root        TYPE REF TO cl_ci_test_root.
+    DATA l_sql_string              TYPE string.
+    DATA l_message                 TYPE string.
+    DATA l_message_long            TYPE string.
+    DATA l_scx_t100key             TYPE scx_t100key.
+    DATA ls_error                  TYPE /cadaxo/sqlcsyntaxerror.
+    DATA lr_exception              TYPE REF TO cx_root.
+    DATA lr_exception_t100         TYPE REF TO /cadaxo/cx_sqlc_to_much_resrow.
+    DATA lr_exception_syntax_error TYPE REF TO /cadaxo/cx_sqlc_syntax_error.
+    DATA lt_fieldcat               TYPE lvc_t_fcat.
 
-    DATA lt_cl_sql_parse        TYPE /cadaxo/sqlc_cl_cockpit_parset.
-    DATA lt_rest                TYPE scit_rest.
-    DATA lr_cl_ci_test_root     TYPE REF TO cl_ci_test_root.
-
-* some data definitions / field symbols
-    DATA: l_sql_string              TYPE string,
-          l_message                 TYPE string,
-          l_message_long            TYPE string,
-          l_scx_t100key             TYPE scx_t100key,
-          ls_error                  TYPE /cadaxo/sqlcsyntaxerror,
-          lr_exception              TYPE REF TO cx_root,
-          lr_exception_t100         TYPE REF TO /cadaxo/cx_sqlc_to_much_resrow,
-          lr_exception_syntax_error TYPE REF TO /cadaxo/cx_sqlc_syntax_error.
-
-    DATA lt_fieldcat TYPE lvc_t_fcat.
-
-    FIELD-SYMBOLS: <l_cl_sql_parse>  TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse,
-                   <lt_cl_sql_parse> TYPE /cadaxo/sqlc_cl_cockpit_parset,
-                   <ls_fieldcat>     TYPE LINE OF lvc_t_fcat,
-                   <ls_scirestps>    TYPE scir_rest.
+    FIELD-SYMBOLS <l_cl_sql_parse>  TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
+    FIELD-SYMBOLS <lt_cl_sql_parse> TYPE /cadaxo/sqlc_cl_cockpit_parset.
+    FIELD-SYMBOLS <ls_fieldcat>     TYPE LINE OF lvc_t_fcat.
 
     IF i_use_local_parser = abap_true.
       ASSIGN lt_cl_sql_parse TO <lt_cl_sql_parse>.
@@ -1003,38 +968,41 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       ASSIGN gt_cl_sql_parse TO <lt_cl_sql_parse>.
     ENDIF.
 
-* clear slq paraser
+    " clear slq paraser
     CLEAR <lt_cl_sql_parse>.
 
-* get sql string from editor control
-    l_sql_string = me->get_sql_area( ).
+    " get sql string from editor control
+    l_sql_string = get_sql_area( ).
 
     CLEAR: l_message,
-           l_message_long,           "CDX
-           l_scx_t100key.            "CDX
+           l_message_long,           " CDX
+           l_scx_t100key.            " CDX
 
     TRY.
 
-        IF NOT l_sql_string IS INITIAL
-           AND l_sql_string CN cl_abap_char_utilities=>get_simple_spaces_for_cur_cp( ). "COCKPIT-235
+        IF     l_sql_string IS NOT INITIAL
+           AND l_sql_string CN cl_abap_char_utilities=>get_simple_spaces_for_cur_cp( ). " COCKPIT-235
 
           /cadaxo/cl_sqlc_cockpit_assist=>clear_used_symbols_table( ).
           CLEAR gt_used_symbols.
 
           /cadaxo/cl_sqlc_cockpit_assist=>replace_all_symbols_with_value( CHANGING c_string = l_sql_string ).
 
-          /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i(
-            EXPORTING
-              i_sql                       = l_sql_string
-              i_user_settings             = me->ms_user_settings_xml
-              i_role                      = me->g_auth
-              i_main_ref_id               = g_my_main_id
-              i_main_ref                  = me
-            IMPORTING
-              e_sql_parsed                = <lt_cl_sql_parse> ).
+          /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( EXPORTING i_sql           = l_sql_string
+                                                                i_user_settings = ms_user_settings_xml
+                                                                i_role          = g_auth
+                                                                i_main_ref_id   = g_my_main_id
+                                                                i_main_ref      = me
+                                                      IMPORTING e_sql_parsed    = <lt_cl_sql_parse> ).
 
-          /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( EXPORTING i_sql_parsed = <lt_cl_sql_parse>
-                                                        IMPORTING et_rest      = lt_rest ).
+          IF g_user_settings-strict_mode = abap_true.
+            DATA(start_sql_version) = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
+          ELSE.
+            start_sql_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
+          ENDIF.
+          /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( EXPORTING i_sql_parsed     = <lt_cl_sql_parse>
+                                                                  i_select_version = start_sql_version
+                                                        IMPORTING e_sci_results    = DATA(sci_results) ).
 
           LOOP AT <lt_cl_sql_parse> ASSIGNING <l_cl_sql_parse>.
             <l_cl_sql_parse>->parse_sql_ii( ).
@@ -1046,56 +1014,55 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
           MESSAGE e103(/cadaxo/sqlc) INTO l_message.
 
           RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-            EXPORTING
-              message       = l_message
-              /cadaxo/msgid = '/CADAXO/SQLC'
-              /cadaxo/msgnr = '103'.
+            EXPORTING message       = l_message
+                      /cadaxo/msgid = '/CADAXO/SQLC'
+                      /cadaxo/msgnr = '103'.
         ENDIF.
-* catch exceptions
+        " catch exceptions
       CATCH /cadaxo/cx_sqlc_to_much_resrow INTO lr_exception_t100.
         l_message = lr_exception_t100->get_text( ).
-        l_message_long = lr_exception_t100->get_longtext( ). "CDX
+        l_message_long = lr_exception_t100->get_longtext( ). " CDX
         l_scx_t100key = lr_exception_t100->if_t100_message~t100key.
         IF l_message IS INITIAL.
           l_message = TEXT-e01.
         ENDIF.
       CATCH /cadaxo/cx_sqlc_syntax_error INTO lr_exception_syntax_error.
         l_message = lr_exception_syntax_error->get_text( ).
-        l_message_long = lr_exception_syntax_error->get_longtext( ). "CDX
+        l_message_long = lr_exception_syntax_error->get_longtext( ). " CDX
         l_scx_t100key-msgno = lr_exception_syntax_error->/cadaxo/msgnr.
         l_scx_t100key-msgid = lr_exception_syntax_error->/cadaxo/msgid.
         IF l_message IS INITIAL.
           l_message = TEXT-e01.
         ENDIF.
       CATCH cx_root INTO lr_exception.
-        IF lr_exception->previous IS BOUND.                   "RT229
-          l_message = lr_exception->previous->get_text( ).              "RT229
-          l_message_long = lr_exception->previous->get_longtext( ).     "RT229
-        ENDIF.                                                "RT229
+        IF lr_exception->previous IS BOUND.                   " RT229
+          l_message = lr_exception->previous->get_text( ).              " RT229
+          l_message_long = lr_exception->previous->get_longtext( ).     " RT229
+        ENDIF.                                                " RT229
         IF l_message IS INITIAL.
           l_message = lr_exception->get_text( ).
-          l_message_long = lr_exception->get_longtext( ). "CDX
+          l_message_long = lr_exception->get_longtext( ). " CDX
           IF l_message IS INITIAL.
             l_message = TEXT-e01.
           ENDIF.
         ENDIF.
     ENDTRY.
 
-* clear error table
+    " clear error table
     CLEAR gt_errors.
 
-    IF NOT l_message IS INITIAL.
+    IF l_message IS NOT INITIAL.
 
-      ls_error-text = l_message.
+      ls_error-text    = l_message.
       ls_error-msgtype = icon_red_light.
 
-      IF NOT l_message_long IS INITIAL.
+      IF l_message_long IS NOT INITIAL.
         ls_error-longtext = icon_system_help.
       ENDIF.
 
-      IF NOT l_scx_t100key IS INITIAL.
-        ls_error-msgno = l_scx_t100key-msgno.
-        ls_error-msgid = l_scx_t100key-msgid.
+      IF l_scx_t100key IS NOT INITIAL.
+        ls_error-msgno    = l_scx_t100key-msgno.
+        ls_error-msgid    = l_scx_t100key-msgid.
         ls_error-longtext = icon_display_text.
       ENDIF.
 
@@ -1116,42 +1083,44 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       ASSIGN lt_fieldcat[ fieldname = 'LONGTEXT' ] TO <ls_fieldcat>.
       IF sy-subrc = 0.
         IF ls_error-longtext IS INITIAL.
-          <ls_fieldcat>-no_out  = abap_true.
+          <ls_fieldcat>-no_out = abap_true.
         ELSE.
-          <ls_fieldcat>-no_out  = abap_false.
+          <ls_fieldcat>-no_out = abap_false.
         ENDIF.
-        gc_abap_error->set_frontend_fieldcatalog( EXPORTING it_fieldcatalog = lt_fieldcat ).
+        gc_abap_error->set_frontend_fieldcatalog( it_fieldcatalog = lt_fieldcat ).
       ENDIF.
 
       gc_abap_error->refresh_table_display( ).
 
-      gs_splitter_editor->set_row_height( id = 2 height = toolbar_row_height * 3 ).
+      gs_splitter_editor->set_row_height( id     = 2
+                                          height = toolbar_row_height * 3 ).
 
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-        EXPORTING
-          message = l_message.
+        EXPORTING message = l_message.
     ELSE.
 
-      LOOP AT lt_rest ASSIGNING <ls_scirestps>.
+      LOOP AT sci_results ASSIGNING FIELD-SYMBOL(<ls_scirestps>).
 
         CLEAR ls_error.
 
         CREATE OBJECT lr_cl_ci_test_root TYPE (<ls_scirestps>-test).
 
-        CALL METHOD lr_cl_ci_test_root->get_message_text( EXPORTING p_test = <ls_scirestps>-test p_code = <ls_scirestps>-code IMPORTING p_text = l_message ).
+        lr_cl_ci_test_root->get_message_text( EXPORTING p_test = <ls_scirestps>-test
+                                                        p_code = <ls_scirestps>-code
+                                              IMPORTING p_text = l_message ).
 
         REPLACE '&1' WITH <ls_scirestps>-param1 INTO l_message.
         REPLACE '&2' WITH <ls_scirestps>-param2 INTO l_message.
         REPLACE '&3' WITH <ls_scirestps>-param3 INTO l_message.
         REPLACE '&4' WITH <ls_scirestps>-param4 INTO l_message.
 
-        MOVE l_message TO ls_error-text.
-        MOVE icon_yellow_light    TO ls_error-msgtype.
+        ls_error-text     = l_message.
+        ls_error-msgtype  = icon_yellow_light.
 
-        MOVE icon_display_text     TO ls_error-longtext.
+        ls_error-longtext = icon_display_text.
 
-        MOVE <ls_scirestps>-code  TO ls_error-ci_code.
-        MOVE <ls_scirestps>-test  TO ls_error-ci_test.
+        ls_error-ci_code  = <ls_scirestps>-code.
+        ls_error-ci_test  = <ls_scirestps>-test.
 
         APPEND ls_error TO gt_errors.
 
@@ -1159,13 +1128,14 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       gc_abap_error->refresh_table_display( ).
 
-      IF lt_rest IS INITIAL.
-        gs_splitter_editor->set_row_height( id = 2 height = 0 ).
+      IF sci_results IS INITIAL.
+        gs_splitter_editor->set_row_height( id     = 2
+                                            height = 0 ).
       ELSE.
-        gs_splitter_editor->set_row_height( id = 2 height = toolbar_row_height * 3 ).
+        gs_splitter_editor->set_row_height( id     = 2
+                                            height = toolbar_row_height * 3 ).
       ENDIF.
     ENDIF.
-
   ENDMETHOD.
 
 

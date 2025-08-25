@@ -4040,7 +4040,11 @@ METHOD parse_sql_i.
       IF /cadaxo/cl_sqlc_special_parse=>may_be_datasource( sql_string ).
 
         IF /cadaxo/cl_sqlc_special_parse=>is_datasource( sql_string ).
-          l_sql_string_c = `SELECT * FROM ` && l_sql_string_c.
+          IF g_user_settings-strict_mode = abap_true.
+            l_sql_string_c = |SELECT FROM { l_sql_string_c } FIELDS *|.
+          ELSE.
+            l_sql_string_c = |SELECT * FROM { l_sql_string_c }|.
+          ENDIF.
           sql_string = l_sql_string_c.
           l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
           l_cl_sql_parse->sql_syntax = l_sql_string_c.
@@ -4424,7 +4428,7 @@ END-ENHANCEMENT-SECTION.
     IF is_count_star_only( l_cl_sql_parse->column_syntax ).                          "COCKPIT-100
       IF l_cl_sql_parse->group_syntax IS NOT INITIAL.                                "COCKPIT-100
         MESSAGE e109(/cadaxo/sqlc) INTO l_message.                                   "COCKPIT-100
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                            "COCKPIT-100
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error "COCKPIT-100
           EXPORTING
             message       = l_message
             /cadaxo/msgid = '/CADAXO/SQLC'
