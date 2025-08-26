@@ -177,7 +177,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
                                                     IMPORTING e_sql_parsed    = lt_cl_sql_parse ).
 
 * check the sql syntax
-        /cadaxo/cl_sqlc_cockpit_parse=>check_sql_syntax( lt_cl_sql_parse ).
+        /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( lt_cl_sql_parse ).
 
         LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
           <lr_cl_sql_parse>->parse_sql_ii( ).
