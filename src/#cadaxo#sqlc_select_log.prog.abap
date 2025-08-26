@@ -43,8 +43,7 @@ INITIALIZATION.
                                             ass_tab      = assignment ).
 
   CALL FUNCTION 'SELECT_OPTIONS_RESTRICT'
-    EXPORTING
-               restriction            = restrictions
+    EXPORTING  restriction            = restrictions
     EXCEPTIONS too_late               = 1
                repeated               = 2
                selopt_without_options = 3
@@ -55,15 +54,17 @@ INITIALIZATION.
                repeated_kind_a        = 8
                OTHERS                 = 9.
   IF sy-subrc <> 0.
- MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
-   WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
   ENDIF.
 
 
 START-OF-SELECTION.
-
   TRY.
-      NEW lcl_local_runner( )->run( i_username = sel_user[] i_dates = sel_date[] i_runtime = sel_runt[] i_rows = sel_rows[] ).
+      NEW lcl_local_runner( )->run( i_username = sel_user[]
+                                    i_dates    = sel_date[]
+                                    i_runtime  = sel_runt[]
+                                    i_rows     = sel_rows[] ).
     CATCH cx_salv_msg INTO DATA(e1).
       WRITE: / 'Error (ALV):', e1->get_text( ).
     CATCH cx_parameter_invalid_range INTO DATA(e2).

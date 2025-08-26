@@ -25,6 +25,11 @@ CLASS lcl_local_runner DEFINITION.
     TYPES runtime_ranges   TYPE RANGE OF /cadaxo/sqlclogalv-result_runtime.
     TYPES row_ranges       TYPE RANGE OF /cadaxo/sqlclogalv-result_rows.
 
+    CLASS-METHODS conv_date_to_timestamp
+      IMPORTING i_dates             TYPE date_range
+      RETURNING VALUE(r_timestamps) TYPE timestamp_ranges
+      RAISING
+                cx_abap_invalid_value.
 
     METHODS run
       IMPORTING i_username TYPE user_name_range OPTIONAL
@@ -54,11 +59,6 @@ CLASS lcl_local_runner DEFINITION.
 
     METHODS auth_check.
 
-    METHODS conv_date_to_timestamp
-      IMPORTING i_dates             TYPE date_range
-      RETURNING VALUE(r_timestamps) TYPE timestamp_ranges
-      RAISING
-                cx_abap_invalid_value.
 
     METHODS db_query
       IMPORTING i_timestamps     TYPE timestamp_ranges OPTIONAL
@@ -70,11 +70,11 @@ CLASS lcl_local_runner DEFINITION.
       CHANGING c_output_table TYPE /cadaxo/cl_sqlc_user_hist_log=>ty_sqlclogalvs.
 
 
-    METHODS get_start_of_day_timestamp
+    CLASS-METHODS get_start_of_day_timestamp
       IMPORTING i_date          TYPE d
       RETURNING VALUE(r_ts_low) TYPE timestamp.
 
-    METHODS get_end_of_day_timestamp
+    CLASS-METHODS get_end_of_day_timestamp
       IMPORTING i_date           TYPE d
       RETURNING VALUE(r_ts_high) TYPE timestamp.
 
