@@ -1164,13 +1164,13 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
       ENDIF.
 
       ASSIGN COMPONENT l_fieldname OF STRUCTURE <ls_result_s> TO FIELD-SYMBOL(<lv_value_compare_s>).
-      IF <lv_value_s> IS ASSIGNED.
+      IF <lv_value_s> IS ASSIGNED AND <lv_value_compare_s> IS ASSIGNED .
         <lv_value_compare_s> = <lv_value_s>.
         UNASSIGN <lv_value_s>.
       ENDIF.
 
       ASSIGN COMPONENT l_fieldname OF STRUCTURE <ls_result_t> TO FIELD-SYMBOL(<lv_value_compare_t>).
-      IF <lv_value_t> IS ASSIGNED.
+      IF <lv_value_t> IS ASSIGNED AND <lv_value_compare_t> IS ASSIGNED.
         <lv_value_compare_t> = <lv_value_t>.
         UNASSIGN <lv_value_t>.
       ENDIF.
