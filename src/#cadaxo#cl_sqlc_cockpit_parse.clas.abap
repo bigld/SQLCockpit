@@ -4873,6 +4873,8 @@ ENDMETHOD.
 
 METHOD parse_sql_ii_2.
 
+  CONSTANTS: join_alias_regex TYPE string VALUE '^([[:word:]/]+)(?:\s+AS\s+([[:word:]/]+)|[[:word:]/]+|.*).*$'.
+
   TYPES: BEGIN OF t_tab_field,
            table       TYPE string,
            field       TYPE string,
@@ -4887,28 +4889,28 @@ METHOD parse_sql_ii_2.
            ddfields TYPE ddfields,
          END OF typ_source_ddfields.
 
-  DATA: l_skip          TYPE i,
-        l_tabix_next    TYPE i,
-        l_tab_field     TYPE t_tab_field,
-        lt_tab_field    TYPE TABLE OF t_tab_field,
-        l_field_dfies   TYPE dfies,
-        ls_result_field TYPE /cadaxo/sqlcdfies,
-        lcl_structtype  TYPE REF TO cl_abap_structdescr,
-        lcl_elemdescr   TYPE REF TO cl_abap_elemdescr,
-        lt_fields       TYPE ddfields.
-  DATA lt_column_split TYPE TABLE OF string.
-  DATA lr_ref_data TYPE REF TO data.
-  DATA l_string TYPE string.
-  DATA l_lines TYPE i.
-  DATA l_cols TYPE string.
-  DATA lr_struct TYPE REF TO cl_abap_structdescr.
+  DATA l_skip             TYPE i.
+  DATA l_tabix_next       TYPE i.
+  DATA l_tab_field        TYPE t_tab_field.
+  DATA lt_tab_field       TYPE TABLE OF t_tab_field.
+  DATA l_field_dfies      TYPE dfies.
+  DATA ls_result_field    TYPE /cadaxo/sqlcdfies.
+  DATA lcl_structtype     TYPE REF TO cl_abap_structdescr.
+  DATA lcl_elemdescr      TYPE REF TO cl_abap_elemdescr.
+  DATA lt_fields          TYPE ddfields.
+  DATA lt_column_split    TYPE TABLE OF string.
+  DATA lr_ref_data        TYPE REF TO data.
+  DATA l_string           TYPE string.
+  DATA l_lines            TYPE i.
+  DATA l_cols             TYPE string.
+  DATA lr_struct          TYPE REF TO cl_abap_structdescr.
   DATA lt_source_ddfields TYPE TABLE OF typ_source_ddfields.
 
-  FIELD-SYMBOLS: <l_source_split_next> TYPE string,
-                 <l_column_split>      TYPE string,
-                 <l_column_split_next> TYPE string,
-                 <l_dfies>             TYPE dfies,
-                 <l_result_source>     LIKE LINE OF me->result_source_t.
+  FIELD-SYMBOLS <l_source_split_next> TYPE string.
+  FIELD-SYMBOLS <l_column_split>      TYPE string.
+  FIELD-SYMBOLS <l_column_split_next> TYPE string.
+  FIELD-SYMBOLS <l_dfies>             TYPE dfies.
+  FIELD-SYMBOLS <l_result_source>     LIKE LINE OF me->result_source_t.
 
   CLEAR: l_skip,
          me->gt_result_ddfields,
@@ -4921,7 +4923,16 @@ METHOD parse_sql_ii_2.
   SPLIT l_string AT | JOIN | INTO TABLE DATA(lt_joins).
 
   LOOP AT lt_joins ASSIGNING FIELD-SYMBOL(<join>).
-    FIND REGEX '^([[:word:]/]+)(?:\s+AS\s+([[:word:]/]+)|[[:word:]/]+|.*).*$' IN <join> SUBMATCHES DATA(l_table) DATA(l_alias). "FOE $002
+    TRY.
+        FIND REGEX join_alias_regex IN <join> SUBMATCHES DATA(l_table) DATA(l_alias). "FOE $002
+      CATCH cx_sy_regex_too_complex INTO DATA(regex_ex).
+        SPLIT <join> AT | ON | INTO DATA(table) DATA(onclause).
+        IF sy-subrc <> 0.
+          FIND REGEX join_alias_regex IN <join> SUBMATCHES l_table l_alias. "Exception!
+        ELSE.
+          FIND REGEX join_alias_regex IN table SUBMATCHES l_table l_alias.
+        ENDIF.
+    ENDTRY.
     IF sy-subrc = 0.
       APPEND VALUE #( table = l_table alias = l_alias ) TO me->result_source_t.
     ENDIF.
@@ -5133,7 +5144,7 @@ METHOD parse_sql_ii_2.
     LOOP AT lt_tab_field ASSIGNING <l_tab_field>.
 
       CLEAR l_field_dfies.
-      clear ls_result_field.
+      CLEAR ls_result_field.
 
       IF <l_tab_field>-field EQ '*' OR <l_tab_field>-field EQ 'COUNT(*)' OR <l_tab_field>-field EQ 'COUNT( * )'.
 
@@ -5175,7 +5186,7 @@ METHOD parse_sql_ii_2.
                   ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
                   ls_result_field-/cadaxo/alias_value = <l_tab_field>-field.
                   APPEND ls_result_field TO me->gt_result_ddfields.
-                  exit.
+                  EXIT.
                 ENDIF.
               ENDLOOP.
 
