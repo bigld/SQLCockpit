@@ -22,6 +22,7 @@
 *            |                      |                                             |                *
 ****************************************************************************************************
 REPORT  /cadaxo/sqlc_select_user_log.
+INCLUDE /cadaxo/sqlc_select_log_c01.
 
 DATA: gs_sqlculog        TYPE /cadaxo/sqlculog.
 DATA: gt_sqlculog        TYPE TABLE OF /cadaxo/sqlculog.
@@ -31,12 +32,53 @@ DATA: gs_log_xml         TYPE /cadaxo/sqlculog_xml.
 DATA: rg_sel_timestamps  TYPE RANGE OF timestampl.
 DATA: rg_sel_timestamp   LIKE LINE OF rg_sel_timestamps.
 DATA: gv_time            TYPE sy-uzeit.
+DATA: date_selection     TYPE /cadaxo/sqlcexecute_date.
 
 SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-t01.
   SELECT-OPTIONS: so_uname FOR  gs_sqlculog-uname DEFAULT sy-uname,
-                  so_date  FOR  sy-datum.
+                  so_date  FOR  date_selection NO-EXTENSION.
 SELECTION-SCREEN END OF BLOCK sel.
 
+INITIALIZATION.
+  DATA(options_list) = VALUE sscr_opt_list_tab(
+    ( name       = 'DateRes'
+      options-eq = abap_true
+      options-bt = abap_true
+      options-ge = abap_true
+      options-le = abap_true
+      options-cp = abap_false
+      options-gt = abap_false
+      options-lt = abap_false
+      options-nb = abap_false
+      options-ne = abap_false
+      options-np = abap_false ) ).
+
+  DATA(assignment) = VALUE sscr_ass_tab(
+    ( kind    = 'S'
+      name    = 'SO_DATE'
+      sg_main = 'I'
+      op_main = 'DateRes' ) ).
+
+  DATA(restrictions) = VALUE sscr_restrict(
+    opt_list_tab = options_list
+    ass_tab      = assignment ).
+
+  CALL FUNCTION 'SELECT_OPTIONS_RESTRICT'
+    EXPORTING
+                restriction = restrictions
+    EXCEPTIONS too_late               = 1
+               repeated               = 2
+               selopt_without_options = 3
+               selopt_without_signs   = 4
+               invalid_sign           = 5
+               empty_option_list      = 6
+               invalid_kind           = 7
+               repeated_kind_a        = 8
+               OTHERS                 = 9.
+  IF sy-subrc <> 0.
+ MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+   WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
 
 START-OF-SELECTION.
 
@@ -44,26 +86,15 @@ START-OF-SELECTION.
   IF sy-subrc NE 0.
     MESSAGE e036(/cadaxo/sqlc).
   ENDIF.
+TRY.
+  DATA(timestamps) = NEW lcl_local_runner(  )->conv_date_to_timestamp( i_dates = so_date[] ).
+CATCH cx_abap_invalid_value.
+ENDTRY.
 
-  CLEAR: rg_sel_timestamps.
-
-  LOOP AT so_date ASSIGNING FIELD-SYMBOL(<rg_date>).
-    rg_sel_timestamp = CORRESPONDING #( <rg_date> ).
-    IF <rg_date>-low IS NOT INITIAL.
-      gv_time = '000000'.
-      CONVERT DATE <rg_date>-low TIME gv_time INTO TIME STAMP rg_sel_timestamp-low TIME ZONE sy-zonlo.
-    ENDIF.
-
-    IF <rg_date>-high IS NOT INITIAL.
-      gv_time = '235959'.
-      CONVERT DATE <rg_date>-high TIME gv_time INTO TIME STAMP rg_sel_timestamp-high TIME ZONE sy-zonlo.
-    ENDIF.
-    APPEND rg_sel_timestamp TO rg_sel_timestamps.
-  ENDLOOP.
 
   SELECT * FROM /cadaxo/sqlculog PACKAGE SIZE 1000
          INTO TABLE gt_sqlculog  WHERE uname   IN so_uname
-                                 AND timestamp IN rg_sel_timestamps.
+                                 AND timestamp IN timestamps.
 
     LOOP AT gt_sqlculog ASSIGNING FIELD-SYMBOL(<gs_sqlculog>).
 
