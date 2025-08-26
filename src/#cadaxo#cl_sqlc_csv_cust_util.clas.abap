@@ -72,7 +72,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_CSV_CUST_UTIL IMPLEMENTATION.
 
 
   METHOD convert_date.
@@ -176,7 +176,10 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util IMPLEMENTATION.
         ELSE.
           IF ( <ls_field>-inttype = 'C' OR <ls_field>-inttype = 'g' )
              AND ( <ls_line> CS cl_abap_char_utilities=>cr_lf OR <ls_line> CS cl_abap_char_utilities=>newline ).
-            lv_output_line = lv_output_line && lv_separator && '"' && <ls_line> && '"'.
+            lv_tmp_out = <ls_line>.
+            REPLACE ALL OCCURRENCES OF '"' IN lv_tmp_out WITH '""'.
+
+            lv_output_line = lv_output_line && lv_separator && '"' && lv_tmp_out && '"'.
           ELSE.
             lv_output_line = lv_output_line && lv_separator && <ls_line>.
           ENDIF.
