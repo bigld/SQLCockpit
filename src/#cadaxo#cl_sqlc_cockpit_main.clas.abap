@@ -4607,8 +4607,14 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
         it_target             = <lt_target>
         i_source_number       = i_source
         i_target_number       = i_target
-        it_source_dfies       = <ls_sql_parse_s>->gt_result_ddfields
-        it_target_dfies       = <ls_sql_parse_t>->gt_result_ddfields
+        it_source_dfies       = COND #(
+                                   WHEN <ls_sql_parse_s>->gt_result_ddfields_all IS NOT INITIAL
+                                   THEN <ls_sql_parse_s>->gt_result_ddfields_all
+                                   ELSE <ls_sql_parse_s>->gt_result_ddfields )
+        it_target_dfies       = COND #(
+                                   WHEN <ls_sql_parse_t>->gt_result_ddfields_all IS NOT INITIAL
+                                   THEN <ls_sql_parse_t>->gt_result_ddfields_all
+                                   ELSE <ls_sql_parse_t>->gt_result_ddfields )
         iv_source_select_type = lv_source_type
         iv_target_select_type = lv_target_type
         i_source_name         = l_stable
@@ -7018,6 +7024,13 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       DATA(original) = to_upper( contextstring ).
 
       contextstring = to_upper( contextstring+l_from(l_len) ).
+
+      DATA(paren_off) = sy-fdpos.
+      FIND FIRST OCCURRENCE OF '(' IN contextstring MATCH OFFSET paren_off.
+      IF sy-subrc = 0 and paren_off > 0.
+         contextstring = contextstring+0(paren_off).
+         CONDENSE contextstring NO-GAPS.
+      ENDIF.
 
       IF contextstring CA '()+'.
         RETURN.
@@ -13007,7 +13020,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                                           buttons      = abap_true
                                           context_menu = abap_true ).
             CATCH cx_transformation_error INTO DATA(lx_transform).
-              MESSAGE lx_transform->get_text( ) TYPE 'E'.
+              MESSAGE lx_transform->get_text( )
+                TYPE 'S'
+                DISPLAY LIKE 'E'.
           ENDTRY.
 
         ELSE.
