@@ -12,6 +12,7 @@
     <item>/package.json</item>
     <item>/.travis.yml</item>
    </IGNORE>
+   <VERSION_CONSTANT>/CADAXO/IF_SQLC_VERSION=&gt;VERSION</VERSION_CONSTANT>
   </DATA>
  </asx:values>
 </asx:abap>
