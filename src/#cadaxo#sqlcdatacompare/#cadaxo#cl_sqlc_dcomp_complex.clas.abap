@@ -1817,7 +1817,10 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
           <lv_value_compare_source> = <lv_source_value>.
 
           ASSIGN COMPONENT lv_fieldname_target OF STRUCTURE <ls_result_target> TO FIELD-SYMBOL(<lv_value_compare_target>)."+Cockpit405
-          <lv_value_compare_target> = <lv_value_target>.
+          IF <lv_value_compare_target> IS ASSIGNED AND <lv_value_target> IS ASSIGNED .
+            <lv_value_compare_target> = <lv_value_target>.
+            UNASSIGN <ls_result_target>.
+          ENDIF.
 
           IF <ls_link>-type = c_linktype_field.
 
@@ -1830,11 +1833,11 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
               lv_row_status = c_status_different.
 
-                compare_column_name_diff( iv_fieldname = lv_fieldname_source iv_line_index = lv_compare_index ).
-                compare_column_name_diff( iv_fieldname = lv_fieldname_target iv_line_index = lv_compare_index ).
+              compare_column_name_diff( iv_fieldname = lv_fieldname_source iv_line_index = lv_compare_index ).
+              compare_column_name_diff( iv_fieldname = lv_fieldname_target iv_line_index = lv_compare_index ).
 
-                set_column_color( EXPORTING iv_fieldname = lv_fieldname_source iv_col = 3 iv_int = 0 CHANGING ct_lvc_t_col = <lt_lvc_col_s> ).
-                set_column_color( EXPORTING iv_fieldname = lv_fieldname_target iv_col = 3 iv_int = 1 CHANGING ct_lvc_t_col = <lt_lvc_col_t> ).
+              set_column_color( EXPORTING iv_fieldname = lv_fieldname_source iv_col = 3 iv_int = 0 CHANGING ct_lvc_t_col = <lt_lvc_col_s> ).
+              set_column_color( EXPORTING iv_fieldname = lv_fieldname_target iv_col = 3 iv_int = 1 CHANGING ct_lvc_t_col = <lt_lvc_col_t> ).
 
             ENDIF.
 
