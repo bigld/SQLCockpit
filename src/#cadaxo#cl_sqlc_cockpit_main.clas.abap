@@ -7027,9 +7027,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       DATA(paren_off) = sy-fdpos.
       FIND FIRST OCCURRENCE OF '(' IN contextstring MATCH OFFSET paren_off.
-      IF sy-subrc = 0 and paren_off > 0.
-         contextstring = contextstring+0(paren_off).
-         CONDENSE contextstring NO-GAPS.
+      IF sy-subrc = 0 AND paren_off > 0.
+        contextstring = contextstring+0(paren_off).
+        CONDENSE contextstring NO-GAPS.
       ENDIF.
 
       IF contextstring CA '()+'.
@@ -7252,7 +7252,9 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
           "sender->show_quick_info( EXPORTING  info_string = CONV #( text-eif )
           "                         EXCEPTIONS OTHERS      = 1 ).
-
+          IF g_show_clipboard = ' '.
+            set_clipboard_alv( ).
+          ENDIF.
         ENDIF.
 
       ENDIF.
