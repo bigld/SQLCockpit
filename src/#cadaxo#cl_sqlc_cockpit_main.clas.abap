@@ -4941,12 +4941,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
     FIELD-SYMBOLS <ls_result_details>  LIKE LINE OF me->gt_result_details.
     FIELD-SYMBOLS <l_cont_grid_result> LIKE LINE OF me->gcont_grid_result_t.
 
-*    " TODO: variable is assigned but only used in commented-out code (ABAP cleaner)
-*    FIELD-SYMBOLS <lt_result_old>      TYPE STANDARD TABLE.
-*    " TODO: variable is assigned but only used in commented-out code (ABAP cleaner)
-*    FIELD-SYMBOLS <lt_result_new>      TYPE STANDARD TABLE.
-*    "  FIELD-SYMBOLS <fcat> LIKE LINE OF gt_lvc_t_fcat.
-
     READ TABLE dref_result_tab_t INDEX i_grid_i ASSIGNING <lr_dref>.
     IF sy-subrc = 0.
       l_index = sy-tabix.
@@ -5217,17 +5211,15 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *            |                      | to prevent dump by 255                      |                *
 ****************************************************************************************************
 
-    DATA: lv_codeline   TYPE /cadaxo/sqlccodeline. "TODO Umbauen auf String
-    DATA: lv_pos        TYPE i.
-    DATA: lv_string     TYPE string.
-    DATA: lt_string     TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
-    DATA: lv_line       TYPE i.  "COCKPIT-315
+    DATA lv_codeline TYPE /cadaxo/sqlccodeline.
+    DATA lv_pos      TYPE i.
+    DATA lv_string   TYPE string.
+    DATA lt_string   TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
+    DATA lv_line     TYPE i. " COCKPIT-315
 
-    lv_line = iv_line.   "COCKPIT-315
+    lv_line = iv_line.   " COCKPIT-315
 
     lv_string = iv_sqlstring.
-
-
 
     gc_abap_editor->get_line_text( EXPORTING line_number = lv_line
                                    IMPORTING text        = lv_codeline ).
@@ -5236,31 +5228,31 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       lv_pos = iv_pos - 2.
     ENDIF.
 
-    IF lv_pos GE 1.
-* is there a leading space? if not, add a space
-      IF lv_codeline+lv_pos(1) CN ' /"(~`'''.                             "CDX001-0022 "COCKPIT-308 '`
+    IF lv_pos >= 1 AND lv_pos < strlen( lv_codeline ).
+      " is there a leading space? if not, add a space
+      IF lv_codeline+lv_pos(1) CN ' /"(~`'''.                             " CDX001-0022 "COCKPIT-308 '`
         CONCATENATE ' ' lv_string INTO lv_string RESPECTING BLANKS.
       ENDIF.
     ENDIF.
 
-    IF iv_pos <> 1.                                                     "CDX001-0006
-      lv_pos = iv_pos - 1.                                              "CDX001-0006
-    ENDIF.                                                              "CDX001-0006
+    IF iv_pos <> 1.                                                     " CDX001-0006
+      lv_pos = iv_pos - 1.                                              " CDX001-0006
+    ENDIF.                                                              " CDX001-0006
 
-    IF lv_pos GE 1.                                                     "CDX001-0006
-      IF lv_codeline+lv_pos(1) CN ' /")~`'''.                           "CDX001-0006
-        CONCATENATE lv_string ' ' INTO lv_string RESPECTING BLANKS.     "CDX001-0006 "COCKPIT-308 '`
-      ENDIF.                                                            "CDX001-0006
-    ENDIF.                                                              "CDX001-0006
+    IF lv_pos >= 1 AND lv_pos < strlen( lv_codeline ).                                                    " CDX001-0006
+      IF lv_codeline+lv_pos(1) CN ' /")~`'''.                           " CDX001-0006
+        CONCATENATE lv_string ' ' INTO lv_string RESPECTING BLANKS.     " CDX001-0006 "COCKPIT-308 '`
+      ENDIF.                                                            " CDX001-0006
+    ENDIF.                                                              " CDX001-0006
 
-    IF lv_pos GE 220.                                                     "COCKPIT-315
-      lv_string = space && cl_abap_char_utilities=>cr_lf && lv_string.    "COCKPIT-315
-    ENDIF.                                                                "COCKPIT-315
+    IF lv_pos >= 220.                                                     " COCKPIT-315
+      lv_string = space && cl_abap_char_utilities=>cr_lf && lv_string.    " COCKPIT-315
+    ENDIF.                                                                " COCKPIT-315
 
-* split the string at cr/lf into table
-    SPLIT lv_string AT cl_abap_char_utilities=>cr_lf INTO TABLE lt_string. "CDX001-0014
+    " split the string at cr/lf into table
+    SPLIT lv_string AT cl_abap_char_utilities=>cr_lf INTO TABLE lt_string. " CDX001-0014
 
-* insert the sql string
+    " insert the sql string
     gc_abap_editor->insert_block_at_position( EXPORTING  line     = lv_line
                                                          pos      = iv_pos
                                                          text_tab = lt_string
@@ -5273,24 +5265,21 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
                                              to_line   = 0
                                   EXCEPTIONS OTHERS    = 2 ).
 
-    IF lv_pos GE 220.                       "COCKPIT-315
-      lv_pos = strlen( iv_sqlstring ) + 1.  "COCKPIT-315
-      lv_line = lv_line + 1.                "COCKPIT-315
-    ELSE.                                   "COCKPIT-315
-      lv_pos = iv_pos + strlen( iv_sqlstring ) + 1.           "CDX001-0006
-    ENDIF.                                  "COCKPIT-315
+    IF lv_pos >= 220.                       " COCKPIT-315
+      lv_pos = strlen( iv_sqlstring ) + 1.  " COCKPIT-315
+      lv_line = lv_line + 1.                " COCKPIT-315
+    ELSE.                                   " COCKPIT-315
+      lv_pos = iv_pos + strlen( iv_sqlstring ) + 1.           " CDX001-0006
+    ENDIF.                                  " COCKPIT-315
 
-
-    gc_abap_editor->set_selection_pos_in_line( EXPORTING line = lv_line                                   "CDX001-0006
-                                                         pos  = lv_pos ).                                 "CDX001-0006
+    gc_abap_editor->set_selection_pos_in_line( line = lv_line                                   " CDX001-0006
+                                               pos  = lv_pos ).                                 " CDX001-0006
 
     IF i_set_focus = abap_true.
-      gc_abap_editor->set_focus(
-         control = gc_abap_editor ).
+      gc_abap_editor->set_focus( control = gc_abap_editor ).
     ENDIF.
 
     FREE lt_string[].
-
   ENDMETHOD.
 
 
@@ -8379,7 +8368,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 *     field-symbols: <ls_result_line> type any.
 
           IF e_ucomm = 'EDIT'.
-            " TODO: variable is assigned but never used (ABAP cleaner)
             SELECT SINGLE @abap_true FROM nriv INTO @DATA(lv_nr_exists) WHERE object = '/CADAXO/01'.
             IF sy-subrc <> 0.
               MESSAGE TEXT-003 TYPE 'I'.
