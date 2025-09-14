@@ -1,34 +1,47 @@
-CLASS /cadaxo/cl_sqlc_sql_syntax DEFINITION
-  PUBLIC FINAL
-  CREATE PUBLIC.
+class /CADAXO/CL_SQLC_SQL_SYNTAX definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
-    CONSTANTS: BEGIN OF cc_select_version,
+public section.
+
+  constants:
+    BEGIN OF cc_select_version,
                  v0 TYPE /cadaxo/sqlc_select_version VALUE 0 ##NO_TEXT,
                  v1 TYPE /cadaxo/sqlc_select_version VALUE 1 ##NO_TEXT,
                  v2 TYPE /cadaxo/sqlc_select_version VALUE 2 ##NO_TEXT,
-               END OF cc_select_version.
+               END OF cc_select_version .
 
-    CLASS-METHODS check_sql_syntax
-      IMPORTING i_sql_parsed     TYPE /cadaxo/sqlc_cl_cockpit_parset
-                i_select_version TYPE /cadaxo/sqlc_select_version DEFAULT /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1
-      EXPORTING e_sci_results    TYPE scit_rest
-                e_select_version TYPE /cadaxo/sqlc_select_version
-      RAISING   /cadaxo/cx_sqlc_syntax_error.
-
-    CLASS-METHODS build_abap_code
-      IMPORTING i_cl_cockpit_parse TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse
-                i_select_version   TYPE /cadaxo/sqlc_select_version DEFAULT /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1
-      EXPORTING e_abap_code        TYPE /cadaxo/sqlcstring_t
-                e_abap_code_data   TYPE /cadaxo/sqlcstring_t.
-
-    CLASS-METHODS format_abap_code
-      IMPORTING i_columns    TYPE i OPTIONAL
-      CHANGING  ct_abap_code TYPE /cadaxo/sqlcstring_t.
+  class-methods CHECK_SQL_SYNTAX
+    importing
+      !I_SQL_PARSED type /CADAXO/SQLC_CL_COCKPIT_PARSET
+      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_SQL_SYNTAX=>CC_SELECT_VERSION-V1
+    exporting
+      !E_SCI_RESULTS type SCIT_REST
+      !E_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION
+    raising
+      /CADAXO/CX_SQLC_SYNTAX_ERROR .
+  class-methods BUILD_ABAP_CODE
+    importing
+      !I_CL_COCKPIT_PARSE type ref to /CADAXO/CL_SQLC_COCKPIT_PARSE
+      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_SQL_SYNTAX=>CC_SELECT_VERSION-V1
+    exporting
+      !E_ABAP_CODE type /CADAXO/SQLCSTRING_T
+      !E_ABAP_CODE_DATA type /CADAXO/SQLCSTRING_T .
+  class-methods FORMAT_ABAP_CODE
+    importing
+      !I_COLUMNS type I optional
+    changing
+      !CT_ABAP_CODE type /CADAXO/SQLCSTRING_T .
+protected section.
+private section.
 ENDCLASS.
 
 
-CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
+
+CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
+
+
   METHOD check_sql_syntax.
 
 
@@ -101,7 +114,9 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
                                                                                                                             OR message_detail-msgnumber = '544' )
                                               OR lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2 AND ( message_detail-msgnumber = '547' ) )
          OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'G2F' )
+         OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'GSG' )
          OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'GF5' ).
+         " SEE table trmsg
 
         IF lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2 AND ( message_detail-msgnumber = '547' ).
           IF <l_cl_sql_parse>->g_no_upto IS INITIAL.
@@ -224,6 +239,7 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD build_abap_code.
     DATA l_line  LIKE LINE OF e_abap_code.
     DATA l_dummy TYPE string.
@@ -343,6 +359,7 @@ END-ENHANCEMENT-SECTION.
 
     APPEND '.' TO e_abap_code.
   ENDMETHOD.
+
 
   METHOD format_abap_code.
     DATA lt_abap_code TYPE /cadaxo/sqlcstring_t.
