@@ -112,9 +112,10 @@ CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
                                                                                                                             OR message_detail-msgnumber = '487'
                                                                                                                             OR message_detail-msgnumber = '541'
                                                                                                                             OR message_detail-msgnumber = '544' )
-                                              OR lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2 AND ( message_detail-msgnumber = '547' ) )
+                                                     OR lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2 AND ( message_detail-msgnumber = '547' ) )
          OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'G2F' )
          OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'GSG' )
+         OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'G2G' )
          OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'GF5' ).
          " SEE table trmsg
 
@@ -129,13 +130,20 @@ CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
         IF lv_loop IS INITIAL.
           check_sql_syntax( EXPORTING i_sql_parsed     = VALUE #( ( <l_cl_sql_parse> ) )
                                       i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2
-                            IMPORTING e_sci_results          = e_sci_results
+                            IMPORTING e_sci_results    = e_sci_results
                                       e_select_version = <l_cl_sql_parse>->g_select_version ).
           CLEAR check_message.
           CLEAR message_detail.
         ENDIF.
       ELSE.
-        <l_cl_sql_parse>->g_select_version = lv_select_version.
+        IF check_message IS INITIAL.
+          <l_cl_sql_parse>->g_select_version = lv_select_version.
+        ELSE.
+          check_sql_syntax( EXPORTING i_sql_parsed     = VALUE #( ( <l_cl_sql_parse> ) )
+                                      i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2
+                            IMPORTING e_sci_results    = e_sci_results
+                                      e_select_version = <l_cl_sql_parse>->g_select_version ).
+        ENDIF.
       ENDIF.
 
       " show popup-message, if there is an error
