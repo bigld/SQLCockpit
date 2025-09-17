@@ -184,7 +184,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
         VALUE(r_active) TYPE /cadaxo/sqlcactive .
     CLASS-METHODS export_data
       IMPORTING
-        !i_export_type TYPE char5 DEFAULT 'CSV'
+        !i_export_type TYPE /CADAXO/SQLC_CHAR5 DEFAULT 'CSV'
         !it_fcat       TYPE lvc_t_fcat
         !it_data       TYPE ANY TABLE .
     CLASS-METHODS export_data_asxml
