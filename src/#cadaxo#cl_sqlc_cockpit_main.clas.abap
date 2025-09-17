@@ -7256,7 +7256,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-* Double click should always work (like for symbols), even if user disabled in settings
+* Double click should always work ( like for Symbols ), even if user disabled in settings
 *    CHECK NOT g_user_settings-result_doubleclick IS INITIAL.
 
     DATA: l_fields    TYPE string,
