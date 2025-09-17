@@ -212,11 +212,6 @@
      <DESCRIPT>brackground mode</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CMPNAME>BLACKLIST_CHECK_TABLES</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Check against blacklist tables</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
      <CMPNAME>BUILD_ABAP_CODE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Build abap code for syntax check and sub-pool</DESCRIPT>

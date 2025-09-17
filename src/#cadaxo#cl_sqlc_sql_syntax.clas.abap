@@ -141,7 +141,7 @@ CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
       ELSE.
         IF check_message IS INITIAL.
           <l_cl_sql_parse>->g_select_version = lv_select_version.
-        ELSE.
+        ELSEIF lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
           check_sql_syntax( EXPORTING i_sql_parsed     = VALUE #( ( <l_cl_sql_parse> ) )
                                       i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2
                             IMPORTING e_sci_results    = e_sci_results

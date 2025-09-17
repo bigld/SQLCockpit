@@ -38,7 +38,7 @@ CLASS /cadaxo/tc_sqlc_cockpit_parse DEFINITION FOR TESTING
     METHODS: is_not_count_star_only FOR TESTING.
     METHODS: parse_sql_i FOR TESTING.
     METHODS: parse_sql_i_2 FOR TESTING.
-    METHODS: blacklist_check_tables FOR TESTING.
+
 
 ENDCLASS.       "/cadaxo/tc_Sqlc_Cockpit_Parse
 
@@ -247,12 +247,5 @@ CLASS /cadaxo/tc_sqlc_cockpit_parse IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD BLACKLIST_CHECK_TABLES.
-
-    f_cut->BLACKLIST_CHECK_TABLES(
-
-    ).
-
-  ENDMETHOD.
 
 ENDCLASS.

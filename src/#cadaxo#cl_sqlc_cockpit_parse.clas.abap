@@ -102,7 +102,6 @@ public section.
       !C_DOMAIN_VALUE type GTS_DOMVAL
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods BLACKLIST_CHECK_TABLES .
   methods CHECK_SQL_ODATA_SYNTAX
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR
@@ -702,129 +701,6 @@ METHOD add_domain_value_sub.
   component_new-name = e_comp-name.
   component_new-type = structure_new.
   APPEND component_new TO c_components_new.
-
-ENDMETHOD.
-
-
-METHOD blacklist_check_tables.
-****************************************************************************************************
-* Description             : Check authorizations                                                   *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 08.03.2011 | Fößleitner Johann    | Check the S_TABU_DIS authorization          | CDX001-022     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.07.2017 | Harald Wiesinger     | New message when user has no roles assigned | COCKPIT-212    *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-
-  DATA: l_yes    TYPE c,
-        l_tables TYPE string.
-
-  FIELD-SYMBOLS: <l_result_source> LIKE LINE OF me->result_source_t,
-                 <l_auth>          TYPE /cadaxo/sqlctable_auth.
-
-* check blacklist tables
-  LOOP AT me->result_source_t ASSIGNING <l_result_source>.
-    /cadaxo/cl_sqlc_cockpit_assist=>blacklist_check_table(
-      EXPORTING  i_table                = <l_result_source>-table
-      EXCEPTIONS table_access_forbidden = 1
-                 OTHERS                 = 2 ).
-    IF sy-subrc NE 0.
-      MESSAGE e010(/cadaxo/sqlc) WITH <l_result_source>-table.
-    ENDIF.
-  ENDLOOP.
-
-* check user authorization
-  LOOP AT me->result_source_t ASSIGNING <l_result_source>.
-
-    CLEAR l_yes.
-
-    LOOP AT me->g_role-included ASSIGNING <l_auth>.
-      IF <l_result_source>-table CP <l_auth> OR
-         <l_result_source>-table = <l_auth>.
-        l_yes = abap_true.
-        EXIT.
-      ENDIF.
-    ENDLOOP.
-
-    IF l_yes = abap_true.
-      LOOP AT me->g_role-excluded ASSIGNING <l_auth>.
-        IF <l_result_source>-table CP <l_auth>.
-          CLEAR l_yes.
-          IF l_tables IS INITIAL.
-            l_tables = <l_result_source>-table.
-          ELSE.
-            CONCATENATE l_tables ',' INTO l_tables.
-            CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
-          ENDIF.
-          EXIT.
-        ENDIF.
-      ENDLOOP.
-    ELSE.
-      IF l_tables IS INITIAL.
-        l_tables = <l_result_source>-table.
-      ELSE.
-        CONCATENATE l_tables ',' INTO l_tables.
-        CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
-      ENDIF.
-    ENDIF.
-
-  ENDLOOP.
-
-* send error message if no authorization
-  IF me->g_role-excluded IS INITIAL AND me->g_role-included IS INITIAL.               "COCKPIT-212
-    MESSAGE e118(/cadaxo/sqlc).                                                       "COCKPIT-212
-  ELSEIF l_yes EQ space.                                                              "COCKPIT-212
-    MESSAGE e010(/cadaxo/sqlc) WITH l_tables.
-  ELSE.
-* also check the s_tabu_dis authority
-    CLEAR l_tables.                                         "CDX001-022
-    DATA l_view_name(30) TYPE c.
-    LOOP AT me->result_source_t ASSIGNING <l_result_source>.
-      l_view_name = <l_result_source>-table.
-      CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
-        EXPORTING
-          view_action                = 'S' "SHOW
-          view_name                  = l_view_name
-          no_warning_for_clientindep = abap_true
-        EXCEPTIONS
-          OTHERS                     = 1.
-      IF sy-subrc NE 0.
-        CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
-          EXPORTING
-            view_action                = 'U' "UPDATE
-            view_name                  = l_view_name
-            no_warning_for_clientindep = abap_true
-          EXCEPTIONS
-            OTHERS                     = 1.
-        IF sy-subrc NE 0.
-          IF l_tables IS INITIAL.
-            l_tables = <l_result_source>-table.
-          ELSE.
-            CONCATENATE l_tables ',' INTO l_tables.
-            CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
-          ENDIF.
-        ENDIF.
-      ENDIF.
-    ENDLOOP.                                                "CDX001-022
-    IF NOT l_tables IS INITIAL.                             "CDX001-022
-      MESSAGE e058(/cadaxo/sqlc) WITH l_tables.             "CDX001-022
-    ENDIF.                                                  "CDX001-022
-  ENDIF.
 
 ENDMETHOD.
 
