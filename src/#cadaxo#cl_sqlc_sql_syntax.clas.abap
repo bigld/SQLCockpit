@@ -65,17 +65,20 @@ CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
 
     LOOP AT i_sql_parsed ASSIGNING <l_cl_sql_parse>.
 
-      lv_select_version = i_select_version.                         " COCKPIT-214
+      lv_select_version = i_select_version.
 
-      IF lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.                    " COCKPIT-214
-        /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex(          " COCKPIT-214
-                                                           EXPORTING i_where_syntax = <l_cl_sql_parse>->where_syntax " COCKPIT-214
-                                                           IMPORTING e_result_tab   = lt_results ).                 " COCKPIT-214
+      IF lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
+        /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex( EXPORTING i_where_syntax = <l_cl_sql_parse>->where_syntax
+                                                           IMPORTING e_result_tab   = lt_results ).
 
-        IF lt_results IS NOT INITIAL.                               " COCKPIT-214
-          lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.                   " COCKPIT-214
-        ENDIF.                                                      " COCKPIT-214
-      ENDIF.                                                        " COCKPIT-214
+        IF lt_results IS NOT INITIAL.
+          lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
+        ENDIF.
+
+        IF <l_cl_sql_parse>->fields_syntax IS NOT INITIAL.
+          lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
+        ENDIF.
+      ENDIF.
 
       " create main abap code.
       CLEAR lt_abap_code_data.
@@ -117,7 +120,7 @@ CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
          OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'GSG' )
          OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'G2G' )
          OR message_detail-keyword = 'MESSAGE' AND (    lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1 AND message_detail-msgnumber = 'GF5' ).
-         " SEE table trmsg
+        " SEE table trmsg
 
         IF lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2 AND ( message_detail-msgnumber = '547' ).
           IF <l_cl_sql_parse>->g_no_upto IS INITIAL.
