@@ -140,6 +140,12 @@
      <MSGNR>021</MSGNR>
      <TEXT>The Cadaxo Rapid Report Generator for SAP Fiori is not installed</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
+     <MSGNR>022</MSGNR>
+     <TEXT>Type &amp;1 is not supported</TEXT>
+    </T100>
    </T100>
    <I18N_LANGS>
     <LANGU>D</LANGU>
