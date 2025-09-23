@@ -627,7 +627,7 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
       CATCH /cadaxo/cx_sqlc_rrg_wiz INTO DATA(lr_exception).
 
-        MESSAGE lr_exception->get_text( ) TYPE 'E'.
+        MESSAGE lr_exception->get_text( ) TYPE 'S' DISPLAY LIKE 'E'.
 
     ENDTRY.
 

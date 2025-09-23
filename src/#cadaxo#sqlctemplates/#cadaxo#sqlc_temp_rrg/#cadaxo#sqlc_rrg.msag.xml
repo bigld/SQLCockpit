@@ -144,7 +144,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC_RRG</ARBGB>
      <MSGNR>022</MSGNR>
-     <TEXT>Type &amp;1 is not supported</TEXT>
+     <TEXT>Datatype &amp;1 is not yet supported</TEXT>
     </T100>
    </T100>
    <I18N_LANGS>
@@ -267,6 +267,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>021</MSGNR>
      <TEXT>Der Cadaxo Rapid Report Generator for SAP Fiori ist nicht installiert</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>022</MSGNR>
+     <TEXT>Datentyp &amp;1 wird noch nicht unterstützt</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>
