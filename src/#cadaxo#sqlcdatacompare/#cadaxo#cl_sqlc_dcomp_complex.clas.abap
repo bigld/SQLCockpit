@@ -14,7 +14,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
         cdxdfies        TYPE /cadaxo/sqlcdfies_t,
         sort_tab        TYPE abap_sortorder_tab,
         link_fieldname  TYPE string,
-        compare_prefix  TYPE char2,
+        compare_prefix  TYPE /CADAXO/SQLC_CHAR2,
         components_view TYPE abap_component_view_tab,
         select_type     TYPE i,
         netplan_tab     TYPE REF TO if_aqqgraphic_table,
@@ -149,9 +149,9 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
       END OF typ_link .
     TYPES:
       BEGIN OF tys_progress_indi,
-        lines_compare       TYPE char10,
+        lines_compare       TYPE /CADAXO/SQLC_CHAR10,
         percentage_previous TYPE i,
-        current_line        TYPE char10,
+        current_line        TYPE /CADAXO/SQLC_CHAR10,
       END OF tys_progress_indi .
     TYPES:
       typ_link_tab TYPE STANDARD TABLE OF typ_link WITH DEFAULT KEY .
@@ -346,7 +346,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
       CHANGING
         !is_table_details TYPE tys_table_details
       RETURNING
-        VALUE(ev_unique)  TYPE flag .
+        VALUE(ev_unique)  TYPE /CADAXO/SQLC_GENERAL_FLAG .
     METHODS set_column_color
       IMPORTING
         !iv_fieldname TYPE string
@@ -366,7 +366,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
       IMPORTING
         !iv_row_status  TYPE i
       CHANGING
-        !ec_light_field TYPE char1 .
+        !ec_light_field TYPE /CADAXO/SQLC_CHAR1 .
     "! prepare dfies
     "!
     "! @parameter it_dfies | SQL Cockpit - Table of /CADAXO/SQLCDFIES
@@ -453,7 +453,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
     METHODS fieldmapping_delete .
     METHODS fieldmapping_set
       IMPORTING
-        !iv_kind TYPE char1 .
+        !iv_kind TYPE /CADAXO/SQLC_CHAR1 .
     METHODS legent_build_line
       IMPORTING
         !is_table_details TYPE tys_table_details
@@ -520,7 +520,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
         !it_fcat                   TYPE lvc_t_fcat
         !is_column_id              TYPE lvc_s_col
         !iv_default_field_pos      TYPE i
-        !iv_mark_target            TYPE flag DEFAULT abap_true
+        !iv_mark_target            TYPE /CADAXO/SQLC_GENERAL_FLAG DEFAULT abap_true
       RETURNING
         VALUE(rv_cursor_field_pos) TYPE i .
     "! navigate to previous difference
@@ -577,16 +577,16 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
       IMPORTING
         !iv_row_status    TYPE i
       CHANGING
-        !ec_light_field_s TYPE char1
-        !ec_light_field_t TYPE char1 .
+        !ec_light_field_s TYPE /CADAXO/SQLC_CHAR1
+        !ec_light_field_t TYPE /CADAXO/SQLC_CHAR1 .
     METHODS fill_gds_rows_comp_state . "Cockpit402
   PRIVATE SECTION.
 
-    CONSTANTS c_prefix_source TYPE char2 VALUE 'S_' ##NO_TEXT.
-    CONSTANTS c_prefix_target TYPE char2 VALUE 'T_' ##NO_TEXT.
+    CONSTANTS c_prefix_source TYPE /CADAXO/SQLC_CHAR2 VALUE 'S_' ##NO_TEXT.
+    CONSTANTS c_prefix_target TYPE /CADAXO/SQLC_CHAR2 VALUE 'T_' ##NO_TEXT.
     CONSTANTS c_fieldname_lights TYPE string VALUE 'LIGHTS' ##NO_TEXT.
-    CONSTANTS c_mapkind_fieldname TYPE char1 VALUE 'F' ##NO_TEXT.
-    CONSTANTS c_mapkind_index TYPE char1 VALUE 'I' ##NO_TEXT.
+    CONSTANTS c_mapkind_fieldname TYPE /CADAXO/SQLC_CHAR1 VALUE 'F' ##NO_TEXT.
+    CONSTANTS c_mapkind_index TYPE /CADAXO/SQLC_CHAR1 VALUE 'I' ##NO_TEXT.
     CONSTANTS c_action_show_red TYPE stb_button-function VALUE 'SHOW_RED' ##NO_TEXT.
     CONSTANTS c_action_show_yellow TYPE stb_button-function VALUE 'SHOW_YELLOW' ##NO_TEXT.
     CONSTANTS c_action_show_green TYPE stb_button-function VALUE 'SHOW_GREEN' ##NO_TEXT.
@@ -612,8 +612,8 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
       IMPORTING
         !iv_idx_source     TYPE int2
         !iv_idx_target     TYPE int2
-        !iv_move_source    TYPE flag OPTIONAL
-        !iv_move_target    TYPE flag OPTIONAL
+        !iv_move_source    TYPE /CADAXO/SQLC_GENERAL_FLAG OPTIONAL
+        !iv_move_target    TYPE /CADAXO/SQLC_GENERAL_FLAG OPTIONAL
       RETURNING
         VALUE(ev_linktype) TYPE int2
       RAISING
