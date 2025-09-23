@@ -1008,7 +1008,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>166</MSGNR>
-     <TEXT>Selected field does not contain JSON data</TEXT>
+     <TEXT>Input is not a correct JSON</TEXT>
     </T100>
    </T100>
    <LONGTEXTS>
@@ -3159,7 +3159,7 @@
     <item>
      <SPRSL>D</SPRSL>
      <MSGNR>166</MSGNR>
-     <TEXT>Das ausgewählte Feld enthält keine JSON-Daten</TEXT>
+     <TEXT>Eingabe ist kein korrektes JSON</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>

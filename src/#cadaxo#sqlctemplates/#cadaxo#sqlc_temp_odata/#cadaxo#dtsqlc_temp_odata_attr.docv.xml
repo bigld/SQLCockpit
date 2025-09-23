@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DOCV" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DOC>
+    <HEAD>
+     <TDOBJECT>DOKU</TDOBJECT>
+     <TDNAME>/CADAXO/SQLC_TEMP_ODATA_ATTR</TDNAME>
+     <TDID>DT</TDID>
+     <TDSPRAS>E</TDSPRAS>
+     <TDFORM>S_DOCU_SHOW</TDFORM>
+     <TDSTYLE>S_DOCUS1</TDSTYLE>
+     <TDVERSION>00001</TDVERSION>
+     <TDLINESIZE>072</TDLINESIZE>
+    </HEAD>
+    <LINES>
+     <TLINE>
+      <TDFORMAT>U1</TDFORMAT>
+      <TDLINE>SQL Cockpit - OData Template Wizard</TDLINE>
+     </TLINE>
+     <TLINE>
+      <TDFORMAT>*</TDFORMAT>
+      <TDLINE>Specify the OData attributes like &lt;ZH&gt; Project name, Package, Entity</TDLINE>
+     </TLINE>
+     <TLINE>
+      <TDLINE>&lt;/&gt;and &lt;ZH&gt; Entity set.&lt;/&gt;</TDLINE>
+     </TLINE>
+     <TLINE>
+      <TDFORMAT>*</TDFORMAT>
+      <TDLINE>To register the OData service fill check box &lt;ZH&gt;Register Service.&lt;/&gt;</TDLINE>
+     </TLINE>
+     <TLINE>
+      <TDFORMAT>*</TDFORMAT>
+      <TDLINE>OData system query options &lt;ZH&gt;($filter, $orderby, $top, $skip, $count)</TDLINE>
+     </TLINE>
+     <TLINE>
+      <TDLINE>&lt;/&gt; implementation can be generated for data provider class</TDLINE>
+     </TLINE>
+     <TLINE>
+      <TDLINE>&lt;Entity Set&gt;_GET_ENTITYSET method using the corresponding checkbox.</TDLINE>
+     </TLINE>
+    </LINES>
+   </DOC>
+  </asx:values>
+ </asx:abap>
+</abapGit>

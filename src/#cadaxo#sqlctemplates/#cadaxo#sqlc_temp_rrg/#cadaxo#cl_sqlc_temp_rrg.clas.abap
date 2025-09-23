@@ -45,7 +45,9 @@ CLASS /cadaxo/cl_sqlc_temp_rrg DEFINITION
     METHODS add_structure_to_transport
       IMPORTING
         !i_structure_name TYPE ddobjname .
-    METHODS create_structure .
+    METHODS create_structure
+              RAISING
+                /cadaxo/cx_sqlc_rrg_wiz .
     METHODS create_abap_class .
     METHODS generate_source_code
       EXPORTING
@@ -519,8 +521,20 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
             <ls_dd03p>-datatype = 'STRING'.
           WHEN 'XSTRING'.
             <ls_dd03p>-datatype = 'RAWSTRING'.
+          WHEN '8'.
+            <ls_dd03p>-datatype = 'INT8'.
+          WHEN 'b'.
+            <ls_dd03p>-datatype = 'INT1'.
+          WHEN 's'.
+            <ls_dd03p>-datatype = 'INT2'.
+          WHEN 'p'.
+            <ls_dd03p>-datatype = 'UTCL'.
+          WHEN OTHERS.
+            RAISE EXCEPTION TYPE /CADAXO/CX_SQLC_RRG_WIZ
+              EXPORTING
+                textid   = /cadaxo/cx_sqlc_rrg_wiz=>type_not_supported
+                datatype = CONV #( <ls_dd03p>-inttype ) .
 
-            "when others then exception
         ENDCASE.
 
         <ls_dd03p>-leng = <ls_dd03p>-outputlen.
@@ -651,6 +665,9 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
       CATCH /cadaxo/cx_sqlc_temp_rrg INTO DATA(lr_exception).
 
         MESSAGE lr_exception->get_text( ) TYPE 'S' DISPLAY LIKE 'E'.
+
+      CATCH /cadaxo/cx_sqlc_rrg_wiz INTO DATA(lr_wiz_exc).
+        MESSAGE lr_wiz_exc->get_text(  ) TYPE 'S' DISPLAY LIKE 'E'.
 
     ENDTRY.
 

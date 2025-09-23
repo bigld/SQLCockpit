@@ -52,7 +52,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
         no_table_selected .
     CLASS-METHODS blacklist_check_table
       IMPORTING
-        !i_table TYPE char30
+        !i_table TYPE /CADAXO/SQLC_CHAR30
       EXCEPTIONS
         table_access_forbidden .
     CLASS-METHODS get_parameter_value
@@ -73,7 +73,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
       EXPORTING
         !e_date_from         TYPE dats
         !e_time_from         TYPE tims
-        !e_success           TYPE char1 .
+        !e_success           TYPE /CADAXO/SQLC_CHAR1 .
     CLASS-METHODS sql_trace_off
       IMPORTING
         !i_sql_trace         TYPE /cadaxo/sqlcsqltrace DEFAULT 'X'
@@ -84,7 +84,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
     CLASS-METHODS get_global_symbol_value
       IMPORTING
         !i_symbol       TYPE /cadaxo/sqlcsymbol_name OPTIONAL
-        !i_field_type   TYPE char1 OPTIONAL
+        !i_field_type   TYPE /CADAXO/SQLC_CHAR1 OPTIONAL
       EXPORTING
         !e_symbol_value TYPE any
       RAISING
@@ -112,7 +112,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
       EXPORTING
         !e_symbol_multivalue TYPE string
         !e_symbol_value      TYPE string
-        !e_is_multi          TYPE flag
+        !e_is_multi          TYPE /CADAXO/SQLC_GENERAL_FLAG
       RAISING
         /cadaxo/cx_sqlc_symb_not_found .
     CLASS-METHODS condense
@@ -184,7 +184,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
         VALUE(r_active) TYPE /cadaxo/sqlcactive .
     CLASS-METHODS export_data
       IMPORTING
-        !i_export_type TYPE char5 DEFAULT 'CSV'
+        !i_export_type TYPE /CADAXO/SQLC_CHAR5 DEFAULT 'CSV'
         !it_fcat       TYPE lvc_t_fcat
         !it_data       TYPE ANY TABLE .
     CLASS-METHODS export_data_asxml
@@ -242,7 +242,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
         VALUE(iv_offset)  TYPE i DEFAULT 0
         !iv_literal_mark  TYPE c DEFAULT `'`
       RETURNING
-        VALUE(ev_is_open) TYPE flag .
+        VALUE(ev_is_open) TYPE /CADAXO/SQLC_GENERAL_FLAG .
     CLASS-METHODS create_data_reference
       IMPORTING
         !iv_inttype           TYPE inttype
@@ -272,10 +272,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
       CHANGING
         !ev_symbol_value          TYPE string
       RETURNING
-        VALUE(ev_apostrophe_char) TYPE char1 .
+        VALUE(ev_apostrophe_char) TYPE /CADAXO/SQLC_CHAR1 .
     CLASS-METHODS encloding_apostrophe_set
       IMPORTING
-        !iv_apostrophe_char TYPE char1
+        !iv_apostrophe_char TYPE /CADAXO/SQLC_CHAR1
       CHANGING
         !ev_symbol_value    TYPE string .
     CLASS-METHODS get_sql_cockpit_standard_users
@@ -298,7 +298,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
 
 *"* protected components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
 *"* do not include other source files here!!!
-    CLASS-DATA g_open TYPE char1 .
+    CLASS-DATA g_open TYPE /CADAXO/SQLC_CHAR1 .
     CLASS-DATA g_space_string TYPE string .
     CLASS-DATA gs_admin_cust TYPE /cadaxo/sqlc_admin_cust .
   PRIVATE SECTION.
@@ -496,9 +496,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
     DATA l_pos TYPE i.
     DATA l_type TYPE c.
-    DATA l_col_value_p TYPE char30.
-    DATA l_col_value_x TYPE char32.
-    DATA l_col_value_d TYPE c LENGTH 10.
+    DATA l_col_value_p TYPE /CADAXO/SQLC_CHAR30.
+    DATA l_col_value_x TYPE c LENGTH 32.
+    DATA l_col_value_d TYPE /CADAXO/SQLC_CHAR10.
     DATA l_col_value_string TYPE string.
     DATA l_double_enclosure(2) TYPE c.
     DATA l_col_enclosure(1)    TYPE c.
@@ -1129,7 +1129,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
     DATA l_pos_from           TYPE i.
     DATA l_pos_to             TYPE i.
-    DATA l_do_while           TYPE flag.
+    DATA l_do_while           TYPE /CADAXO/SQLC_GENERAL_FLAG.
     DATA lt_abap_code_tmp     TYPE /cadaxo/sqlcstring_t.
     DATA ls_abap_code         LIKE LINE OF ct_code.
     DATA l_space              TYPE string.
@@ -1432,9 +1432,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
     DATA: l_symbol_name TYPE /cadaxo/sqlcsymbol_name,
           ls_sqlcsymb   TYPE /cadaxo/sqlcsymb.
 
-    DATA: l_no_usersymbol TYPE flag.                                             "CDX001-0020
-    DATA: l_comma_s       TYPE char1.
-    DATA: l_comma_e       TYPE char1.
+    DATA: l_no_usersymbol TYPE /CADAXO/SQLC_GENERAL_FLAG.                                             "CDX001-0020
+    DATA: l_comma_s       TYPE /CADAXO/SQLC_CHAR1.
+    DATA: l_comma_e       TYPE /CADAXO/SQLC_CHAR1.
     DATA: l_length        TYPE i.
 
 
@@ -1800,8 +1800,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
     DATA: l_from_pos  TYPE i.
     DATA: l_to_line   TYPE i.
     DATA: l_to_pos    TYPE i.
-    DATA: l_string1   TYPE char256.
-    DATA: l_string2   TYPE char256.
+    DATA: l_string1   TYPE /CADAXO/SQLCTEXT255.
+    DATA: l_string2   TYPE /CADAXO/SQLCTEXT255.
     DATA: lt_code     TYPE /cadaxo/sqlccodeline_t.
     FIELD-SYMBOLS: <f_code> TYPE  /cadaxo/sqlccodeline.
     CONSTANTS: c_header TYPE c VALUE '*&%HEADER' LENGTH 9.
@@ -1977,7 +1977,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
     DATA l_length               TYPE i.
     DATA lt_symbols             TYPE TABLE OF /cadaxo/sqlcsymbol_name.
     DATA ls_sqlcsymb            TYPE /cadaxo/sqlcsymb.
-    DATA lv_is_multi            TYPE flag.   "COCKPIT-216
+    DATA lv_is_multi            TYPE /CADAXO/SQLC_GENERAL_FLAG.   "COCKPIT-216
 
     FIELD-SYMBOLS: <ls_result>  LIKE LINE OF lt_results,
                    <ls_symbols> LIKE LINE OF lt_symbols.
@@ -2091,7 +2091,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-    CONSTANTS c_apostrophe TYPE char1 VALUE ''''.
+    CONSTANTS c_apostrophe TYPE /CADAXO/SQLC_CHAR1 VALUE ''''.
 
     DATA l_len    TYPE i.
     DATA l_pos    TYPE i.
@@ -2607,7 +2607,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
           l_wp_no    TYPE wpinfo-wp_no,
           l_wp_pid   TYPE wpinfo-wp_pid,
           l_wp_index TYPE wpinfo-wp_index, "$002
-          l_proc_nr  TYPE char3.
+          l_proc_nr  TYPE /CADAXO/SQLC_CHAR3.
 
     CLEAR: e_success,
            e_date_from,
