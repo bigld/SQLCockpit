@@ -11,7 +11,7 @@ CLASS /cadaxo/cl_sqlc_functrace DEFINITION
   PRIVATE SECTION.
 
 
-    CONSTANTS c_2nd_connection TYPE char30 VALUE 'R/3*SAP_2TH_CONNECT_APPL_LOG' ##NO_TEXT.
+    CONSTANTS c_2nd_connection TYPE /CADAXO/SQLC_CHAR30 VALUE 'R/3*SAP_2TH_CONNECT_APPL_LOG' ##NO_TEXT.
 
     CLASS-DATA gr_trace TYPE REF TO /cadaxo/cl_sqlc_functrace.
     CLASS-METHODS _get_instance

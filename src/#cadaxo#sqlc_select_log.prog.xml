@@ -24,30 +24,30 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>SO_DATE</KEY>
+     <KEY>SEL_DATE</KEY>
      <ENTRY>.</ENTRY>
-     <LENGTH>20</LENGTH>
+     <LENGTH>22</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
     <item>
      <ID>S</ID>
-     <KEY>SO_RROWS</KEY>
+     <KEY>SEL_ROWS</KEY>
+     <ENTRY>.</ENTRY>
+     <LENGTH>19</LENGTH>
+     <SPLIT>D</SPLIT>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>SEL_RUNT</KEY>
+     <ENTRY>.</ENTRY>
+     <LENGTH>22</LENGTH>
+     <SPLIT>D</SPLIT>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>SEL_USER</KEY>
      <ENTRY>.</ENTRY>
      <LENGTH>9</LENGTH>
-     <SPLIT>D</SPLIT>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>SO_RUNT</KEY>
-     <ENTRY>.</ENTRY>
-     <LENGTH>9</LENGTH>
-     <SPLIT>D</SPLIT>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>SO_UNAME</KEY>
-     <ENTRY>.</ENTRY>
-     <LENGTH>17</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
    </TPOOL>

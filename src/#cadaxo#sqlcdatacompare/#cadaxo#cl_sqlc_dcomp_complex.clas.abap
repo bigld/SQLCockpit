@@ -1,20 +1,20 @@
 "! Cadaxo SQL Cockpit - Complex Data Compare
-class /CADAXO/CL_SQLC_DCOMP_COMPLEX definition
-  public
-  final
-  create public .
+CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  types:
-    BEGIN OF tys_table_details,
+    TYPES:
+      BEGIN OF tys_table_details,
         number          TYPE i,
         name            TYPE string,
         data            TYPE REF TO data,
         cdxdfies        TYPE /cadaxo/sqlcdfies_t,
         sort_tab        TYPE abap_sortorder_tab,
         link_fieldname  TYPE string,
-        compare_prefix  TYPE char2,
+        compare_prefix  TYPE /CADAXO/SQLC_CHAR2,
         components_view TYPE abap_component_view_tab,
         select_type     TYPE i,
         netplan_tab     TYPE REF TO if_aqqgraphic_table,
@@ -23,35 +23,35 @@ public section.
       END OF tys_table_details .
 
     "! Container for Custom Controls in the Screen Area
-  data GR_CONTAINER_MAPPING type ref to CL_GUI_CUSTOM_CONTAINER .
+    DATA gr_container_mapping TYPE REF TO cl_gui_custom_container .
     "! Container for Custom Controls in the Screen Area
-  data GR_CONTAINER_RESULTS type ref to CL_GUI_CUSTOM_CONTAINER .
+    DATA gr_container_results TYPE REF TO cl_gui_custom_container .
     "! Container for Custom Controls in the Screen Area
-  data GR_CONTAINER_LEGEND type ref to CL_GUI_CUSTOM_CONTAINER .
+    DATA gr_container_legend TYPE REF TO cl_gui_custom_container .
     "! Container for Custom Controls in the Screen Area
-  data GR_CONTAINER_INFO_0200 type ref to CL_GUI_CUSTOM_CONTAINER .
+    DATA gr_container_info_0200 TYPE REF TO cl_gui_custom_container .
     "! SAP TextEdit Control
-  data GR_TEXT_INFO_0200 type ref to CL_GUI_TEXTEDIT .
+    DATA gr_text_info_0200 TYPE REF TO cl_gui_textedit .
     "! Container for Custom Controls in the Screen Area
-  data GR_CONTAINER_INFO_0300 type ref to CL_GUI_CUSTOM_CONTAINER .
+    DATA gr_container_info_0300 TYPE REF TO cl_gui_custom_container .
     "! SAP TextEdit Control
-  data GR_TEXT_INFO_0300 type ref to CL_GUI_TEXTEDIT .
+    DATA gr_text_info_0300 TYPE REF TO cl_gui_textedit .
     "! ALV List Viewer
-  data GR_COMPARE_RESULTS_GRID type ref to CL_GUI_ALV_GRID .
+    DATA gr_compare_results_grid TYPE REF TO cl_gui_alv_grid .
     "! ALV List Viewer
-  data GR_LEGEND_GRID type ref to CL_GUI_ALV_GRID .
+    DATA gr_legend_grid TYPE REF TO cl_gui_alv_grid .
     "! General Network Control Methods
-  data GR_NETPLAN type ref to IF_GUI_AQQGRAPHIC .
-  data GV_KEYS_UNIQUE type BOOLEAN .
-  data GD_STAT_ONEMAPPING type ICONS-TEXT .
-  data GD_STAT_UNIQU_KEYMAPPING type ICONS-TEXT .
-  data GD_STAT_UNIQU_KEYMAPPING1 type ICONS-TEXT .
-  data GD_STAT_UNIQU_KEYMAPPING2 type ICONS-TEXT .
-  data:
-    BEGIN OF gds_rows_comp_state,
-        missing   TYPE c LENGTH 6,
-        different TYPE c LENGTH 6,
-        equal     TYPE c LENGTH 6,
+    DATA gr_netplan TYPE REF TO if_gui_aqqgraphic .
+    DATA gv_keys_unique TYPE boolean .
+    DATA gd_stat_onemapping TYPE icons-text .
+    DATA gd_stat_uniqu_keymapping TYPE icons-text .
+    DATA gd_stat_uniqu_keymapping1 TYPE icons-text .
+    DATA gd_stat_uniqu_keymapping2 TYPE icons-text .
+    DATA:
+      BEGIN OF gds_rows_comp_state,
+        missing             TYPE c LENGTH 6,
+        different           TYPE c LENGTH 6,
+        equal               TYPE c LENGTH 6,
         percent_equal       TYPE p LENGTH 6 DECIMALS 2,
         percent_different   TYPE p LENGTH 6 DECIMALS 2,
         percent_missing     TYPE p LENGTH 6 DECIMALS 2,
@@ -59,14 +59,14 @@ public section.
         percent_different_c TYPE c LENGTH 6,
         percent_missing_c   TYPE c LENGTH 6,
       END OF gds_rows_comp_state .
-  class-data:
-    BEGIN OF gs_rows_comp_state,
+    CLASS-DATA:
+      BEGIN OF gs_rows_comp_state,
         missing   TYPE i,
         different TYPE i,
         equal     TYPE i,
       END OF gs_rows_comp_state .
-  data GS_SOURCE type TYS_TABLE_DETAILS read-only .
-  data GS_TARGET type TYS_TABLE_DETAILS read-only .
+    DATA gs_source TYPE tys_table_details READ-ONLY .
+    DATA gs_target TYPE tys_table_details READ-ONLY .
 
     "! Constructor
     "!
@@ -74,455 +74,455 @@ public section.
     "! @parameter it_target_dfies   | SQL Cockpit - Table of /CADAXO/SQLCDFIES
     "! @parameter i_user_settings   | SQL Cockpit - Usersettings Dynpro
     "! @parameter it_result_details | SQL Cockpit - Table of /CADAXO/SQLCRESULT_DETAILS
-  methods CONSTRUCTOR
-    importing
-      !IT_SOURCE type STANDARD TABLE
-      !IT_TARGET type STANDARD TABLE
-      !I_SOURCE_NUMBER type I
-      !I_TARGET_NUMBER type I
-      !IT_SOURCE_DFIES type /CADAXO/SQLCDFIES_T
-      !IT_TARGET_DFIES type /CADAXO/SQLCDFIES_T
-      !I_SOURCE_NAME type STRING optional
-      !I_TARGET_NAME type STRING optional
-      !I_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN
-      !IT_RESULT_DETAILS type /CADAXO/SQLCRESULT_DETAILS_T
-      !IV_SOURCE_SELECT_TYPE type I default 0
-      !IV_TARGET_SELECT_TYPE type I default 0 .
+    METHODS constructor
+      IMPORTING
+        !it_source             TYPE STANDARD TABLE
+        !it_target             TYPE STANDARD TABLE
+        !i_source_number       TYPE i
+        !i_target_number       TYPE i
+        !it_source_dfies       TYPE /cadaxo/sqlcdfies_t
+        !it_target_dfies       TYPE /cadaxo/sqlcdfies_t
+        !i_source_name         TYPE string OPTIONAL
+        !i_target_name         TYPE string OPTIONAL
+        !i_user_settings       TYPE /cadaxo/sqlcusrp_dyn
+        !it_result_details     TYPE /cadaxo/sqlcresult_details_t
+        !iv_source_select_type TYPE i DEFAULT 0
+        !iv_target_select_type TYPE i DEFAULT 0 .
     "! PAI 0100
     "!
     "! @parameter i_ok_code | ABAP System Field: PAI-Triggering Function Code
-  methods PAI_0100
-    importing
-      !I_OK_CODE type SY-UCOMM .
+    METHODS pai_0100
+      IMPORTING
+        !i_ok_code TYPE sy-ucomm .
     "! PBO 0100
-  methods PBO_0100 .
+    METHODS pbo_0100 .
     "! PBO 0200
-  methods PBO_0200 .
+    METHODS pbo_0200 .
     "! do check
-  methods DO_CHECK .
+    METHODS do_check .
     "! PBO 0300
-  methods PBO_0300 .
+    METHODS pbo_0300 .
     "! free data
-  methods FREE .
+    METHODS free .
     "! free results
-  methods FREE_RESULTS .
-  methods DO_CHECK_HR .  "Cockpit-405
-protected section.
+    METHODS free_results .
+    METHODS do_check_hr .  "Cockpit-405
+  PROTECTED SECTION.
 
-  types:
-    BEGIN OF tys_mapping_allowed,
-             type_source TYPE dynptype,
-             type_target TYPE dynptype,
-           END OF tys_mapping_allowed .
-  types:
-    tyt_mapping_allowed TYPE SORTED TABLE OF tys_mapping_allowed WITH UNIQUE DEFAULT KEY .
-  types:
-    BEGIN OF tys_detail_difference,
-             idx       TYPE i,
-             row       TYPE i,
-             fieldname TYPE fieldname,
-           END OF tys_detail_difference .
-  types:
-    tyt_detail_difference TYPE STANDARD TABLE OF tys_detail_difference .
-  types:
-    BEGIN OF typ_map,
+    TYPES:
+      BEGIN OF tys_mapping_allowed,
+        type_source TYPE dynptype,
+        type_target TYPE dynptype,
+      END OF tys_mapping_allowed .
+    TYPES:
+      tyt_mapping_allowed TYPE SORTED TABLE OF tys_mapping_allowed WITH UNIQUE DEFAULT KEY .
+    TYPES:
+      BEGIN OF tys_detail_difference,
+        idx       TYPE i,
+        row       TYPE i,
+        fieldname TYPE fieldname,
+      END OF tys_detail_difference .
+    TYPES:
+      tyt_detail_difference TYPE STANDARD TABLE OF tys_detail_difference .
+    TYPES:
+      BEGIN OF typ_map,
         icon      TYPE icon_d,
         fieldname TYPE c LENGTH 30,
         fieldtext TYPE c LENGTH 60,
         data_type TYPE c LENGTH 20,
       END OF typ_map .
-  types:
-    typ_map_tab TYPE STANDARD TABLE OF typ_map WITH DEFAULT KEY .
-  types:
-    BEGIN OF tys_meta_data,
-             datatype TYPE dynptype,
-             length   TYPE outputlen,
-             decimals TYPE decimals,
-             is_key   TYPE boolean,
-           END OF tys_meta_data .
-  types:
-    BEGIN OF  typ_link,
+    TYPES:
+      typ_map_tab TYPE STANDARD TABLE OF typ_map WITH DEFAULT KEY .
+    TYPES:
+      BEGIN OF tys_meta_data,
+        datatype TYPE dynptype,
+        length   TYPE outputlen,
+        decimals TYPE decimals,
+        is_key   TYPE boolean,
+      END OF tys_meta_data .
+    TYPES:
+      BEGIN OF  typ_link,
         source TYPE int2,
         target TYPE int2,
         type   TYPE int2,
         link   TYPE REF TO if_aqqgraphic_link,
       END OF typ_link .
-  types:
-    BEGIN OF tys_progress_indi,
-             lines_compare       TYPE char10,
-             percentage_previous TYPE i,
-             current_line        TYPE char10,
-           END OF tys_progress_indi .
-  types:
-    typ_link_tab TYPE STANDARD TABLE OF typ_link WITH DEFAULT KEY .
-  types:
-    BEGIN OF typ_sort_components,
-             fieldname_1  TYPE fieldname,
-             fieldname_2  TYPE fieldname,
-             fieldname_3  TYPE fieldname,
-             fieldname_4  TYPE fieldname,
-             fieldname_5  TYPE fieldname,
-             fieldname_6  TYPE fieldname,
-             fieldname_7  TYPE fieldname,
-             fieldname_8  TYPE fieldname,
-             fieldname_9  TYPE fieldname,
-             fieldname_10 TYPE fieldname,
-             fieldname_11 TYPE fieldname,
-             fieldname_12 TYPE fieldname,
-             fieldname_13 TYPE fieldname,
-             fieldname_14 TYPE fieldname,
-             fieldname_15 TYPE fieldname,
-             fieldname_16 TYPE fieldname,
-             fieldname_17 TYPE fieldname,
-             fieldname_18 TYPE fieldname,
-             fieldname_19 TYPE fieldname,
-             fieldname_20 TYPE fieldname,
-           END OF typ_sort_components .
+    TYPES:
+      BEGIN OF tys_progress_indi,
+        lines_compare       TYPE /CADAXO/SQLC_CHAR10,
+        percentage_previous TYPE i,
+        current_line        TYPE /CADAXO/SQLC_CHAR10,
+      END OF tys_progress_indi .
+    TYPES:
+      typ_link_tab TYPE STANDARD TABLE OF typ_link WITH DEFAULT KEY .
+    TYPES:
+      BEGIN OF typ_sort_components,
+        fieldname_1  TYPE fieldname,
+        fieldname_2  TYPE fieldname,
+        fieldname_3  TYPE fieldname,
+        fieldname_4  TYPE fieldname,
+        fieldname_5  TYPE fieldname,
+        fieldname_6  TYPE fieldname,
+        fieldname_7  TYPE fieldname,
+        fieldname_8  TYPE fieldname,
+        fieldname_9  TYPE fieldname,
+        fieldname_10 TYPE fieldname,
+        fieldname_11 TYPE fieldname,
+        fieldname_12 TYPE fieldname,
+        fieldname_13 TYPE fieldname,
+        fieldname_14 TYPE fieldname,
+        fieldname_15 TYPE fieldname,
+        fieldname_16 TYPE fieldname,
+        fieldname_17 TYPE fieldname,
+        fieldname_18 TYPE fieldname,
+        fieldname_19 TYPE fieldname,
+        fieldname_20 TYPE fieldname,
+      END OF typ_sort_components .
 
-  constants C_LINKTYPE_FIELD type INT2 value 0 ##NO_TEXT.
-  constants C_LINKTYPE_KEY type INT2 value 1 ##NO_TEXT.
-  class-data GT_MAPPING_ALLOWED type TYT_MAPPING_ALLOWED .
+    CONSTANTS c_linktype_field TYPE int2 VALUE 0 ##NO_TEXT.
+    CONSTANTS c_linktype_key TYPE int2 VALUE 1 ##NO_TEXT.
+    CLASS-DATA gt_mapping_allowed TYPE tyt_mapping_allowed .
     "! SQL Cockpit - Usersettings Dynpro
-  data G_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN .
+    DATA g_user_settings TYPE /cadaxo/sqlcusrp_dyn .
     "! SQL Cockpit - Table of /CADAXO/SQLCRESULT_DETAILS
-  data GT_RESULT_DETAILS type /CADAXO/SQLCRESULT_DETAILS_T .
-  data GT_LINK type TYP_LINK_TAB .
-  data GV_SHOW_GREEN type BOOLEAN .
-  data GV_SHOW_YELLOW type BOOLEAN .
-  data GV_SHOW_ALL_COLUMNS type BOOLEAN .
-  data GT_DETAILED_DIFFERENCE type TYT_DETAIL_DIFFERENCE .
-  data GV_DIFFERENCE_INDEX type I .
+    DATA gt_result_details TYPE /cadaxo/sqlcresult_details_t .
+    DATA gt_link TYPE typ_link_tab .
+    DATA gv_show_green TYPE boolean .
+    DATA gv_show_yellow TYPE boolean .
+    DATA gv_show_all_columns TYPE boolean .
+    DATA gt_detailed_difference TYPE tyt_detail_difference .
+    DATA gv_difference_index TYPE i .
 *    DATA gr_datacontainer_pie TYPE REF TO /cdaxo/cl_sqlc_dcomp_complpie .
-  data GT_COMPONENTS_COMPARE type ABAP_COMPONENT_TAB .
-  data GRT_COMPARE_RESULT type ref to DATA .
-  data GRS_COMPARE_RESULT type ref to DATA .
-  data GV_ICON_RED type ICONS-TEXT .
-  data GV_ICON_GREEN type ICONS-TEXT .
-  data GT_RESULT_FCAT type LVC_T_FCAT .
-  data GT_EXCLUDING_ALV type UI_FUNCTIONS .
-  data GV_SHOW_RED type BOOLEAN .
-  data GV_KEY_NAME01 type STRING .
-  data GV_KEY_NAME02 type STRING .
-  data GV_KEY_NAME03 type STRING .
-  data GV_KEY_NAME04 type STRING .
-  data GV_KEY_NAME05 type STRING .
-  data GV_KEY_NAME06 type STRING .
-  data GV_KEY_NAME07 type STRING .
-  data GV_KEY_NAME08 type STRING .
-  data GV_KEY_NAME09 type STRING .
-  data GV_KEY_NAME10 type STRING .
-  data GV_KEY_NAME11 type STRING .
-  data GV_KEY_NAME12 type STRING .
-  data GV_KEY_NAME13 type STRING .
-  data GV_KEY_NAME14 type STRING .
-  data GV_KEY_NAME15 type STRING .
-  data GV_KEY_NAME16 type STRING .
-  data GV_KEY_NAME17 type STRING .
-  data GV_KEY_NAME18 type STRING .
-  data GV_KEY_NAME19 type STRING .
-  data GV_KEY_NAME20 type STRING .
-  data GV_KEY_VALUE01 type ref to DATA .
-  data GV_KEY_VALUE02 type ref to DATA .
-  data GV_KEY_VALUE03 type ref to DATA .
-  data GV_KEY_VALUE04 type ref to DATA .
-  data GV_KEY_VALUE05 type ref to DATA .
-  data GV_KEY_VALUE06 type ref to DATA .
-  data GV_KEY_VALUE07 type ref to DATA .
-  data GV_KEY_VALUE08 type ref to DATA .
-  data GV_KEY_VALUE09 type ref to DATA .
-  data GV_KEY_VALUE10 type ref to DATA .
-  data GV_KEY_VALUE11 type ref to DATA .
-  data GV_KEY_VALUE12 type ref to DATA .
-  data GV_KEY_VALUE13 type ref to DATA .
-  data GV_KEY_VALUE14 type ref to DATA .
-  data GV_KEY_VALUE15 type ref to DATA .
-  data GV_KEY_VALUE16 type ref to DATA .
-  data GV_KEY_VALUE17 type ref to DATA .
-  data GV_KEY_VALUE18 type ref to DATA .
-  data GV_KEY_VALUE19 type ref to DATA .
-  data GV_KEY_VALUE20 type ref to DATA .
-  data GV_ROW_BASED type ABAP_BOOL . "Cockpit-405
+    DATA gt_components_compare TYPE abap_component_tab .
+    DATA grt_compare_result TYPE REF TO data .
+    DATA grs_compare_result TYPE REF TO data .
+    DATA gv_icon_red TYPE icons-text .
+    DATA gv_icon_green TYPE icons-text .
+    DATA gt_result_fcat TYPE lvc_t_fcat .
+    DATA gt_excluding_alv TYPE ui_functions .
+    DATA gv_show_red TYPE boolean .
+    DATA gv_key_name01 TYPE string .
+    DATA gv_key_name02 TYPE string .
+    DATA gv_key_name03 TYPE string .
+    DATA gv_key_name04 TYPE string .
+    DATA gv_key_name05 TYPE string .
+    DATA gv_key_name06 TYPE string .
+    DATA gv_key_name07 TYPE string .
+    DATA gv_key_name08 TYPE string .
+    DATA gv_key_name09 TYPE string .
+    DATA gv_key_name10 TYPE string .
+    DATA gv_key_name11 TYPE string .
+    DATA gv_key_name12 TYPE string .
+    DATA gv_key_name13 TYPE string .
+    DATA gv_key_name14 TYPE string .
+    DATA gv_key_name15 TYPE string .
+    DATA gv_key_name16 TYPE string .
+    DATA gv_key_name17 TYPE string .
+    DATA gv_key_name18 TYPE string .
+    DATA gv_key_name19 TYPE string .
+    DATA gv_key_name20 TYPE string .
+    DATA gv_key_value01 TYPE REF TO data .
+    DATA gv_key_value02 TYPE REF TO data .
+    DATA gv_key_value03 TYPE REF TO data .
+    DATA gv_key_value04 TYPE REF TO data .
+    DATA gv_key_value05 TYPE REF TO data .
+    DATA gv_key_value06 TYPE REF TO data .
+    DATA gv_key_value07 TYPE REF TO data .
+    DATA gv_key_value08 TYPE REF TO data .
+    DATA gv_key_value09 TYPE REF TO data .
+    DATA gv_key_value10 TYPE REF TO data .
+    DATA gv_key_value11 TYPE REF TO data .
+    DATA gv_key_value12 TYPE REF TO data .
+    DATA gv_key_value13 TYPE REF TO data .
+    DATA gv_key_value14 TYPE REF TO data .
+    DATA gv_key_value15 TYPE REF TO data .
+    DATA gv_key_value16 TYPE REF TO data .
+    DATA gv_key_value17 TYPE REF TO data .
+    DATA gv_key_value18 TYPE REF TO data .
+    DATA gv_key_value19 TYPE REF TO data .
+    DATA gv_key_value20 TYPE REF TO data .
+    DATA gv_row_based TYPE abap_bool . "Cockpit-405
 
-  methods FREE_NETPLAN .
+    METHODS free_netplan .
     "! context menu request
-  methods ON_HANDLE_CTXMNUREQ
-    for event CTXMNUREQUEST of IF_GUI_AQQGRAPHIC
-    importing
-      !R_TABLE
-      !ROWINDEX
-      !R_LINK
-      !BACKGROUND
-      !R_CTXMNU .
+    METHODS on_handle_ctxmnureq
+      FOR EVENT ctxmnurequest OF if_gui_aqqgraphic
+      IMPORTING
+        !r_table
+        !rowindex
+        !r_link
+        !background
+        !r_ctxmnu .
     "! context menue select
-  methods ON_HANDLE_CTXMNUSEL
-    for event CTXMNUFCODESEL of IF_GUI_AQQGRAPHIC
-    importing
-      !R_TABLE
-      !ROWINDEX
-      !R_LINK
-      !BACKGROUND
-      !FCODE .
+    METHODS on_handle_ctxmnusel
+      FOR EVENT ctxmnufcodesel OF if_gui_aqqgraphic
+      IMPORTING
+        !r_table
+        !rowindex
+        !r_link
+        !background
+        !fcode .
     "! new link created
-  methods ON_HANDLE_LINK_CREATED
-    for event LINK_CREATED of IF_GUI_AQQGRAPHIC
-    importing
-      !R_NEWLINK
-      !R_SUCCTAB
-      !SUCC_ROW
-      !R_PREDTAB
-      !PRED_ROW
-      !R_DOIT .
+    METHODS on_handle_link_created
+      FOR EVENT link_created OF if_gui_aqqgraphic
+      IMPORTING
+        !r_newlink
+        !r_succtab
+        !succ_row
+        !r_predtab
+        !pred_row
+        !r_doit .
     "! left button double click
     "! @parameter !r_link |
     "! @parameter !r_table |
     "! @parameter !row |
-  methods ON_HANDLE_DOUBLE_CLICK
-    for event OBJECT_DOUBLE_CLICK of IF_GUI_AQQGRAPHIC
-    importing
-      !R_LINK
-      !R_TABLE
-      !ROW .
+    METHODS on_handle_double_click
+      FOR EVENT object_double_click OF if_gui_aqqgraphic
+      IMPORTING
+        !r_link
+        !r_table
+        !row .
     "! result toolbar
-  methods ON_HANDLE_RESULT_TOOLBAR
-    for event TOOLBAR of CL_GUI_ALV_GRID
-    importing
-      !E_OBJECT
-      !E_INTERACTIVE .
+    METHODS on_handle_result_toolbar
+      FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+        !e_object
+        !e_interactive .
     "! result user command
-  methods ON_HANDLE_RESULT_USER_COMMAND
-    for event USER_COMMAND of CL_GUI_ALV_GRID
-    importing
-      !E_UCOMM .
-  methods SET_NETPLAN_TABLE
-    changing
-      !IS_TABLE_DETAILS type TYS_TABLE_DETAILS .
+    METHODS on_handle_result_user_command
+      FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+        !e_ucomm .
+    METHODS set_netplan_table
+      CHANGING
+        !is_table_details TYPE tys_table_details .
     "! build mapping table
     "!
     "! @parameter it_dfies | SQL Cockpit - Table of /CADAXO/SQLCDFIES
-  methods BUILD_MAPPING_TABLE
-    importing
-      !IT_DFIES type /CADAXO/SQLCDFIES_T
-      !IV_SELECT_TYPE type I default 0
-    returning
-      value(RT_TAB) type TYP_MAP_TAB .
+    METHODS build_mapping_table
+      IMPORTING
+        !it_dfies       TYPE /cadaxo/sqlcdfies_t
+        !iv_select_type TYPE i DEFAULT 0
+      RETURNING
+        VALUE(rt_tab)   TYPE typ_map_tab .
     "! set netplan tab
     "!
     "! @parameter is_pos  | Position of an Object in Network
     "! @parameter i_title | Object Heading in Network
     "! @parameter ir_tab  | Network Table Object
-  methods SET_NETPLAN_TAB
-    importing
-      !IS_POS type AQQ_S_POS
-      !I_TITLE type AQQ_TITLE
-      !IR_TAB type ref to IF_AQQGRAPHIC_TABLE .
-  methods LINK_DELETE
-    importing
-      !IR_LINK type ref to IF_AQQGRAPHIC_LINK .
-  methods LINK_KEY_SET
-    importing
-      !IR_LINK type ref to IF_AQQGRAPHIC_LINK .
-  methods LINK_KEY_REMOVE
-    importing
-      !IR_LINK type ref to IF_AQQGRAPHIC_LINK .
-  methods LINK_CREATE
-    importing
-      !IV_PREDROW type INT2
-      !IV_SUCCROW type INT2
-      !IV_TEXT type AQQ_TEXT default ''
-      !IV_TOOLTIP type AQTOOLTIP default ''
-      !IV_ICON type ICON_L4 default ''
-      !IV_LINKSTYLE type AQQ_STYLE default '10004'
-      !IV_TYPE type INT2
-      !IR_LINK type ref to IF_AQQGRAPHIC_LINK optional .
+    METHODS set_netplan_tab
+      IMPORTING
+        !is_pos  TYPE aqq_s_pos
+        !i_title TYPE aqq_title
+        !ir_tab  TYPE REF TO if_aqqgraphic_table .
+    METHODS link_delete
+      IMPORTING
+        !ir_link TYPE REF TO if_aqqgraphic_link .
+    METHODS link_key_set
+      IMPORTING
+        !ir_link TYPE REF TO if_aqqgraphic_link .
+    METHODS link_key_remove
+      IMPORTING
+        !ir_link TYPE REF TO if_aqqgraphic_link .
+    METHODS link_create
+      IMPORTING
+        !iv_predrow   TYPE int2
+        !iv_succrow   TYPE int2
+        !iv_text      TYPE aqq_text DEFAULT ''
+        !iv_tooltip   TYPE aqtooltip DEFAULT ''
+        !iv_icon      TYPE icon_l4 DEFAULT ''
+        !iv_linkstyle TYPE aqq_style DEFAULT '10004'
+        !iv_type      TYPE int2
+        !ir_link      TYPE REF TO if_aqqgraphic_link OPTIONAL .
     "! check keys
-  methods CHECK_KEYS .
+    METHODS check_keys .
     "! clear
-  methods CLEAR .
+    METHODS clear .
     "! set initial status icons
-  methods SET_INITIAL_STATUS_ICONS .
+    METHODS set_initial_status_icons .
     "! set link status icons
-  methods SET_LINK_STATUS_ICONS .
-  methods CHECK_KEYS_TABLE
-    changing
-      !IS_TABLE_DETAILS type TYS_TABLE_DETAILS
-    returning
-      value(EV_UNIQUE) type FLAG .
-  methods SET_COLUMN_COLOR
-    importing
-      !IV_FIELDNAME type STRING
-      !IV_COL type INT4
-      !IV_INT type INT4 default 0
-    changing
-      !CT_LVC_T_COL type LVC_T_SCOL .
+    METHODS set_link_status_icons .
+    METHODS check_keys_table
+      CHANGING
+        !is_table_details TYPE tys_table_details
+      RETURNING
+        VALUE(ev_unique)  TYPE /CADAXO/SQLC_GENERAL_FLAG .
+    METHODS set_column_color
+      IMPORTING
+        !iv_fieldname TYPE string
+        !iv_col       TYPE int4
+        !iv_int       TYPE int4 DEFAULT 0
+      CHANGING
+        !ct_lvc_t_col TYPE lvc_t_scol .
     "! refresh filter
     "!
     "! @parameter i_refresh_alv | Boolean Variable (X=True, -=False, Space=Unknown)
-  methods UPDATE_FILTER
-    importing
-      !I_REFRESH_ALV type BOOLEAN .
-  methods TOGGLE_SHOW_ALL_COLUMNS .
+    METHODS update_filter
+      IMPORTING
+        !i_refresh_alv TYPE boolean .
+    METHODS toggle_show_all_columns .
     "! update status
-  methods UPDATE_STATUS
-    importing
-      !IV_ROW_STATUS type I
-    changing
-      !EC_LIGHT_FIELD type CHAR1 .
+    METHODS update_status
+      IMPORTING
+        !iv_row_status  TYPE i
+      CHANGING
+        !ec_light_field TYPE /CADAXO/SQLC_CHAR1 .
     "! prepare dfies
     "!
     "! @parameter it_dfies | SQL Cockpit - Table of /CADAXO/SQLCDFIES
     "! @parameter rt_dfies | SQL Cockpit - Table of /CADAXO/SQLCDFIES
-  methods PREPARE_DFIES
-    importing
-      !IT_DFIES type /CADAXO/SQLCDFIES_T
-    returning
-      value(RT_DFIES) type /CADAXO/SQLCDFIES_T .
-  methods BUILD_SORT_TABLE
-    changing
-      !CS_TABLE_DETAILS type TYS_TABLE_DETAILS
-      !CT_SORT_COMPONENTS type TYP_SORT_COMPONENTS optional .
+    METHODS prepare_dfies
+      IMPORTING
+        !it_dfies       TYPE /cadaxo/sqlcdfies_t
+      RETURNING
+        VALUE(rt_dfies) TYPE /cadaxo/sqlcdfies_t .
+    METHODS build_sort_table
+      CHANGING
+        !cs_table_details   TYPE tys_table_details
+        !ct_sort_components TYPE typ_sort_components OPTIONAL .
     "! create result table
-  methods CREATE_RESULT_TABLES .
+    METHODS create_result_tables .
     "! breakup components
-  methods BREAKUP_COMPONENTS
-    importing
-      !IT_COMPONENTS type ABAP_COMPONENT_VIEW_TAB
-    returning
-      value(RT_COMPONENTS) type ABAP_COMPONENT_VIEW_TAB .
+    METHODS breakup_components
+      IMPORTING
+        !it_components       TYPE abap_component_view_tab
+      RETURNING
+        VALUE(rt_components) TYPE abap_component_view_tab .
     "! sort original data
-  methods SORT_ORIGINAL_DATA .
+    METHODS sort_original_data .
     "! create compare result table
-  methods CREATE_COMPARE_RESULT_TABLE .
+    METHODS create_compare_result_table .
     "! get fieldname
     "!
     "! @parameter is_dfies_cadaxo | SQL Cockpit - Dictionary Field Information
-  methods GET_FIELDNAME
-    importing
-      !IS_DFIES_CADAXO type /CADAXO/SQLCDFIES
-      !IV_SELECT_TYPE type I default 0
-    returning
-      value(RV_FIELDNAME) type STRING .
-  methods DYNAMIC_KEY_ATTRIBUTES_CREATE
-    importing
-      !IS_TABLINE type ANY .
+    METHODS get_fieldname
+      IMPORTING
+        !is_dfies_cadaxo    TYPE /cadaxo/sqlcdfies
+        !iv_select_type     TYPE i DEFAULT 0
+      RETURNING
+        VALUE(rv_fieldname) TYPE string .
+    METHODS dynamic_key_attributes_create
+      IMPORTING
+        !is_tabline TYPE any .
     "! get field meta
     "!
     "! @parameter is_dfies | DD Interface: Table Fields for DDIF_FIELDINFO_GET
-  methods GET_FIELD_META
-    importing
-      !IS_DFIES type DFIES
-    exporting
-      !ES_META_DATA type TYS_META_DATA .
+    METHODS get_field_meta
+      IMPORTING
+        !is_dfies     TYPE dfies
+      EXPORTING
+        !es_meta_data TYPE tys_meta_data .
     "! link pred changed
-  methods ON_HANDLE_LINK_PRED_CHANGED
-    for event LINK_PRED_CHANGED of IF_GUI_AQQGRAPHIC
-    importing
-      !R_LINK
-      !R_PREDTAB
-      !PREDROW
-      !R_DOIT .
-  methods LINK_MOVE_ALLOWED
-    importing
-      !I_SOURCE type I
-      !I_TARGET type I
-    returning
-      value(R_ALLOWED) type BOOLEAN .
-  methods BUILD_RESULT_FCAT_LINE
-    importing
-      !IV_INDEX type INT2
-      !IS_TABLE_DETAILS type TYS_TABLE_DETAILS
-    returning
-      value(ES_FCAT) type LVC_S_FCAT  ##NO_TEXT.
+    METHODS on_handle_link_pred_changed
+      FOR EVENT link_pred_changed OF if_gui_aqqgraphic
+      IMPORTING
+        !r_link
+        !r_predtab
+        !predrow
+        !r_doit .
+    METHODS link_move_allowed
+      IMPORTING
+        !i_source        TYPE i
+        !i_target        TYPE i
+      RETURNING
+        VALUE(r_allowed) TYPE boolean .
+    METHODS build_result_fcat_line
+      IMPORTING
+        !iv_index         TYPE int2
+        !is_table_details TYPE tys_table_details
+      RETURNING
+        VALUE(es_fcat)    TYPE lvc_s_fcat  ##NO_TEXT.
     "! link succ changed
-  methods ON_HANDLE_LINK_SUCC_CHANGED
-    for event LINK_SUCC_CHANGED of IF_GUI_AQQGRAPHIC
-    importing
-      !R_LINK
-      !R_SUCCTAB
-      !SUCCROW
-      !R_DOIT .
-  methods CHECK_FIELD_MAPPING_TYPES
-    importing
-      !IV_DATATYPE_SOURCE type DYNPTYPE
-      !IV_LENGTH_SOURCE type OUTPUTLEN
-      !IV_DECIMALS_SOURCE type DECIMALS
-      !IV_DATATYPE_TARGET type DYNPTYPE
-      !IV_LENGTH_TARGET type OUTPUTLEN
-      !IV_DECIMALS_TARGET type DECIMALS
-    raising
-      /CADAXO/CX_SQLC_DCOMP_FIELDMAP .
-  methods FIELDMAPPING_DELETE .
-  methods FIELDMAPPING_SET
-    importing
-      !IV_KIND type CHAR1 .
-  methods LEGENT_BUILD_LINE
-    importing
-      !IS_TABLE_DETAILS type TYS_TABLE_DETAILS
-      !IV_COL type INT4
-      !IV_INT type INT4 default 0
-    returning
-      value(ES_LEGEND) type /CADAXO/SQLCDATACOMPLEGEND_ALV .
-  methods DYNAMIC_KEY_ATTRIBUTES_CLEAR .
-  methods GET_FIELD_VALUE
-    importing
-      !IS_TABLE_DETAILS type TYS_TABLE_DETAILS
-      !IV_INDEX type INT2
-      !IS_LINE type ANY
-    exporting
-      !EV_VALUE type ref to DATA
-      !EV_FIELDNAME type STRING
-      !EV_FIELDNAME_DB type STRING .
-  methods COMPARE_COLUMN_NAME_DIFF
-    importing
-      !IV_FIELDNAME type STRING
-      !IV_LINE_INDEX type I .
-  methods COMPARE_SET_COL_COLOR_DIFF
-    importing
-      !IV_FIELDNAME_SOURCE type STRING
-      !IV_FIELDNAME_TARGET type STRING
-      !IV_LINE_INDEX type I
-    changing
-      !CT_LVC_COL type LVC_T_SCOL .
-  methods COMPARE_SET_COL_COLOR_EQUAL
-    importing
-      !IV_FIELDNAME_SOURCE type STRING
-      !IV_FIELDNAME_TARGET type STRING
-    changing
-      !CT_LVC_COL type LVC_T_SCOL .
-  methods COMPARE_SET_COL_COLOR_KEY
-    importing
-      !IV_FIELDNAME_SOURCE type STRING optional
-      !IV_FIELDNAME_TARGET type STRING optional
-    changing
-      !CT_LVC_COL type LVC_T_SCOL .
-  methods COMPARE_SET_COL_COLOR_MISSING
-    importing
-      !IV_FIELDNAME type STRING
-      !IV_LINK_TYPE type INT2
-      !IS_TABLE_DETAILS type TYS_TABLE_DETAILS
-    changing
-      !CT_LVC_COL type LVC_T_SCOL .
-  methods COMPARE_SET_LINE_MISSING
-    importing
-      !IS_TABLE_DETAILS type TYS_TABLE_DETAILS
-      !IS_LINE type ANY
-    changing
-      !IS_COMPARE_LINE type ANY .
-  methods TOGGLE_BUTTON
-    changing
-      !IC_BUTTON_FLAG type BOOLEAN .
-  methods NAVIGATE_DIFFERENCE
-    importing
-      !IV_KIND type INT2
-    raising
-      /CADAXO/CX_SQLC_DCOMP_COMPLEX .
-  methods GET_CUSROR_FIELD
-    importing
-      !IT_FCAT type LVC_T_FCAT
-      !IS_COLUMN_ID type LVC_S_COL
-      !IV_DEFAULT_FIELD_POS type I
-      !IV_MARK_TARGET type FLAG default ABAP_TRUE
-    returning
-      value(RV_CURSOR_FIELD_POS) type I .
+    METHODS on_handle_link_succ_changed
+      FOR EVENT link_succ_changed OF if_gui_aqqgraphic
+      IMPORTING
+        !r_link
+        !r_succtab
+        !succrow
+        !r_doit .
+    METHODS check_field_mapping_types
+      IMPORTING
+        !iv_datatype_source TYPE dynptype
+        !iv_length_source   TYPE outputlen
+        !iv_decimals_source TYPE decimals
+        !iv_datatype_target TYPE dynptype
+        !iv_length_target   TYPE outputlen
+        !iv_decimals_target TYPE decimals
+      RAISING
+        /cadaxo/cx_sqlc_dcomp_fieldmap .
+    METHODS fieldmapping_delete .
+    METHODS fieldmapping_set
+      IMPORTING
+        !iv_kind TYPE /CADAXO/SQLC_CHAR1 .
+    METHODS legent_build_line
+      IMPORTING
+        !is_table_details TYPE tys_table_details
+        !iv_col           TYPE int4
+        !iv_int           TYPE int4 DEFAULT 0
+      RETURNING
+        VALUE(es_legend)  TYPE /cadaxo/sqlcdatacomplegend_alv .
+    METHODS dynamic_key_attributes_clear .
+    METHODS get_field_value
+      IMPORTING
+        !is_table_details TYPE tys_table_details
+        !iv_index         TYPE int2
+        !is_line          TYPE any
+      EXPORTING
+        !ev_value         TYPE REF TO data
+        !ev_fieldname     TYPE string
+        !ev_fieldname_db  TYPE string .
+    METHODS compare_column_name_diff
+      IMPORTING
+        !iv_fieldname  TYPE string
+        !iv_line_index TYPE i .
+    METHODS compare_set_col_color_diff
+      IMPORTING
+        !iv_fieldname_source TYPE string
+        !iv_fieldname_target TYPE string
+        !iv_line_index       TYPE i
+      CHANGING
+        !ct_lvc_col          TYPE lvc_t_scol .
+    METHODS compare_set_col_color_equal
+      IMPORTING
+        !iv_fieldname_source TYPE string
+        !iv_fieldname_target TYPE string
+      CHANGING
+        !ct_lvc_col          TYPE lvc_t_scol .
+    METHODS compare_set_col_color_key
+      IMPORTING
+        !iv_fieldname_source TYPE string OPTIONAL
+        !iv_fieldname_target TYPE string OPTIONAL
+      CHANGING
+        !ct_lvc_col          TYPE lvc_t_scol .
+    METHODS compare_set_col_color_missing
+      IMPORTING
+        !iv_fieldname     TYPE string
+        !iv_link_type     TYPE int2
+        !is_table_details TYPE tys_table_details
+      CHANGING
+        !ct_lvc_col       TYPE lvc_t_scol .
+    METHODS compare_set_line_missing
+      IMPORTING
+        !is_table_details TYPE tys_table_details
+        !is_line          TYPE any
+      CHANGING
+        !is_compare_line  TYPE any .
+    METHODS toggle_button
+      CHANGING
+        !ic_button_flag TYPE boolean .
+    METHODS navigate_difference
+      IMPORTING
+        !iv_kind TYPE int2
+      RAISING
+        /cadaxo/cx_sqlc_dcomp_complex .
+    METHODS get_cusror_field
+      IMPORTING
+        !it_fcat                   TYPE lvc_t_fcat
+        !is_column_id              TYPE lvc_s_col
+        !iv_default_field_pos      TYPE i
+        !iv_mark_target            TYPE /CADAXO/SQLC_GENERAL_FLAG DEFAULT abap_true
+      RETURNING
+        VALUE(rv_cursor_field_pos) TYPE i .
     "! navigate to previous difference
     "!
     "! @parameter iv_cursor_field_pos | actual position in result fcat
@@ -530,99 +530,99 @@ protected section.
     "! @parameter is_row_id | rowid
     "! @parameter ev_focus_field | new focus field
     "! @parameter ev_focus_row | new rowid
-  methods NAVIGATE_DIFFERENCE_NEXT
-    importing
-      !IV_CURSOR_FIELD_POS type I
-      !IT_FCAT type LVC_T_FCAT
-      !IS_ROW_ID type LVC_S_ROW
-    exporting
-      !EV_FOCUS_FIELD type LVC_S_FCAT-FIELDNAME
-      !EV_FOCUS_ROW type LVC_S_ROW-INDEX .
+    METHODS navigate_difference_next
+      IMPORTING
+        !iv_cursor_field_pos TYPE i
+        !it_fcat             TYPE lvc_t_fcat
+        !is_row_id           TYPE lvc_s_row
+      EXPORTING
+        !ev_focus_field      TYPE lvc_s_fcat-fieldname
+        !ev_focus_row        TYPE lvc_s_row-index .
     "! navigate to previous difference
-  methods NAVIGATE_DIFFERENCE_PREVIOUS
-    importing
-      !IV_CURSOR_FIELD_POS type I
-      !IT_FCAT type LVC_T_FCAT
-      !IS_ROW_ID type LVC_S_ROW
-    exporting
-      !EV_FOCUS_FIELD type LVC_S_FCAT-FIELDNAME
-      !EV_FOCUS_ROW type LVC_S_ROW-INDEX .
-  methods CREATE_RESULT_TABLE
-    changing
-      !IS_TABLE_DETAILS type TYS_TABLE_DETAILS .
-  methods SET_DIFFERENT_CELL
-    importing
-      !IV_FOCUS_FIELD type LVC_S_FCAT-FIELDNAME
-      !IV_FOCUS_ROW type LVC_S_ROW-INDEX
-    raising
-      /CADAXO/CX_SQLC_DCOMP_COMPLEX .
-  methods SWITCH_TO_HR .    "Cockpit-405
-  methods SWITCH_TO_VR .    "Cockpit-405
-  methods CREATE_COMPARE_RESULT_TABLE_HR . "Cockpit-405
-  methods COMPARE_SET_LINE_MISSING_HR "Cockpit-405
-    importing
-      !IS_LINE_S type ANY
-      !IS_LINE_T type ANY
-    changing
-      !CT_RESULT type STANDARD TABLE optional .
-  methods BUILD_RESULT_FCAT_LINE_HR "Cockpit-405
-    importing
-      !IV_INDEX_S type INT2
-      !IS_TABLE_DETAILS_S type TYS_TABLE_DETAILS
-      !IS_TABLE_DETAILS_T type TYS_TABLE_DETAILS
-      !IV_INDEX_T type INT2
-    returning
-      value(ES_FCAT) type LVC_S_FCAT .
-  methods UPDATE_STATUS_HR "Cockpit-405
-    importing
-      !IV_ROW_STATUS type I
-    changing
-      !EC_LIGHT_FIELD_S type CHAR1
-      !EC_LIGHT_FIELD_T type CHAR1 .
-  methods FILL_GDS_ROWS_COMP_STATE . "Cockpit402
-private section.
+    METHODS navigate_difference_previous
+      IMPORTING
+        !iv_cursor_field_pos TYPE i
+        !it_fcat             TYPE lvc_t_fcat
+        !is_row_id           TYPE lvc_s_row
+      EXPORTING
+        !ev_focus_field      TYPE lvc_s_fcat-fieldname
+        !ev_focus_row        TYPE lvc_s_row-index .
+    METHODS create_result_table
+      CHANGING
+        !is_table_details TYPE tys_table_details .
+    METHODS set_different_cell
+      IMPORTING
+        !iv_focus_field TYPE lvc_s_fcat-fieldname
+        !iv_focus_row   TYPE lvc_s_row-index
+      RAISING
+        /cadaxo/cx_sqlc_dcomp_complex .
+    METHODS switch_to_hr .    "Cockpit-405
+    METHODS switch_to_vr .    "Cockpit-405
+    METHODS create_compare_result_table_hr . "Cockpit-405
+    METHODS compare_set_line_missing_hr "Cockpit-405
+      IMPORTING
+        !is_line_s TYPE any
+        !is_line_t TYPE any
+      CHANGING
+        !ct_result TYPE STANDARD TABLE OPTIONAL .
+    METHODS build_result_fcat_line_hr "Cockpit-405
+      IMPORTING
+        !iv_index_s         TYPE int2
+        !is_table_details_s TYPE tys_table_details
+        !is_table_details_t TYPE tys_table_details
+        !iv_index_t         TYPE int2
+      RETURNING
+        VALUE(es_fcat)      TYPE lvc_s_fcat .
+    METHODS update_status_hr "Cockpit-405
+      IMPORTING
+        !iv_row_status    TYPE i
+      CHANGING
+        !ec_light_field_s TYPE /CADAXO/SQLC_CHAR1
+        !ec_light_field_t TYPE /CADAXO/SQLC_CHAR1 .
+    METHODS fill_gds_rows_comp_state . "Cockpit402
+  PRIVATE SECTION.
 
-  constants C_PREFIX_SOURCE type CHAR2 value 'S_' ##NO_TEXT.
-  constants C_PREFIX_TARGET type CHAR2 value 'T_' ##NO_TEXT.
-  constants C_FIELDNAME_LIGHTS type STRING value 'LIGHTS' ##NO_TEXT.
-  constants C_MAPKIND_FIELDNAME type CHAR1 value 'F' ##NO_TEXT.
-  constants C_MAPKIND_INDEX type CHAR1 value 'I' ##NO_TEXT.
-  constants C_ACTION_SHOW_RED type STB_BUTTON-FUNCTION value 'SHOW_RED' ##NO_TEXT.
-  constants C_ACTION_SHOW_YELLOW type STB_BUTTON-FUNCTION value 'SHOW_YELLOW' ##NO_TEXT.
-  constants C_ACTION_SHOW_GREEN type STB_BUTTON-FUNCTION value 'SHOW_GREEN' ##NO_TEXT.
-  constants C_ACTION_SHOW_ALL_COLUMNS type STB_BUTTON-FUNCTION value 'SHOW_ALL_COLUMNS' ##NO_TEXT.
-  constants C_ACTION_MAP_DELETE type STRING value 'MAP_DELETE' ##NO_TEXT.
-  constants C_ACTION_MAP_ROWS type STRING value 'MAP_ROWS' ##NO_TEXT.
-  constants C_ACTION_MAP_FIELDS type STRING value 'MAP_FIELDS' ##NO_TEXT.
-  constants C_ACTION_DIFF_NEXT type STB_BUTTON-FUNCTION value 'GO_TO_NEXT_DIF' ##NO_TEXT.
-  constants C_ACTION_DIFF_PREVIOUS type STB_BUTTON-FUNCTION value 'GO_TO_PREV_DIF' ##NO_TEXT.
-  constants C_ACTION_SET_KEY_LINK type UI_FUNC value 'SET_KEY_MAPPING' ##NO_TEXT.
-  constants C_ACTION_REMOVE_KEY_LINK type UI_FUNC value 'REMOVE_KEY_MAPPING' ##NO_TEXT.
-  constants C_ACTION_DELETE_LINK type UI_FUNC value 'DELETE_MAPPING' ##NO_TEXT.
-  constants C_STATUS_MISSING type I value 1 ##NO_TEXT.
-  constants C_STATUS_DIFFERENT type I value 2 ##NO_TEXT.
-  constants C_STATUS_EQUAL type I value 3 ##NO_TEXT.
-  constants C_NAVKIND_NEXT type INT2 value 2 ##NO_TEXT.
-  constants C_NAVKIND_PREV type INT2 value 3 ##NO_TEXT.
+    CONSTANTS c_prefix_source TYPE /CADAXO/SQLC_CHAR2 VALUE 'S_' ##NO_TEXT.
+    CONSTANTS c_prefix_target TYPE /CADAXO/SQLC_CHAR2 VALUE 'T_' ##NO_TEXT.
+    CONSTANTS c_fieldname_lights TYPE string VALUE 'LIGHTS' ##NO_TEXT.
+    CONSTANTS c_mapkind_fieldname TYPE /CADAXO/SQLC_CHAR1 VALUE 'F' ##NO_TEXT.
+    CONSTANTS c_mapkind_index TYPE /CADAXO/SQLC_CHAR1 VALUE 'I' ##NO_TEXT.
+    CONSTANTS c_action_show_red TYPE stb_button-function VALUE 'SHOW_RED' ##NO_TEXT.
+    CONSTANTS c_action_show_yellow TYPE stb_button-function VALUE 'SHOW_YELLOW' ##NO_TEXT.
+    CONSTANTS c_action_show_green TYPE stb_button-function VALUE 'SHOW_GREEN' ##NO_TEXT.
+    CONSTANTS c_action_show_all_columns TYPE stb_button-function VALUE 'SHOW_ALL_COLUMNS' ##NO_TEXT.
+    CONSTANTS c_action_map_delete TYPE string VALUE 'MAP_DELETE' ##NO_TEXT.
+    CONSTANTS c_action_map_rows TYPE string VALUE 'MAP_ROWS' ##NO_TEXT.
+    CONSTANTS c_action_map_fields TYPE string VALUE 'MAP_FIELDS' ##NO_TEXT.
+    CONSTANTS c_action_diff_next TYPE stb_button-function VALUE 'GO_TO_NEXT_DIF' ##NO_TEXT.
+    CONSTANTS c_action_diff_previous TYPE stb_button-function VALUE 'GO_TO_PREV_DIF' ##NO_TEXT.
+    CONSTANTS c_action_set_key_link TYPE ui_func VALUE 'SET_KEY_MAPPING' ##NO_TEXT.
+    CONSTANTS c_action_remove_key_link TYPE ui_func VALUE 'REMOVE_KEY_MAPPING' ##NO_TEXT.
+    CONSTANTS c_action_delete_link TYPE ui_func VALUE 'DELETE_MAPPING' ##NO_TEXT.
+    CONSTANTS c_status_missing TYPE i VALUE 1 ##NO_TEXT.
+    CONSTANTS c_status_different TYPE i VALUE 2 ##NO_TEXT.
+    CONSTANTS c_status_equal TYPE i VALUE 3 ##NO_TEXT.
+    CONSTANTS c_navkind_next TYPE int2 VALUE 2 ##NO_TEXT.
+    CONSTANTS c_navkind_prev TYPE int2 VALUE 3 ##NO_TEXT.
 
-  methods SHOW_PROGRESS_INDICATOR
-    changing
-      !CS_PROGRESS_INIDCATOR type TYS_PROGRESS_INDI .
-  methods IS_FIELD_MAPPING_ALLOWED
-    importing
-      !IV_IDX_SOURCE type INT2
-      !IV_IDX_TARGET type INT2
-      !IV_MOVE_SOURCE type FLAG optional
-      !IV_MOVE_TARGET type FLAG optional
-    returning
-      value(EV_LINKTYPE) type INT2
-    raising
-      /CADAXO/CX_SQLC_DCOMP_FIELDMAP .
+    METHODS show_progress_indicator
+      CHANGING
+        !cs_progress_inidcator TYPE tys_progress_indi .
+    METHODS is_field_mapping_allowed
+      IMPORTING
+        !iv_idx_source     TYPE int2
+        !iv_idx_target     TYPE int2
+        !iv_move_source    TYPE /CADAXO/SQLC_GENERAL_FLAG OPTIONAL
+        !iv_move_target    TYPE /CADAXO/SQLC_GENERAL_FLAG OPTIONAL
+      RETURNING
+        VALUE(ev_linktype) TYPE int2
+      RAISING
+        /cadaxo/cx_sqlc_dcomp_fieldmap .
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_dcomp_complex IMPLEMENTATION.
 
 
   METHOD breakup_components.
@@ -784,9 +784,13 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
             ls_component-type ?= <ls_component_s>-type.
             ASSIGN <ls_dfies_s> TO <ls_dfies>.
           ENDIF.
-          ls_component-name = |{ <ls_component_s>-name }_{ <ls_component_t>-name }|.
+          IF <ls_component_s>-name = <ls_component_t>-name.
+            ls_component-name = <ls_component_t>-name.
+          ELSE.
+            ls_component-name = |{ <ls_component_s>-name }_{ <ls_component_t>-name }|.
+          ENDIF.
           IF strlen( ls_component-name ) GT 30.
-          ls_component-name = ls_component-name(30).
+            ls_component-name = ls_component-name(30).
           ENDIF.
         ENDIF.
 
@@ -1340,7 +1344,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
     DATA ls_fcat_tabno TYPE lvc_s_fcat.
     ls_fcat_tabno-fieldname = 'TABNO'.
     ls_fcat_tabno-scrtext_s = 'Nr.'.
-    ls_fcat_tabno-scrtext_m = text-007.
+    ls_fcat_tabno-scrtext_m = TEXT-007.
     ls_fcat_tabno-outputlen = '2'.
     ls_fcat_tabno-datatype = '/CADAXO/SQLC_DATA_COMP_LST_NR'.
     APPEND ls_fcat_tabno TO gt_result_fcat.
@@ -1830,11 +1834,11 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
               lv_row_status = c_status_different.
 
-                compare_column_name_diff( iv_fieldname = lv_fieldname_source iv_line_index = lv_compare_index ).
-                compare_column_name_diff( iv_fieldname = lv_fieldname_target iv_line_index = lv_compare_index ).
+              compare_column_name_diff( iv_fieldname = lv_fieldname_source iv_line_index = lv_compare_index ).
+              compare_column_name_diff( iv_fieldname = lv_fieldname_target iv_line_index = lv_compare_index ).
 
-                set_column_color( EXPORTING iv_fieldname = lv_fieldname_source iv_col = 3 iv_int = 0 CHANGING ct_lvc_t_col = <lt_lvc_col_s> ).
-                set_column_color( EXPORTING iv_fieldname = lv_fieldname_target iv_col = 3 iv_int = 1 CHANGING ct_lvc_t_col = <lt_lvc_col_t> ).
+              set_column_color( EXPORTING iv_fieldname = lv_fieldname_source iv_col = 3 iv_int = 0 CHANGING ct_lvc_t_col = <lt_lvc_col_s> ).
+              set_column_color( EXPORTING iv_fieldname = lv_fieldname_target iv_col = 3 iv_int = 1 CHANGING ct_lvc_t_col = <lt_lvc_col_t> ).
 
             ENDIF.
 
@@ -2143,11 +2147,11 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
       rv_fieldname = is_dfies_cadaxo-map_fieldname.
 
-    ELSEIF ( is_dfies_cadaxo-tabname IS NOT INITIAL and is_dfies_cadaxo-map_fieldname is not initial ).
+    ELSEIF ( is_dfies_cadaxo-tabname IS NOT INITIAL AND is_dfies_cadaxo-map_fieldname IS NOT INITIAL ).
 
       rv_fieldname = is_dfies_cadaxo-tabname && '-' && is_dfies_cadaxo-map_fieldname.
 
-    elseif is_dfies_cadaxo-tabname is not initial.
+    ELSEIF is_dfies_cadaxo-tabname IS NOT INITIAL.
 
       rv_fieldname = is_dfies_cadaxo-tabname.
 
@@ -2237,6 +2241,8 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
             es_meta_data-datatype = 'd34d'.
           WHEN '8'.
             es_meta_data-datatype = 'i8b'.
+          WHEN 'p'.
+            es_meta_data-datatype = 'dec'.
           WHEN OTHERS.
             es_meta_data-datatype =  to_lower( is_dfies-inttype ).
         ENDCASE.
@@ -2289,7 +2295,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_dcomp_fieldmap
         EXPORTING
           textid  = /cadaxo/cx_sqlc_dcomp_fieldmap=>invalid_index
-          iv_msg1 = text-stn
+          iv_msg1 = TEXT-stn
           iv_msg2 = |{ iv_idx_source }|.
     ENDIF.
     ASSIGN gs_target-cdxdfies[ iv_idx_target ] TO FIELD-SYMBOL(<ls_dfies_target>).
@@ -2297,7 +2303,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_dcomp_fieldmap
         EXPORTING
           textid  = /cadaxo/cx_sqlc_dcomp_fieldmap=>invalid_index
-          iv_msg1 = text-ttn
+          iv_msg1 = TEXT-ttn
           iv_msg2 = |{ iv_idx_target }|.
     ENDIF.
 
@@ -2305,14 +2311,14 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_dcomp_fieldmap
         EXPORTING
           textid  = /cadaxo/cx_sqlc_dcomp_fieldmap=>mapping_exists
-          iv_msg1 = text-stn
+          iv_msg1 = TEXT-stn
           iv_msg2 = CONV #( get_fieldname( is_dfies_cadaxo = <ls_dfies_source>
                                            iv_select_type  = gs_source-select_type ) ).
     ELSEIF iv_move_source IS INITIAL AND line_exists( gt_link[ target = iv_idx_target ] ).
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_dcomp_fieldmap
         EXPORTING
           textid  = /cadaxo/cx_sqlc_dcomp_fieldmap=>mapping_exists
-          iv_msg1 = text-ttn
+          iv_msg1 = TEXT-ttn
           iv_msg2 = CONV #( get_fieldname( is_dfies_cadaxo = <ls_dfies_target>
                                            iv_select_type  = gs_target-select_type ) ).
     ENDIF.
@@ -2362,7 +2368,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
     es_legend-mandant     = ls_result_details-mandant.
     es_legend-list_number = '#' && is_table_details-number.
     es_legend-tables      = is_table_details-name.
-    es_legend-SAVED_LIST  = ls_result_details-SAVED_LIST.
+    es_legend-saved_list  = ls_result_details-saved_list.
 
     CONVERT TIME STAMP ls_result_details-create_timestamp TIME ZONE sy-zonlo INTO DATE es_legend-created_date TIME es_legend-created_time.
 
@@ -2620,7 +2626,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
     r_ctxmnu->add_function(
       EXPORTING
         fcode = c_action_delete_link
-        text = text-004 ).
+        text = TEXT-004 ).
 
     r_ctxmnu->add_separator( ).
 
@@ -2640,23 +2646,23 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
         r_ctxmnu->add_function(
           EXPORTING
             fcode             = c_action_set_key_link
-            text              = text-005
+            text              = TEXT-005
             disabled          = abap_false ).
         r_ctxmnu->add_function(
           EXPORTING
             fcode             = c_action_remove_key_link
-            text              = text-006
+            text              = TEXT-006
             disabled          = abap_true ).
       ELSE.
         r_ctxmnu->add_function(
           EXPORTING
             fcode             = c_action_set_key_link
-            text              = text-005
+            text              = TEXT-005
             disabled          = abap_true ).
         r_ctxmnu->add_function(
           EXPORTING
             fcode             = c_action_remove_key_link
-            text              = text-006
+            text              = TEXT-006
             disabled          = abap_false ).
       ENDIF.
     ENDIF.
@@ -2804,32 +2810,32 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
                     icon      = icon_led_green
                     butn_type = cntb_btype_check
                     disabled  = abap_false
-                    quickinfo = SWITCH #( gv_show_green WHEN abap_true THEN text-q11
-                                                        ELSE text-q01 )
+                    quickinfo = SWITCH #( gv_show_green WHEN abap_true THEN TEXT-q11
+                                                        ELSE TEXT-q01 )
                     checked   = gv_show_green ) INTO e_object->mt_toolbar INDEX 1.
 
     INSERT VALUE #( function  = c_action_show_yellow
                     icon      = icon_led_yellow
                     butn_type = cntb_btype_check
                     disabled  = abap_false
-                    quickinfo = SWITCH #( gv_show_yellow WHEN abap_true THEN text-q12
-                                                         ELSE text-q03 )
+                    quickinfo = SWITCH #( gv_show_yellow WHEN abap_true THEN TEXT-q12
+                                                         ELSE TEXT-q03 )
                     checked   = gv_show_yellow ) INTO e_object->mt_toolbar INDEX 2.
 
     INSERT VALUE #( function  = c_action_show_red
                     icon      = icon_led_red
                     butn_type = cntb_btype_check
                     disabled  = abap_false
-                    quickinfo = SWITCH #( gv_show_red WHEN abap_true THEN text-q13
-                                                      ELSE text-q03 )
+                    quickinfo = SWITCH #( gv_show_red WHEN abap_true THEN TEXT-q13
+                                                      ELSE TEXT-q03 )
                     checked   = gv_show_red ) INTO e_object->mt_toolbar INDEX 3.
 
     INSERT VALUE #( function  = c_action_show_all_columns
                     icon      = icon_ranking
                     butn_type = cntb_btype_check
                     disabled  = abap_false
-                    quickinfo = SWITCH #( gv_show_all_columns WHEN abap_true THEN text-q14
-                                                              ELSE text-q04 )
+                    quickinfo = SWITCH #( gv_show_all_columns WHEN abap_true THEN TEXT-q14
+                                                              ELSE TEXT-q04 )
                     checked   = gv_show_all_columns ) INTO e_object->mt_toolbar INDEX 4.
 
     INSERT VALUE #( butn_type = cntb_btype_sep ) INTO e_object->mt_toolbar INDEX 5.
@@ -2838,13 +2844,13 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
                     icon      = icon_previous_object
                     butn_type = cntb_btype_button
                     disabled  = abap_false
-                    quickinfo = text-q07 ) INTO e_object->mt_toolbar INDEX 6.
+                    quickinfo = TEXT-q07 ) INTO e_object->mt_toolbar INDEX 6.
 
     INSERT VALUE #( function  = c_action_diff_next
                     icon      = icon_next_object
                     butn_type = cntb_btype_button
                     disabled  = abap_false
-                    quickinfo = text-q06 ) INTO e_object->mt_toolbar INDEX 7.
+                    quickinfo = TEXT-q06 ) INTO e_object->mt_toolbar INDEX 7.
 
     INSERT VALUE #( butn_type = cntb_btype_sep ) INTO e_object->mt_toolbar INDEX 8.
 
@@ -2853,7 +2859,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
                     icon      = icon_invert_line
                     butn_type = cntb_btype_button
                     disabled  = abap_false
-                    quickinfo = text-008 ) INTO e_object->mt_toolbar INDEX 9.
+                    quickinfo = TEXT-008 ) INTO e_object->mt_toolbar INDEX 9.
     INSERT VALUE #( butn_type = cntb_btype_sep ) INTO e_object->mt_toolbar INDEX 10.
 *end   of insert 405
   ENDMETHOD.
@@ -2943,9 +2949,9 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
 
       gr_text_info_0200->set_toolbar_mode( toolbar_mode = 0 ).
 
-      lv_note = text-i03 && cl_abap_char_utilities=>cr_lf && cl_abap_char_utilities=>cr_lf &&
-                text-i01 && cl_abap_char_utilities=>cr_lf && cl_abap_char_utilities=>cr_lf &&
-                text-i02.
+      lv_note = TEXT-i03 && cl_abap_char_utilities=>cr_lf && cl_abap_char_utilities=>cr_lf &&
+                TEXT-i01 && cl_abap_char_utilities=>cr_lf && cl_abap_char_utilities=>cr_lf &&
+                TEXT-i02.
 
       gr_text_info_0200->set_textstream( EXPORTING text = lv_note ).
 
@@ -3252,15 +3258,15 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
                                    i_colwidth  = 400 ).
 
     ir_tab->set_column_properties( i_column_nr = 2
-                                   i_title     = text-001
+                                   i_title     = TEXT-001
                                    i_colwidth  = 4000 ).
 
     ir_tab->set_column_properties( i_column_nr = 3
-                                   i_title     = text-002
+                                   i_title     = TEXT-002
                                    i_colwidth  = 5700 ).
 
     ir_tab->set_column_properties( i_column_nr = 4
-                                   i_title     = text-003
+                                   i_title     = TEXT-003
                                    i_colwidth  = 0 ).
 
   ENDMETHOD.
@@ -3319,7 +3325,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
       CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
         EXPORTING
           percentage = l_percentage
-          text       = |{ text-pi1 } { shift_left( val = cs_progress_inidcator-current_line sub = '0' ) } { text-pi2 } { shift_left( val = cs_progress_inidcator-lines_compare sub = '0' ) }|.
+          text       = |{ TEXT-pi1 } { shift_left( val = cs_progress_inidcator-current_line sub = '0' ) } { TEXT-pi2 } { shift_left( val = cs_progress_inidcator-lines_compare sub = '0' ) }|.
       cs_progress_inidcator-percentage_previous = l_percentage.
     ENDIF.
 
@@ -3375,30 +3381,30 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD SWITCH_TO_VR.
-          me->do_check( ).
-      CALL METHOD gr_compare_results_grid->set_frontend_fieldcatalog( gt_result_fcat ).
+  METHOD switch_to_vr.
+    me->do_check( ).
+    CALL METHOD gr_compare_results_grid->set_frontend_fieldcatalog( gt_result_fcat ).
 
     DATA ls_layout TYPE lvc_s_layo.
     FIELD-SYMBOLS <lt_compare_result> TYPE STANDARD TABLE.
 
-      CLEAR ls_layout.
-      ls_layout-excp_fname = c_fieldname_lights.
-      ls_layout-excp_led   = abap_true.
-      ls_layout-ctab_fname = 'CT'.
-      ls_layout-cwidth_opt = abap_false.
-      ASSIGN grt_compare_result->* TO <lt_compare_result>.
+    CLEAR ls_layout.
+    ls_layout-excp_fname = c_fieldname_lights.
+    ls_layout-excp_led   = abap_true.
+    ls_layout-ctab_fname = 'CT'.
+    ls_layout-cwidth_opt = abap_false.
+    ASSIGN grt_compare_result->* TO <lt_compare_result>.
 
 
-      gr_compare_results_grid->set_table_for_first_display( EXPORTING is_layout            = ls_layout
-                                                                      it_toolbar_excluding = gt_excluding_alv
-                                                            CHANGING  it_outtab            = <lt_compare_result>
-                                                                      it_fieldcatalog      = gt_result_fcat ).
+    gr_compare_results_grid->set_table_for_first_display( EXPORTING is_layout            = ls_layout
+                                                                    it_toolbar_excluding = gt_excluding_alv
+                                                          CHANGING  it_outtab            = <lt_compare_result>
+                                                                    it_fieldcatalog      = gt_result_fcat ).
 
-      SET HANDLER: on_handle_result_toolbar       FOR gr_compare_results_grid,
-                   on_handle_result_user_command  FOR gr_compare_results_grid.
+    SET HANDLER: on_handle_result_toolbar       FOR gr_compare_results_grid,
+                 on_handle_result_user_command  FOR gr_compare_results_grid.
 
-      update_filter( i_refresh_alv = abap_true ).
+    update_filter( i_refresh_alv = abap_true ).
 
 
   ENDMETHOD.
@@ -3505,7 +3511,7 @@ CLASS /CADAXO/CL_SQLC_DCOMP_COMPLEX IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD UPDATE_STATUS_HR.
+  METHOD update_status_hr.
 
     ASSIGN COMPONENT iv_row_status OF STRUCTURE gs_rows_comp_state TO FIELD-SYMBOL(<ls_count>).
     IF sy-subrc = 0.

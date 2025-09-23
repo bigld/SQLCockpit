@@ -1004,6 +1004,12 @@
      <MSGNR>165</MSGNR>
      <TEXT>Error writing file &amp;1 (&amp;2)</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>166</MSGNR>
+     <TEXT>Input is not a correct JSON</TEXT>
+    </T100>
    </T100>
    <LONGTEXTS>
     <item>
@@ -3149,6 +3155,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>165</MSGNR>
      <TEXT>Fehler beim Erstellen der Datei &amp;1 (&amp;2)</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>166</MSGNR>
+     <TEXT>Eingabe ist kein korrektes JSON</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>
