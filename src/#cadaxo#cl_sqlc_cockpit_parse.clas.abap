@@ -3795,6 +3795,8 @@ METHOD parse_sql_i.
 
   SHIFT sql_string LEFT DELETING LEADING space.
 
+  CONDENSE sql_string.
+
   DATA: l_len                TYPE i,
         l_from               TYPE i,
         l_to                 TYPE i,
@@ -3895,20 +3897,34 @@ METHOD parse_sql_i.
         l_klammer_offen.
 
 * Check if SELECT is first
+
     l_sql_string_c = sql_string.
 
-    IF l_sql_string_c(15) EQ 'SELECT DISTINCT'.
-      l_foff = l_foff + 16.
-      l_cl_sql_parse->g_select_distinct = abap_true.
-    ELSEIF l_sql_string_c(22) EQ 'SELECT SINGLE DISTINCT'.
-      l_foff = l_foff + 23.
-      l_cl_sql_parse->g_select_distinct = abap_true.
-      l_cl_sql_parse->g_select_single = abap_true.
-    ELSEIF l_sql_string_c(13) EQ 'SELECT SINGLE'.
-      l_foff = l_foff + 14.
-      l_cl_sql_parse->g_select_single = abap_true.
-    ELSEIF l_sql_string_c(6) EQ 'SELECT'.
-      l_foff = l_foff + 7.
+    DATA lv_is_select   TYPE abap_bool.
+    DATA lv_is_distinct TYPE abap_bool.
+    DATA lv_is_single   TYPE abap_bool.
+    DATA lv_match_len   TYPE i.
+    DATA lv_match_off   TYPE i.
+
+    " Detect SELECT/DISTINCT/SINGLE via regex
+    /cadaxo/cl_sqlc_special_parse=>detect_select_pattern(
+      EXPORTING
+        i_sql_string   = CONV string( l_sql_string_c )
+      IMPORTING
+        e_is_select    = lv_is_select
+        e_is_distinct  = lv_is_distinct
+        e_is_single    = lv_is_single
+        e_match_len    = lv_match_len
+        e_match_off    = lv_match_off ).
+
+    IF lv_is_select = abap_true.
+      " move forward by matched keyword length
+      l_foff = l_foff + lv_match_len.
+
+      l_cl_sql_parse->g_select_distinct = lv_is_distinct.
+      l_cl_sql_parse->g_select_single   = lv_is_single.
+
+
     ELSE.
 
 
