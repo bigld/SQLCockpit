@@ -38,6 +38,7 @@ CLASS /cadaxo/tc_sqlc_cockpit_parse DEFINITION FOR TESTING
     METHODS: is_not_count_star_only FOR TESTING.
     METHODS: parse_sql_i FOR TESTING.
     METHODS: parse_sql_i_2 FOR TESTING.
+    METHODS: detect_select_pattern FOR TESTING.
 
 
 ENDCLASS.       "/cadaxo/tc_Sqlc_Cockpit_Parse
@@ -244,6 +245,73 @@ CLASS /cadaxo/tc_sqlc_cockpit_parse IMPLEMENTATION.
 
     ENDLOOP.
 
+
+  ENDMETHOD.
+
+  METHOD detect_select_pattern.
+
+    TYPES: BEGIN OF lty_case,
+             sql          TYPE string,
+             exp_len      TYPE i,
+             exp_distinct TYPE abap_bool,
+             exp_single   TYPE abap_bool,
+           END OF lty_case.
+
+    DATA lt_cases TYPE STANDARD TABLE OF lty_case WITH EMPTY KEY.
+    DATA(tab) = cl_abap_char_utilities=>horizontal_tab.
+    DATA(newline) = cl_abap_char_utilities=>newline.
+
+
+
+    lt_cases = VALUE #(
+   ( sql = `SELECT * FROM but000`              exp_len = 7  exp_distinct = abap_false exp_single = abap_false )
+   ( sql = `SELECT DISTINCT * FROM but000`     exp_len = 16 exp_distinct = abap_true  exp_single = abap_false )
+   ( sql = `SELECT SINGLE * FROM but000`       exp_len = 14 exp_distinct = abap_false exp_single = abap_true  )
+   ( sql = `SELECT DISTINCT SINGLE * FROM but000`
+                                             exp_len = 23 exp_distinct = abap_true  exp_single = abap_true  )
+   ( sql = | SELECT    DISTINCT  * FROM but000 | exp_len = 16 exp_distinct = abap_true  exp_single = abap_false )
+   ( sql = |SELECT | && tab && |SINGLE  * FROM but000|          exp_len = 15 exp_distinct = abap_false exp_single = abap_true  )
+   ( sql = |SELECT | && newline  && |DISTINCT SINGLE * FROM but000|   exp_len = 24 exp_distinct = abap_true  exp_single = abap_true  )
+ ).
+
+    LOOP AT lt_cases INTO DATA(case).
+      DATA(lv_is_select)   = abap_false.
+      DATA(lv_is_distinct) = abap_false.
+      DATA(lv_is_single)   = abap_false.
+      DATA(lv_len)         = 0.
+      DATA(lv_off)         = 0.
+
+      /cadaxo/cl_sqlc_special_parse=>detect_select_pattern(
+         EXPORTING
+            i_sql_string = case-sql
+         IMPORTING
+            e_is_select    = lv_is_select
+          e_is_distinct  = lv_is_distinct
+          e_is_single    = lv_is_single
+          e_match_len    = lv_len
+          e_match_off    = lv_off ).
+
+      cl_abap_unit_assert=>assert_true(
+        EXPORTING
+          act              = lv_is_select                                        " Actual value
+          msg              = |Expected SELECT detected for: { case-sql }| ).                                       " Description
+
+      cl_abap_unit_assert=>assert_equals(
+         act = lv_len
+         exp = case-exp_len
+         msg = |Match length mismatch for: { case-sql }| ).
+
+      cl_abap_unit_assert=>assert_equals(
+        act = lv_is_distinct
+        exp = case-exp_distinct
+        msg = |DISTINCT flag mismatch for: { case-sql }| ).
+
+      cl_abap_unit_assert=>assert_equals(
+        act = lv_is_single
+        exp = case-exp_single
+        msg = |SINGLE flag mismatch for: { case-sql }| ).
+
+    ENDLOOP.
 
   ENDMETHOD.
 
