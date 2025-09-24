@@ -3896,38 +3896,18 @@ METHOD parse_sql_i.
         l_connection_t,
         l_klammer_offen.
 
-* Check if SELECT is first
-
     l_sql_string_c = sql_string.
 
-    DATA lv_is_select   TYPE abap_bool.
-    DATA lv_is_distinct TYPE abap_bool.
-    DATA lv_is_single   TYPE abap_bool.
-    DATA lv_match_len   TYPE i.
-    DATA lv_match_off   TYPE i.
+   data(select_pattern) = /cadaxo/cl_sqlc_special_parse=>detect_select_pattern( CONV #( l_sql_string_c ) ).
 
-    " Detect SELECT/DISTINCT/SINGLE via regex
-    /cadaxo/cl_sqlc_special_parse=>detect_select_pattern(
-      EXPORTING
-        i_sql_string   = CONV string( l_sql_string_c )
-      IMPORTING
-        e_is_select    = lv_is_select
-        e_is_distinct  = lv_is_distinct
-        e_is_single    = lv_is_single
-        e_match_len    = lv_match_len
-        e_match_off    = lv_match_off ).
+    IF select_pattern-is_select = abap_true.
 
-    IF lv_is_select = abap_true.
-      " move forward by matched keyword length
-      l_foff = l_foff + lv_match_len.
+      l_foff = l_foff + select_pattern-match_length.
 
-      l_cl_sql_parse->g_select_distinct = lv_is_distinct.
-      l_cl_sql_parse->g_select_single   = lv_is_single.
-
+      l_cl_sql_parse->g_select_distinct = select_pattern-is_distinct.
+      l_cl_sql_parse->g_select_single   = select_pattern-is_single.
 
     ELSE.
-
-
 
       IF /cadaxo/cl_sqlc_special_parse=>may_be_datasource( sql_string ).
 
