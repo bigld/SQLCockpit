@@ -3688,316 +3688,333 @@ ENDMETHOD.
   ENDMETHOD.
 
 
-METHOD parse_sql_i.
-****************************************************************************************************
-* Description             : Parse 1                                                                *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 09.09.2010 | Fößleitner Johann    | Support DB Hints                            | CDX001-0011    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.10.2010 | Bigl Domi            |                                             | CDX001-0019    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.01.2011 | Bigl Domi            |                                             | CDX001-0022    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.01.2011 | Bigl Domi            |                                             | CDX001-DEMO    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 11.11.2011 | Johann Fößleitner    | add new attribute sql_syntax_without_where  | CDX001-0029    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 11.11.2011 | Johann Fößleitner    | fix bug open/close bracket                  | CDX001-0029    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 22.05.2012 | Ana Lekic            | max number of selects from admin-customizing| CDX130-011     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 27.04.2015 | Ana Lekic            | parse where                                 | COCKPIT-60     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 26.01.2017 | Domi Bigl            | count(*) + group by                         | COCKPIT-100    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 05.07.2017 | Dusan Sacha          | fix working with 'unlimited' string  SELECT | COCKPIT-222    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.07.2017 | Domi Bigl            | Select is too large                         | COCKPIT-223    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.07.2017 | Harald Wiesinger     | check for USING CLIENT                      | COCKPIT-225    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 16.09.2017 | Domi Bigl            | Brackets in FROM                            | COCKPIT-114    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 21.09.2017 | Föß                  | Add FIELDS                                  | COCKPIT-261    *
-****************************************************************************************************
+  METHOD parse_sql_i.
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             : Parse 1                                                                -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    -
+    "  Date                    : xx.xx.xxxx                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  09.09.2010 | Fößleitner Johann    | Support DB Hints                            | CDX001-0011    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.10.2010 | Bigl Domi            |                                             | CDX001-0019    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.01.2011 | Bigl Domi            |                                             | CDX001-0022    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.01.2011 | Bigl Domi            |                                             | CDX001-DEMO    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  11.11.2011 | Johann Fößleitner    | add new attribute sql_syntax_without_where  | CDX001-0029    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  11.11.2011 | Johann Fößleitner    | fix bug open/close bracket                  | CDX001-0029    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  22.05.2012 | Ana Lekic            | max number of selects from admin-customizing| CDX130-011     -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  27.04.2015 | Ana Lekic            | parse where                                 | COCKPIT-60     -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  26.01.2017 | Domi Bigl            | count(*) + group by                         | COCKPIT-100    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  05.07.2017 | Dusan Sacha          | fix working with 'unlimited' string  SELECT | COCKPIT-222    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  06.07.2017 | Domi Bigl            | Select is too large                         | COCKPIT-223    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.07.2017 | Harald Wiesinger     | check for USING CLIENT                      | COCKPIT-225    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  16.09.2017 | Domi Bigl            | Brackets in FROM                            | COCKPIT-114    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  21.09.2017 | Föß                  | Add FIELDS                                  | COCKPIT-261    -
+    " ---------------------------------------------------------------------------------------------------
 
-  TYPES: BEGIN OF t_split,
-           line(255),
-         END OF t_split.
+    TYPES: BEGIN OF t_split,
+             line TYPE c LENGTH 255,
+           END OF t_split.
 
+    DATA l_section           TYPE c LENGTH 10.
+    DATA l_moff              TYPE i.
+    DATA l_foff              TYPE i.
+    DATA l_column_f          TYPE i.
+    DATA l_column_t          TYPE i.
+    DATA l_from_f            TYPE i.
+    DATA l_connection_f      TYPE i.
+    DATA l_connection_t      TYPE i.
+    DATA l_from_t            TYPE i.
+    DATA l_where_f           TYPE i.
+    DATA l_where_t           TYPE i.
+    DATA l_order_f           TYPE i.
+    DATA l_hints_f           TYPE i. " CDX001-0011
+    DATA l_order_t           TYPE i.
+    DATA l_group_f           TYPE i.
+    DATA l_group_t           TYPE i.
+    DATA l_having_f          TYPE i.
+    DATA l_having_t          TYPE i.
+    DATA l_hints_t           TYPE i. " CDX001-0011
+    DATA l_fields_f          TYPE i. " COCKPIT-261
+    DATA l_fields_t          TYPE i. " COCKPIT-261
+    DATA l_offset_f          TYPE i.
+    DATA l_offset_t          TYPE i.
+    DATA l_klammer_offen     TYPE i.
+    DATA lv_check_sql_string TYPE string. " COCKPIT-222
+    DATA lv_spacer_string    TYPE string. " COCKPIT-222
+    DATA l_alias             TYPE c LENGTH 1.
+    DATA l_length            TYPE i.
+    DATA l_message           TYPE string.
 
-  DATA: l_section(10),
-        l_moff              TYPE i,
-        l_foff              TYPE i,
-        l_column_f          TYPE i,
-        l_column_t          TYPE i,
-        l_from_f            TYPE i,
-        l_connection_f      TYPE i,
-        l_connection_t      TYPE i,
-        l_from_t            TYPE i,
-        l_where_f           TYPE i,
-        l_where_t           TYPE i,
-        l_order_f           TYPE i,
-        l_hints_f           TYPE i,                "CDX001-0011
-        l_order_t           TYPE i,
-        l_group_f           TYPE i,
-        l_group_t           TYPE i,
-        l_having_f          TYPE i,
-        l_having_t          TYPE i,
-        l_hints_t           TYPE i,                "CDX001-0011
-        l_fields_f          TYPE i,                "COCKPIT-261
-        l_fields_t          TYPE i,                "COCKPIT-261
-        l_offset_f          TYPE i,
-        l_offset_t          TYPE i,
-        l_klammer_offen     TYPE i,
-        lv_check_sql_string TYPE string,           "COCKPIT-222
-        lv_spacer_string    TYPE string,           "COCKPIT-222
-        l_alias             TYPE c,
-        l_length            TYPE i,
-        l_message           TYPE string.
+    DATA lt_split            TYPE TABLE OF t_split.
+    DATA lt_match_results    TYPE TABLE OF match_result.
+    DATA l_sql_string_c      TYPE c LENGTH 100.
+    DATA l_maxsel            TYPE i.
+    DATA l_sql_string        TYPE string.
+    DATA l_off_tmp           TYPE i.
+    DATA l_len_tmp           TYPE i.
+    DATA l_moff_tmp          TYPE i.
+    DATA ls_adm_cust         TYPE /cadaxo/sqlc_admin_cust.
 
-  DATA: lt_split            TYPE TABLE OF t_split.
-  DATA: lt_match_results    TYPE TABLE OF match_result.
-  DATA: l_sql_string_c(100) TYPE c.
-  DATA: l_maxsel            TYPE i.
-  DATA: l_sql_string        TYPE string.
-  DATA: l_off_tmp           TYPE i.
-  DATA: l_len_tmp           TYPE i.
-  DATA: l_moff_tmp          TYPE i.
-  DATA: ls_adm_cust         TYPE /cadaxo/sqlc_admin_cust.
+    FIELD-SYMBOLS <l_match_result> TYPE match_result.
+    FIELD-SYMBOLS <l_split>        LIKE LINE OF lt_split.
 
-  FIELD-SYMBOLS: <l_match_result> TYPE match_result,
-                 <l_split>        LIKE LINE OF lt_split.
+    sql_string = i_sql.
+    g_role     = i_role.
+    g_main_ref = i_main_ref.
 
-  sql_string = i_sql.
-  g_role     = i_role.
-  g_main_ref = i_main_ref.
+    " get customizing
+    /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing( IMPORTING e_customizing = ls_adm_cust ).
 
-* get customizing
-  /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing( IMPORTING e_customizing = ls_adm_cust ).
-
-* convert sql-string to upper case
-  sql_string = /cadaxo/cl_sqlc_cockpit_assist=>translate_sql_str_upper_case( sql_string ).
-
-  SHIFT sql_string LEFT DELETING LEADING space.
-
-  CONDENSE sql_string.
-
-  DATA: l_len                TYPE i,
-        l_from               TYPE i,
-        l_to                 TYPE i,
-        l_act_do             TYPE i,
-        l_apostrophe_open(1) TYPE c,
-        lt_string_sql        TYPE TABLE OF string,
-        l_string             TYPE string.
-
-  DATA: l_cl_sql_parse TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
-
-  l_len = strlen( sql_string ).
-  l_from = 0.
-  DO l_len TIMES.
-    l_act_do = sy-index - 1.
-    CASE sql_string+l_act_do(1).
-      WHEN '.'.
-        IF l_apostrophe_open EQ space.
-          l_to = l_act_do - l_from.
-          MOVE sql_string+l_from(l_to) TO l_string.
-          IF NOT l_string IS INITIAL AND
-                 l_string NE cl_abap_char_utilities=>cr_lf AND
-                 l_string CA 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890=().'.
-            APPEND l_string TO lt_string_sql.
-          ENDIF.
-          l_from = l_act_do + 1.
-        ENDIF.
-      WHEN c_apostrophe.
-        TRANSLATE l_apostrophe_open USING ' XX '.
-    ENDCASE.
-  ENDDO.
-  IF NOT sql_string+l_from IS INITIAL.
-    MOVE sql_string+l_from TO l_string.
-    IF NOT l_string IS INITIAL AND
-           l_string NE cl_abap_char_utilities=>cr_lf AND
-           l_string CA 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890=().'.
-      APPEND l_string TO lt_string_sql.
-    ENDIF.
-  ENDIF.
-
-  CLEAR: e_sql_parsed[].
-
-  LOOP AT lt_string_sql INTO sql_string.
-
-    CREATE OBJECT l_cl_sql_parse.
+    " convert sql-string to upper case
+    sql_string = /cadaxo/cl_sqlc_cockpit_assist=>translate_sql_str_upper_case( sql_string ).
 
     SHIFT sql_string LEFT DELETING LEADING space.
 
-    TRY.
-        WHILE sql_string(2) EQ cl_abap_char_utilities=>cr_lf.
-          sql_string = sql_string+2.
-          SHIFT sql_string LEFT DELETING LEADING space.
-        ENDWHILE.
-      CATCH cx_sy_range_out_of_bounds.
-    ENDTRY.
+    CONDENSE sql_string.
 
-    l_cl_sql_parse->sql_syntax = sql_string.
+    DATA l_len             TYPE i.
+    DATA l_from            TYPE i.
+    DATA l_to              TYPE i.
+    DATA l_act_do          TYPE i.
+    DATA l_apostrophe_open TYPE c LENGTH 1.
+    DATA lt_string_sql     TYPE TABLE OF string.
+    DATA l_string          TYPE string.
 
-* Delete CR/LF
-    REPLACE ALL OCCURRENCES OF cl_abap_char_utilities=>cr_lf IN sql_string WITH space.
-    SHIFT sql_string LEFT DELETING LEADING space.
+    DATA l_cl_sql_parse    TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
 
-***    DATA(l_bytes) = strlen( sql_string ) * cl_abap_char_utilities=>charsize."COCKPIT-223
-***    IF l_bytes > 57000.                                                     "COCKPIT-223
-***      MESSAGE e116(/cadaxo/sqlc) INTO l_message.                            "COCKPIT-223
-***      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                     "COCKPIT-223
-***        EXPORTING                                                           "COCKPIT-223
-***          message       = l_message                                         "COCKPIT-223
-***          /cadaxo/msgid = '/CADAXO/SQLC'                                    "COCKPIT-223
-***          /cadaxo/msgnr = '016'.                                            "COCKPIT-223
-***    ENDIF.                                                                  "COCKPIT-223
-
-    l_cl_sql_parse->sql_syntax_without_where = sql_string.     "CDX001-0029
-
-    CLEAR:
-        l_section,
-        l_moff,
-        l_foff,
-        l_column_f,
-        l_column_t,
-        l_from_f,
-        l_from_t,
-        l_where_f,
-        l_where_t,
-        l_order_f,
-        l_order_t,
-        l_group_f,
-        l_group_t,
-        l_having_f,
-        l_having_t,
-        l_hints_f,                               "CDX001-0019
-        l_hints_t,                               "CDX001-0019
-        l_fields_f,                              "COCKPIT-261
-        l_fields_t,                              "COCKPIT-261
-        l_offset_f,
-        l_offset_t,
-        l_connection_f,
-        l_connection_t,
-        l_klammer_offen.
-
-    l_sql_string_c = sql_string.
-
-   data(select_pattern) = /cadaxo/cl_sqlc_special_parse=>detect_select_pattern( CONV #( l_sql_string_c ) ).
-
-    IF select_pattern-is_select = abap_true.
-
-      l_foff = l_foff + select_pattern-match_length.
-
-      l_cl_sql_parse->g_select_distinct = select_pattern-is_distinct.
-      l_cl_sql_parse->g_select_single   = select_pattern-is_single.
-
-    ELSE.
-
-      IF /cadaxo/cl_sqlc_special_parse=>may_be_datasource( sql_string ).
-
-        IF /cadaxo/cl_sqlc_special_parse=>is_datasource( sql_string ).
-          IF g_user_settings-strict_mode = abap_true.
-            l_sql_string_c = |SELECT FROM { l_sql_string_c } FIELDS *|.
-          ELSE.
-            l_sql_string_c = |SELECT * FROM { l_sql_string_c }|.
+    l_len = strlen( sql_string ).
+    l_from = 0.
+    DO l_len TIMES.
+      l_act_do = sy-index - 1.
+      CASE sql_string+l_act_do(1).
+        WHEN '.'.
+          IF l_apostrophe_open = space.
+            l_to = l_act_do - l_from.
+            l_string = sql_string+l_from(l_to).
+            IF     l_string IS NOT INITIAL
+               AND l_string <> cl_abap_char_utilities=>cr_lf
+               AND l_string CA 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890=().'.
+              APPEND l_string TO lt_string_sql.
+            ENDIF.
+            l_from = l_act_do + 1.
           ENDIF.
-          sql_string = l_sql_string_c.
-          l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
-          l_cl_sql_parse->sql_syntax = l_sql_string_c.
-          l_foff = l_foff + 7.
-        ELSE.
-          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
-            EXPORTING
-              textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_tab_1st.
-        ENDIF.
-
-      ELSE.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
-          EXPORTING
-            textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_at_firs.
+        WHEN c_apostrophe.
+          l_apostrophe_open = translate( val  = l_apostrophe_open
+                                         from = ` X`
+                                         to   = `X ` ).
+      ENDCASE.
+    ENDDO.
+    IF sql_string+l_from IS NOT INITIAL.
+      l_string = sql_string+l_from.
+      IF     l_string IS NOT INITIAL
+         AND l_string <> cl_abap_char_utilities=>cr_lf
+         AND l_string CA 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890=().'.
+        APPEND l_string TO lt_string_sql.
       ENDIF.
-
     ENDIF.
 
-* Set initial section
-    l_section  = 'COLUMN'.
-    l_column_f = l_foff.
+    CLEAR e_sql_parsed[].
 
-* Delete ending '.'
-    CLEAR sy-subrc.
-    WHILE sy-subrc EQ 0.
-      FIND FIRST OCCURRENCE OF REGEX '\.$' IN sql_string MATCH OFFSET l_moff.
-      IF sy-subrc EQ 0.
-        sql_string = sql_string(l_moff).
-      ENDIF.
-    ENDWHILE.
+    LOOP AT lt_string_sql INTO sql_string.
 
-* extract up to x rows, bypassing buffer and client specified
-    lv_check_sql_string = sql_string.
+      l_cl_sql_parse = NEW #( ).
 
-    FIND ALL OCCURRENCES OF REGEX '''[^'']*''' IN sql_string RESULTS lt_match_results.
-    IF sy-subrc EQ 0.
-      SORT lt_match_results BY offset DESCENDING.
-      LOOP AT lt_match_results ASSIGNING <l_match_result>.
-        lv_check_sql_string = replace( val = lv_check_sql_string off = <l_match_result>-offset len = <l_match_result>-length
-                                       with = repeat( val = ` ` occ = <l_match_result>-length ) ). "COCKPIT-222
-      ENDLOOP.
-    ENDIF.
+      SHIFT sql_string LEFT DELETING LEADING space.
 
-    FIND REGEX 'UP\s+TO\s+\d+\s+ROWS' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
-    IF sy-subrc EQ 0.
-      DATA(lv_up_to_string) = condense( val = lv_check_sql_string+l_moff(l_length) del = ` `). "COCKPIT-222
-
-      SPLIT lv_up_to_string AT space INTO TABLE lt_split.
-      READ TABLE lt_split INDEX 3 ASSIGNING <l_split>.
       TRY.
-          l_cl_sql_parse->g_up_to_x_rows = <l_split>.
-        CATCH cx_sy_conversion_overflow.
-
-          MESSAGE e016(/cadaxo/sqlc) WITH <l_split> INTO l_message.
-
-          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-            EXPORTING
-              message = l_message.
+          WHILE sql_string(2) = cl_abap_char_utilities=>cr_lf.
+            sql_string = sql_string+2.
+            SHIFT sql_string LEFT DELETING LEADING space.
+          ENDWHILE.
+        CATCH cx_sy_range_out_of_bounds.
       ENDTRY.
 
-      lv_spacer_string = repeat( val = ` ` occ = l_length ).                                                         "COCKPIT-222
-      lv_check_sql_string = replace( val = lv_check_sql_string off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
-      sql_string          = replace( val = sql_string          off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
+      l_cl_sql_parse->sql_syntax = sql_string.
 
-    ENDIF.
+      " Delete CR/LF
+      REPLACE ALL OCCURRENCES OF cl_abap_char_utilities=>cr_lf IN sql_string WITH space.
+      SHIFT sql_string LEFT DELETING LEADING space.
 
-    FIND REGEX 'BYPASSING\s+BUFFER' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
-    IF sy-subrc EQ 0.
+      " DATA(l_bytes) = strlen( sql_string ) * cl_abap_char_utilities=>charsize."COCKPIT-223
+      " IF l_bytes > 57000.                                                     "COCKPIT-223
+      " MESSAGE e116(/cadaxo/sqlc) INTO l_message.                            "COCKPIT-223
+      " RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                     "COCKPIT-223
+      " EXPORTING                                                           "COCKPIT-223
+      " message       = l_message                                         "COCKPIT-223
+      " /cadaxo/msgid = '/CADAXO/SQLC'                                    "COCKPIT-223
+      " /cadaxo/msgnr = '016'.                                            "COCKPIT-223
+      " ENDIF.                                                                  "COCKPIT-223
 
-      l_cl_sql_parse->g_bypassing_buffer = abap_true.
-      lv_spacer_string = repeat( val = ` ` occ = l_length ).                                                         "COCKPIT-222
-      lv_check_sql_string = replace( val = lv_check_sql_string off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
-      sql_string          = replace( val = sql_string          off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
+      l_cl_sql_parse->sql_syntax_without_where = sql_string.     " CDX001-0029
 
-    ENDIF.
+      CLEAR:
+          l_section,
+          l_moff,
+          l_foff,
+          l_column_f,
+          l_column_t,
+          l_from_f,
+          l_from_t,
+          l_where_f,
+          l_where_t,
+          l_order_f,
+          l_order_t,
+          l_group_f,
+          l_group_t,
+          l_having_f,
+          l_having_t,
+          l_hints_f,                               " CDX001-0019
+          l_hints_t,                               " CDX001-0019
+          l_fields_f,                              " COCKPIT-261
+          l_fields_t,                              " COCKPIT-261
+          l_offset_f,
+          l_offset_t,
+          l_connection_f,
+          l_connection_t,
+          l_klammer_offen.
 
-* prüfung ob subselect eine CLIENT SPECIFIED hat '\ASELECT(.*)SELECT(.*)(CLIENT\s+SPECIFIED)'
+      l_sql_string_c = sql_string.
 
-    DATA lt_results TYPE match_result_tab.
-    DATA ls_results TYPE match_result.
-    DATA l_length2   TYPE i.
+      DATA(select_pattern) = /cadaxo/cl_sqlc_special_parse=>detect_select_pattern( CONV #( l_sql_string_c ) ).
+
+      IF select_pattern-is_select = abap_true.
+
+        l_foff = l_foff + select_pattern-match_length.
+
+        l_cl_sql_parse->g_select_distinct = select_pattern-is_distinct.
+        l_cl_sql_parse->g_select_single   = select_pattern-is_single.
+
+      ELSE.
+
+        IF /cadaxo/cl_sqlc_special_parse=>may_be_datasource( sql_string ).
+
+          IF /cadaxo/cl_sqlc_special_parse=>is_datasource( sql_string ).
+            IF g_user_settings-strict_mode = abap_true.
+              l_sql_string_c = |SELECT FROM { l_sql_string_c } FIELDS *|.
+            ELSE.
+              l_sql_string_c = |SELECT * FROM { l_sql_string_c }|.
+            ENDIF.
+            sql_string = l_sql_string_c.
+            l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
+            l_cl_sql_parse->sql_syntax               = l_sql_string_c.
+            l_foff = l_foff + 7.
+          ELSE.
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
+              EXPORTING textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_tab_1st.
+          ENDIF.
+
+        ELSE.
+          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
+            EXPORTING textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_at_firs.
+        ENDIF.
+
+      ENDIF.
+
+      " Set initial section
+      l_section  = 'COLUMN'.
+      l_column_f = l_foff.
+
+      " Delete ending '.'
+      CLEAR sy-subrc.
+      WHILE sy-subrc = 0.
+        FIND FIRST OCCURRENCE OF REGEX '\.$' IN sql_string MATCH OFFSET l_moff.
+        IF sy-subrc = 0.
+          sql_string = sql_string(l_moff).
+        ENDIF.
+      ENDWHILE.
+
+      " extract up to x rows, bypassing buffer and client specified
+      lv_check_sql_string = sql_string.
+
+      FIND ALL OCCURRENCES OF REGEX '''[^'']*''' IN sql_string RESULTS lt_match_results.
+      IF sy-subrc = 0.
+        SORT lt_match_results BY offset DESCENDING.
+        LOOP AT lt_match_results ASSIGNING <l_match_result>.
+          lv_check_sql_string = replace( val  = lv_check_sql_string
+                                         off  = <l_match_result>-offset
+                                         len  = <l_match_result>-length
+                                         with = repeat( val = ` `
+                                                        occ = <l_match_result>-length ) ). " COCKPIT-222
+        ENDLOOP.
+      ENDIF.
+
+      FIND REGEX 'UP\s+TO\s+\d+\s+ROWS' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
+      IF sy-subrc = 0.
+        DATA(lv_up_to_string) = condense( val = lv_check_sql_string+l_moff(l_length)
+                                          del = ` ` ). " COCKPIT-222
+
+        SPLIT lv_up_to_string AT space INTO TABLE lt_split.
+        ASSIGN lt_split[ 3 ] TO <l_split>.
+        TRY.
+            l_cl_sql_parse->g_up_to_x_rows = <l_split>.
+          CATCH cx_sy_conversion_overflow.
+
+            MESSAGE e016(/cadaxo/sqlc) WITH <l_split> INTO l_message.
+
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
+              EXPORTING message = l_message.
+        ENDTRY.
+
+        lv_spacer_string = repeat( val = ` `
+                                   occ = l_length ).                                                         " COCKPIT-222
+        lv_check_sql_string = replace( val  = lv_check_sql_string
+                                       off  = l_moff
+                                       len  = l_length
+                                       with = lv_spacer_string ). " COCKPIT-222
+        sql_string          = replace( val  = sql_string
+                                       off  = l_moff
+                                       len  = l_length
+                                       with = lv_spacer_string ). " COCKPIT-222
+
+      ENDIF.
+
+      FIND REGEX 'BYPASSING\s+BUFFER' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
+      IF sy-subrc = 0.
+
+        l_cl_sql_parse->g_bypassing_buffer = abap_true.
+        lv_spacer_string = repeat( val = ` `
+                                   occ = l_length ).                                                         " COCKPIT-222
+        lv_check_sql_string = replace( val  = lv_check_sql_string
+                                       off  = l_moff
+                                       len  = l_length
+                                       with = lv_spacer_string ). " COCKPIT-222
+        sql_string          = replace( val  = sql_string
+                                       off  = l_moff
+                                       len  = l_length
+                                       with = lv_spacer_string ). " COCKPIT-222
+
+      ENDIF.
+
+      " prüfung ob subselect eine CLIENT SPECIFIED hat '\ASELECT(.*)SELECT(.*)(CLIENT\s+SPECIFIED)'
+
+      DATA lt_results TYPE match_result_tab.
+      DATA ls_results TYPE match_result.
+      DATA l_length2  TYPE i.
+
 
 ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_001 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001.
 *...
