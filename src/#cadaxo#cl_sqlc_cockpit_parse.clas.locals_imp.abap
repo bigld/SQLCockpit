@@ -6,13 +6,13 @@ DEFINE macro_case_section.
 
   CASE l_section.
     WHEN 'SOURCE'.
-      l_from_t = l_foff - 1.
-    when 'FIELDS'.
+      section_range-from-end = l_foff - 1.
+    WHEN 'FIELDS'.
       l_fields_t = l_foff - 1.
-    when 'OFFSET'.
+    WHEN 'OFFSET'.
       l_offset_t = l_foff - 1.
     WHEN 'WHERE'.
-      l_where_t = l_foff - 1.
+      section_range-where-end = l_foff - 1.
     WHEN 'GROUP'.
       l_group_t = l_foff - 1.
     WHEN 'HAVING'.
@@ -20,7 +20,7 @@ DEFINE macro_case_section.
     WHEN 'ORDER'.
       l_order_t = l_foff - 1.
     WHEN 'CONNECTION'.
-      l_connection_t = l_foff - 1.
+      section_range-connection-end = l_foff - 1.
   ENDCASE.
 
 END-OF-DEFINITION.

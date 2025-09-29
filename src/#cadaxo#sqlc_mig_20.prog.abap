@@ -28,13 +28,13 @@ DATA: gt_prot TYPE TABLE OF sprot_u.
 **********************************************************************
 * SELECTION-SCREEN                                                   *
 **********************************************************************
-SELECTION-SCREEN: BEGIN OF BLOCK bl1 WITH FRAME TITLE text-bl1.
-PARAMETERS: p_admi TYPE c AS CHECKBOX DEFAULT 'X'.
-PARAMETERS: p_vari TYPE c AS CHECKBOX DEFAULT 'X'.
-PARAMETERS: p_jobs TYPE c AS CHECKBOX DEFAULT 'X'.
-PARAMETERS: p_logs TYPE c AS CHECKBOX DEFAULT 'X'.
-SELECTION-SCREEN: ULINE.
-PARAMETERS: p_prod TYPE c AS CHECKBOX DEFAULT 'X'.
+SELECTION-SCREEN: BEGIN OF BLOCK bl1 WITH FRAME TITLE TEXT-bl1.
+  PARAMETERS: p_admi TYPE c AS CHECKBOX DEFAULT 'X'.
+  PARAMETERS: p_vari TYPE c AS CHECKBOX DEFAULT 'X'.
+  PARAMETERS: p_jobs TYPE c AS CHECKBOX DEFAULT 'X'.
+  PARAMETERS: p_logs TYPE c AS CHECKBOX DEFAULT 'X'.
+  SELECTION-SCREEN: ULINE.
+  PARAMETERS: p_prod TYPE c AS CHECKBOX DEFAULT 'X'.
 SELECTION-SCREEN: END OF BLOCK bl1.
 
 **********************************************************************
@@ -50,7 +50,7 @@ START-OF-SELECTION.
                  'Report /CADAXO/SQLC_MIG_20'
                  ''
                  'to'(001)
-                 '3.9.2'.
+                 /cadaxo/if_sqlc_version=>version.
 
   PERFORM convert_user_sql_log.
   PERFORM convert_variants.
@@ -153,7 +153,7 @@ FORM convert_admin_settings.
 
   TYPES: BEGIN OF ltyp_admin_cust,
            client TYPE mandt.
-          INCLUDE STRUCTURE /cadaxo/sqlc_admin_cust.
+           INCLUDE STRUCTURE /cadaxo/sqlc_admin_cust.
   TYPES: END OF ltyp_admin_cust.
 
   DATA ls_adm_cust     TYPE ltyp_admin_cust.
@@ -547,13 +547,13 @@ FORM set_rev_version.
                   '/CADAXO/SQLC_ULOG'
                    '010'
                    'Revision'
-                   '3.9.2'
+                   /cadaxo/if_sqlc_version=>version
                    ''
                    ''.
 
   UPDATE /cadaxo/sqlcparv CLIENT SPECIFIED
-                          SET parameter_value = '3.9.2'
-                          WHERE parameter_id    = 'CADAXO_REV_VERSION'.
+                          SET parameter_value = /cadaxo/if_sqlc_version=>version
+                          WHERE parameter_id  = 'CADAXO_REV_VERSION'.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  tr_prot

@@ -1,7 +1,10 @@
 class /CADAXO/CL_SQLC_COCKPIT_PARSE definition
   public
   final
-  create public .
+  create public
+
+  global friends /CADAXO/CL_SQLC_COCKPIT_MAIN
+                 /CADAXO/CL_SQLC_SQL_SYNTAX .
 
 *"* public components of class /CADAXO/CL_SQLC_COCKPIT_PARSE
 *"* do not include other source files here!!!
@@ -54,18 +57,17 @@ public section.
   data GT_RESULT_DDFIELDS_ALL type /CADAXO/SQLCDFIES_T .
   data GT_SQL_WHERE_COL_TAB_T type /CADAXO/SQLCWHERECOL_STR_T .
   data GT_SUB_COMPONENTS type ABAP_COMPONENT_TAB .
-  data G_BYPASSING_BUFFER type CHAR1 .
+  data G_BYPASSING_BUFFER type /CADAXO/SQLC_CHAR1 .
     "COCKPIT-458 END
-  data G_HOLD_RESULT type CHAR1 .
+  data G_HOLD_RESULT type /CADAXO/SQLC_CHAR1 .
   data G_NO_UPTO type FLAG .
   data G_SAVED_LIST type ABAP_BOOL .
-  data G_SELECT_DISTINCT type CHAR1 .
-  data G_SELECT_SINGLE type CHAR1 .
+  data G_SELECT_DISTINCT type /CADAXO/SQLC_CHAR1 .
+  data G_SELECT_SINGLE type /CADAXO/SQLC_CHAR1 .
   data G_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION read-only .
   data G_UP_TO_X_ROWS type INT4 .
   data HAVING_SYNTAX type /CADAXO/SQLCSELECTHAVINGSYNTAX .
   data OFFSET_SYNTAX type /CADAXO/SQLCSELECTOFFSETSYNTAX .
-  data ORDER_SYNTAX type /CADAXO/SQLCSELECTORDERSYNTAX .
   data RESULT_COMPONENT_T type /CADAXO/SQLCPARSECOMPONENT_T .
   data RESULT_LINES type INT4 .
   data RESULT_RUNTIME type /CADAXO/SQLCRUNTIME .
@@ -75,7 +77,7 @@ public section.
   data SOURCE_SYNTAX type /CADAXO/SQLCSELECTSOURCESYNTAX .
   data SQL_SYNTAX type STRING .
   data SQL_SYNTAX_WITHOUT_WHERE type STRING .
-  data SUBQUERY type CHAR1 .
+  data SUBQUERY type /CADAXO/SQLC_CHAR1 .
   data WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX .
   data WHERE_SYNTAX_WILDCARD type /CADAXO/SQLCSELECTWHERESYNTAX .
 
@@ -100,20 +102,10 @@ public section.
       !C_DOMAIN_VALUE type GTS_DOMVAL
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  methods BLACKLIST_CHECK_TABLES .
   methods CHECK_SQL_ODATA_SYNTAX
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR
       /CADAXO/CX_SQLC_ODATA_GEN .
-  class-methods CHECK_SQL_SYNTAX
-    importing
-      !I_SQL_PARSED type /CADAXO/SQLC_CL_COCKPIT_PARSET
-      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_COCKPIT_PARSE=>C_SELECT_VERSION_1
-    exporting
-      !ET_REST type SCIT_REST
-      !E_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
   methods CONSTRUCTOR
     importing
       !I_MAIN_REF_ID type I optional .
@@ -231,7 +223,8 @@ protected section.
   types:
     gtt_subpool_result type TABLE OF gts_subpool_result .
 
-  constants C_APOSTROPHE type CHAR1 value '''' ##NO_TEXT.
+  data ORDER_SYNTAX type /CADAXO/SQLCSELECTORDERSYNTAX .
+  constants C_APOSTROPHE type /CADAXO/SQLC_CHAR1 value '''' ##NO_TEXT.
   class-data GT_ABAP_TYPEDESCR type /CADAXO/SQLCTABTYPEDESCR_T .
   class-data G_ROLE type /CADAXO/SQLCROLE_AUTH_XML .
   class-data G_USER_SETTINGS type /CADAXO/SQLCUSRP_XML .
@@ -245,6 +238,7 @@ protected section.
   data MR_ARFC_EXCEPTION type ref to CX_ROOT .
   data G_MAIN_REF_ID type I .
   data BACKGROUND_MODE type FLAG .
+  data SUBSELECTS type /CADAXO/SQLC_CL_COCKPIT_PARSET .
 
   class-methods BUILD_ABAP_CODE
     importing
@@ -288,11 +282,6 @@ protected section.
       value(E_RESULT_DETAILS) type /CADAXO/SQLCRESULT_DETAILS
     raising
       /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  class-methods FORMAT_ABAP_CODE
-    importing
-      !I_COLUMNS type I optional
-    changing
-      !CT_ABAP_CODE type /CADAXO/SQLCSTRING_T .
   methods FORMAT_VALUE
     importing
       !I_ABAP_TYPE type ref to CL_ABAP_ELEMDESCR
@@ -718,129 +707,6 @@ METHOD add_domain_value_sub.
 ENDMETHOD.
 
 
-METHOD blacklist_check_tables.
-****************************************************************************************************
-* Description             : Check authorizations                                                   *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 08.03.2011 | Fößleitner Johann    | Check the S_TABU_DIS authorization          | CDX001-022     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.07.2017 | Harald Wiesinger     | New message when user has no roles assigned | COCKPIT-212    *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-
-  DATA: l_yes    TYPE c,
-        l_tables TYPE string.
-
-  FIELD-SYMBOLS: <l_result_source> LIKE LINE OF me->result_source_t,
-                 <l_auth>          TYPE /cadaxo/sqlctable_auth.
-
-* check blacklist tables
-  LOOP AT me->result_source_t ASSIGNING <l_result_source>.
-    /cadaxo/cl_sqlc_cockpit_assist=>blacklist_check_table(
-      EXPORTING  i_table                = <l_result_source>-table
-      EXCEPTIONS table_access_forbidden = 1
-                 OTHERS                 = 2 ).
-    IF sy-subrc NE 0.
-      MESSAGE e010(/cadaxo/sqlc) WITH <l_result_source>-table.
-    ENDIF.
-  ENDLOOP.
-
-* check user authorization
-  LOOP AT me->result_source_t ASSIGNING <l_result_source>.
-
-    CLEAR l_yes.
-
-    LOOP AT me->g_role-included ASSIGNING <l_auth>.
-      IF <l_result_source>-table CP <l_auth> OR
-         <l_result_source>-table = <l_auth>.
-        l_yes = abap_true.
-        EXIT.
-      ENDIF.
-    ENDLOOP.
-
-    IF l_yes = abap_true.
-      LOOP AT me->g_role-excluded ASSIGNING <l_auth>.
-        IF <l_result_source>-table CP <l_auth>.
-          CLEAR l_yes.
-          IF l_tables IS INITIAL.
-            l_tables = <l_result_source>-table.
-          ELSE.
-            CONCATENATE l_tables ',' INTO l_tables.
-            CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
-          ENDIF.
-          EXIT.
-        ENDIF.
-      ENDLOOP.
-    ELSE.
-      IF l_tables IS INITIAL.
-        l_tables = <l_result_source>-table.
-      ELSE.
-        CONCATENATE l_tables ',' INTO l_tables.
-        CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
-      ENDIF.
-    ENDIF.
-
-  ENDLOOP.
-
-* send error message if no authorization
-  IF me->g_role-excluded IS INITIAL AND me->g_role-included IS INITIAL.               "COCKPIT-212
-    MESSAGE e118(/cadaxo/sqlc).                                                       "COCKPIT-212
-  ELSEIF l_yes EQ space.                                                              "COCKPIT-212
-    MESSAGE e010(/cadaxo/sqlc) WITH l_tables.
-  ELSE.
-* also check the s_tabu_dis authority
-    CLEAR l_tables.                                         "CDX001-022
-    DATA l_view_name(30) TYPE c.
-    LOOP AT me->result_source_t ASSIGNING <l_result_source>.
-      l_view_name = <l_result_source>-table.
-      CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
-        EXPORTING
-          view_action                = 'S' "SHOW
-          view_name                  = l_view_name
-          no_warning_for_clientindep = abap_true
-        EXCEPTIONS
-          OTHERS                     = 1.
-      IF sy-subrc NE 0.
-        CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
-          EXPORTING
-            view_action                = 'U' "UPDATE
-            view_name                  = l_view_name
-            no_warning_for_clientindep = abap_true
-          EXCEPTIONS
-            OTHERS                     = 1.
-        IF sy-subrc NE 0.
-          IF l_tables IS INITIAL.
-            l_tables = <l_result_source>-table.
-          ELSE.
-            CONCATENATE l_tables ',' INTO l_tables.
-            CONCATENATE l_tables <l_result_source>-table INTO l_tables SEPARATED BY space.
-          ENDIF.
-        ENDIF.
-      ENDIF.
-    ENDLOOP.                                                "CDX001-022
-    IF NOT l_tables IS INITIAL.                             "CDX001-022
-      MESSAGE e058(/cadaxo/sqlc) WITH l_tables.             "CDX001-022
-    ENDIF.                                                  "CDX001-022
-  ENDIF.
-
-ENDMETHOD.
-
-
 METHOD build_abap_code.
 ****************************************************************************************************
 * Description             : Build the main abap code for syntax-check and subroutine pool          *
@@ -1209,245 +1075,6 @@ METHOD check_sql_string_includes_subq.
   IF sy-subrc EQ 0.
     r_true = 'X'.
   ENDIF.
-
-ENDMETHOD.
-
-
-METHOD check_sql_syntax.
-****************************************************************************************************
-* Description ....... Checks the Syntax of a sql statement                                         *
-* Developer ......... Johann Fößleitner       Date .... 03.02.2010                                 *
-* Status ............ xxxxxxxxx                                                                    *                                                                                                  *
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.06.2010                                                             *
-****************************************************************************************************
-* Date       | User              | Description                                       |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-* 23.05.2023 | Domi Bigl         | class interface changed by SAP                    | COCKPIT-502 *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-****************************************************************************************************
-
-  DATA: lt_line TYPE sedi_source.
-
-  DATA: l_mess TYPE edmessage, "string,                                 "#EC NEEDED
-        l_lin  TYPE i,                                      "#EC NEEDED
-        l_wrd  TYPE tdbaustein, "string,                         "#EC NEEDED
-        l_dir  TYPE trdir.                                  "#EC NEEDED
-
-  DATA lt_abap_code_data TYPE /cadaxo/sqlcstring_t.
-  DATA lt_abap_code_prog TYPE /cadaxo/sqlcstring_t.
-
-  DATA lr_cl_ci_check_result  TYPE REF TO cl_ci_check_result.
-  DATA lr_cl_ci_inspection    TYPE REF TO cl_ci_inspection.
-  DATA lt_rest                TYPE scit_rest.
-  DATA lr_cl_ci_test_root     TYPE REF TO cl_ci_test_root.
-  DATA ls_adm_cust            TYPE /cadaxo/sqlc_admin_cust.
-  DATA lwa_key                TYPE trmsg_key.
-
-  DATA lt_results             TYPE match_result_tab.            "COCKPIT-214
-  DATA lv_select_version      TYPE /cadaxo/sqlc_select_version. "COCKPIT-214
-
-  FIELD-SYMBOLS: <l_cl_sql_parse> TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
-
-  LOOP AT i_sql_parsed ASSIGNING <l_cl_sql_parse>.
-
-    lv_select_version = i_select_version.                         "COCKPIT-214
-
-    IF lv_select_version = c_select_version_1.                    "COCKPIT-214
-      /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex(          "COCKPIT-214
-        EXPORTING i_where_syntax = <l_cl_sql_parse>->where_syntax "COCKPIT-214
-        IMPORTING e_result_tab   =  lt_results ).                 "COCKPIT-214
-
-      IF lt_results IS NOT INITIAL.                               "COCKPIT-214
-        lv_select_version = c_select_version_2.                   "COCKPIT-214
-      ENDIF.                                                      "COCKPIT-214
-    ENDIF.                                                        "COCKPIT-214
-
-
-* create main abap code.
-    CLEAR lt_abap_code_data.
-    CLEAR lt_abap_code_prog.
-    CLEAR lt_line.
-
-    APPEND 'PROGRAM SYNTAX_CHECK.' TO lt_line.
-    APPEND 'FORM UNTER TABLES TAB_RESULT.' TO lt_line.
-
-* create main abap code.
-    /cadaxo/cl_sqlc_cockpit_parse=>build_abap_code(
-       EXPORTING i_cl_cockpit_parse = <l_cl_sql_parse>
-                 i_select_version   = lv_select_version
-       IMPORTING e_abap_code      = lt_abap_code_prog
-                 e_abap_code_data = lt_abap_code_data ).
-
-    format_abap_code( EXPORTING i_columns    = 254                   "COCKPIT-223
-                      CHANGING  ct_abap_code = lt_abap_code_prog ).  "COCKPIT-223
-
-    SORT lt_abap_code_data.
-    DELETE ADJACENT DUPLICATES FROM lt_abap_code_data.
-
-    APPEND LINES OF lt_abap_code_data TO lt_line.
-    APPEND LINES OF lt_abap_code_prog TO lt_line.
-
-    APPEND 'ENDFORM.' TO lt_line.
-
-    l_dir-uccheck = abap_true.
-    l_dir-fixpt   = abap_true.
-
-* do the check syntax
-    SYNTAX-CHECK FOR lt_line MESSAGE l_mess LINE l_lin WORD l_wrd DIRECTORY ENTRY l_dir MESSAGE-ID lwa_key.
-
-    IF lwa_key-keyword = 'SELECT' AND (   lv_select_version = c_select_version_1 AND (    lwa_key-msgnumber = '484'
-                                                                                       OR lwa_key-msgnumber = '487'
-                                                                                       OR lwa_key-msgnumber = '541'
-                                                                                       OR lwa_key-msgnumber = '544' )
-                                       OR lv_select_version = c_select_version_2 AND (    lwa_key-msgnumber = '547' ) )
-       OR lwa_key-keyword = 'MESSAGE'  AND (   lv_select_version = c_select_version_1 AND lwa_key-msgnumber = 'G2F' )
-       OR lwa_key-keyword = 'MESSAGE'  AND (   lv_select_version = c_select_version_1 AND lwa_key-msgnumber = 'GF5' ).
-
-      IF lv_select_version = c_select_version_2 AND ( lwa_key-msgnumber = '547' ).
-        IF <l_cl_sql_parse>->g_no_upto IS INITIAL.
-          <l_cl_sql_parse>->g_no_upto = abap_true.
-        ELSE.
-          DATA(lv_loop) = abap_true.
-        ENDIF.
-
-      ENDIF.
-      IF lv_loop IS INITIAL.
-        /cadaxo/cl_sqlc_cockpit_parse=>check_sql_syntax(
-          EXPORTING
-            i_sql_parsed     = VALUE #( ( <l_cl_sql_parse> ) )
-            i_select_version = c_select_version_2
-          IMPORTING
-            et_rest          = et_rest
-            e_select_version = <l_cl_sql_parse>->g_select_version ).
-        CLEAR l_mess.
-        CLEAR lwa_key.
-      ENDIF.
-    ELSE.
-      <l_cl_sql_parse>->g_select_version = lv_select_version.
-    ENDIF.
-
-* show popup-message, if there is an error
-    IF NOT l_mess IS INITIAL.
-      IF ( lwa_key-keyword = 'MESSAGE' AND lwa_key-msgnumber = 'GAN' ) OR
-         ( lwa_key-keyword = 'SYS$$INCOMPLETE$$' AND lwa_key-msgnumber = '000' ).
-*The length of the current statement is greater that the allowed maximum length of 28 kilobytes.
-*The last statement is not complete (period missing).
-        l_mess = l_mess && ' ' && TEXT-e04.
-      ENDIF.
-
-*    RAISE syntax_error.
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-        EXPORTING
-          message = CONV #( l_mess ).
-    ELSE.
-
-      CLEAR lt_rest.
-
-      /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing( IMPORTING e_customizing = ls_adm_cust ).
-      IF ls_adm_cust-sci_chkv NE space.
-
-        CALL FUNCTION 'PRETTY_PRINTER'
-          EXPORTING
-            inctoo = space
-          TABLES
-            ntext  = lt_line
-            otext  = lt_line.
-
-        TRY.
-* COCKPIT-502 replace
-*            CALL METHOD cl_ci_check=>source_code
-*              EXPORTING
-*                p_variant = ls_adm_cust-sci_chkv
-*                p_code    = lt_line
-*              IMPORTING
-*                p_result  = lr_cl_ci_check_result.
-            TRY.
-
-                DATA(parmas_old) = VALUE abap_parmbind_tab( ( name  = 'P_VARIANT'
-                                                              kind  = cl_abap_objectdescr=>exporting
-                                                              value = REF #( ls_adm_cust-sci_chkv ) )
-                                                            ( name  = 'P_CODE'
-                                                              kind  = cl_abap_objectdescr=>exporting
-                                                              value = REF #( lt_line ) )
-                                                            ( name  = 'P_RESULT'
-                                                              kind  = cl_abap_objectdescr=>importing
-                                                              value = REF #( lr_cl_ci_check_result ) )
-                                                          ).
-
-                CALL METHOD cl_ci_check=>('SOURCE_CODE') PARAMETER-TABLE parmas_old.
-              CATCH cx_sy_dyn_call_error.
-                TRY.
-                    DATA(program_guid) = cl_system_uuid=>create_uuid_c22_static( ).
-                    TRANSLATE program_guid USING '{_}_'.
-                  CATCH cx_uuid_error.    "
-                ENDTRY.
-                DATA(program_name) = CONV program( 'ZCDXCI' && to_upper( program_guid ) ).
-                INSERT REPORT program_name FROM lt_line.
-                DATA(parmas_new) = VALUE abap_parmbind_tab( ( name  = 'P_VARIANT'
-                                                              kind  = cl_abap_objectdescr=>exporting
-                                                              value = REF #( ls_adm_cust-sci_chkv ) )
-                                                            ( name  = 'P_PROGRAM'
-                                                              kind  = cl_abap_objectdescr=>exporting
-                                                              value = REF #( program_name ) )
-                                                            ( name  = 'P_RESULT'
-                                                              kind  = cl_abap_objectdescr=>importing
-                                                              value = REF #( lr_cl_ci_check_result ) )
-                                                          ).
-
-                CALL METHOD cl_ci_check=>('SOURCE_CODE') PARAMETER-TABLE parmas_new.
-
-
-                CALL FUNCTION 'RS_DELETE_PROGRAM'
-                  EXPORTING
-                    program         = program_name
-                    suppress_checks = abap_true
-                    suppress_popup  = abap_true
-                  EXCEPTIONS
-                    OTHERS          = 1.
-
-            ENDTRY.
-* COCKPIT-502 replace end
-
-            lr_cl_ci_inspection = lr_cl_ci_check_result->get_inspection( ).
-            lt_rest = lr_cl_ci_inspection->scirestps.
-
-            DELETE lt_rest WHERE kind NE 'E' AND kind NE 'W'.
-            DELETE lt_rest WHERE test EQ 'CL_CI_TEST_EXTENDED_CHECK'.
-
-            et_rest = lt_rest.
-
-          CATCH: cx_ci_invalid_variant
-                 cx_ci_check_error
-                 cx_ci_invalid_object
-*          CATCH cx_ci_missing_authority
-                 cx_root ##NO_HANLDER.
-            IF program_name IS NOT INITIAL.
-              CALL FUNCTION 'RS_DELETE_PROGRAM'
-                EXPORTING
-                  program         = program_name
-                  suppress_checks = abap_true
-                  suppress_popup  = abap_true
-                EXCEPTIONS
-                  OTHERS          = 1.
-            ENDIF.
-        ENDTRY.
-      ENDIF.
-    ENDIF.
-  ENDLOOP.
-
-  FREE: lt_abap_code_data,
-        lt_abap_code_prog,
-        lr_cl_ci_check_result,
-        lr_cl_ci_inspection,
-        lt_rest,
-        lr_cl_ci_test_root,
-        ls_adm_cust.
 
 ENDMETHOD.
 
@@ -3418,97 +3045,6 @@ METHOD execute_select_v_2.
 ENDMETHOD.
 
 
-METHOD format_abap_code.
-****************************************************************************************************
-* Description             : Format the ABAP Code                                                   *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 09.09.2010 | Fößleitner Johann    | Position error                              | CDX001-0011    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-  DATA: lt_abap_code TYPE /cadaxo/sqlcstring_t,
-        ls_abap_code LIKE LINE OF lt_abap_code.
-
-  DATA: l_pos_from TYPE i,
-        l_pos_to   TYPE i,
-        l_len      TYPE i,
-        l_count    TYPE p DECIMALS 1,
-        l_space    TYPE string.
-
-  FIELD-SYMBOLS: <l_abap_code> LIKE LINE OF lt_abap_code.
-
-  CONCATENATE '' '' INTO l_space SEPARATED BY space.
-
-  MOVE ct_abap_code[] TO lt_abap_code[].
-
-  CLEAR ct_abap_code.
-
-  l_pos_to = i_columns.
-*  l_pos_from = 0.                               "CDX001-0011
-
-  LOOP AT lt_abap_code ASSIGNING <l_abap_code>.
-    l_pos_from = 0.                              "CDX001-0011
-    IF strlen( <l_abap_code> ) LE l_pos_to.
-      APPEND shift_left( <l_abap_code> ) TO ct_abap_code.
-    ELSE.
-      ls_abap_code = <l_abap_code>.
-      DATA(lv_line_length) = strlen( ls_abap_code ).
-      WHILE l_pos_to <= lv_line_length. "ls_abap_code+l_pos_to NE l_space.
-
-        DO.
-          IF ls_abap_code+l_pos_to(1) EQ l_space.
-            FIND ALL OCCURRENCES OF '''' IN SECTION OFFSET l_pos_to OF ls_abap_code MATCH COUNT l_count.
-            IF sy-subrc EQ 0.
-              l_count = l_count / 2.
-              IF frac( l_count ) EQ 0.
-                l_pos_to = l_pos_to - 1.
-                EXIT.
-              ENDIF.
-            ELSE.
-              l_pos_to = l_pos_to - 1.
-              EXIT.
-            ENDIF.
-          ENDIF.
-          l_pos_to = l_pos_to - 1.
-        ENDDO.
-
-        l_len = ( l_pos_to - l_pos_from ) + 1.
-
-        APPEND shift_left( ls_abap_code+l_pos_from(l_len) ) TO ct_abap_code.
-
-        l_pos_from = l_pos_to + 1.
-        l_pos_to = l_pos_from + i_columns.
-
-        IF l_pos_to > lv_line_length.
-          APPEND shift_left( ls_abap_code+l_pos_from ) TO ct_abap_code.
-          EXIT.
-        ENDIF.
-
-      ENDWHILE.
-
-    ENDIF.
-  ENDLOOP.
-
-
-ENDMETHOD.
-
-
 METHOD format_value.
 ****************************************************************************************************
 * Description             : Bring the value of th where_col in right format  (CDX130-018)          *
@@ -4154,648 +3690,709 @@ ENDMETHOD.
   ENDMETHOD.
 
 
-METHOD parse_sql_i.
-****************************************************************************************************
-* Description             : Parse 1                                                                *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 09.09.2010 | Fößleitner Johann    | Support DB Hints                            | CDX001-0011    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.10.2010 | Bigl Domi            |                                             | CDX001-0019    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.01.2011 | Bigl Domi            |                                             | CDX001-0022    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.01.2011 | Bigl Domi            |                                             | CDX001-DEMO    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 11.11.2011 | Johann Fößleitner    | add new attribute sql_syntax_without_where  | CDX001-0029    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 11.11.2011 | Johann Fößleitner    | fix bug open/close bracket                  | CDX001-0029    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 22.05.2012 | Ana Lekic            | max number of selects from admin-customizing| CDX130-011     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 27.04.2015 | Ana Lekic            | parse where                                 | COCKPIT-60     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 26.01.2017 | Domi Bigl            | count(*) + group by                         | COCKPIT-100    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 05.07.2017 | Dusan Sacha          | fix working with 'unlimited' string  SELECT | COCKPIT-222    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.07.2017 | Domi Bigl            | Select is too large                         | COCKPIT-223    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 24.07.2017 | Harald Wiesinger     | check for USING CLIENT                      | COCKPIT-225    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 16.09.2017 | Domi Bigl            | Brackets in FROM                            | COCKPIT-114    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 21.09.2017 | Föß                  | Add FIELDS                                  | COCKPIT-261    *
-****************************************************************************************************
+  METHOD parse_sql_i.
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             : Parse 1                                                                -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    -
+    "  Date                    : xx.xx.xxxx                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  09.09.2010 | Fößleitner Johann    | Support DB Hints                            | CDX001-0011    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.10.2010 | Bigl Domi            |                                             | CDX001-0019    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.01.2011 | Bigl Domi            |                                             | CDX001-0022    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.01.2011 | Bigl Domi            |                                             | CDX001-DEMO    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  11.11.2011 | Johann Fößleitner    | add new attribute sql_syntax_without_where  | CDX001-0029    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  11.11.2011 | Johann Fößleitner    | fix bug open/close bracket                  | CDX001-0029    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  22.05.2012 | Ana Lekic            | max number of selects from admin-customizing| CDX130-011     -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  27.04.2015 | Ana Lekic            | parse where                                 | COCKPIT-60     -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  26.01.2017 | Domi Bigl            | count(*) + group by                         | COCKPIT-100    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  05.07.2017 | Dusan Sacha          | fix working with 'unlimited' string  SELECT | COCKPIT-222    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  06.07.2017 | Domi Bigl            | Select is too large                         | COCKPIT-223    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  24.07.2017 | Harald Wiesinger     | check for USING CLIENT                      | COCKPIT-225    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  16.09.2017 | Domi Bigl            | Brackets in FROM                            | COCKPIT-114    -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "  21.09.2017 | Föß                  | Add FIELDS                                  | COCKPIT-261    -
+    " ---------------------------------------------------------------------------------------------------
 
-  TYPES: BEGIN OF t_split,
-           line(255),
-         END OF t_split.
+    TYPES: BEGIN OF t_split,
+             line TYPE c LENGTH 255,
+           END OF t_split.
 
+    TYPES: BEGIN OF ty_range,
+             start TYPE i,
+             end   TYPE i,
+           END OF ty_range.
+    DATA: BEGIN OF section_range,
+            column     TYPE ty_range,
+            from       TYPE ty_range,
+            connection TYPE ty_range,
+            subselect  TYPE ty_range,
+            where      TYPE ty_range,
+          END OF section_range.
+    DATA l_section            TYPE c LENGTH 10.
+    DATA matchoffset          TYPE i.
+    DATA l_foff               TYPE i.
+    DATA l_order_f            TYPE i.
+    DATA l_hints_f            TYPE i. " CDX001-0011
+    DATA l_order_t            TYPE i.
+    DATA l_group_f            TYPE i.
+    DATA l_group_t            TYPE i.
+    DATA l_having_f           TYPE i.
+    DATA l_having_t           TYPE i.
+    DATA l_hints_t            TYPE i. " CDX001-0011
+    DATA l_fields_f           TYPE i. " COCKPIT-261
+    DATA l_fields_t           TYPE i. " COCKPIT-261
+    DATA l_offset_f           TYPE i.
+    DATA l_offset_t           TYPE i.
+    DATA brackets_open        TYPE i.
+    DATA bracket_closed_index TYPE i.
+    DATA lv_check_sql_string TYPE string. " COCKPIT-222
+    DATA lv_spacer_string    TYPE string. " COCKPIT-222
+    DATA l_alias             TYPE abap_bool.
+    DATA in_subsection       TYPE abap_bool.
+    DATA in_subselect        TYPE abap_bool.
+    DATA subselects          TYPE TABLE OF string.
+    DATA l_length            TYPE i.
+    DATA l_message           TYPE string.
+    DATA lt_split            TYPE TABLE OF t_split.
+    DATA lt_match_results    TYPE TABLE OF match_result.
+    DATA l_sql_string_c      TYPE c LENGTH 100.
+    DATA l_maxsel            TYPE i.
+    DATA l_sql_string        TYPE string.
+    DATA l_off_tmp           TYPE i.
+    DATA length_tmp          TYPE i.
+    DATA matchoffset_tmp     TYPE i.
+    DATA ls_adm_cust         TYPE /cadaxo/sqlc_admin_cust.
+    DATA length              TYPE i.
+    DATA length2             TYPE i.
+    DATA lt_results          TYPE match_result_tab.
+    DATA ls_results          TYPE match_result.
+    DATA l_from              TYPE i.
+    DATA l_to                TYPE i.
+    DATA l_act_do            TYPE i.
+    DATA l_apostrophe_open   TYPE c LENGTH 1.
+    DATA lt_string_sql       TYPE TABLE OF string.
+    DATA l_string            TYPE string.
 
-  DATA: l_section(10),
-        l_moff              TYPE i,
-        l_foff              TYPE i,
-        l_column_f          TYPE i,
-        l_column_t          TYPE i,
-        l_from_f            TYPE i,
-        l_connection_f      TYPE i,
-        l_connection_t      TYPE i,
-        l_from_t            TYPE i,
-        l_where_f           TYPE i,
-        l_where_t           TYPE i,
-        l_order_f           TYPE i,
-        l_hints_f           TYPE i,                "CDX001-0011
-        l_order_t           TYPE i,
-        l_group_f           TYPE i,
-        l_group_t           TYPE i,
-        l_having_f          TYPE i,
-        l_having_t          TYPE i,
-        l_hints_t           TYPE i,                "CDX001-0011
-        l_fields_f          TYPE i,                "COCKPIT-261
-        l_fields_t          TYPE i,                "COCKPIT-261
-        l_offset_f          TYPE i,
-        l_offset_t          TYPE i,
-        l_klammer_offen     TYPE i,
-        lv_check_sql_string TYPE string,           "COCKPIT-222
-        lv_spacer_string    TYPE string,           "COCKPIT-222
-        l_alias             TYPE c,
-        l_length            TYPE i,
-        l_message           TYPE string.
+    DATA l_cl_sql_parse    TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
+    FIELD-SYMBOLS <l_match_result> TYPE match_result.
+    FIELD-SYMBOLS <l_split>        LIKE LINE OF lt_split.
 
-  DATA: lt_split            TYPE TABLE OF t_split.
-  DATA: lt_match_results    TYPE TABLE OF match_result.
-  DATA: l_sql_string_c(100) TYPE c.
-  DATA: l_maxsel            TYPE i.
-  DATA: l_sql_string        TYPE string.
-  DATA: l_off_tmp           TYPE i.
-  DATA: l_len_tmp           TYPE i.
-  DATA: l_moff_tmp          TYPE i.
-  DATA: ls_adm_cust         TYPE /cadaxo/sqlc_admin_cust.
+    sql_string = i_sql.
+    g_role     = i_role.
+    g_main_ref = i_main_ref.
 
-  FIELD-SYMBOLS: <l_match_result> TYPE match_result,
-                 <l_split>        LIKE LINE OF lt_split.
+    " get customizing
+    /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing( IMPORTING e_customizing = ls_adm_cust ).
 
-  sql_string = i_sql.
-  g_role     = i_role.
-  g_main_ref = i_main_ref.
+    " convert sql-string to upper case
+    sql_string = /cadaxo/cl_sqlc_cockpit_assist=>translate_sql_str_upper_case( sql_string ).
 
-* get customizing
-  /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing( IMPORTING e_customizing = ls_adm_cust ).
+    SHIFT sql_string LEFT DELETING LEADING space.
 
-* convert sql-string to upper case
-  sql_string = /cadaxo/cl_sqlc_cockpit_assist=>translate_sql_str_upper_case( sql_string ).
+    CONDENSE sql_string.
 
-  SHIFT sql_string LEFT DELETING LEADING space.
-
-  DATA: l_len                TYPE i,
-        l_from               TYPE i,
-        l_to                 TYPE i,
-        l_act_do             TYPE i,
-        l_apostrophe_open(1) TYPE c,
-        lt_string_sql        TYPE TABLE OF string,
-        l_string             TYPE string.
-
-  DATA: l_cl_sql_parse TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
-
-  l_len = strlen( sql_string ).
-  l_from = 0.
-  DO l_len TIMES.
-    l_act_do = sy-index - 1.
-    CASE sql_string+l_act_do(1).
-      WHEN '.'.
-        IF l_apostrophe_open EQ space.
-          l_to = l_act_do - l_from.
-          MOVE sql_string+l_from(l_to) TO l_string.
-          IF NOT l_string IS INITIAL AND
-                 l_string NE cl_abap_char_utilities=>cr_lf AND
-                 l_string CA 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890=().'.
-            APPEND l_string TO lt_string_sql.
+    length = strlen( sql_string ).
+    l_from = 0.
+    DO length TIMES.
+      l_act_do = sy-index - 1.
+      CASE sql_string+l_act_do(1).
+        WHEN '.'.
+          IF l_apostrophe_open = space.
+            l_to = l_act_do - l_from.
+            l_string = sql_string+l_from(l_to).
+            IF     l_string IS NOT INITIAL
+               AND l_string <> cl_abap_char_utilities=>cr_lf
+               AND l_string CA 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890=().'.
+              APPEND l_string TO lt_string_sql.
+            ENDIF.
+            l_from = l_act_do + 1.
           ENDIF.
-          l_from = l_act_do + 1.
-        ENDIF.
-      WHEN c_apostrophe.
-        TRANSLATE l_apostrophe_open USING ' XX '.
-    ENDCASE.
-  ENDDO.
-  IF NOT sql_string+l_from IS INITIAL.
-    MOVE sql_string+l_from TO l_string.
-    IF NOT l_string IS INITIAL AND
-           l_string NE cl_abap_char_utilities=>cr_lf AND
-           l_string CA 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890=().'.
-      APPEND l_string TO lt_string_sql.
+        WHEN c_apostrophe.
+          l_apostrophe_open = translate( val  = l_apostrophe_open
+                                         from = ` X`
+                                         to   = `X ` ).
+      ENDCASE.
+    ENDDO.
+    IF sql_string+l_from IS NOT INITIAL.
+      l_string = sql_string+l_from.
+      IF     l_string IS NOT INITIAL
+         AND l_string <> cl_abap_char_utilities=>cr_lf
+         AND l_string CA 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890=().'.
+        APPEND l_string TO lt_string_sql.
+      ENDIF.
     ENDIF.
-  ENDIF.
 
-  CLEAR: e_sql_parsed[].
+    CLEAR e_sql_parsed[].
 
-  LOOP AT lt_string_sql INTO sql_string.
+    LOOP AT lt_string_sql INTO sql_string.
 
-    CREATE OBJECT l_cl_sql_parse.
+      l_cl_sql_parse = NEW #( ).
 
-    SHIFT sql_string LEFT DELETING LEADING space.
+      SHIFT sql_string LEFT DELETING LEADING space.
 
-    TRY.
-        WHILE sql_string(2) EQ cl_abap_char_utilities=>cr_lf.
-          sql_string = sql_string+2.
-          SHIFT sql_string LEFT DELETING LEADING space.
-        ENDWHILE.
-      CATCH cx_sy_range_out_of_bounds.
-    ENDTRY.
+      TRY.
+          WHILE sql_string(2) = cl_abap_char_utilities=>cr_lf.
+            sql_string = sql_string+2.
+            SHIFT sql_string LEFT DELETING LEADING space.
+          ENDWHILE.
+        CATCH cx_sy_range_out_of_bounds.
+      ENDTRY.
 
-    l_cl_sql_parse->sql_syntax = sql_string.
+      l_cl_sql_parse->sql_syntax = sql_string.
 
-* Delete CR/LF
-    REPLACE ALL OCCURRENCES OF cl_abap_char_utilities=>cr_lf IN sql_string WITH space.
-    SHIFT sql_string LEFT DELETING LEADING space.
+      " Delete CR/LF
+      REPLACE ALL OCCURRENCES OF cl_abap_char_utilities=>cr_lf IN sql_string WITH space.
+      SHIFT sql_string LEFT DELETING LEADING space.
 
-***    DATA(l_bytes) = strlen( sql_string ) * cl_abap_char_utilities=>charsize."COCKPIT-223
-***    IF l_bytes > 57000.                                                     "COCKPIT-223
-***      MESSAGE e116(/cadaxo/sqlc) INTO l_message.                            "COCKPIT-223
-***      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                     "COCKPIT-223
-***        EXPORTING                                                           "COCKPIT-223
-***          message       = l_message                                         "COCKPIT-223
-***          /cadaxo/msgid = '/CADAXO/SQLC'                                    "COCKPIT-223
-***          /cadaxo/msgnr = '016'.                                            "COCKPIT-223
-***    ENDIF.                                                                  "COCKPIT-223
+      " DATA(l_bytes) = strlen( sql_string ) * cl_abap_char_utilities=>charsize."COCKPIT-223
+      " IF l_bytes > 57000.                                                     "COCKPIT-223
+      " MESSAGE e116(/cadaxo/sqlc) INTO l_message.                            "COCKPIT-223
+      " RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                     "COCKPIT-223
+      " EXPORTING                                                           "COCKPIT-223
+      " message       = l_message                                         "COCKPIT-223
+      " /cadaxo/msgid = '/CADAXO/SQLC'                                    "COCKPIT-223
+      " /cadaxo/msgnr = '016'.                                            "COCKPIT-223
+      " ENDIF.                                                                  "COCKPIT-223
 
-    l_cl_sql_parse->sql_syntax_without_where = sql_string.     "CDX001-0029
+      l_cl_sql_parse->sql_syntax_without_where = sql_string.     " CDX001-0029
 
-    CLEAR:
-        l_section,
-        l_moff,
-        l_foff,
-        l_column_f,
-        l_column_t,
-        l_from_f,
-        l_from_t,
-        l_where_f,
-        l_where_t,
-        l_order_f,
-        l_order_t,
-        l_group_f,
-        l_group_t,
-        l_having_f,
-        l_having_t,
-        l_hints_f,                               "CDX001-0019
-        l_hints_t,                               "CDX001-0019
-        l_fields_f,                              "COCKPIT-261
-        l_fields_t,                              "COCKPIT-261
-        l_offset_f,
-        l_offset_t,
-        l_connection_f,
-        l_connection_t,
-        l_klammer_offen.
+      CLEAR:
+          l_section,
+          matchoffset,
+          l_foff,
+          section_range,
+          l_order_f,
+          l_order_t,
+          l_group_f,
+          l_group_t,
+          l_having_f,
+          l_having_t,
+          l_hints_f,                               " CDX001-0019
+          l_hints_t,                               " CDX001-0019
+          l_fields_f,                              " COCKPIT-261
+          l_fields_t,                              " COCKPIT-261
+          l_offset_f,
+          l_offset_t,
+          brackets_open.
 
-* Check if SELECT is first
-    l_sql_string_c = sql_string.
+      l_sql_string_c = sql_string.
 
-    IF l_sql_string_c(15) EQ 'SELECT DISTINCT'.
-      l_foff = l_foff + 16.
-      l_cl_sql_parse->g_select_distinct = abap_true.
-    ELSEIF l_sql_string_c(22) EQ 'SELECT SINGLE DISTINCT'.
-      l_foff = l_foff + 23.
-      l_cl_sql_parse->g_select_distinct = abap_true.
-      l_cl_sql_parse->g_select_single = abap_true.
-    ELSEIF l_sql_string_c(13) EQ 'SELECT SINGLE'.
-      l_foff = l_foff + 14.
-      l_cl_sql_parse->g_select_single = abap_true.
-    ELSEIF l_sql_string_c(6) EQ 'SELECT'.
-      l_foff = l_foff + 7.
-    ELSE.
+      DATA(select_pattern) = /cadaxo/cl_sqlc_special_parse=>detect_select_pattern( CONV #( l_sql_string_c ) ).
 
+      IF select_pattern-is_select = abap_true.
 
+        l_foff = l_foff + select_pattern-match_length.
 
-      IF /cadaxo/cl_sqlc_special_parse=>may_be_datasource( sql_string ).
+        l_cl_sql_parse->g_select_distinct = select_pattern-is_distinct.
+        l_cl_sql_parse->g_select_single   = select_pattern-is_single.
 
-        IF /cadaxo/cl_sqlc_special_parse=>is_datasource( sql_string ).
-          l_sql_string_c = `SELECT * FROM ` && l_sql_string_c.
-          sql_string = l_sql_string_c.
-          l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
-          l_cl_sql_parse->sql_syntax = l_sql_string_c.
-          l_foff = l_foff + 7.
+      ELSE.
+
+        IF /cadaxo/cl_sqlc_special_parse=>may_be_datasource( sql_string ).
+
+          IF /cadaxo/cl_sqlc_special_parse=>is_datasource( sql_string ).
+            IF g_user_settings-strict_mode = abap_true.
+              l_sql_string_c = |SELECT FROM { l_sql_string_c } FIELDS *|.
+            ELSE.
+              l_sql_string_c = |SELECT * FROM { l_sql_string_c }|.
+            ENDIF.
+            sql_string = l_sql_string_c.
+            l_cl_sql_parse->sql_syntax_without_where = l_sql_string_c.
+            l_cl_sql_parse->sql_syntax               = l_sql_string_c.
+            l_foff = l_foff + 7.
+          ELSE.
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
+              EXPORTING
+                textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_tab_1st.
+          ENDIF.
+
         ELSE.
           RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
             EXPORTING
-              textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_tab_1st.
+              textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_at_firs.
         ENDIF.
 
-      ELSE.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_sel_at_firs
-          EXPORTING
-            textid = /cadaxo/cx_sqlc_no_sel_at_firs=>/cadaxo/cx_sqlc_no_sel_at_firs.
       ENDIF.
 
-    ENDIF.
+      " Set initial section
+      l_section  = 'COLUMN'.
+      section_range-column-start = l_foff.
 
-* Set initial section
-    l_section  = 'COLUMN'.
-    l_column_f = l_foff.
+      " Delete ending '.'
+      CLEAR sy-subrc.
+      WHILE sy-subrc = 0.
+        FIND FIRST OCCURRENCE OF REGEX '\.$' IN sql_string MATCH OFFSET matchoffset.
+        IF sy-subrc = 0.
+          sql_string = sql_string(matchoffset).
+        ENDIF.
+      ENDWHILE.
 
-* Delete ending '.'
-    CLEAR sy-subrc.
-    WHILE sy-subrc EQ 0.
-      FIND FIRST OCCURRENCE OF REGEX '\.$' IN sql_string MATCH OFFSET l_moff.
-      IF sy-subrc EQ 0.
-        sql_string = sql_string(l_moff).
+      " extract up to x rows, bypassing buffer and client specified
+      lv_check_sql_string = sql_string.
+
+      FIND ALL OCCURRENCES OF REGEX '''[^'']*''' IN sql_string RESULTS lt_match_results.
+      IF sy-subrc = 0.
+        SORT lt_match_results BY offset DESCENDING.
+        LOOP AT lt_match_results ASSIGNING <l_match_result>.
+          lv_check_sql_string = replace( val  = lv_check_sql_string
+                                         off  = <l_match_result>-offset
+                                         len  = <l_match_result>-length
+                                         with = repeat( val = ` `
+                                                        occ = <l_match_result>-length ) ). " COCKPIT-222
+        ENDLOOP.
       ENDIF.
-    ENDWHILE.
 
-* extract up to x rows, bypassing buffer and client specified
-    lv_check_sql_string = sql_string.
+      FIND REGEX 'UP\s+TO\s+\d+\s+ROWS' IN lv_check_sql_string MATCH OFFSET matchoffset MATCH LENGTH l_length.
+      IF sy-subrc = 0.
+        DATA(lv_up_to_string) = condense( val = lv_check_sql_string+matchoffset(l_length)
+                                          del = ` ` ). " COCKPIT-222
 
-    FIND ALL OCCURRENCES OF REGEX '''[^'']*''' IN sql_string RESULTS lt_match_results.
-    IF sy-subrc EQ 0.
-      SORT lt_match_results BY offset DESCENDING.
-      LOOP AT lt_match_results ASSIGNING <l_match_result>.
-        lv_check_sql_string = replace( val = lv_check_sql_string off = <l_match_result>-offset len = <l_match_result>-length
-                                       with = repeat( val = ` ` occ = <l_match_result>-length ) ). "COCKPIT-222
-      ENDLOOP.
-    ENDIF.
+        SPLIT lv_up_to_string AT space INTO TABLE lt_split.
+        ASSIGN lt_split[ 3 ] TO <l_split>.
+        TRY.
+            l_cl_sql_parse->g_up_to_x_rows = <l_split>.
+          CATCH cx_sy_conversion_overflow.
 
-    FIND REGEX 'UP\s+TO\s+\d+\s+ROWS' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
-    IF sy-subrc EQ 0.
-      DATA(lv_up_to_string) = condense( val = lv_check_sql_string+l_moff(l_length) del = ` `). "COCKPIT-222
+            MESSAGE e016(/cadaxo/sqlc) WITH <l_split> INTO l_message.
 
-      SPLIT lv_up_to_string AT space INTO TABLE lt_split.
-      READ TABLE lt_split INDEX 3 ASSIGNING <l_split>.
-      TRY.
-          l_cl_sql_parse->g_up_to_x_rows = <l_split>.
-        CATCH cx_sy_conversion_overflow.
+            RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
+              EXPORTING
+                message = l_message.
+        ENDTRY.
 
-          MESSAGE e016(/cadaxo/sqlc) WITH <l_split> INTO l_message.
+        lv_spacer_string = repeat( val = ` `
+                                   occ = l_length ).                                                         " COCKPIT-222
+        lv_check_sql_string = replace( val  = lv_check_sql_string
+                                       off  = matchoffset
+                                       len  = l_length
+                                       with = lv_spacer_string ). " COCKPIT-222
+        sql_string          = replace( val  = sql_string
+                                       off  = matchoffset
+                                       len  = l_length
+                                       with = lv_spacer_string ). " COCKPIT-222
 
-          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-            EXPORTING
-              message = l_message.
-      ENDTRY.
+      ENDIF.
 
-      lv_spacer_string = repeat( val = ` ` occ = l_length ).                                                         "COCKPIT-222
-      lv_check_sql_string = replace( val = lv_check_sql_string off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
-      sql_string          = replace( val = sql_string          off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
+      FIND REGEX 'BYPASSING\s+BUFFER' IN lv_check_sql_string MATCH OFFSET matchoffset MATCH LENGTH l_length.
+      IF sy-subrc = 0.
 
-    ENDIF.
+        l_cl_sql_parse->g_bypassing_buffer = abap_true.
+        lv_spacer_string = repeat( val = ` `
+                                   occ = l_length ).                                                         " COCKPIT-222
+        lv_check_sql_string = replace( val  = lv_check_sql_string
+                                       off  = matchoffset
+                                       len  = l_length
+                                       with = lv_spacer_string ). " COCKPIT-222
+        sql_string          = replace( val  = sql_string
+                                       off  = matchoffset
+                                       len  = l_length
+                                       with = lv_spacer_string ). " COCKPIT-222
 
-    FIND REGEX 'BYPASSING\s+BUFFER' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
-    IF sy-subrc EQ 0.
+      ENDIF.
 
-      l_cl_sql_parse->g_bypassing_buffer = abap_true.
-      lv_spacer_string = repeat( val = ` ` occ = l_length ).                                                         "COCKPIT-222
-      lv_check_sql_string = replace( val = lv_check_sql_string off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
-      sql_string          = replace( val = sql_string          off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
+      " prüfung ob subselect eine CLIENT SPECIFIED hat '\ASELECT(.*)SELECT(.*)(CLIENT\s+SPECIFIED)'
 
-    ENDIF.
 
-* prüfung ob subselect eine CLIENT SPECIFIED hat '\ASELECT(.*)SELECT(.*)(CLIENT\s+SPECIFIED)'
 
-    DATA lt_results TYPE match_result_tab.
-    DATA ls_results TYPE match_result.
-    DATA l_length2   TYPE i.
 
-ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_001 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001.
+ENHANCEMENT-SECTION /CADAXO/SQLC_EHN_S_CLS_SE_001 SPOTS /CADAXO/SQLC_EHNSP_CLS_SE_001 .
 *...
-FIND REGEX 'CLIENT\s+SPECIFIED' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
+FIND REGEX 'CLIENT\s+SPECIFIED' IN lv_check_sql_string MATCH OFFSET matchoffset MATCH LENGTH l_length.
 IF sy-subrc EQ 0.
   MESSAGE e013(/cadaxo/sqlc).
 ENDIF.
 
-FIND REGEX 'USING\s+CLIENT' IN lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.   "COCKPIT-225
+FIND REGEX 'USING\s+CLIENT' IN lv_check_sql_string MATCH OFFSET matchoffset MATCH LENGTH l_length.   "COCKPIT-225
 IF sy-subrc EQ 0.                                                                               "COCKPIT-225
   MESSAGE e121(/cadaxo/sqlc).                                                                   "COCKPIT-225
 ENDIF.                                                                                          "COCKPIT-225
 
+
 END-ENHANCEMENT-SECTION.
 
-    REPLACE 'COUNT(*)' IN sql_string WITH 'COUNT( * )'.
+      REPLACE 'COUNT(*)' IN sql_string WITH 'COUNT( * )'.
 
-    l_sql_string = sql_string.
+      l_sql_string = sql_string.
 
 * remove strings
-    /cadaxo/cl_sqlc_cockpit_assist=>replace_apostrophes_with_space( CHANGING c_string = l_sql_string ).
+      /cadaxo/cl_sqlc_cockpit_assist=>replace_apostrophes_with_space( CHANGING c_string = l_sql_string ).
 
-    DO.
-      TRY.
-          FIND REGEX '\s' IN SECTION OFFSET l_foff OF l_sql_string MATCH OFFSET l_moff.
-          IF sy-subrc EQ 0.
-            l_len = l_moff - l_foff.
+      DO.
+        TRY.
+            FIND REGEX '\s' IN SECTION OFFSET l_foff OF l_sql_string MATCH OFFSET matchoffset.
+            IF sy-subrc EQ 0.
+              length = matchoffset - l_foff.
 
-            IF sql_string+l_foff(l_len) EQ c_apostrophe.
-              l_foff = l_foff + 1.
-              FIND FIRST OCCURRENCE OF c_apostrophe
-                   IN SECTION OFFSET l_foff OF sql_string MATCH OFFSET l_moff.
-              l_foff = l_moff.
-            ELSEIF sql_string+l_foff(l_len) CA '('.
-              l_klammer_offen = l_klammer_offen + 1.
-              IF sql_string+l_foff(l_len) CA ')'.                  "CDX001-0039
-                l_klammer_offen = l_klammer_offen - 1.             "CDX001-0039
-              ENDIF.                                               "CDX001-0039
-            ELSEIF sql_string+l_foff(l_len) CA ')'.
-              l_klammer_offen = l_klammer_offen - 1.
-            ELSEIF sql_string+l_foff(l_len) EQ '.'.
-              l_foff = l_foff + 1.
-              l_foff = l_moff.
-            ELSE.
+              IF sql_string+l_foff(length) EQ c_apostrophe.
+                l_foff = l_foff + 1.
+                FIND FIRST OCCURRENCE OF c_apostrophe
+                     IN SECTION OFFSET l_foff OF sql_string MATCH OFFSET matchoffset.
+                l_foff = matchoffset.
+              ELSEIF sql_string+l_foff(length) CA '('.
+                brackets_open = brackets_open + 1.
+                IF sql_string+l_foff(length) CA ')'.
+                  brackets_open = brackets_open - 1.
+                  bracket_closed_index = l_foff.
+                ENDIF.
+              ELSEIF sql_string+l_foff(length) CA ')'.
+                brackets_open = brackets_open - 1.
+                bracket_closed_index = l_foff.
+              ELSEIF sql_string+l_foff(length) EQ '.'.
+                l_foff = l_foff + 1.
+                l_foff = matchoffset.
+              ELSE.
 
-              IF l_klammer_offen = 0.
+                IF brackets_open = 0.
 
-                IF l_alias EQ space.
-                  CASE sql_string+l_foff(l_len).
-                    WHEN 'AS'.
-                      l_alias = 'X'.
-                    WHEN 'FROM'.
-                      IF l_from_f IS INITIAL.
-                        l_column_t = l_foff - 1.
-                        l_from_f   = l_moff + 1.
-                        l_section  = 'SOURCE'.
+                  IF l_alias EQ space.
+
+                    IF in_subsection = abap_true.
+                      in_subsection = abap_false.
+                      IF in_subselect = abap_true.
+                        in_subselect = abap_false.
+                        section_range-subselect-end = bracket_closed_index - 1.
+                        length2 = section_range-subselect-end - section_range-subselect-start.
+                        APPEND sql_string+section_range-subselect-start(length2) TO subselects.
+                        CLEAR section_range-subselect.
                       ENDIF.
-                    WHEN 'FIELDS'.
-                      IF l_fields_f IS INITIAL.
-                        l_fields_f  = l_moff + 1.
+                    ENDIF.
+
+                    CASE sql_string+l_foff(length).
+                      WHEN 'AS'.
+                        l_alias = abap_true.
+                      WHEN 'IN'.
+                        in_subsection = abap_true.
+                      WHEN 'FROM'.
+                        IF section_range-from-start IS INITIAL.
+                          section_range-column-end = l_foff - 1.
+                          section_range-from-start   = matchoffset + 1.
+                          l_section  = 'SOURCE'.
+                        ENDIF.
+                      WHEN 'FIELDS'.
+                        IF l_fields_f IS INITIAL.
+                          l_fields_f  = matchoffset + 1.
+                          macro_case_section.
+                          l_section = 'FIELDS'.
+                        ENDIF.
+                      WHEN 'OFFSET'.
+                        l_offset_f  = matchoffset + 1.
                         macro_case_section.
-                        l_section = 'FIELDS'.
-                      ENDIF.
-                    WHEN 'OFFSET'.
-                      l_offset_f  = l_moff + 1.
-                      macro_case_section.
-                      l_section = 'OFFSET'.
-                    WHEN 'CONNECTION'.
-                      l_connection_f  = l_moff + 1.
-                      macro_case_section.
-                      l_section       = 'CONNECTION'.
-                    WHEN 'WHERE'.
-                      IF l_where_f IS INITIAL. "COCKPIT-60
-                        l_where_f  = l_moff + 1.
+                        l_section = 'OFFSET'.
+                      WHEN 'CONNECTION'.
+                        section_range-connection-start = matchoffset + 1.
                         macro_case_section.
-                        l_section  = 'WHERE'.
-                      ENDIF.
-                    WHEN 'GROUP'.
-                      macro_case_section.
-                      l_group_f = l_moff + 1.
-                      l_off_tmp = l_moff + 1.
+                        l_section       = 'CONNECTION'.
+                      WHEN 'WHERE'.
+                        IF section_range-where-start IS INITIAL. "COCKPIT-60
+                          section_range-where-start  = matchoffset + 1.
+                          macro_case_section.
+                          l_section  = 'WHERE'.
+                        ENDIF.
+                      WHEN 'GROUP'.
+                        macro_case_section.
+                        l_group_f = matchoffset + 1.
+                        l_off_tmp = matchoffset + 1.
 
-                      FIND REGEX '^ *BY +' IN SECTION OFFSET l_off_tmp OF sql_string MATCH OFFSET l_moff_tmp MATCH LENGTH l_len_tmp.
-                      IF sy-subrc NE 0.
-                        MESSAGE e093(/cadaxo/sqlc) INTO l_message.
-                        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = l_message.
-                      ELSE.
-                        l_group_f = l_moff_tmp + l_len_tmp.
-                      ENDIF.
+                        FIND REGEX '^ *BY +' IN SECTION OFFSET l_off_tmp OF sql_string MATCH OFFSET matchoffset_tmp MATCH LENGTH length_tmp.
+                        IF sy-subrc NE 0.
+                          MESSAGE e093(/cadaxo/sqlc) INTO l_message.
+                          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = l_message.
+                        ELSE.
+                          l_group_f = matchoffset_tmp + length_tmp.
+                        ENDIF.
 
-                      l_section  = 'GROUP'.
-                    WHEN 'HAVING'.
-                      l_having_f  = l_moff + 1.
-                      macro_case_section.
-                      l_section  = 'HAVING'.
-                    WHEN 'ORDER'.
-                      macro_case_section.
-                      l_order_f  = l_moff + 3.
-                      l_section  = 'ORDER'.
-                    WHEN '%_HINTS'.                          "CDX001-0011
-                      macro_case_section.
+                        l_section  = 'GROUP'.
+                      WHEN 'HAVING'.
+                        l_having_f  = matchoffset + 1.
+                        macro_case_section.
+                        l_section  = 'HAVING'.
+                      WHEN 'ORDER'.
+                        macro_case_section.
+                        l_order_f  = matchoffset + 3.
+                        l_section  = 'ORDER'.
+                      WHEN '%_HINTS'.                          "CDX001-0011
+                        macro_case_section.
 
-                      l_moff = l_moff + 1.                   "CDX001-0011
+                        matchoffset = matchoffset + 1.                   "CDX001-0011
 
-                      FIND REGEX '\s' IN SECTION OFFSET l_moff OF sql_string MATCH OFFSET l_moff. "CDX001-0011
+                        FIND REGEX '\s' IN SECTION OFFSET matchoffset OF sql_string MATCH OFFSET matchoffset. "CDX001-0011
 
-                      l_hints_f  = l_moff + 1.               "CDX001-0011
-                      l_section  = '%_HINTS'.                "CDX001-0011
+                        l_hints_f  = matchoffset + 1.               "CDX001-0011
+                        l_section  = '%_HINTS'.                "CDX001-0011
 
-                  ENDCASE.
-                ELSE.
+                    ENDCASE.
+                  ELSE.
 
 * not supported alias
-                  IF sql_string+l_foff(l_len) EQ 'HAVING' OR
-                     sql_string+l_foff(l_len) EQ 'WHERE' OR
-                     sql_string+l_foff(l_len) EQ 'INTO' OR
-                     sql_string+l_foff(l_len) EQ 'INNER' OR
-                     sql_string+l_foff(l_len) EQ 'LEFT' OR
-                     sql_string+l_foff(l_len) EQ 'ON'.
+                    IF sql_string+l_foff(length) EQ 'HAVING' OR
+                       sql_string+l_foff(length) EQ 'WHERE' OR
+                       sql_string+l_foff(length) EQ 'INTO' OR
+                       sql_string+l_foff(length) EQ 'INNER' OR
+                       sql_string+l_foff(length) EQ 'LEFT' OR
+                       sql_string+l_foff(length) EQ 'ON'.
 
-                    MOVE sql_string+l_foff(l_len) TO l_message.
-                    MESSAGE e040(/cadaxo/sqlc) WITH l_message INTO l_message.
-                    RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = l_message.
+                      MOVE sql_string+l_foff(length) TO l_message.
+                      MESSAGE e040(/cadaxo/sqlc) WITH l_message INTO l_message.
+                      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = l_message.
+
+                    ENDIF.
+
+                    CLEAR l_alias.
 
                   ENDIF.
-
-                  CLEAR l_alias.
-
+                ELSE.
+                  IF in_subsection = abap_true.
+                    CASE sql_string+l_foff(length).
+                      WHEN 'SELECT'.
+                        in_subselect = abap_true.
+                        section_range-subselect-start = matchoffset - strlen('SELECT').
+                    ENDCASE.
+                  ENDIF.
                 ENDIF.
-
               ENDIF.
+              l_foff = matchoffset + 1. "1
+            ELSE.
+              IF section_range-from-end IS INITIAL AND section_range-from-start IS NOT INITIAL.
+                section_range-from-end = strlen( sql_string ).
+              ENDIF.
+              IF section_range-where-end IS INITIAL AND section_range-where-start IS NOT INITIAL.
+                section_range-where-end = strlen( sql_string ).
+              ENDIF.
+              IF in_subselect = abap_true AND section_range-subselect-end IS INITIAL AND section_range-subselect-start IS NOT INITIAL.
+                section_range-subselect-end = strlen( sql_string ) - 1. " )
+              ENDIF.
+              IF l_order_t IS INITIAL AND l_order_f IS NOT INITIAL.
+                l_order_t = strlen( sql_string ).
+              ENDIF.
+              IF l_group_t IS INITIAL AND l_group_f IS NOT INITIAL.
+                l_group_t = strlen( sql_string ).
+              ENDIF.
+              IF l_having_t IS INITIAL AND l_having_f IS NOT INITIAL.
+                l_having_t = strlen( sql_string ).
+              ENDIF.
+              IF l_hints_t IS INITIAL AND l_hints_f IS NOT INITIAL.   "CDX001-0011
+                l_hints_t = strlen( sql_string ).                     "CDX001-0011
+              ENDIF.                                                  "CDX001-0011
+              IF l_fields_t IS INITIAL AND l_fields_f IS NOT INITIAL. "COCKPIT-261
+                l_fields_t = strlen( sql_string ).                    "COCKPIT-261
+              ENDIF.                                                  "COCKPIT-261
+              IF l_offset_t IS INITIAL AND l_offset_f IS NOT INITIAL.
+                l_offset_t = strlen( sql_string ).
+              ENDIF.
+              IF section_range-connection-end IS INITIAL AND section_range-connection-start IS NOT INITIAL.
+                section_range-connection-end = strlen( sql_string ).
+              ENDIF.
+              EXIT.
             ENDIF.
-            l_foff = l_moff + 1. "1
-          ELSE.
-            IF l_from_t IS INITIAL AND NOT l_from_f IS INITIAL.
-              l_from_t = strlen( sql_string ).
-            ENDIF.
-            IF l_where_t IS INITIAL AND NOT l_where_f IS INITIAL.
-              l_where_t = strlen( sql_string ).
-            ENDIF.
-            IF l_order_t IS INITIAL AND NOT l_order_f IS INITIAL.
-              l_order_t = strlen( sql_string ).
-            ENDIF.
-            IF l_group_t IS INITIAL AND NOT l_group_f IS INITIAL.
-              l_group_t = strlen( sql_string ).
-            ENDIF.
-            IF l_having_t IS INITIAL AND NOT l_having_f IS INITIAL.
-              l_having_t = strlen( sql_string ).
-            ENDIF.
-            IF l_hints_t IS INITIAL AND NOT l_hints_f IS INITIAL.   "CDX001-0011
-              l_hints_t = strlen( sql_string ).                     "CDX001-0011
-            ENDIF.                                                  "CDX001-0011
-            IF l_fields_t IS INITIAL AND NOT l_fields_f IS INITIAL. "COCKPIT-261
-              l_fields_t = strlen( sql_string ).                    "COCKPIT-261
-            ENDIF.                                                  "COCKPIT-261
-            IF l_offset_t IS INITIAL AND NOT l_offset_f IS INITIAL.
-              l_offset_t = strlen( sql_string ).
-            ENDIF.
-            IF l_connection_t IS INITIAL AND NOT l_connection_f IS INITIAL.
-              l_connection_t = strlen( sql_string ).
-            ENDIF.
+
+          CATCH cx_sy_range_out_of_bounds.
             EXIT.
-          ENDIF.
+        ENDTRY.
+      ENDDO.
 
-
-
-        CATCH cx_sy_range_out_of_bounds.
-          EXIT.
-      ENDTRY.
-    ENDDO.
-
-    l_len = l_column_t - l_column_f.
-    IF l_len GT 0.
-      l_cl_sql_parse->column_syntax = sql_string+l_column_f(l_len).
-      SHIFT l_cl_sql_parse->column_syntax RIGHT DELETING TRAILING space.                 "CDX001-0022
-      SHIFT l_cl_sql_parse->column_syntax LEFT DELETING LEADING space.
-    ENDIF.
-
-    l_len = l_from_t - l_from_f.
-
-    IF l_len GT 0.
-
-      l_cl_sql_parse->source_syntax = sql_string+l_from_f(l_len).
-*      l_cl_sql_parse->source_syntax = replace( val = l_cl_sql_parse->source_syntax regex = '\( | \)' with = '' occ = 0 ). "COCKPIT-114
-      l_cl_sql_parse->source_syntax = shift_left( l_cl_sql_parse->source_syntax ).                                         "COCKPIT-114
-      DATA(lv_syntax_cleanup) = shift_left( val = l_cl_sql_parse->source_syntax sub = '(' ).                               "COCKPIT-114
-      "COCKPIT-114
-      IF lv_syntax_cleanup <> l_cl_sql_parse->source_syntax.                                                               "COCKPIT-114
-        "COCKPIT-114
-        l_cl_sql_parse->source_syntax = shift_left( lv_syntax_cleanup ).                                                   "COCKPIT-114
-        l_cl_sql_parse->source_syntax = shift_right( l_cl_sql_parse->source_syntax ).                                      "COCKPIT-114
-        l_cl_sql_parse->source_syntax = shift_right( val = l_cl_sql_parse->source_syntax sub = ')' ).                      "COCKPIT-114
-        "COCKPIT-114
-      ENDIF.                                                                                                               "COCKPIT-114
-
-    ENDIF.
-
-* no source syntax
-    IF l_cl_sql_parse->source_syntax EQ space.
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_source.
-    ENDIF.
-
-
-    l_len = l_where_t - l_where_f.
-    IF l_len GT 0.
-      MOVE sql_string+l_where_f(l_len) TO l_cl_sql_parse->where_syntax.
-      SHIFT l_cl_sql_parse->where_syntax LEFT DELETING LEADING space.
-    ENDIF.
-
-    l_len = l_order_t - l_order_f.
-    IF l_len GT 0.
-      MOVE sql_string+l_order_f(l_len) TO l_cl_sql_parse->order_syntax.
-      SHIFT l_cl_sql_parse->order_syntax LEFT DELETING LEADING space.
-    ENDIF.
-
-    l_len = l_group_t - l_group_f.
-    IF l_len GT 0.
-      MOVE sql_string+l_group_f(l_len) TO l_cl_sql_parse->group_syntax.
-      SHIFT l_cl_sql_parse->group_syntax LEFT DELETING LEADING space.
-    ENDIF.
-
-    l_len = l_having_t - l_having_f.
-    IF l_len GT 0.
-      MOVE sql_string+l_having_f(l_len) TO l_cl_sql_parse->having_syntax.
-      SHIFT l_cl_sql_parse->having_syntax LEFT DELETING LEADING space.
-    ENDIF.
-
-    l_len = l_hints_t - l_hints_f.                                       "CDX001-0011
-    IF l_len GT 0 AND sql_string+l_hints_f(l_len) NE space.              "CDX001-0011
-      MOVE sql_string+l_hints_f(l_len) TO l_cl_sql_parse->dbhint_syntax. "CDX001-0011
-      SHIFT l_cl_sql_parse->dbhint_syntax LEFT DELETING LEADING space.   "CDX001-0011
-    ENDIF.                                                               "CDX001-0011
-
-    l_len = l_fields_t - l_fields_f.                                     "COCKPIT-261
-    IF l_len GT 0 AND sql_string+l_fields_f(l_len) NE space.             "COCKPIT-261
-      MOVE sql_string+l_fields_f(l_len) TO l_cl_sql_parse->fields_syntax."COCKPIT-261
-      SHIFT l_cl_sql_parse->fields_syntax LEFT DELETING LEADING space.   "COCKPIT-261
-    ENDIF.                                                               "COCKPIT-261
-
-    l_len = l_offset_t - l_offset_f.
-    IF l_len GT 0 AND sql_string+l_offset_f(l_len) NE space.
-      MOVE sql_string+l_offset_f(l_len) TO l_cl_sql_parse->offset_syntax.
-      SHIFT l_cl_sql_parse->offset_syntax LEFT DELETING LEADING space.
-    ENDIF.
-
-    l_len = l_connection_t - l_connection_f.
-    IF l_len GT 0 AND sql_string+l_connection_f(l_len) NE space.
-      IF ls_adm_cust-allow_connection <> abap_true.
-        MESSAGE e097(/cadaxo/sqlc) INTO l_message.
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-          EXPORTING
-            message       = l_message
-            /cadaxo/msgid = '/CADAXO/SQLC'
-            /cadaxo/msgnr = '097'.
+      length = section_range-column-end - section_range-column-start.
+      IF length GT 0.
+        l_cl_sql_parse->column_syntax = sql_string+section_range-column-start(length).
+        SHIFT l_cl_sql_parse->column_syntax RIGHT DELETING TRAILING space.                 "CDX001-0022
+        SHIFT l_cl_sql_parse->column_syntax LEFT DELETING LEADING space.
       ENDIF.
 
-      MOVE sql_string+l_connection_f(l_len) TO l_cl_sql_parse->connection_syntax.
-      SHIFT l_cl_sql_parse->connection_syntax LEFT DELETING LEADING space.
+      length = section_range-from-end - section_range-from-start.
 
-    ENDIF.
+      IF length GT 0.
+
+        l_cl_sql_parse->source_syntax = sql_string+section_range-from-start(length).
+*      l_cl_sql_parse->source_syntax = replace( val = l_cl_sql_parse->source_syntax regex = '\( | \)' with = '' occ = 0 ). "COCKPIT-114
+        l_cl_sql_parse->source_syntax = shift_left( l_cl_sql_parse->source_syntax ).                                         "COCKPIT-114
+        DATA(lv_syntax_cleanup) = shift_left( val = l_cl_sql_parse->source_syntax sub = '(' ).                               "COCKPIT-114
+        "COCKPIT-114
+        IF lv_syntax_cleanup <> l_cl_sql_parse->source_syntax.                                                               "COCKPIT-114
+          "COCKPIT-114
+          l_cl_sql_parse->source_syntax = shift_left( lv_syntax_cleanup ).                                                   "COCKPIT-114
+          l_cl_sql_parse->source_syntax = shift_right( l_cl_sql_parse->source_syntax ).                                      "COCKPIT-114
+          l_cl_sql_parse->source_syntax = shift_right( val = l_cl_sql_parse->source_syntax sub = ')' ).                      "COCKPIT-114
+          "COCKPIT-114
+        ENDIF.                                                                                                               "COCKPIT-114
+
+      ENDIF.
+
+* no source syntax
+      IF l_cl_sql_parse->source_syntax = space.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_no_source.
+      ENDIF.
+
+      length = section_range-where-end - section_range-where-start.
+      IF length > 0.
+        l_cl_sql_parse->where_syntax = sql_string+section_range-where-start(length).
+        SHIFT l_cl_sql_parse->where_syntax LEFT DELETING LEADING space.
+      ENDIF.
+
+      length = section_range-subselect-end - section_range-subselect-start.
+      IF length > 0.
+        APPEND sql_string+section_range-subselect-start(length) TO subselects.
+        CLEAR section_range-subselect.
+      ENDIF.
+
+      length = l_order_t - l_order_f.
+      IF length > 0.
+        MOVE sql_string+l_order_f(length) TO l_cl_sql_parse->order_syntax.
+        SHIFT l_cl_sql_parse->order_syntax LEFT DELETING LEADING space.
+      ENDIF.
+
+      length = l_group_t - l_group_f.
+      IF length > 0.
+        MOVE sql_string+l_group_f(length) TO l_cl_sql_parse->group_syntax.
+        SHIFT l_cl_sql_parse->group_syntax LEFT DELETING LEADING space.
+      ENDIF.
+
+      length = l_having_t - l_having_f.
+      IF length > 0.
+        MOVE sql_string+l_having_f(length) TO l_cl_sql_parse->having_syntax.
+        SHIFT l_cl_sql_parse->having_syntax LEFT DELETING LEADING space.
+      ENDIF.
+
+      length = l_hints_t - l_hints_f.                                       "CDX001-0011
+      IF length > 0 AND sql_string+l_hints_f(length) <> space.              "CDX001-0011
+        MOVE sql_string+l_hints_f(length) TO l_cl_sql_parse->dbhint_syntax. "CDX001-0011
+        SHIFT l_cl_sql_parse->dbhint_syntax LEFT DELETING LEADING space.   "CDX001-0011
+      ENDIF.                                                               "CDX001-0011
+
+      length = l_fields_t - l_fields_f.                                     "COCKPIT-261
+      IF length > 0 AND sql_string+l_fields_f(length) <> space.             "COCKPIT-261
+        MOVE sql_string+l_fields_f(length) TO l_cl_sql_parse->fields_syntax."COCKPIT-261
+        SHIFT l_cl_sql_parse->fields_syntax LEFT DELETING LEADING space.   "COCKPIT-261
+      ENDIF.                                                               "COCKPIT-261
+
+      length = l_offset_t - l_offset_f.
+      IF length > 0 AND sql_string+l_offset_f(length) <> space.
+        MOVE sql_string+l_offset_f(length) TO l_cl_sql_parse->offset_syntax.
+        SHIFT l_cl_sql_parse->offset_syntax LEFT DELETING LEADING space.
+      ENDIF.
+
+      length = section_range-connection-end - section_range-connection-start.
+      IF length > 0 AND sql_string+section_range-connection-start(length) <> space.
+        IF ls_adm_cust-allow_connection <> abap_true.
+          MESSAGE e097(/cadaxo/sqlc) INTO l_message.
+          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
+            EXPORTING
+              message       = l_message
+              /cadaxo/msgid = '/CADAXO/SQLC'
+              /cadaxo/msgnr = '097'.
+        ENDIF.
+
+        l_cl_sql_parse->connection_syntax = sql_string+section_range-connection-start(length).
+        SHIFT l_cl_sql_parse->connection_syntax LEFT DELETING LEADING space.
+
+      ENDIF.
 
 * cds views
-    FIND FIRST OCCURRENCE OF REGEX '^([^(\s]+)(\(.*\).*)$' IN l_cl_sql_parse->source_syntax
-       SUBMATCHES l_cl_sql_parse->source_syntax l_cl_sql_parse->cds_parameter_syntax.
+      FIND FIRST OCCURRENCE OF REGEX '^([^(\s]+)(\(.*\).*)$' IN l_cl_sql_parse->source_syntax
+         SUBMATCHES l_cl_sql_parse->source_syntax l_cl_sql_parse->cds_parameter_syntax.
 
 * check subqueries
-    l_cl_sql_parse->subquery = check_sql_string_includes_subq( l_cl_sql_parse->where_syntax ).
-    IF l_cl_sql_parse->subquery IS INITIAL AND NOT l_cl_sql_parse->having_syntax IS INITIAL.
-      l_cl_sql_parse->subquery = check_sql_string_includes_subq( l_cl_sql_parse->having_syntax ).
-    ENDIF.
+      l_cl_sql_parse->subquery = check_sql_string_includes_subq( l_cl_sql_parse->where_syntax ).
+      IF l_cl_sql_parse->subquery IS INITIAL AND NOT l_cl_sql_parse->having_syntax IS INITIAL.
+        l_cl_sql_parse->subquery = check_sql_string_includes_subq( l_cl_sql_parse->having_syntax ).
+      ENDIF.
 
 * check host expressions
-    IF ls_adm_cust-allow_host_expressions <> abap_true.
-      check_for_host_expressions( CONV #( l_cl_sql_parse->where_syntax ) ).
-      check_for_host_expressions( CONV #( l_cl_sql_parse->column_syntax ) ).
-      check_for_host_expressions( CONV #( l_cl_sql_parse->fields_syntax ) ).
-      check_for_host_expressions( CONV #( l_cl_sql_parse->offset_syntax ) ).
-      check_for_host_expressions( CONV #( l_cl_sql_parse->source_syntax ) ).
-      check_for_host_expressions( CONV #( l_cl_sql_parse->cds_parameter_syntax ) ).
-      check_for_host_expressions( CONV #( l_cl_sql_parse->group_syntax ) ).
-      check_for_host_expressions( CONV #( l_cl_sql_parse->order_syntax ) ).
-      check_for_host_expressions( CONV #( l_cl_sql_parse->dbhint_syntax ) ).
-    ENDIF.
+      IF ls_adm_cust-allow_host_expressions <> abap_true.
+        check_for_host_expressions( CONV #( l_cl_sql_parse->where_syntax ) ).
+        check_for_host_expressions( CONV #( l_cl_sql_parse->column_syntax ) ).
+        check_for_host_expressions( CONV #( l_cl_sql_parse->fields_syntax ) ).
+        check_for_host_expressions( CONV #( l_cl_sql_parse->offset_syntax ) ).
+        check_for_host_expressions( CONV #( l_cl_sql_parse->source_syntax ) ).
+        check_for_host_expressions( CONV #( l_cl_sql_parse->cds_parameter_syntax ) ).
+        check_for_host_expressions( CONV #( l_cl_sql_parse->group_syntax ) ).
+        check_for_host_expressions( CONV #( l_cl_sql_parse->order_syntax ) ).
+        check_for_host_expressions( CONV #( l_cl_sql_parse->dbhint_syntax ) ).
+      ENDIF.
 
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->where_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->where_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->column_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->fields_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->offset_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->source_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->cds_parameter_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->group_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->order_syntax ) ).
-    check_for_host_expr_meth( CONV #( l_cl_sql_parse->dbhint_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->where_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->where_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->column_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->fields_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->offset_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->source_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->cds_parameter_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->group_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->order_syntax ) ).
+      check_for_host_expr_meth( CONV #( l_cl_sql_parse->dbhint_syntax ) ).
 
-    IF i_user_settings IS SUPPLIED.
-      MOVE i_user_settings TO l_cl_sql_parse->g_user_settings.
-    ENDIF.
+      IF i_user_settings IS SUPPLIED.
+        MOVE i_user_settings TO l_cl_sql_parse->g_user_settings.
+      ENDIF.
 
-    IF is_count_star_only( l_cl_sql_parse->column_syntax ).                          "COCKPIT-100
-      IF l_cl_sql_parse->group_syntax IS NOT INITIAL.                                "COCKPIT-100
-        MESSAGE e109(/cadaxo/sqlc) INTO l_message.                                   "COCKPIT-100
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                            "COCKPIT-100
-          EXPORTING
-            message       = l_message
-            /cadaxo/msgid = '/CADAXO/SQLC'
-            /cadaxo/msgnr = '109'.
-      ELSE.                                                                          "COCKPIT-100
-        l_cl_sql_parse->g_select_single = abap_true.                                 "COCKPIT-100
-      ENDIF.                                                                         "COCKPIT-100
-    ENDIF.
+      IF is_count_star_only( l_cl_sql_parse->column_syntax ).                          "COCKPIT-100
+        IF l_cl_sql_parse->group_syntax IS NOT INITIAL.                                "COCKPIT-100
+          MESSAGE e109(/cadaxo/sqlc) INTO l_message.                                   "COCKPIT-100
+          RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error "COCKPIT-100
+            EXPORTING
+              message       = l_message
+              /cadaxo/msgid = '/CADAXO/SQLC'
+              /cadaxo/msgnr = '109'.
+        ELSE.                                                                          "COCKPIT-100
+          l_cl_sql_parse->g_select_single = abap_true.                                 "COCKPIT-100
+        ENDIF.                                                                         "COCKPIT-100
+      ENDIF.
 
-    IF NOT l_cl_sql_parse->where_syntax IS INITIAL.                                  "CDX001-0029
-      REPLACE FIRST OCCURRENCE OF l_cl_sql_parse->where_syntax                       "CDX001-0029
-              IN l_cl_sql_parse->sql_syntax_without_where WITH '<WHEREPARAM>'.       "CDX001-0029
-    ENDIF.                                                                           "CDX001-0029
+      IF NOT l_cl_sql_parse->where_syntax IS INITIAL.                                  "CDX001-0029
+        REPLACE FIRST OCCURRENCE OF l_cl_sql_parse->where_syntax                       "CDX001-0029
+                IN l_cl_sql_parse->sql_syntax_without_where WITH '<WHEREPARAM>'.       "CDX001-0029
+      ENDIF.                                                                           "CDX001-0029
 
-    APPEND l_cl_sql_parse TO e_sql_parsed.
+      APPEND l_cl_sql_parse TO e_sql_parsed.
 
-* CDX130-011 Begin
-    IF ls_adm_cust-maxsel IS NOT INITIAL.
-      MOVE ls_adm_cust-maxsel TO l_maxsel.
-    ELSE.
-      l_maxsel = 16.
-    ENDIF.
+      IF ls_adm_cust-maxsel IS NOT INITIAL.
+        MOVE ls_adm_cust-maxsel TO l_maxsel.
+      ELSE.
+        l_maxsel = 16.
+      ENDIF.
 
-    IF sy-tabix GT l_maxsel.
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_to_much_resrow EXPORTING max_nr_of_selects = l_maxsel.
-    ENDIF.
-*  CDX130-011 End
-  ENDLOOP.
-ENDMETHOD.
+      IF sy-tabix GT l_maxsel.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_to_much_resrow EXPORTING max_nr_of_selects = l_maxsel.
+      ENDIF.
+
+      LOOP AT subselects ASSIGNING FIELD-SYMBOL(<subselect>).
+
+        /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( EXPORTING i_sql           = <subselect>
+                                                              i_user_settings = i_user_settings
+                                                              i_role          = i_role
+                                                              i_main_ref_id   = i_main_ref_id
+                                                              i_main_ref      = i_main_ref
+                                                    IMPORTING e_sql_parsed    = l_cl_sql_parse->subselects ).
+        LOOP AT l_cl_sql_parse->subselects ASSIGNING FIELD-SYMBOL(<parsedsubselect>).
+          <parsedsubselect>->parse_sql_ii( ).
+          i_main_ref->authcheck->blacklist_check_tables( <parsedsubselect>->result_source_t ).
+        ENDLOOP.
+      ENDLOOP.
+
+    ENDLOOP.
+  ENDMETHOD.
 
 
 METHOD parse_sql_ii.
@@ -5211,6 +4808,8 @@ ENDMETHOD.
 
 METHOD parse_sql_ii_2.
 
+  CONSTANTS: join_alias_regex TYPE string VALUE '^([[:word:]/]+)(?:\s+AS\s+([[:word:]/]+)|[[:word:]/]+|.*).*$'.
+
   TYPES: BEGIN OF t_tab_field,
            table       TYPE string,
            field       TYPE string,
@@ -5225,28 +4824,28 @@ METHOD parse_sql_ii_2.
            ddfields TYPE ddfields,
          END OF typ_source_ddfields.
 
-  DATA: l_skip          TYPE i,
-        l_tabix_next    TYPE i,
-        l_tab_field     TYPE t_tab_field,
-        lt_tab_field    TYPE TABLE OF t_tab_field,
-        l_field_dfies   TYPE dfies,
-        ls_result_field TYPE /cadaxo/sqlcdfies,
-        lcl_structtype  TYPE REF TO cl_abap_structdescr,
-        lcl_elemdescr   TYPE REF TO cl_abap_elemdescr,
-        lt_fields       TYPE ddfields.
-  DATA lt_column_split TYPE TABLE OF string.
-  DATA lr_ref_data TYPE REF TO data.
-  DATA l_string TYPE string.
-  DATA l_lines TYPE i.
-  DATA l_cols TYPE string.
-  DATA lr_struct TYPE REF TO cl_abap_structdescr.
+  DATA l_skip             TYPE i.
+  DATA l_tabix_next       TYPE i.
+  DATA l_tab_field        TYPE t_tab_field.
+  DATA lt_tab_field       TYPE TABLE OF t_tab_field.
+  DATA l_field_dfies      TYPE dfies.
+  DATA ls_result_field    TYPE /cadaxo/sqlcdfies.
+  DATA lcl_structtype     TYPE REF TO cl_abap_structdescr.
+  DATA lcl_elemdescr      TYPE REF TO cl_abap_elemdescr.
+  DATA lt_fields          TYPE ddfields.
+  DATA lt_column_split    TYPE TABLE OF string.
+  DATA lr_ref_data        TYPE REF TO data.
+  DATA l_string           TYPE string.
+  DATA l_lines            TYPE i.
+  DATA l_cols             TYPE string.
+  DATA lr_struct          TYPE REF TO cl_abap_structdescr.
   DATA lt_source_ddfields TYPE TABLE OF typ_source_ddfields.
 
-  FIELD-SYMBOLS: <l_source_split_next> TYPE string,
-                 <l_column_split>      TYPE string,
-                 <l_column_split_next> TYPE string,
-                 <l_dfies>             TYPE dfies,
-                 <l_result_source>     LIKE LINE OF me->result_source_t.
+  FIELD-SYMBOLS <l_source_split_next> TYPE string.
+  FIELD-SYMBOLS <l_column_split>      TYPE string.
+  FIELD-SYMBOLS <l_column_split_next> TYPE string.
+  FIELD-SYMBOLS <l_dfies>             TYPE dfies.
+  FIELD-SYMBOLS <l_result_source>     LIKE LINE OF me->result_source_t.
 
   CLEAR: l_skip,
          me->gt_result_ddfields,
@@ -5259,7 +4858,16 @@ METHOD parse_sql_ii_2.
   SPLIT l_string AT | JOIN | INTO TABLE DATA(lt_joins).
 
   LOOP AT lt_joins ASSIGNING FIELD-SYMBOL(<join>).
-    FIND REGEX '^([[:word:]/]+)(?:\s+AS\s+([[:word:]/]+)|[[:word:]/]+|.*).*$' IN <join> SUBMATCHES DATA(l_table) DATA(l_alias). "FOE $002
+    TRY.
+        FIND REGEX join_alias_regex IN <join> SUBMATCHES DATA(l_table) DATA(l_alias). "FOE $002
+      CATCH cx_sy_regex_too_complex INTO DATA(regex_ex).
+        SPLIT <join> AT | ON | INTO DATA(table) DATA(onclause).
+        IF sy-subrc <> 0.
+          FIND REGEX join_alias_regex IN <join> SUBMATCHES l_table l_alias. "Exception!
+        ELSE.
+          FIND REGEX join_alias_regex IN table SUBMATCHES l_table l_alias.
+        ENDIF.
+    ENDTRY.
     IF sy-subrc = 0.
       APPEND VALUE #( table = l_table alias = l_alias ) TO me->result_source_t.
     ENDIF.
@@ -5471,7 +5079,7 @@ METHOD parse_sql_ii_2.
     LOOP AT lt_tab_field ASSIGNING <l_tab_field>.
 
       CLEAR l_field_dfies.
-      clear ls_result_field.
+      CLEAR ls_result_field.
 
       IF <l_tab_field>-field EQ '*' OR <l_tab_field>-field EQ 'COUNT(*)' OR <l_tab_field>-field EQ 'COUNT( * )'.
 
@@ -5513,7 +5121,7 @@ METHOD parse_sql_ii_2.
                   ls_result_field-/cadaxo/alias_field = <l_tab_field>-alias_field.
                   ls_result_field-/cadaxo/alias_value = <l_tab_field>-field.
                   APPEND ls_result_field TO me->gt_result_ddfields.
-                  exit.
+                  EXIT.
                 ENDIF.
               ENDLOOP.
 

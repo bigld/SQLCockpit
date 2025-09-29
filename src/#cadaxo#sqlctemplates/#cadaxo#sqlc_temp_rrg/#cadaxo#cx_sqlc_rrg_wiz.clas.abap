@@ -79,11 +79,23 @@ public section.
       attr3 type scx_attrname value '',
       attr4 type scx_attrname value '',
     end of OBJECT_GENERATION_NOT_POSSIBLE .
+  CONSTANTS:
+    BEGIN OF type_not_supported,
+      msgid TYPE symsgid VALUE '/CADAXO/SQLC_RRG',
+      msgno TYPE symsgno VALUE '022',
+      attr1 TYPE scx_attrname VALUE 'DATATYPE',
+      attr2 TYPE scx_attrname VALUE '',
+      attr3 TYPE scx_attrname VALUE '',
+      attr4 TYPE scx_attrname VALUE '',
+    END OF type_not_supported .
+
+  DATA datatype TYPE String.
 
   methods CONSTRUCTOR
     importing
       !TEXTID like IF_T100_MESSAGE=>T100KEY optional
-      !PREVIOUS like PREVIOUS optional .
+      !PREVIOUS like PREVIOUS optional
+      !DATATYPE type STRING optional .
   class-methods RAISE_T100
     importing
       value(IV_MSGID) type SYMSGID default SY-MSGID
@@ -107,6 +119,8 @@ CLASS /CADAXO/CX_SQLC_RRG_WIZ IMPLEMENTATION.
     CALL METHOD super->constructor
       EXPORTING
         previous = previous.
+
+        me->DATATYPE = DATATYPE .
     CLEAR me->textid.
     IF textid IS INITIAL.
       if_t100_message~t100key = if_t100_message=>default_textid.

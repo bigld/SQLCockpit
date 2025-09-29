@@ -5,11 +5,11 @@ ENHANCEMENT 0 /CADAXO/SQLC_EHNIMP_CLS_PE_3.
     FIND ALL OCCURRENCES OF 'SELECT' IN lv_check_sql_string RESULTS lt_results.
     READ TABLE lt_results INDEX 2 INTO ls_results.
     IF sy-subrc EQ 0.
-      l_length2 = ls_results-offset.
+      length2 = ls_results-offset.
     ELSE.
-      l_length2 = strlen( sql_string ).
+      length2 = strlen( sql_string ).
     ENDIF.
-    FIND FIRST OCCURRENCE OF REGEX 'CLIENT\s+SPECIFIED' IN SECTION OFFSET 0 LENGTH l_length2 OF lv_check_sql_string MATCH OFFSET l_moff MATCH LENGTH l_length.
+    FIND FIRST OCCURRENCE OF REGEX 'CLIENT\s+SPECIFIED' IN SECTION OFFSET 0 LENGTH length2 OF lv_check_sql_string MATCH OFFSET matchoffset MATCH LENGTH l_length.
     IF sy-subrc EQ 0.
       IF ls_adm_cust-allow_cls NE abap_true.
         MESSAGE e013(/cadaxo/sqlc) INTO l_message.
@@ -21,8 +21,8 @@ ENHANCEMENT 0 /CADAXO/SQLC_EHNIMP_CLS_PE_3.
 
         l_cl_sql_parse->gs_client_handling-client_specified = abap_true.
         lv_spacer_string = repeat( val = ` ` occ = l_length ).                                                         "COCKPIT-222
-        lv_check_sql_string = replace( val = lv_check_sql_string off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
-        sql_string          = replace( val = sql_string          off = l_moff len = l_length with = lv_spacer_string )."COCKPIT-222
+        lv_check_sql_string = replace( val = lv_check_sql_string off = matchoffset len = l_length with = lv_spacer_string )."COCKPIT-222
+        sql_string          = replace( val = sql_string          off = matchoffset len = l_length with = lv_spacer_string )."COCKPIT-222
 
       ENDIF.
     ENDIF.
@@ -41,8 +41,8 @@ ENHANCEMENT 0 /CADAXO/SQLC_EHNIMP_CLS_PE_3.
 
 
     FIND FIRST OCCURRENCE OF REGEX 'USING\s+CLIENT'                                                      "COCKPIT-225
-         IN SECTION OFFSET 0 LENGTH l_length2 OF lv_check_sql_string                                     "COCKPIT-225
-         MATCH OFFSET l_moff MATCH LENGTH l_length.                                                      "COCKPIT-225
+         IN SECTION OFFSET 0 LENGTH length2 OF lv_check_sql_string                                     "COCKPIT-225
+         MATCH OFFSET matchoffset MATCH LENGTH length.                                                   "COCKPIT-225
     IF sy-subrc EQ 0.                                                                                    "COCKPIT-225
       IF ls_adm_cust-allow_cls NE abap_true.                                                             "COCKPIT-225
         MESSAGE e121(/cadaxo/sqlc) INTO l_message.                                                       "COCKPIT-225
