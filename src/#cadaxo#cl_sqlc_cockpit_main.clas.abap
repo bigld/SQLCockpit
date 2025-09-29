@@ -3,7 +3,8 @@ class /CADAXO/CL_SQLC_COCKPIT_MAIN definition
   create public
 
   global friends /CADAXO/CL_SQLC_BACKGROUND
-                 /CADAXO/CL_SQLC_SYMBOLS .
+                 /CADAXO/CL_SQLC_SYMBOLS
+                 /cadaxo/cl_sqlc_cockpit_parse .
 
 public section.
 
