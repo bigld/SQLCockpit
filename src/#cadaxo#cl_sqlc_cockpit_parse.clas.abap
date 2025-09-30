@@ -3,7 +3,8 @@ class /CADAXO/CL_SQLC_COCKPIT_PARSE definition
   final
   create public
 
-  global friends /CADAXO/CL_SQLC_COCKPIT_MAIN
+  global friends /CADAXO/CL_SQLC_BACKGROUND
+                 /CADAXO/CL_SQLC_COCKPIT_MAIN
                  /CADAXO/CL_SQLC_SQL_SYNTAX .
 
 *"* public components of class /CADAXO/CL_SQLC_COCKPIT_PARSE
@@ -3691,51 +3692,6 @@ ENDMETHOD.
 
 
   METHOD parse_sql_i.
-    " ---------------------------------------------------------------------------------------------------
-    "  Description             : Parse 1                                                                -
-    " ---------------------------------------------------------------------------------------------------
-    "  Additional informations :                                                                        -
-    "                                                                                                   -
-    " ---------------------------------------------------------------------------------------------------
-    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
-    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
-    " ---------------------------------------------------------------------------------------------------
-    "  Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxr       Company    : CADAXO GesmbH                    -
-    "  Date                    : xx.xx.xxxx                                                             -
-    " ---------------------------------------------------------------------------------------------------
-    "                                                                                                   -
-    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
-    "                                                                                                   -
-    "  Date       | Developer            | Description                                 |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  09.09.2010 | Fößleitner Johann    | Support DB Hints                            | CDX001-0011    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  24.10.2010 | Bigl Domi            |                                             | CDX001-0019    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  24.01.2011 | Bigl Domi            |                                             | CDX001-0022    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  24.01.2011 | Bigl Domi            |                                             | CDX001-DEMO    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  11.11.2011 | Johann Fößleitner    | add new attribute sql_syntax_without_where  | CDX001-0029    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  11.11.2011 | Johann Fößleitner    | fix bug open/close bracket                  | CDX001-0029    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  22.05.2012 | Ana Lekic            | max number of selects from admin-customizing| CDX130-011     -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  27.04.2015 | Ana Lekic            | parse where                                 | COCKPIT-60     -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  26.01.2017 | Domi Bigl            | count(*) + group by                         | COCKPIT-100    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  05.07.2017 | Dusan Sacha          | fix working with 'unlimited' string  SELECT | COCKPIT-222    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  06.07.2017 | Domi Bigl            | Select is too large                         | COCKPIT-223    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  24.07.2017 | Harald Wiesinger     | check for USING CLIENT                      | COCKPIT-225    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  16.09.2017 | Domi Bigl            | Brackets in FROM                            | COCKPIT-114    -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  21.09.2017 | Föß                  | Add FIELDS                                  | COCKPIT-261    -
-    " ---------------------------------------------------------------------------------------------------
 
     TYPES: BEGIN OF t_split,
              line TYPE c LENGTH 255,
@@ -3751,18 +3707,15 @@ ENDMETHOD.
             connection TYPE ty_range,
             subselect  TYPE ty_range,
             where      TYPE ty_range,
+            order      TYPE ty_range,
+            hints      TYPE ty_range,
+            group      TYPE ty_range,
           END OF section_range.
     DATA l_section            TYPE c LENGTH 10.
     DATA matchoffset          TYPE i.
     DATA l_foff               TYPE i.
-    DATA l_order_f            TYPE i.
-    DATA l_hints_f            TYPE i. " CDX001-0011
-    DATA l_order_t            TYPE i.
-    DATA l_group_f            TYPE i.
-    DATA l_group_t            TYPE i.
     DATA l_having_f           TYPE i.
     DATA l_having_t           TYPE i.
-    DATA l_hints_t            TYPE i. " CDX001-0011
     DATA l_fields_f           TYPE i. " COCKPIT-261
     DATA l_fields_t           TYPE i. " COCKPIT-261
     DATA l_offset_f           TYPE i.
@@ -3885,14 +3838,8 @@ ENDMETHOD.
           matchoffset,
           l_foff,
           section_range,
-          l_order_f,
-          l_order_t,
-          l_group_f,
-          l_group_t,
           l_having_f,
           l_having_t,
-          l_hints_f,                               " CDX001-0019
-          l_hints_t,                               " CDX001-0019
           l_fields_f,                              " COCKPIT-261
           l_fields_t,                              " COCKPIT-261
           l_offset_f,
@@ -4114,7 +4061,7 @@ END-ENHANCEMENT-SECTION.
                         ENDIF.
                       WHEN 'GROUP'.
                         macro_case_section.
-                        l_group_f = matchoffset + 1.
+                        section_range-group-start = matchoffset + 1.
                         l_off_tmp = matchoffset + 1.
 
                         FIND REGEX '^ *BY +' IN SECTION OFFSET l_off_tmp OF sql_string MATCH OFFSET matchoffset_tmp MATCH LENGTH length_tmp.
@@ -4122,7 +4069,7 @@ END-ENHANCEMENT-SECTION.
                           MESSAGE e093(/cadaxo/sqlc) INTO l_message.
                           RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error EXPORTING message = l_message.
                         ELSE.
-                          l_group_f = matchoffset_tmp + length_tmp.
+                          section_range-group-start = matchoffset_tmp + length_tmp.
                         ENDIF.
 
                         l_section  = 'GROUP'.
@@ -4132,7 +4079,7 @@ END-ENHANCEMENT-SECTION.
                         l_section  = 'HAVING'.
                       WHEN 'ORDER'.
                         macro_case_section.
-                        l_order_f  = matchoffset + 3.
+                        section_range-order-start  = matchoffset + 3.
                         l_section  = 'ORDER'.
                       WHEN '%_HINTS'.                          "CDX001-0011
                         macro_case_section.
@@ -4141,7 +4088,7 @@ END-ENHANCEMENT-SECTION.
 
                         FIND REGEX '\s' IN SECTION OFFSET matchoffset OF sql_string MATCH OFFSET matchoffset. "CDX001-0011
 
-                        l_hints_f  = matchoffset + 1.               "CDX001-0011
+                        section_range-hints-start  = matchoffset + 1.               "CDX001-0011
                         l_section  = '%_HINTS'.                "CDX001-0011
 
                     ENDCASE.
@@ -4185,17 +4132,17 @@ END-ENHANCEMENT-SECTION.
               IF in_subselect = abap_true AND section_range-subselect-end IS INITIAL AND section_range-subselect-start IS NOT INITIAL.
                 section_range-subselect-end = strlen( sql_string ) - 1. " )
               ENDIF.
-              IF l_order_t IS INITIAL AND l_order_f IS NOT INITIAL.
-                l_order_t = strlen( sql_string ).
+              IF section_range-order-end IS INITIAL AND section_range-order-start IS NOT INITIAL.
+                section_range-order-end = strlen( sql_string ).
               ENDIF.
-              IF l_group_t IS INITIAL AND l_group_f IS NOT INITIAL.
-                l_group_t = strlen( sql_string ).
+              IF section_range-group-end IS INITIAL AND section_range-group-start IS NOT INITIAL.
+                section_range-group-end = strlen( sql_string ).
               ENDIF.
               IF l_having_t IS INITIAL AND l_having_f IS NOT INITIAL.
                 l_having_t = strlen( sql_string ).
               ENDIF.
-              IF l_hints_t IS INITIAL AND l_hints_f IS NOT INITIAL.   "CDX001-0011
-                l_hints_t = strlen( sql_string ).                     "CDX001-0011
+              IF section_range-hints-end IS INITIAL AND section_range-hints-start IS NOT INITIAL.   "CDX001-0011
+                section_range-hints-end = strlen( sql_string ).                     "CDX001-0011
               ENDIF.                                                  "CDX001-0011
               IF l_fields_t IS INITIAL AND l_fields_f IS NOT INITIAL. "COCKPIT-261
                 l_fields_t = strlen( sql_string ).                    "COCKPIT-261
@@ -4257,15 +4204,15 @@ END-ENHANCEMENT-SECTION.
         CLEAR section_range-subselect.
       ENDIF.
 
-      length = l_order_t - l_order_f.
+      length = section_range-order-end - section_range-order-start.
       IF length > 0.
-        MOVE sql_string+l_order_f(length) TO l_cl_sql_parse->order_syntax.
+        MOVE sql_string+section_range-order-start(length) TO l_cl_sql_parse->order_syntax.
         SHIFT l_cl_sql_parse->order_syntax LEFT DELETING LEADING space.
       ENDIF.
 
-      length = l_group_t - l_group_f.
+      length = section_range-group-end - section_range-group-start.
       IF length > 0.
-        MOVE sql_string+l_group_f(length) TO l_cl_sql_parse->group_syntax.
+        MOVE sql_string+section_range-group-start(length) TO l_cl_sql_parse->group_syntax.
         SHIFT l_cl_sql_parse->group_syntax LEFT DELETING LEADING space.
       ENDIF.
 
@@ -4275,9 +4222,9 @@ END-ENHANCEMENT-SECTION.
         SHIFT l_cl_sql_parse->having_syntax LEFT DELETING LEADING space.
       ENDIF.
 
-      length = l_hints_t - l_hints_f.                                       "CDX001-0011
-      IF length > 0 AND sql_string+l_hints_f(length) <> space.              "CDX001-0011
-        MOVE sql_string+l_hints_f(length) TO l_cl_sql_parse->dbhint_syntax. "CDX001-0011
+      length = section_range-hints-end - section_range-hints-start.                                       "CDX001-0011
+      IF length > 0 AND sql_string+section_range-hints-start(length) <> space.              "CDX001-0011
+        MOVE sql_string+section_range-hints-start(length) TO l_cl_sql_parse->dbhint_syntax. "CDX001-0011
         SHIFT l_cl_sql_parse->dbhint_syntax LEFT DELETING LEADING space.   "CDX001-0011
       ENDIF.                                                               "CDX001-0011
 
@@ -4384,11 +4331,9 @@ END-ENHANCEMENT-SECTION.
                                                               i_role          = i_role
                                                               i_main_ref_id   = i_main_ref_id
                                                               i_main_ref      = i_main_ref
-                                                    IMPORTING e_sql_parsed    = l_cl_sql_parse->subselects ).
-        LOOP AT l_cl_sql_parse->subselects ASSIGNING FIELD-SYMBOL(<parsedsubselect>).
-          <parsedsubselect>->parse_sql_ii( ).
-          i_main_ref->authcheck->blacklist_check_tables( <parsedsubselect>->result_source_t ).
-        ENDLOOP.
+                                                    IMPORTING e_sql_parsed    = DATA(paresedsubselects) ).
+        APPEND LINES OF paresedsubselects TO l_cl_sql_parse->subselects.
+
       ENDLOOP.
 
     ENDLOOP.
@@ -4531,6 +4476,10 @@ METHOD parse_sql_ii_1.
     ENDIF.
   ENDLOOP.
 
+  LOOP AT subselects ASSIGNING FIELD-SYMBOL(<subselect>).
+    <subselect>->parse_sql_ii( ).
+    APPEND LINES OF <subselect>->result_source_t TO result_source_t.
+  ENDLOOP.
 
 * no special columns selected, only one table (SELECT * FROM ... )
   IF me->column_syntax EQ '*'.
@@ -4871,6 +4820,11 @@ METHOD parse_sql_ii_2.
     IF sy-subrc = 0.
       APPEND VALUE #( table = l_table alias = l_alias ) TO me->result_source_t.
     ENDIF.
+  ENDLOOP.
+
+  LOOP AT subselects ASSIGNING FIELD-SYMBOL(<subselect>).
+    <subselect>->parse_sql_ii( ).
+    APPEND LINES OF <subselect>->result_source_t TO result_source_t.
   ENDLOOP.
 
   LOOP AT me->result_source_t ASSIGNING FIELD-SYMBOL(<source>).
@@ -6287,6 +6241,7 @@ ENDMETHOD.
                   where_col-fieldlength = 1333.
                 ENDIF.
               CATCH /cadaxo/cx_sqlc_type_not_found.
+                CLEAR lr_abap_type.
             ENDTRY.
 
         ENDCASE.

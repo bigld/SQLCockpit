@@ -14,11 +14,11 @@ DEFINE macro_case_section.
     WHEN 'WHERE'.
       section_range-where-end = l_foff - 1.
     WHEN 'GROUP'.
-      l_group_t = l_foff - 1.
+      section_range-group-end = l_foff - 1.
     WHEN 'HAVING'.
       l_having_t = l_foff - 1.
     WHEN 'ORDER'.
-      l_order_t = l_foff - 1.
+      section_range-order-end = l_foff - 1.
     WHEN 'CONNECTION'.
       section_range-connection-end = l_foff - 1.
   ENDCASE.
