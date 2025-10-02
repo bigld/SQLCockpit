@@ -4,7 +4,8 @@ class /CADAXO/CL_SQLC_COCKPIT_PARSE definition
   create public
 
   global friends /CADAXO/CL_SQLC_COCKPIT_MAIN
-                 /CADAXO/CL_SQLC_SQL_SYNTAX .
+                 /CADAXO/CL_SQLC_SQL_SYNTAX
+                 /CADAXO/CL_SQLC_TEMP_RRG .
 
 *"* public components of class /CADAXO/CL_SQLC_COCKPIT_PARSE
 *"* do not include other source files here!!!
@@ -80,6 +81,7 @@ public section.
   data SUBQUERY type /CADAXO/SQLC_CHAR1 .
   data WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX .
   data WHERE_SYNTAX_WILDCARD type /CADAXO/SQLCSELECTWHERESYNTAX .
+  data ORDER_SYNTAX type /CADAXO/SQLCSELECTORDERSYNTAX .
 
   methods ADD_DOMAIN_VALUE
     raising
@@ -223,7 +225,6 @@ protected section.
   types:
     gtt_subpool_result type TABLE OF gts_subpool_result .
 
-  data ORDER_SYNTAX type /CADAXO/SQLCSELECTORDERSYNTAX .
   constants C_APOSTROPHE type /CADAXO/SQLC_CHAR1 value '''' ##NO_TEXT.
   class-data GT_ABAP_TYPEDESCR type /CADAXO/SQLCTABTYPEDESCR_T .
   class-data G_ROLE type /CADAXO/SQLCROLE_AUTH_XML .
