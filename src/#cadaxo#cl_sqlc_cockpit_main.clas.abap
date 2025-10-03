@@ -757,82 +757,79 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
   METHOD api_execute_sql.
 
-    DATA: lcl_sqlc_cockpit  TYPE REF TO /cadaxo/cl_sqlc_cockpit_main,
-          l_result_details  TYPE /cadaxo/sqlcresult_details,
-          ls_sqlcresult_ref TYPE /cadaxo/sqlcresult_ref,
-          lt_cl_sql_parse   TYPE /cadaxo/sqlc_cl_cockpit_parset,
-          lr_exception      TYPE REF TO cx_static_check.
+    MESSAGE 'DO NOT USE!' TYPE 'X'.
 
-*    FIELD-SYMBOLS: <l_cl_sql_parse>     TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
-
-    CREATE OBJECT lcl_sqlc_cockpit.
-
-    TRY.
-
-* parse the sql string
-        /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i(
-          EXPORTING
-            i_sql           = i_sql_string
-            i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
-            i_role          = lcl_sqlc_cockpit->authcheck->get_cockpitrole( )
-          IMPORTING
-            e_sql_parsed    = lt_cl_sql_parse ).
-
-* INSERT SERILIZATION
-        DATA: l_xml TYPE string.
-        DATA: lr_sql_parse     TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
-        IMPORT xml = l_xml FROM MEMORY ID 'ZPARSEXML'.
-        IF sy-subrc = 0.
-          CALL TRANSFORMATION id
-     SOURCE XML l_xml
-     RESULT parse = lr_sql_parse.
-          APPEND lr_sql_parse TO lt_cl_sql_parse.
-        ENDIF.
-* INSERT SERILIZATION END
-        LOOP AT lt_cl_sql_parse ASSIGNING FIELD-SYMBOL(<lr_cl_sql_parse>).
-* INSERT SERILIZATION
-          IF <lr_cl_sql_parse>->source_syntax = 'BUT000'.
-            CALL TRANSFORMATION id
-            SOURCE parse = <lr_cl_sql_parse>
-            RESULT XML l_xml.
-            EXPORT xml = l_xml TO MEMORY ID 'ZPARSEXML'.
-          ENDIF.
-* INSERT SERILIZATION END
-
-          <lr_cl_sql_parse>->parse_sql_ii( ).
-          lcl_sqlc_cockpit->authcheck->blacklist_check_tables( <lr_cl_sql_parse>->result_source_t ).
-          <lr_cl_sql_parse>->parse_sql_where_columns( ).
-
-        ENDLOOP.
-
-        /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( i_sql_parsed = lt_cl_sql_parse ).
-
-        LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
-
-          <lr_cl_sql_parse>->create_alv_field_catalog( i_user_settings   = lcl_sqlc_cockpit->g_user_settings
-                                                       i_dragdrop_handle = 0 ).
-
-          <lr_cl_sql_parse>->create_result_structures( ).
-
-          <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings  = lcl_sqlc_cockpit->ms_user_settings_xml
-                                             IMPORTING e_result_details = l_result_details ).
-
-          CLEAR ls_sqlcresult_ref.
-
-          ls_sqlcresult_ref-table_dref = <lr_cl_sql_parse>->result_table.
-
-          APPEND ls_sqlcresult_ref TO et_table_ref.
-
-        ENDLOOP.
-
-* catch exceptions
-      CATCH /cadaxo/cx_sqlc_symb_not_found INTO lr_exception.
-      CATCH /cadaxo/cx_sqlc_no_sel_at_firs INTO lr_exception.
-      CATCH /cadaxo/cx_sqlc_syntax_error INTO lr_exception.
-      CATCH /cadaxo/cx_sqlc_no_source INTO lr_exception.
-      CATCH cx_sy_open_sql_db.
-    ENDTRY.
-
+*    DATA l_result_details  TYPE /cadaxo/sqlcresult_details.
+*    DATA lcl_sqlc_cockpit  TYPE REF TO /cadaxo/cl_sqlc_cockpit_main.
+*    DATA ls_sqlcresult_ref TYPE /cadaxo/sqlcresult_ref.
+*    DATA lt_cl_sql_parse   TYPE /cadaxo/sqlc_cl_cockpit_parset.
+*    DATA lr_exception      TYPE REF TO cx_static_check.
+*
+*
+*    lcl_sqlc_cockpit = NEW #( ).
+*
+*    TRY.
+*
+*        " parse the sql string
+*        lt_cl_sql_parse = /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i(
+*                              i_sql           = i_sql_string
+*                              i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
+*                              i_role          = lcl_sqlc_cockpit->authcheck->get_cockpitrole( ) ).
+*
+*        " INSERT SERILIZATION
+*        DATA l_xml        TYPE string.
+*        DATA lr_sql_parse TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
+*        IMPORT xml = l_xml FROM MEMORY ID 'ZPARSEXML'.
+*        IF sy-subrc = 0.
+*          CALL TRANSFORMATION id
+*               SOURCE XML l_xml
+*               RESULT parse = lr_sql_parse.
+*          APPEND lr_sql_parse TO lt_cl_sql_parse.
+*        ENDIF.
+** INSERT SERILIZATION END
+*        LOOP AT lt_cl_sql_parse ASSIGNING FIELD-SYMBOL(<lr_cl_sql_parse>).
+*          " INSERT SERILIZATION
+*          IF <lr_cl_sql_parse>->source_syntax = 'BUT000'.
+*            CALL TRANSFORMATION id
+*                 SOURCE parse = <lr_cl_sql_parse>
+*                 RESULT XML l_xml.
+*            EXPORT xml = l_xml TO MEMORY ID 'ZPARSEXML'.
+*          ENDIF.
+** INSERT SERILIZATION END
+*
+*          <lr_cl_sql_parse>->parse_sql_ii( ).
+*          lcl_sqlc_cockpit->authcheck->blacklist_check_tables( <lr_cl_sql_parse>->result_source_t ).
+*          <lr_cl_sql_parse>->parse_sql_where_columns( ).
+*
+*        ENDLOOP.
+*
+*        /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( i_sql_parsed = lt_cl_sql_parse ).
+*
+*        LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
+*
+*          <lr_cl_sql_parse>->create_alv_field_catalog( i_user_settings   = lcl_sqlc_cockpit->g_user_settings
+*                                                       i_dragdrop_handle = 0 ).
+*
+*          <lr_cl_sql_parse>->create_result_structures( ).
+*
+*          <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings  = lcl_sqlc_cockpit->ms_user_settings_xml
+*                                             IMPORTING e_result_details = l_result_details ).
+*
+*          CLEAR ls_sqlcresult_ref.
+*
+*          ls_sqlcresult_ref-table_dref = <lr_cl_sql_parse>->result_table.
+*
+*          APPEND ls_sqlcresult_ref TO et_table_ref.
+*
+*        ENDLOOP.
+*
+*        " catch exceptions
+*      CATCH /cadaxo/cx_sqlc_symb_not_found INTO lr_exception.
+*      CATCH /cadaxo/cx_sqlc_no_sel_at_firs INTO lr_exception.
+*      CATCH /cadaxo/cx_sqlc_syntax_error INTO lr_exception.
+*      CATCH /cadaxo/cx_sqlc_no_source INTO lr_exception.
+*      CATCH cx_sy_open_sql_db.
+*    ENDTRY.
   ENDMETHOD.
 
 
@@ -987,12 +984,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
           /cadaxo/cl_sqlc_cockpit_assist=>replace_all_symbols_with_value( CHANGING c_string = l_sql_string ).
 
-          /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( EXPORTING i_sql           = l_sql_string
-                                                                i_user_settings = ms_user_settings_xml
-                                                                i_role          = authcheck->get_cockpitrole( )
-                                                                i_main_ref_id   = g_my_main_id
-                                                                i_main_ref      = me
-                                                      IMPORTING e_sql_parsed    = <lt_cl_sql_parse> ).
+          <lt_cl_sql_parse> = /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( i_sql           = l_sql_string
+                                                                          i_user_settings = ms_user_settings_xml
+                                                                          i_role          = authcheck->get_cockpitrole( )
+                                                                          i_main_ref_id   = g_my_main_id
+                                                                          i_main_ref      = me ).
 
           IF g_user_settings-strict_mode = abap_true.
             DATA(start_sql_version) = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.

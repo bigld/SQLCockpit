@@ -120,27 +120,23 @@ CLASS /cadaxo/tc_sqlc_cockpit_parse IMPLEMENTATION.
     FIELD-SYMBOLS: <any_field> TYPE any.
 
 
-    f_cut->parse_sql_i(
-      EXPORTING
-        i_sql = `SELECT DISTINCT ID1~PARTNER FROM BUT0ID AS ID1` &&
-                ` INNER JOIN BUT050 AS BUT` &&
-                `         ON ID1~PARTNER = BUT~PARTNER1` &&
-                ` AND BUT~RELTYP  = 'ZBSALO'` &&
-                `         AND BUT~XDFREL = 'X'` &&
-                `      INNER JOIN BUT0ID AS ID2` &&
-                `        ON BUT~PARTNER2 = ID2~PARTNER` &&
-                `        AND ID2~TYPE = 'ZR3VKO'` &&
-                `      UP     TO     5656    ROWS` &&
-                ` WHERE ID1~TYPE = 'ZCRSCP'` &&
-                `        AND  NOT ID2~IDNUMBER IN ('1580', '1620' )` &&
-                `        AND ID1~IDNUMBER IN (` &&
-                `   '1110043618',` &&
-                ` '1030199116',` &&
-                ` '1030229954',` &&
-                ` '1030238172' ).`
-      IMPORTING
-        e_sql_parsed                   = lt_parsed
-    ).
+    lt_parsed = f_cut->parse_sql_i(
+                 `SELECT DISTINCT ID1~PARTNER FROM BUT0ID AS ID1` &&
+                 ` INNER JOIN BUT050 AS BUT` &&
+                 `         ON ID1~PARTNER = BUT~PARTNER1` &&
+                 ` AND BUT~RELTYP  = 'ZBSALO'` &&
+                 `         AND BUT~XDFREL = 'X'` &&
+                 `      INNER JOIN BUT0ID AS ID2` &&
+                 `        ON BUT~PARTNER2 = ID2~PARTNER` &&
+                 `        AND ID2~TYPE = 'ZR3VKO'` &&
+                 `      UP     TO     5656    ROWS` &&
+                 ` WHERE ID1~TYPE = 'ZCRSCP'` &&
+                 `        AND  NOT ID2~IDNUMBER IN ('1580', '1620' )` &&
+                 `        AND ID1~IDNUMBER IN (` &&
+                 `   '1110043618',` &&
+                 ` '1030199116',` &&
+                 ` '1030229954',` &&
+                 ` '1030238172' ).` ).
 
     DATA(lr_parsed) = CAST /cadaxo/cl_sqlc_cockpit_parse( lt_parsed[ 1 ] ).
 
@@ -192,12 +188,7 @@ CLASS /cadaxo/tc_sqlc_cockpit_parse IMPLEMENTATION.
     FIELD-SYMBOLS: <any_field> TYPE any.
 
 
-    f_cut->parse_sql_i(
-      EXPORTING
-        i_sql                          = `select DISTINCT * from but000 UP     TO 3       ROWS where partner = '''dodo'.`
-      IMPORTING
-        e_sql_parsed                   = lt_parsed
-    ).
+    lt_parsed = f_cut->parse_sql_i( `select DISTINCT * from but000 UP     TO 3       ROWS where partner = '''dodo'.` ).
 
     DATA(lr_parsed) = CAST /cadaxo/cl_sqlc_cockpit_parse( lt_parsed[ 1 ] ).
 

@@ -3,8 +3,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
   FINAL
   CREATE PUBLIC .
 
-*"* public components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
-*"* do not include other source files here!!!
   PUBLIC SECTION.
 
     CONSTANTS c_param_version TYPE /cadaxo/sqlcparameter_id VALUE 'CADAXO_VERSION' ##NO_TEXT.
@@ -50,11 +48,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
         !e_fieldname TYPE string
       EXCEPTIONS
         no_table_selected .
-    CLASS-METHODS blacklist_check_table
-      IMPORTING
-        !i_table TYPE /CADAXO/SQLC_CHAR30
-      EXCEPTIONS
-        table_access_forbidden .
     CLASS-METHODS get_parameter_value
       IMPORTING
         !i_parameter_id          TYPE /cadaxo/sqlcparameter_id
@@ -73,7 +66,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
       EXPORTING
         !e_date_from         TYPE dats
         !e_time_from         TYPE tims
-        !e_success           TYPE /CADAXO/SQLC_CHAR1 .
+        !e_success           TYPE /cadaxo/sqlc_char1 .
     CLASS-METHODS sql_trace_off
       IMPORTING
         !i_sql_trace         TYPE /cadaxo/sqlcsqltrace DEFAULT 'X'
@@ -84,7 +77,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
     CLASS-METHODS get_global_symbol_value
       IMPORTING
         !i_symbol       TYPE /cadaxo/sqlcsymbol_name OPTIONAL
-        !i_field_type   TYPE /CADAXO/SQLC_CHAR1 OPTIONAL
+        !i_field_type   TYPE /cadaxo/sqlc_char1 OPTIONAL
       EXPORTING
         !e_symbol_value TYPE any
       RAISING
@@ -112,7 +105,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
       EXPORTING
         !e_symbol_multivalue TYPE string
         !e_symbol_value      TYPE string
-        !e_is_multi          TYPE /CADAXO/SQLC_GENERAL_FLAG
+        !e_is_multi          TYPE /cadaxo/sqlc_general_flag
       RAISING
         /cadaxo/cx_sqlc_symb_not_found .
     CLASS-METHODS condense
@@ -184,7 +177,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
         VALUE(r_active) TYPE /cadaxo/sqlcactive .
     CLASS-METHODS export_data
       IMPORTING
-        !i_export_type TYPE /CADAXO/SQLC_CHAR5 DEFAULT 'CSV'
+        !i_export_type TYPE /cadaxo/sqlc_char5 DEFAULT 'CSV'
         !it_fcat       TYPE lvc_t_fcat
         !it_data       TYPE ANY TABLE .
     CLASS-METHODS export_data_asxml
@@ -242,7 +235,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
         VALUE(iv_offset)  TYPE i DEFAULT 0
         !iv_literal_mark  TYPE c DEFAULT `'`
       RETURNING
-        VALUE(ev_is_open) TYPE /CADAXO/SQLC_GENERAL_FLAG .
+        VALUE(ev_is_open) TYPE /cadaxo/sqlc_general_flag .
     CLASS-METHODS create_data_reference
       IMPORTING
         !iv_inttype           TYPE inttype
@@ -272,10 +265,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
       CHANGING
         !ev_symbol_value          TYPE string
       RETURNING
-        VALUE(ev_apostrophe_char) TYPE /CADAXO/SQLC_CHAR1 .
+        VALUE(ev_apostrophe_char) TYPE /cadaxo/sqlc_char1 .
     CLASS-METHODS encloding_apostrophe_set
       IMPORTING
-        !iv_apostrophe_char TYPE /CADAXO/SQLC_CHAR1
+        !iv_apostrophe_char TYPE /cadaxo/sqlc_char1
       CHANGING
         !ev_symbol_value    TYPE string .
     CLASS-METHODS get_sql_cockpit_standard_users
@@ -298,7 +291,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
 
 *"* protected components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
 *"* do not include other source files here!!!
-    CLASS-DATA g_open TYPE /CADAXO/SQLC_CHAR1 .
+    CLASS-DATA g_open TYPE /cadaxo/sqlc_char1 .
     CLASS-DATA g_space_string TYPE string .
     CLASS-DATA gs_admin_cust TYPE /cadaxo/sqlc_admin_cust .
   PRIVATE SECTION.
@@ -310,12 +303,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
-
-
-  METHOD blacklist_check_table.
-
-  ENDMETHOD.
+CLASS /cadaxo/cl_sqlc_cockpit_assist IMPLEMENTATION.
 
 
   METHOD call_convertion_exit_input.  "COCKPIT-216
@@ -433,62 +421,61 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
 
   METHOD condense.
-****************************************************************************************************
-* Description             : Condense SQL string respecting spaces between '                        *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.11.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Domi Bigl                Company    : CADAXO GesmbH                    *
-* Date                    : 22.11.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
+    " ---------------------------------------------------------------------------------------------------
+    "  Description             : Condense SQL string respecting spaces between '                        -
+    " ---------------------------------------------------------------------------------------------------
+    "  Additional informations :                                                                        -
+    "                                                                                                   -
+    " ---------------------------------------------------------------------------------------------------
+    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
+    "  Date                    : 01.11.2010               Release    : WAS 7.00                         -
+    " ---------------------------------------------------------------------------------------------------
+    "  Qual. Check(opt.)       : Domi Bigl                Company    : CADAXO GesmbH                    -
+    "  Date                    : 22.11.2010                                                             -
+    " ---------------------------------------------------------------------------------------------------
+    "                                                                                                   -
+    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
+    "                                                                                                   -
+    "  Date       | Developer            | Description                                 |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "             |                      |                                             |                -
+    "             |                      |                                             |                -
+    " ------------+----------------------+---------------------------------------------+-----------------
+    "             |                      |                                             |                -
+    "             |                      |                                             |                -
+    " ---------------------------------------------------------------------------------------------------
 
-    DATA: l_pos            TYPE i,
-          l_strlen         TYPE i,
-          l_open(1)        TYPE c,
-          l_string_new     TYPE string,
-          l_last_character TYPE string.
+    DATA pos            TYPE i.
+    DATA strlen         TYPE i.
+    DATA open           TYPE c LENGTH 1.
+    DATA string_new     TYPE string.
+    DATA previous_character TYPE string.
 
-* first, shift left and delete leading spaces
+    " first, shift left and delete leading spaces
     SHIFT c_string LEFT DELETING LEADING space.
 
-    l_strlen = strlen( c_string ).
+    strlen = strlen( c_string ).
 
-    DO l_strlen TIMES.
-      l_pos = sy-index - 1.
+    DO strlen( c_string ) TIMES.
+      pos = sy-index - 1.
 
-      IF c_string+l_pos(1) EQ `'`.
-        TRANSLATE l_open USING ' XX '.
+      IF c_string+pos(1) = `'`.
+        open = boolc( open <> abap_true ).
       ENDIF.
 
-      IF l_open NE 'X'.
-        IF c_string+l_pos(1) EQ g_space_string AND l_last_character EQ g_space_string.
+      IF open <> abap_true.
+        IF c_string+pos(1) = g_space_string AND previous_character = g_space_string.
           CONTINUE.
         ENDIF.
       ENDIF.
 
-      CONCATENATE l_string_new c_string+l_pos(1) INTO l_string_new.
+      string_new = string_new && c_string+pos(1).
 
-      MOVE c_string+l_pos(1) TO l_last_character.
+      previous_character = c_string+pos(1).
 
     ENDDO.
 
-    c_string = l_string_new.
-
+    c_string = string_new.
   ENDMETHOD.
 
 
@@ -496,9 +483,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
     DATA l_pos TYPE i.
     DATA l_type TYPE c.
-    DATA l_col_value_p TYPE /CADAXO/SQLC_CHAR30.
+    DATA l_col_value_p TYPE /cadaxo/sqlc_char30.
     DATA l_col_value_x TYPE c LENGTH 32.
-    DATA l_col_value_d TYPE /CADAXO/SQLC_CHAR10.
+    DATA l_col_value_d TYPE /cadaxo/sqlc_char10.
     DATA l_col_value_string TYPE string.
     DATA l_double_enclosure(2) TYPE c.
     DATA l_col_enclosure(1)    TYPE c.
@@ -733,10 +720,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
 
   METHOD create_alv_date_header.
-    DATA:  l_date       TYPE dats,
-           l_time       TYPE tims,
-           l_date_c(10),
-           l_time_c(8).
+    DATA: l_date       TYPE dats,
+          l_time       TYPE tims,
+          l_date_c(10),
+          l_time_c(8).
 
     CONVERT TIME STAMP i_timestamp_from TIME ZONE 'UTC   '
             INTO DATE l_date TIME l_time.
@@ -1129,7 +1116,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
     DATA l_pos_from           TYPE i.
     DATA l_pos_to             TYPE i.
-    DATA l_do_while           TYPE /CADAXO/SQLC_GENERAL_FLAG.
+    DATA l_do_while           TYPE /cadaxo/sqlc_general_flag.
     DATA lt_abap_code_tmp     TYPE /cadaxo/sqlcstring_t.
     DATA ls_abap_code         LIKE LINE OF ct_code.
     DATA l_space              TYPE string.
@@ -1432,9 +1419,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
     DATA: l_symbol_name TYPE /cadaxo/sqlcsymbol_name,
           ls_sqlcsymb   TYPE /cadaxo/sqlcsymb.
 
-    DATA: l_no_usersymbol TYPE /CADAXO/SQLC_GENERAL_FLAG.                                             "CDX001-0020
-    DATA: l_comma_s       TYPE /CADAXO/SQLC_CHAR1.
-    DATA: l_comma_e       TYPE /CADAXO/SQLC_CHAR1.
+    DATA: l_no_usersymbol TYPE /cadaxo/sqlc_general_flag.                                             "CDX001-0020
+    DATA: l_comma_s       TYPE /cadaxo/sqlc_char1.
+    DATA: l_comma_e       TYPE /cadaxo/sqlc_char1.
     DATA: l_length        TYPE i.
 
 
@@ -1649,7 +1636,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
         AND username    = @sy-uname.
 
     IF sy-subrc <> 0.                                                            "CDX001-0020
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_symb_not_found                        "CDX001-0020
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_symb_not_found "CDX001-0020
         EXPORTING                                                                "CDX001-0020
           symbol = i_symbol.                                                     "CDX001-0020
     ENDIF.                                                                       "CDX001-0020
@@ -1745,7 +1732,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
     ENDDO.
 
     IF g_open IS NOT INITIAL.                                 "RT229
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value      "RT229
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value "RT229
         EXPORTING
           textid = /cadaxo/cx_sqlc_invalid_value=>open_literal. "RT229
     ENDIF.                                                    "RT229
@@ -1800,8 +1787,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
     DATA: l_from_pos  TYPE i.
     DATA: l_to_line   TYPE i.
     DATA: l_to_pos    TYPE i.
-    DATA: l_string1   TYPE /CADAXO/SQLCTEXT255.
-    DATA: l_string2   TYPE /CADAXO/SQLCTEXT255.
+    DATA: l_string1   TYPE /cadaxo/sqlctext255.
+    DATA: l_string2   TYPE /cadaxo/sqlctext255.
     DATA: lt_code     TYPE /cadaxo/sqlccodeline_t.
     FIELD-SYMBOLS: <f_code> TYPE  /cadaxo/sqlccodeline.
     CONSTANTS: c_header TYPE c VALUE '*&%HEADER' LENGTH 9.
@@ -1977,7 +1964,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
     DATA l_length               TYPE i.
     DATA lt_symbols             TYPE TABLE OF /cadaxo/sqlcsymbol_name.
     DATA ls_sqlcsymb            TYPE /cadaxo/sqlcsymb.
-    DATA lv_is_multi            TYPE /CADAXO/SQLC_GENERAL_FLAG.   "COCKPIT-216
+    DATA lv_is_multi            TYPE /cadaxo/sqlc_general_flag.   "COCKPIT-216
 
     FIELD-SYMBOLS: <ls_result>  LIKE LINE OF lt_results,
                    <ls_symbols> LIKE LINE OF lt_symbols.
@@ -2091,7 +2078,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 *            |                      |                                             |                *
 ****************************************************************************************************
 
-    CONSTANTS c_apostrophe TYPE /CADAXO/SQLC_CHAR1 VALUE ''''.
+    CONSTANTS c_apostrophe TYPE /cadaxo/sqlc_char1 VALUE ''''.
 
     DATA l_len    TYPE i.
     DATA l_pos    TYPE i.
@@ -2408,7 +2395,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
     ENDLOOP.
 
-
   ENDMETHOD.
 
 
@@ -2607,7 +2593,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
           l_wp_no    TYPE wpinfo-wp_no,
           l_wp_pid   TYPE wpinfo-wp_pid,
           l_wp_index TYPE wpinfo-wp_index, "$002
-          l_proc_nr  TYPE /CADAXO/SQLC_CHAR3.
+          l_proc_nr  TYPE /cadaxo/sqlc_char3.
 
     CLEAR: e_success,
            e_date_from,
@@ -2909,7 +2895,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
         dynpprog        = sy-repid
         dynpnr          = sy-dynnr
         dynprofield     = 'FIELDNAME'
-        window_title    = text-001
+        window_title    = TEXT-001
         value_org       = 'S'
       TABLES
         value_tab       = lt_fields_list
