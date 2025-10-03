@@ -173,7 +173,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
 * parse the sql string
         /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( EXPORTING i_sql           = l_sql_string
                                                               i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
-                                                              i_role          = lcl_sqlc_cockpit->g_auth
+                                                              i_role          = lcl_sqlc_cockpit->authcheck->get_cockpitrole( )
                                                     IMPORTING e_sql_parsed    = lt_cl_sql_parse ).
 
 * check the sql syntax
@@ -181,7 +181,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
 
         LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
           <lr_cl_sql_parse>->parse_sql_ii( ).
-          <lr_cl_sql_parse>->blacklist_check_tables( ).
+          lcl_sqlc_cockpit->authcheck->blacklist_check_tables( <lr_cl_sql_parse>->result_source_t  ).
           <lr_cl_sql_parse>->parse_sql_where_columns( ).
           <lr_cl_sql_parse>->g_main_ref = lcl_sqlc_cockpit.
           <lr_cl_sql_parse>->set_bachground_mode( abap_true ).

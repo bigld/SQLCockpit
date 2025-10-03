@@ -11,7 +11,9 @@ CLASS /cadaxo/cl_sqlc_authchecks DEFINITION
   PROTECTED SECTION.
 
     DATA cockpitrole TYPE /cadaxo/sqlcrole_auth_xml .
-  PRIVATE SECTION.
+    METHODS all_sources_allowed IMPORTING i_result_sources     TYPE /cadaxo/sqlcselectsource_t
+                                RETURNING VALUE(e_all_allowed) TYPE /cadaxo/sqlcflagtruefalse
+                                RAISING   /cadaxo/cx_sqlc_authchecks.
 ENDCLASS.
 
 
@@ -77,97 +79,88 @@ CLASS /cadaxo/cl_sqlc_authchecks IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD blacklist_check_tables.
-
-    DATA: l_yes    TYPE c,
-          l_tables TYPE string.
-
-    LOOP AT i_result_sources ASSIGNING FIELD-SYMBOL(<result_sources>).
-      " check blacklist tables
-      /cadaxo/cl_sqlc_cockpit_assist=>blacklist_check_table(
-        EXPORTING  i_table                = <result_sources>-table
-        EXCEPTIONS table_access_forbidden = 1
-                   OTHERS                 = 2 ).
-      IF sy-subrc NE 0.
-        MESSAGE e010(/cadaxo/sqlc) WITH <result_sources>-table.
-      ENDIF.
-
-* check user authorization
-
-      CLEAR l_yes.
-
-      LOOP AT cockpitrole-included ASSIGNING FIELD-SYMBOL(<included_tables>).
-        IF <result_sources>-table CP <included_tables>.
-          l_yes = abap_true.
-          EXIT.
-        ENDIF.
-      ENDLOOP.
-
-      IF l_yes = abap_true.
-        LOOP AT cockpitrole-excluded ASSIGNING FIELD-SYMBOL(<excluded_tables>).
-          IF <result_sources>-table CP <excluded_tables>.
-            CLEAR l_yes.
-            IF l_tables IS INITIAL.
-              l_tables = <result_sources>-table.
-            ELSE.
-              CONCATENATE l_tables ',' INTO l_tables.
-              CONCATENATE l_tables <result_sources>-table INTO l_tables SEPARATED BY space.
-            ENDIF.
-            EXIT.
-          ENDIF.
-        ENDLOOP.
-      ELSE.
-        IF l_tables IS INITIAL.
-          l_tables = <result_sources>-table.
-        ELSE.
-          CONCATENATE l_tables ',' INTO l_tables.
-          CONCATENATE l_tables <result_sources>-table INTO l_tables SEPARATED BY space.
-        ENDIF.
-      ENDIF.
-
-    ENDLOOP.
+    DATA not_allowed_table TYPE string.
 
 * send error message if no authorization
     IF cockpitrole-excluded IS INITIAL AND cockpitrole-included IS INITIAL.
       MESSAGE e118(/cadaxo/sqlc).
-    ELSEIF l_yes EQ space.
-      MESSAGE e010(/cadaxo/sqlc) WITH l_tables.
-    ELSE.
+    ENDIF.
+
+    TRY.
+        IF NOT all_sources_allowed( i_result_sources ).
+
+        ENDIF.
+      CATCH /cadaxo/cx_sqlc_authchecks INTO DATA(authexception).
+        MESSAGE e010(/cadaxo/sqlc) WITH authexception->not_allowed_table.
+        RETURN.
+    ENDTRY.
+
 * also check the s_tabu_dis authority
-      CLEAR l_tables.
-      DATA l_view_name(30) TYPE c.
-      LOOP AT i_result_sources ASSIGNING <result_sources>.
-        l_view_name = <result_sources>-table.
+    LOOP AT i_result_sources ASSIGNING FIELD-SYMBOL(<result_sources>).
+
+      CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
+        EXPORTING
+          view_action                = 'S' "SHOW
+          view_name                  = <result_sources>-table
+          no_warning_for_clientindep = abap_true
+        EXCEPTIONS
+          OTHERS                     = 1.
+      IF sy-subrc NE 0.
         CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
           EXPORTING
-            view_action                = 'S' "SHOW
-            view_name                  = l_view_name
+            view_action                = 'U' "UPDATE
+            view_name                  = <result_sources>-table
             no_warning_for_clientindep = abap_true
           EXCEPTIONS
             OTHERS                     = 1.
         IF sy-subrc NE 0.
-          CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
-            EXPORTING
-              view_action                = 'U' "UPDATE
-              view_name                  = l_view_name
-              no_warning_for_clientindep = abap_true
-            EXCEPTIONS
-              OTHERS                     = 1.
-          IF sy-subrc NE 0.
-            IF l_tables IS INITIAL.
-              l_tables = <result_sources>-table.
-            ELSE.
-              CONCATENATE l_tables ',' INTO l_tables.
-              CONCATENATE l_tables <result_sources>-table INTO l_tables SEPARATED BY space.
-            ENDIF.
-          ENDIF.
+          not_allowed_table = not_allowed_table && COND #( WHEN not_allowed_table IS NOT INITIAL THEN |, | ) && <result_sources>-table.
         ENDIF.
-      ENDLOOP.
-      IF NOT l_tables IS INITIAL.
-        MESSAGE e058(/cadaxo/sqlc) WITH l_tables.
       ENDIF.
+    ENDLOOP.
+    IF NOT not_allowed_table IS INITIAL.
+      MESSAGE e058(/cadaxo/sqlc) WITH not_allowed_table.
     ENDIF.
 
   ENDMETHOD.
+
+  METHOD all_sources_allowed.
+    DATA allowed           TYPE abap_bool.
+    DATA not_allowed_table TYPE string.
+
+    LOOP AT i_result_sources REFERENCE INTO DATA(result_sources).
+
+      allowed = abap_false.
+* check user authorization
+
+      LOOP AT cockpitrole-included ASSIGNING FIELD-SYMBOL(<included_tables>).
+        IF result_sources->table CP <included_tables>.
+          allowed = abap_true.
+          LOOP AT cockpitrole-excluded ASSIGNING FIELD-SYMBOL(<excluded_tables>).
+            IF result_sources->table CP <excluded_tables>.
+              allowed = abap_false.
+            ENDIF.
+          ENDLOOP.
+        ENDIF.
+      ENDLOOP.
+
+      IF allowed = abap_false.
+        not_allowed_table = not_allowed_table && COND #( WHEN not_allowed_table IS NOT INITIAL THEN |, | ) && result_sources->table.
+      ENDIF.
+
+    ENDLOOP.
+
+    e_all_allowed = boolc( not_allowed_table IS INITIAL ).
+
+    IF e_all_allowed = abap_false.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_authchecks
+        EXPORTING
+          textid            = /cadaxo/cx_sqlc_authchecks=>no_table_auth
+          not_allowed_table = not_allowed_table.
+    ENDIF.
+  ENDMETHOD.
+
+
 
   METHOD get_cockpitrole.
     r_cockpitrole = cockpitrole.

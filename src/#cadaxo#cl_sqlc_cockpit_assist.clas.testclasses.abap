@@ -1,28 +1,8 @@
-*"* use this source file for your ABAP unit test classes
-
 CLASS /cadaxo/tc_sqlc_cockpit_assist DEFINITION FOR TESTING
   DURATION SHORT
   RISK LEVEL HARMLESS
 .
-*?﻿<asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
-*?<asx:values>
-*?<TESTCLASS_OPTIONS>
-*?<TEST_CLASS>/cadaxo/tc_Sqlc_Cockpit_Assist
-*?</TEST_CLASS>
-*?<TEST_MEMBER>f_Cut
-*?</TEST_MEMBER>
-*?<OBJECT_UNDER_TEST>/CADAXO/CL_SQLC_COCKPIT_ASSIST
-*?</OBJECT_UNDER_TEST>
-*?<OBJECT_IS_LOCAL/>
-*?<GENERATE_FIXTURE/>
-*?<GENERATE_CLASS_FIXTURE/>
-*?<GENERATE_INVOCATION>X
-*?</GENERATE_INVOCATION>
-*?<GENERATE_ASSERT_EQUAL>X
-*?</GENERATE_ASSERT_EQUAL>
-*?</TESTCLASS_OPTIONS>
-*?</asx:values>
-*?</asx:abap>
+
   PRIVATE SECTION.
     DATA:
       f_cut TYPE REF TO /cadaxo/cl_sqlc_cockpit_assist.  "class under test
@@ -33,6 +13,7 @@ CLASS /cadaxo/tc_sqlc_cockpit_assist DEFINITION FOR TESTING
     METHODS: replace_apostrophes_with_space FOR TESTING.
     METHODS: replace_symbols_with_values FOR TESTING.
     METHODS: format_with_space FOR TESTING.
+    METHODS: condense FOR TESTING.
 ENDCLASS.       "/cadaxo/tc_Sqlc_Cockpit_Assist
 
 
@@ -116,17 +97,17 @@ CLASS /cadaxo/tc_sqlc_cockpit_assist IMPLEMENTATION.
 
   METHOD replace_apostrophes_with_space.
 
-    DATA c_string TYPE string.
+   data(given_sql) = |SELECT  FROM      BUT000| && cl_abap_char_utilities=>cr_lf  && | FIELSD PARTNER WHERE PARTNER = '12345    | && cl_abap_char_utilities=>cr_lf && |'|.
+    data(actual_sql) = given_sql.
 
-    /cadaxo/cl_sqlc_cockpit_assist=>replace_apostrophes_with_space(
-      CHANGING
-        c_string = c_string ).
+    /cadaxo/cl_sqlc_cockpit_assist=>replace_apostrophes_with_space( CHANGING c_string = actual_sql ).
+
+   DATA(expected_sql) = |SELECT  FROM      BUT000| && cl_abap_char_utilities=>cr_lf  && | FIELSD PARTNER WHERE PARTNER = '           '|.
 
     cl_abap_unit_assert=>assert_equals(
-      act   = c_string
-      exp   = c_string          "<--- please adapt expected value
-    " msg   = 'Testing value c_String'
-*     level =
+      act   = actual_sql
+      exp   = expected_sql
+      quit  = if_abap_unit_constant=>quit-no
     ).
   ENDMETHOD.
 
@@ -215,6 +196,19 @@ CLASS /cadaxo/tc_sqlc_cockpit_assist IMPLEMENTATION.
         quit  = 0 ).
 
     ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD condense.
+    data(given_sql) = |SELECT  FROM      BUT000| && cl_abap_char_utilities=>cr_lf  && | FIELSD PARTNER WHERE PARTNER = '12345    | && cl_abap_char_utilities=>cr_lf && |'|.
+    data(actual_sql) = given_sql.
+    /cadaxo/cl_sqlc_cockpit_assist=>condense( changing c_string = actual_sql ).
+
+    DATA(expected_sql) = |SELECT FROM BUT000| && cl_abap_char_utilities=>cr_lf  && | FIELSD PARTNER WHERE PARTNER = '12345    | && cl_abap_char_utilities=>cr_lf && |'|.
+    cl_abap_unit_assert=>assert_equals(
+      act  = actual_sql
+      exp  = expected_sql
+      quit = if_abap_unit_constant=>quit-no ).
 
   ENDMETHOD.
 
