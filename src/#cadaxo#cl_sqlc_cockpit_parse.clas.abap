@@ -5,7 +5,8 @@ class /CADAXO/CL_SQLC_COCKPIT_PARSE definition
 
   global friends /CADAXO/CL_SQLC_BACKGROUND
                  /CADAXO/CL_SQLC_COCKPIT_MAIN
-                 /CADAXO/CL_SQLC_SQL_SYNTAX .
+                 /CADAXO/CL_SQLC_SQL_SYNTAX
+                 /CADAXO/CL_SQLC_TEMP_RRG .
 
 *"* public components of class /CADAXO/CL_SQLC_COCKPIT_PARSE
 *"* do not include other source files here!!!
@@ -171,7 +172,8 @@ public section.
       !I_ROLE type /CADAXO/SQLCROLE_AUTH_XML optional
       value(I_MAIN_REF_ID) type I optional
       value(I_MAIN_REF) type ref to /CADAXO/CL_SQLC_COCKPIT_MAIN optional
-    RETURNING VALUE(E_SQL_PARSED) type /CADAXO/SQLC_CL_COCKPIT_PARSET
+    returning
+      value(E_SQL_PARSED) type /CADAXO/SQLC_CL_COCKPIT_PARSET
     raising
       /CADAXO/CX_SQLC_NO_SEL_AT_FIRS
       /CADAXO/CX_SQLC_SYNTAX_ERROR
