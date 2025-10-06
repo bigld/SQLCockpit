@@ -242,13 +242,6 @@ protected section.
   data BACKGROUND_MODE type FLAG .
   data SUBSELECTS type /CADAXO/SQLC_CL_COCKPIT_PARSET .
 
-  class-methods BUILD_ABAP_CODE
-    importing
-      !I_CL_COCKPIT_PARSE type ref to /CADAXO/CL_SQLC_COCKPIT_PARSE
-      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_COCKPIT_PARSE=>C_SELECT_VERSION_1
-    exporting
-      !E_ABAP_CODE type /CADAXO/SQLCSTRING_T
-      !E_ABAP_CODE_DATA type /CADAXO/SQLCSTRING_T .
   class-methods CHECK_FOR_HOST_EXPRESSIONS
     importing
       !I_STRING type STRING .
@@ -705,137 +698,6 @@ METHOD add_domain_value_sub.
   component_new-name = e_comp-name.
   component_new-type = structure_new.
   APPEND component_new TO c_components_new.
-
-ENDMETHOD.
-
-
-METHOD build_abap_code.
-****************************************************************************************************
-* Description             : Build the main abap code for syntax-check and subroutine pool          *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.03.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 31.12.2015 | Fößleitner Johann    | SQL Cockpit 3.0 - SQL Expressions!          |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
-
-  DATA l_line       LIKE LINE OF e_abap_code.
-  DATA l_dummy      TYPE string.
-
-  CLEAR: e_abap_code[].
-
-  IF NOT i_cl_cockpit_parse->g_select_single IS INITIAL.
-    APPEND 'FIELD-SYMBOLS: <FS_STR_RESULT> TYPE ANY.' TO e_abap_code_data.
-    APPEND 'APPEND INITIAL LINE TO TAB_RESULT ASSIGNING <fs_str_result>.' TO e_abap_code.
-    CONCATENATE ' SELECT SINGLE' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
-  ELSE.
-    IF NOT i_cl_cockpit_parse->g_select_distinct IS INITIAL.
-      CONCATENATE ' SELECT DISTINCT' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
-    ELSE.
-      CONCATENATE ' SELECT' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
-    ENDIF.
-  ENDIF.
-
-  APPEND l_line TO e_abap_code.
-
-  l_dummy = i_cl_cockpit_parse->source_syntax && i_cl_cockpit_parse->cds_parameter_syntax.
-  CONCATENATE ' FROM' l_dummy INTO l_line SEPARATED BY space.
-
-ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_002 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001.
-*...
-END-ENHANCEMENT-SECTION.
-  APPEND l_line TO e_abap_code.
-
-
-
-  IF i_select_version = c_select_version_1 OR
-     i_select_version = c_select_version_0.
-
-    IF i_cl_cockpit_parse->fields_syntax IS INITIAL.
-      i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
-
-      i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
-
-      i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
-
-    ELSE.
-      i_cl_cockpit_parse->get_code_fields( CHANGING ct_code = e_abap_code ).
-    ENDIF.
-
-    IF NOT i_cl_cockpit_parse->g_select_single IS INITIAL.
-      APPEND ' INTO <fs_str_result>' TO e_abap_code.
-    ELSE.
-      APPEND ' INTO TABLE TAB_RESULT' TO e_abap_code.
-    ENDIF.
-  ELSEIF i_select_version = c_select_version_2.
-    i_cl_cockpit_parse->get_code_fields( CHANGING ct_code = e_abap_code ).
-  ENDIF.
-
-  i_cl_cockpit_parse->get_code_where(
-    EXPORTING i_only_initval = abap_true
-    CHANGING ct_code = e_abap_code
-  ).
-  IF i_select_version = c_select_version_2.
-     i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
-  endif.
-
-  i_cl_cockpit_parse->get_code_group_by( CHANGING ct_code = e_abap_code ).
-
-  i_cl_cockpit_parse->get_code_having( CHANGING ct_code = e_abap_code ).
-
-  i_cl_cockpit_parse->get_code_order_by( CHANGING ct_code = e_abap_code ).
-
-  IF i_select_version = c_select_version_2.
-    IF NOT i_cl_cockpit_parse->g_select_single IS INITIAL.
-      APPEND ' INTO @DATA(LS_RESULTDATA)' TO e_abap_code.
-    ELSE.
-      APPEND ' INTO TABLE @DATA(TAB_RESULTDATA)' TO e_abap_code.
-    ENDIF.
-
-    i_cl_cockpit_parse->get_code_offset( CHANGING ct_code = e_abap_code ).
-
-    i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
-
-    i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
-
-    i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
-
-  ELSEIF i_select_version = c_select_version_1.
-
-    i_cl_cockpit_parse->get_code_offset( CHANGING ct_code = e_abap_code ).
-
-    IF i_cl_cockpit_parse->fields_syntax IS NOT INITIAL.
-
-      i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
-
-      i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
-
-      i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
-
-    ENDIF.
-
-  ENDIF.
-
-  IF i_select_version = c_select_version_1.
-     i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
-  endif.
-
-  APPEND '.' TO e_abap_code.
 
 ENDMETHOD.
 
@@ -1810,7 +1672,9 @@ METHOD execute_select_via_subpool.
   CONCATENATE ' FROM' me->source_syntax INTO l_line SEPARATED BY space.
   APPEND l_line TO lt_abap_code.
 
-  cls_cdss.
+  IF me->gs_client_handling-client_specified = abap_true.
+    APPEND 'CLIENT SPECIFIED' TO lt_abap_code.
+  ENDIF.
 
 * connection
   IF NOT me->connection_syntax IS INITIAL.
@@ -2002,11 +1866,6 @@ ENDMETHOD.
     DATA l_error_message  TYPE char128.
     DATA l_dummy          TYPE string.
 
-ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_005 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001 STATIC .
-*...
-CONSTANTS: lc_cs_active TYPE flag VALUE abap_false.
-END-ENHANCEMENT-SECTION.
-
     " MACRO create_dynamic_select_subpool2.
 
     APPEND 'REPORT SUBQUERY.' TO lt_abap_code.
@@ -2081,7 +1940,9 @@ END-ENHANCEMENT-SECTION.
     CONCATENATE ' FROM' l_dummy INTO l_line SEPARATED BY space.
     APPEND l_line TO lt_abap_code.
 
-    cls_cdss.
+    IF me->gs_client_handling-client_specified = abap_true.
+      APPEND 'CLIENT SPECIFIED' TO lt_abap_code.
+    ENDIF.
 
     me->get_code_fields( CHANGING ct_code = lt_abap_code ).
 
@@ -2274,11 +2135,6 @@ END-ENHANCEMENT-SECTION.
 
 METHOD execute_select_v_1.
 
-ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_004 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001 STATIC.
-*...
-CONSTANTS: lc_cs_active TYPE flag VALUE abap_false.
-END-ENHANCEMENT-SECTION.
-
 * Marco m_execute_select
   m_execute_select.
 
@@ -2368,7 +2224,6 @@ END-ENHANCEMENT-SECTION.
           ENDSELECT.
           e_result_details-runtime = runtime->end( ).
         ELSE.
-          ASSERT lc_cs_active = abap_true.
           runtime = /cadaxo/cl_sqlc_rt_measurement=>start( ).
           SELECT (me->column_syntax)
                   FROM (me->source_syntax)
@@ -2450,7 +2305,6 @@ END-ENHANCEMENT-SECTION.
                          HDB      me->dbhint_syntax. "
               e_result_details-runtime = runtime->end( ).
             ELSE.
-              ASSERT lc_cs_active = abap_true.
               runtime = /cadaxo/cl_sqlc_rt_measurement=>start( ).
               SELECT SINGLE (me->column_syntax)
                  FROM (me->source_syntax)
@@ -2606,7 +2460,6 @@ END-ENHANCEMENT-SECTION.
                                   HDB      me->dbhint_syntax. "
                 ENDIF.
               WHEN ' X '.
-                ASSERT lc_cs_active = abap_true.
                 IF i_progress_indicator NE space.
 
                   SELECT (me->column_syntax)
@@ -2709,7 +2562,6 @@ END-ENHANCEMENT-SECTION.
                                   HDB      me->dbhint_syntax. "
                 ENDIF.
               WHEN 'XX '.
-                ASSERT lc_cs_active = abap_true.
                 IF i_progress_indicator NE space.
 
                   SELECT DISTINCT (me->column_syntax)
@@ -2812,7 +2664,6 @@ END-ENHANCEMENT-SECTION.
                                   HDB      me->dbhint_syntax. "
                 ENDIF.
               WHEN ' XX'.
-                ASSERT lc_cs_active = abap_true.
                 IF i_progress_indicator NE space.
 
                   SELECT (me->column_syntax)
@@ -2867,7 +2718,6 @@ END-ENHANCEMENT-SECTION.
 
                 ENDIF.
               WHEN 'XXX'.
-                ASSERT lc_cs_active = abap_true.
                 IF i_progress_indicator NE space.
 
                   SELECT DISTINCT (me->column_syntax)

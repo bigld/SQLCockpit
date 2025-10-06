@@ -1,45 +1,45 @@
-class /CADAXO/CL_SQLC_SQL_SYNTAX definition
-  public
-  final
-  create public .
+CLASS /cadaxo/cl_sqlc_sql_syntax DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  constants:
-    BEGIN OF cc_select_version,
-                 v0 TYPE /cadaxo/sqlc_select_version VALUE 0 ##NO_TEXT,
-                 v1 TYPE /cadaxo/sqlc_select_version VALUE 1 ##NO_TEXT,
-                 v2 TYPE /cadaxo/sqlc_select_version VALUE 2 ##NO_TEXT,
-               END OF cc_select_version .
+    CONSTANTS:
+      BEGIN OF cc_select_version,
+        v0 TYPE /cadaxo/sqlc_select_version VALUE 0 ##NO_TEXT,
+        v1 TYPE /cadaxo/sqlc_select_version VALUE 1 ##NO_TEXT,
+        v2 TYPE /cadaxo/sqlc_select_version VALUE 2 ##NO_TEXT,
+      END OF cc_select_version .
 
-  class-methods CHECK_SQL_SYNTAX
-    importing
-      !I_SQL_PARSED type /CADAXO/SQLC_CL_COCKPIT_PARSET
-      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_SQL_SYNTAX=>CC_SELECT_VERSION-V1
-    exporting
-      !E_SCI_RESULTS type SCIT_REST
-      !E_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION
-    raising
-      /CADAXO/CX_SQLC_SYNTAX_ERROR .
-  class-methods BUILD_ABAP_CODE
-    importing
-      !I_CL_COCKPIT_PARSE type ref to /CADAXO/CL_SQLC_COCKPIT_PARSE
-      !I_SELECT_VERSION type /CADAXO/SQLC_SELECT_VERSION default /CADAXO/CL_SQLC_SQL_SYNTAX=>CC_SELECT_VERSION-V1
-    exporting
-      !E_ABAP_CODE type /CADAXO/SQLCSTRING_T
-      !E_ABAP_CODE_DATA type /CADAXO/SQLCSTRING_T .
-  class-methods FORMAT_ABAP_CODE
-    importing
-      !I_COLUMNS type I optional
-    changing
-      !CT_ABAP_CODE type /CADAXO/SQLCSTRING_T .
-protected section.
-private section.
+    CLASS-METHODS check_sql_syntax
+      IMPORTING
+        !i_sql_parsed     TYPE /cadaxo/sqlc_cl_cockpit_parset
+        !i_select_version TYPE /cadaxo/sqlc_select_version DEFAULT /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1
+      EXPORTING
+        !e_sci_results    TYPE scit_rest
+        !e_select_version TYPE /cadaxo/sqlc_select_version
+      RAISING
+        /cadaxo/cx_sqlc_syntax_error .
+    CLASS-METHODS build_abap_code
+      IMPORTING
+        !i_cl_cockpit_parse TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse
+        !i_select_version   TYPE /cadaxo/sqlc_select_version DEFAULT /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1
+      EXPORTING
+        !e_abap_code        TYPE /cadaxo/sqlcstring_t
+        !e_abap_code_data   TYPE /cadaxo/sqlcstring_t .
+    CLASS-METHODS format_abap_code
+      IMPORTING
+        !i_columns    TYPE i OPTIONAL
+      CHANGING
+        !ct_abap_code TYPE /cadaxo/sqlcstring_t .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
 
 
   METHOD check_sql_syntax.
@@ -274,27 +274,11 @@ CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
     l_dummy = i_cl_cockpit_parse->source_syntax && i_cl_cockpit_parse->cds_parameter_syntax.
     CONCATENATE ' FROM' l_dummy INTO l_line SEPARATED BY space.
 
-    " ----
-    " ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_002 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001.
-    " ...
-    " END-ENHANCEMENT-SECTION.
-    " $*$-Start: /CADAXO/SQLC_EHN_S_CLS_SE_002-------------------------------------------------------$*$-
-    " ENHANCEMENT 2  /CADAXO/SQLC_EHNIMP_CLS_PE_3.    "active version
-    " ...
-    " ---
-    " CASE abap_true.
-    " WHEN i_cl_cockpit_parse->gs_client_handling-client_specified.
-    " CONCATENATE l_line 'CLIENT SPECIFIED' INTO l_line SEPARATED BY space.
-    " WHEN i_cl_cockpit_parse->gs_client_handling-using_client.
-    " CONCATENATE l_line 'USING CLIENT' INTO l_line SEPARATED BY space.
-    " ENDCASE.
-    " ---
-    " ENDENHANCEMENT.
-    " $*$-End:   /CADAXO/SQLC_EHN_S_CLS_SE_002-------------------------------------------------------$*$-
-
-ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_002 SPOTS /cadaxo/sqlc_ehnsp_cls_se_001.
-" ...
-END-ENHANCEMENT-SECTION.
+    IF i_cl_cockpit_parse->gs_client_handling-client_specified = abap_true.
+      CONCATENATE l_line 'CLIENT SPECIFIED' INTO l_line SEPARATED BY space.
+    ELSEIF i_cl_cockpit_parse->gs_client_handling-using_client = abap_true.
+      CONCATENATE l_line 'USING CLIENT' INTO l_line SEPARATED BY space.
+    ENDIF.
 
     APPEND l_line TO e_abap_code.
 
