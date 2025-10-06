@@ -857,16 +857,6 @@ MODULE pbo_0910 OUTPUT.
     gs_adm_cust-maxsel = 99.                         "COCKPIT-194
   ENDIF.
 
-ENHANCEMENT-SECTION /cadaxo/sqlc_ehn_s_cls_se_005 SPOTS /cadaxo/sqlc_ehnsp_cls_se_002 .
-LOOP AT SCREEN.
-  IF screen-group1 = 'CLS'.
-    screen-invisible = '1'.
-    MODIFY SCREEN.
-  ENDIF.
-ENDLOOP.
-END-ENHANCEMENT-SECTION.
-
-
 ENDMODULE.                 " PBO_0910  OUTPUT
 *&---------------------------------------------------------------------*
 *&      Module  PAI_0910  INPUT
