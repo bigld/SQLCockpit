@@ -602,7 +602,7 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
         check_select_fields( ).
 
-        check_select_single( ).
+*        check_select_single( ).
 
         check_select_star( ).
 
@@ -864,12 +864,14 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
       WHEN /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_1.
         IF NOT gr_parser->g_select_single IS INITIAL.
           APPEND ' INTO CORRESPONDING FIELDS OF TABLE @<result>' TO ct_code.
+          APPEND ' UP TO 1 ROWS' TO ct_code.
         ELSE.
           APPEND ' INTO CORRESPONDING FIELDS OF TABLE @<result>' TO ct_code.
         ENDIF.
       WHEN /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_2.
         IF NOT gr_parser->g_select_single IS INITIAL.
           APPEND ' INTO CORRESPONDING FIELDS OF TABLE @<result>' TO ct_code.
+          APPEND ' UP TO 1 ROWS' TO ct_code.
         ELSE.
           APPEND ' INTO CORRESPONDING FIELDS OF TABLE @<result>' TO ct_code.
         ENDIF.
@@ -908,7 +910,7 @@ CLASS /cadaxo/cl_sqlc_temp_rrg IMPLEMENTATION.
 
     APPEND TEXT-007 TO ct_code.
     IF NOT gr_parser->g_select_single IS INITIAL.
-      l_line = `SELECT SINGLE ` && gr_parser->column_syntax.
+      l_line = `SELECT ` && gr_parser->column_syntax.
     ELSE.
       IF NOT gr_parser->g_select_distinct IS INITIAL.
         l_line = `SELECT DISTINCT ` && gr_parser->column_syntax.
