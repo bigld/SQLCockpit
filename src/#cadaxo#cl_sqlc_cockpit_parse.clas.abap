@@ -6218,10 +6218,12 @@ ENDMETHOD.
           WHEN ')'.                                         " CDX3301
             CLEAR l_is_subsel.
             CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-*          l_from = l_from + 2.
+          WHEN 'UNION' OR 'ALL'.
+
           WHEN OTHERS. " Field
             " split field into field, table and alias
             DATA: tablename TYPE string.
+            clear tablename.
             split_field( EXPORTING i_field  = l_string
                          IMPORTING e_field  = where_col-fieldname
                                    e_table  = tablename
