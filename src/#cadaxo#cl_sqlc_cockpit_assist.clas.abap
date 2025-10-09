@@ -1,297 +1,300 @@
-CLASS /cadaxo/cl_sqlc_cockpit_assist DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+class /CADAXO/CL_SQLC_COCKPIT_ASSIST definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
-    CONSTANTS c_param_version TYPE /cadaxo/sqlcparameter_id VALUE 'CADAXO_VERSION' ##NO_TEXT.
-    CONSTANTS c_source_length TYPE i VALUE 80 ##NO_TEXT.
-    CLASS-DATA gr_settings TYPE REF TO if_pretty_printer_settings .
-    CONSTANTS c_release_info_link TYPE /cadaxo/sqlcparameter_id VALUE 'RELEASE_INFO_LINK' ##NO_TEXT.
+  constants C_PARAM_VERSION type /CADAXO/SQLCPARAMETER_ID value 'CADAXO_VERSION' ##NO_TEXT.
+  constants C_SOURCE_LENGTH type I value 80 ##NO_TEXT.
+  class-data GR_SETTINGS type ref to IF_PRETTY_PRINTER_SETTINGS .
+  constants C_RELEASE_INFO_LINK type /CADAXO/SQLCPARAMETER_ID value 'RELEASE_INFO_LINK' ##NO_TEXT.
 
-    CLASS-METHODS find_symbol_regex
-      IMPORTING
-        !i_where_syntax TYPE /cadaxo/sqlcselectwheresyntax
-      EXPORTING
-        !e_result_tab   TYPE match_result_tab .
-    CLASS-METHODS compress_symbol_multivalue
-      IMPORTING
-        !i_symbol_multivalue TYPE rseloption
-      EXPORTING
-        VALUE(e_data)        TYPE xsequence .
-    CLASS-METHODS get_cds_view_of_association
-      IMPORTING
-        !iv_association TYPE string
-      EXPORTING
-        !ev_entity      TYPE string
-        !ev_typekind    TYPE ddtargetkind .
-    CLASS-METHODS decompress_symbol_multivalue
-      IMPORTING
-        !i_symbol_multivalue TYPE /cadaxo/sqlcsymbol_multivalue
-      EXPORTING
-        !e_symbol_multivalue TYPE rseloption .
-    CLASS-METHODS create_frontend_mail
-      IMPORTING
-        !i_mailto  TYPE string
-        !i_subject TYPE any
-        !i_body    TYPE string
-      EXCEPTIONS
-        internal_error .
-    CLASS-METHODS value_help_dd_table
-      EXPORTING
-        !e_tabname TYPE tabname
-      EXCEPTIONS
-        no_table_selected .
-    CLASS-METHODS value_help_sy_fields
-      EXPORTING
-        !e_fieldname TYPE string
-      EXCEPTIONS
-        no_table_selected .
-    CLASS-METHODS get_parameter_value
-      IMPORTING
-        !i_parameter_id          TYPE /cadaxo/sqlcparameter_id
-      RETURNING
-        VALUE(r_parameter_value) TYPE /cadaxo/sqlcparameter_val
-      EXCEPTIONS
-        parameter_not_found .
-    CLASS-METHODS set_parameter_value
-      IMPORTING
-        !i_parameter_id          TYPE /cadaxo/sqlcparameter_id
-        VALUE(i_parameter_value) TYPE /cadaxo/sqlcparameter_val .
-    CLASS-METHODS sql_trace_on
-      IMPORTING
-        !i_sql_trace         TYPE /cadaxo/sqlcsqltrace DEFAULT 'X'
-        !i_tablebuffer_trace TYPE /cadaxo/sqlctablebuffertrace OPTIONAL
-      EXPORTING
-        !e_date_from         TYPE dats
-        !e_time_from         TYPE tims
-        !e_success           TYPE /cadaxo/sqlc_char1 .
-    CLASS-METHODS sql_trace_off
-      IMPORTING
-        !i_sql_trace         TYPE /cadaxo/sqlcsqltrace DEFAULT 'X'
-        !i_tablebuffer_trace TYPE /cadaxo/sqlctablebuffertrace OPTIONAL
-      EXPORTING
-        !e_date_to           TYPE dats
-        !e_time_to           TYPE tims .
-    CLASS-METHODS get_global_symbol_value
-      IMPORTING
-        !i_symbol       TYPE /cadaxo/sqlcsymbol_name OPTIONAL
-        !i_field_type   TYPE /cadaxo/sqlc_char1 OPTIONAL
-      EXPORTING
-        !e_symbol_value TYPE any
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    CLASS-METHODS value_help_dyn_symbols
-      EXPORTING
-        !e_symbol_name TYPE string .
-    CLASS-METHODS value_help_cds_views
-      EXPORTING
-        !e_cds_view TYPE string .
-    CLASS-METHODS replace_symbols_with_values
-      IMPORTING
-        !i_where_column TYPE /cadaxo/sqlcwherecol_str
-        !i_from         TYPE i
-        !i_length       TYPE i OPTIONAL
-      CHANGING
-        !c_where_syntax TYPE /cadaxo/sqlcselectwheresyntax
-        !c_offset       TYPE i
-        !c_total        TYPE i
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    CLASS-METHODS get_user_symbol_value
-      IMPORTING
-        !i_symbol            TYPE /cadaxo/sqlcsymbol_name
-      EXPORTING
-        !e_symbol_multivalue TYPE string
-        !e_symbol_value      TYPE string
-        !e_is_multi          TYPE /cadaxo/sqlc_general_flag
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    CLASS-METHODS condense
-      CHANGING
-        !c_string TYPE string .
-    CLASS-METHODS translate_sql_str_upper_case
-      IMPORTING
-        !i_sql_string       TYPE /cadaxo/sqlcsql_string
-      RETURNING
-        VALUE(r_sql_string) TYPE /cadaxo/sqlcsql_string .
-    CLASS-METHODS split
-      IMPORTING
-        !i_sql_string      TYPE string
-        !i_position_from   TYPE i OPTIONAL
-      RETURNING
-        VALUE(r_sql_table) TYPE stringtab .
-    CLASS-METHODS get_where_value_match_offset
-      IMPORTING
-        !i_from         TYPE i
-        !i_total_length TYPE i
-      CHANGING
-        !c_where_syntax TYPE /cadaxo/sqlcselectwheresyntax
-        !c_offset       TYPE i
-      RAISING
-        /cadaxo/cx_sqlc_invalid_value .
-    CLASS-METHODS class_constructor .
-    CLASS-METHODS replace_one_symbol_with_value
-      IMPORTING
-        !i_where_column TYPE /cadaxo/sqlcwherecol_str
-        !i_symbol_name  TYPE /cadaxo/sqlcsymbol_name
-        !i_from         TYPE i
-        !i_length       TYPE i OPTIONAL
-      CHANGING
-        !c_where_syntax TYPE /cadaxo/sqlcselectwheresyntax
-        !c_offset       TYPE i
-        !c_total        TYPE i
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    CLASS-METHODS create_alv_date_header
-      IMPORTING
-        !i_timestamp_from   TYPE timestamp
-        !i_timestamp_to     TYPE timestamp
-      RETURNING
-        VALUE(r_grid_title) TYPE lvc_title .
-    CLASS-METHODS set_addon_customizing
-      IMPORTING
-        VALUE(i_addon)        TYPE /cadaxo/sqlcaddon_id
-        VALUE(it_customizing) TYPE ANY TABLE .
-    CLASS-METHODS get_addon_customizing
-      IMPORTING
-        VALUE(i_addon)  TYPE /cadaxo/sqlcaddon_id
-      EXPORTING
-        !et_customizing TYPE ANY TABLE .
-    CLASS-METHODS set_adm_customizing
-      IMPORTING
-        VALUE(i_customizing) TYPE any .
-    CLASS-METHODS get_adm_customizing
-      EXPORTING
-        VALUE(e_customizing) TYPE any .
-    CLASS-METHODS create_components_xml
-      EXPORTING
-        !e_xml_components TYPE string
-        !e_sap_components TYPE string
-        !e_sql_components TYPE string .
-    CLASS-METHODS is_addon_active
-      IMPORTING
-        !i_addon        TYPE /cadaxo/sqlcaddon_id
-      RETURNING
-        VALUE(r_active) TYPE /cadaxo/sqlcactive .
-    CLASS-METHODS export_data
-      IMPORTING
-        !i_export_type TYPE /cadaxo/sqlc_char5 DEFAULT 'CSV'
-        !it_fcat       TYPE lvc_t_fcat
-        !it_data       TYPE ANY TABLE .
-    CLASS-METHODS export_data_asxml
-      IMPORTING
-        !it_data TYPE ANY TABLE .
-    CLASS-METHODS export_data_csv
-      IMPORTING
-        !it_fcat TYPE lvc_t_fcat
-        !it_data TYPE ANY TABLE .
-    CLASS-METHODS convert_data_to_csv
-      IMPORTING
-        !i_csv_attr TYPE /cadaxo/sqlcexportcsvattr
-        !it_data    TYPE ANY TABLE
-        !it_col_alv TYPE /cadaxo/sqlcexportcolalv_t
-      EXPORTING
-        !et_data    TYPE STANDARD TABLE .
-    CLASS-METHODS get_used_symbols_table
-      RETURNING
-        VALUE(r_used_symbols_table) TYPE /cadaxo/sqlcusedsymbols_t .
-    CLASS-METHODS set_used_symbols_table
-      IMPORTING
-        !i_used_symbols_table TYPE /cadaxo/sqlcusedsymbols_t .
-    CLASS-METHODS clear_used_symbols_table .
-    CLASS-METHODS map_ddfields_descr_to_fcat
-      IMPORTING
-        !is_dfies         TYPE /cadaxo/sqlcdfies
-        !is_user_settings TYPE /cadaxo/sqlcusrp_dyn
-      CHANGING
-        !cs_fcat          TYPE lvc_s_fcat .
-    CLASS-METHODS set_fcat_header_texts
-      IMPORTING
-        !is_user_settings TYPE /cadaxo/sqlcusrp_xml
-        !it_ddfields      TYPE /cadaxo/sqlcdfies_t
-      CHANGING
-        !ct_fcat          TYPE lvc_t_fcat .
-    CLASS-METHODS replace_apostrophes_with_space
-      CHANGING
-        !c_string TYPE string .
-    CLASS-METHODS replace_all_symbols_with_value
-      CHANGING
-        !c_string TYPE string
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    CLASS-METHODS format_abap_code IMPORTING i_line_size TYPE i DEFAULT /cadaxo/cl_sqlc_cockpit_assist=>c_source_length
-                                   CHANGING  ct_code     TYPE /cadaxo/sqlcstring_t.
-    CLASS-METHODS foreward_navigation_adt_stob
-      IMPORTING
-        !i_ddobjname TYPE ddobjname .
-    CLASS-METHODS foreward_navigation_adt_others
-      IMPORTING
-        !i_ddobjname TYPE ddobjname .
-    CLASS-METHODS has_code_open_literal
-      IMPORTING
-        !iv_abap_code     TYPE /cadaxo/sqlcstring
-        VALUE(iv_offset)  TYPE i DEFAULT 0
-        !iv_literal_mark  TYPE c DEFAULT `'`
-      RETURNING
-        VALUE(ev_is_open) TYPE /cadaxo/sqlc_general_flag .
-    CLASS-METHODS create_data_reference
-      IMPORTING
-        !iv_inttype           TYPE inttype
-        !iv_leng              TYPE ddleng
-        !iv_decimals          TYPE decimals
-        !iv_intlen            TYPE intlen
-        !iv_stru_name         TYPE string
-        !iv_tabix             TYPE syst_tabix
-        !iv_domaintext        TYPE /cadaxo/sqlcadddomaintext
-        !it_components_domval TYPE /cadaxo/sqlcparsecomponent_t
-        !it_comp              TYPE /cadaxo/sqlc_compdesc_t
-        !it_domval            TYPE /cadaxo/sqlc_domval_t
-      RETURNING
-        VALUE(rr_data)        TYPE REF TO data .
-    CLASS-METHODS convert_value_int_to_editor
-      IMPORTING
-        !iv_typ                     TYPE c
-        !iv_fieldvalue_internal     TYPE any
-      RETURNING
-        VALUE(rv_fieldvalue_editor) TYPE string .
-    CLASS-METHODS call_convertion_exit_input
-      IMPORTING
-        !iv_datatype     TYPE rollname
-      CHANGING
-        !ev_symbol_value TYPE string .
-    CLASS-METHODS encloding_apostrophe_remove
-      CHANGING
-        !ev_symbol_value          TYPE string
-      RETURNING
-        VALUE(ev_apostrophe_char) TYPE /cadaxo/sqlc_char1 .
-    CLASS-METHODS encloding_apostrophe_set
-      IMPORTING
-        !iv_apostrophe_char TYPE /cadaxo/sqlc_char1
-      CHANGING
-        !ev_symbol_value    TYPE string .
-    CLASS-METHODS get_sql_cockpit_standard_users
-      RETURNING
-        VALUE(rt_sql_cockpit_standard_users) TYPE /cadaxo/sqlc_user_name_t .
-    CLASS-METHODS format_with_space
-      IMPORTING
-        VALUE(iv_string)    TYPE string
-      RETURNING
-        VALUE(rv_formatted) TYPE string .
-    CLASS-METHODS insert_select_header
-      CHANGING
-        !co_abap_editor TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit .
-    CLASS-METHODS code_completion
-      IMPORTING
-        !i_abap_editor TYPE REF TO /cadaxo/cl_sqlc_gui_abapedit
-      EXPORTING
-        !e_string      TYPE string .
+  class-methods FIND_SYMBOL_REGEX
+    importing
+      !I_WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX
+    exporting
+      !E_RESULT_TAB type MATCH_RESULT_TAB .
+  class-methods COMPRESS_SYMBOL_MULTIVALUE
+    importing
+      !I_SYMBOL_MULTIVALUE type RSELOPTION
+    exporting
+      value(E_DATA) type XSEQUENCE .
+  class-methods GET_CDS_VIEW_OF_ASSOCIATION
+    importing
+      !IV_ASSOCIATION type STRING
+    exporting
+      !EV_ENTITY type STRING
+      !EV_TYPEKIND type DDTARGETKIND .
+  class-methods DECOMPRESS_SYMBOL_MULTIVALUE
+    importing
+      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
+    exporting
+      !E_SYMBOL_MULTIVALUE type RSELOPTION .
+  class-methods CREATE_FRONTEND_MAIL
+    importing
+      !I_MAILTO type STRING
+      !I_SUBJECT type ANY
+      !I_BODY type STRING
+    exceptions
+      INTERNAL_ERROR .
+  class-methods VALUE_HELP_DD_TABLE
+    exporting
+      !E_TABNAME type TABNAME
+    exceptions
+      NO_TABLE_SELECTED .
+  class-methods VALUE_HELP_SY_FIELDS
+    exporting
+      !E_FIELDNAME type STRING
+    exceptions
+      NO_TABLE_SELECTED .
+  class-methods GET_PARAMETER_VALUE
+    importing
+      !I_PARAMETER_ID type /CADAXO/SQLCPARAMETER_ID
+    returning
+      value(R_PARAMETER_VALUE) type /CADAXO/SQLCPARAMETER_VAL
+    exceptions
+      PARAMETER_NOT_FOUND .
+  class-methods SET_PARAMETER_VALUE
+    importing
+      !I_PARAMETER_ID type /CADAXO/SQLCPARAMETER_ID
+      value(I_PARAMETER_VALUE) type /CADAXO/SQLCPARAMETER_VAL .
+  class-methods SQL_TRACE_ON
+    importing
+      !I_SQL_TRACE type /CADAXO/SQLCSQLTRACE default 'X'
+      !I_TABLEBUFFER_TRACE type /CADAXO/SQLCTABLEBUFFERTRACE optional
+    exporting
+      !E_DATE_FROM type DATS
+      !E_TIME_FROM type TIMS
+      !E_SUCCESS type ABAP_BOOLEAN .            "/cadaxo/sqlc_char1 .
+  class-methods SQL_TRACE_OFF
+    importing
+      !I_SQL_TRACE type /CADAXO/SQLCSQLTRACE default 'X'
+      !I_TABLEBUFFER_TRACE type /CADAXO/SQLCTABLEBUFFERTRACE optional
+    exporting
+      !E_DATE_TO type DATS
+      !E_TIME_TO type TIMS .
+  class-methods GET_GLOBAL_SYMBOL_VALUE
+    importing
+      !I_SYMBOL type /CADAXO/SQLCSYMBOL_NAME optional
+      !I_FIELD_TYPE type /CADAXO/SQLC_CHAR1 optional
+    exporting
+      !E_SYMBOL_VALUE type ANY
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  class-methods VALUE_HELP_DYN_SYMBOLS
+    exporting
+      !E_SYMBOL_NAME type STRING .
+  class-methods VALUE_HELP_CDS_VIEWS
+    exporting
+      !E_CDS_VIEW type STRING .
+  class-methods REPLACE_SYMBOLS_WITH_VALUES
+    importing
+      !I_WHERE_COLUMN type /CADAXO/SQLCWHERECOL_STR
+      !I_FROM type I
+      !I_LENGTH type I optional
+    changing
+      !C_WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX
+      !C_OFFSET type I
+      !C_TOTAL type I
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  class-methods GET_USER_SYMBOL_VALUE
+    importing
+      !I_SYMBOL type /CADAXO/SQLCSYMBOL_NAME
+    exporting
+      !E_SYMBOL_MULTIVALUE type STRING
+      !E_SYMBOL_VALUE type STRING
+      !E_IS_MULTI type /CADAXO/SQLC_GENERAL_FLAG
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  class-methods CONDENSE
+    changing
+      !C_STRING type STRING .
+  class-methods TRANSLATE_SQL_STR_UPPER_CASE
+    importing
+      !I_SQL_STRING type /CADAXO/SQLCSQL_STRING
+    returning
+      value(R_SQL_STRING) type /CADAXO/SQLCSQL_STRING .
+  class-methods SPLIT
+    importing
+      !I_SQL_STRING type STRING
+      !I_POSITION_FROM type I optional
+    returning
+      value(R_SQL_TABLE) type STRINGTAB .
+  class-methods GET_WHERE_VALUE_MATCH_OFFSET
+    importing
+      !I_FROM type I
+      !I_TOTAL_LENGTH type I
+    changing
+      !C_WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX
+      !C_OFFSET type I
+    raising
+      /CADAXO/CX_SQLC_INVALID_VALUE .
+  class-methods CLASS_CONSTRUCTOR .
+  class-methods REPLACE_ONE_SYMBOL_WITH_VALUE
+    importing
+      !I_WHERE_COLUMN type /CADAXO/SQLCWHERECOL_STR
+      !I_SYMBOL_NAME type /CADAXO/SQLCSYMBOL_NAME
+      !I_FROM type I
+      !I_LENGTH type I optional
+    changing
+      !C_WHERE_SYNTAX type /CADAXO/SQLCSELECTWHERESYNTAX
+      !C_OFFSET type I
+      !C_TOTAL type I
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  class-methods CREATE_ALV_DATE_HEADER
+    importing
+      !I_TIMESTAMP_FROM type TIMESTAMP
+      !I_TIMESTAMP_TO type TIMESTAMP
+    returning
+      value(R_GRID_TITLE) type LVC_TITLE .
+  class-methods SET_ADDON_CUSTOMIZING
+    importing
+      value(I_ADDON) type /CADAXO/SQLCADDON_ID
+      value(IT_CUSTOMIZING) type ANY TABLE .
+  class-methods GET_ADDON_CUSTOMIZING
+    importing
+      value(I_ADDON) type /CADAXO/SQLCADDON_ID
+    exporting
+      !ET_CUSTOMIZING type ANY TABLE .
+  class-methods SET_ADM_CUSTOMIZING
+    importing
+      value(I_CUSTOMIZING) type ANY .
+  class-methods GET_ADM_CUSTOMIZING
+    exporting
+      value(E_CUSTOMIZING) type ANY .
+  class-methods CREATE_COMPONENTS_XML
+    exporting
+      !E_XML_COMPONENTS type STRING
+      !E_SAP_COMPONENTS type STRING
+      !E_SQL_COMPONENTS type STRING .
+  class-methods IS_ADDON_ACTIVE
+    importing
+      !I_ADDON type /CADAXO/SQLCADDON_ID
+    returning
+      value(R_ACTIVE) type /CADAXO/SQLCACTIVE .
+  class-methods EXPORT_DATA
+    importing
+      !I_EXPORT_TYPE type /CADAXO/SQLC_CHAR5 default 'CSV'
+      !IT_FCAT type LVC_T_FCAT
+      !IT_DATA type ANY TABLE .
+  class-methods EXPORT_DATA_ASXML
+    importing
+      !IT_DATA type ANY TABLE .
+  class-methods EXPORT_DATA_CSV
+    importing
+      !IT_FCAT type LVC_T_FCAT
+      !IT_DATA type ANY TABLE .
+  class-methods CONVERT_DATA_TO_CSV
+    importing
+      !I_CSV_ATTR type /CADAXO/SQLCEXPORTCSVATTR
+      !IT_DATA type ANY TABLE
+      !IT_COL_ALV type /CADAXO/SQLCEXPORTCOLALV_T
+    exporting
+      !ET_DATA type STANDARD TABLE .
+  class-methods GET_USED_SYMBOLS_TABLE
+    returning
+      value(R_USED_SYMBOLS_TABLE) type /CADAXO/SQLCUSEDSYMBOLS_T .
+  class-methods SET_USED_SYMBOLS_TABLE
+    importing
+      !I_USED_SYMBOLS_TABLE type /CADAXO/SQLCUSEDSYMBOLS_T .
+  class-methods CLEAR_USED_SYMBOLS_TABLE .
+  class-methods MAP_DDFIELDS_DESCR_TO_FCAT
+    importing
+      !IS_DFIES type /CADAXO/SQLCDFIES
+      !IS_USER_SETTINGS type /CADAXO/SQLCUSRP_DYN
+    changing
+      !CS_FCAT type LVC_S_FCAT .
+  class-methods SET_FCAT_HEADER_TEXTS
+    importing
+      !IS_USER_SETTINGS type /CADAXO/SQLCUSRP_XML
+      !IT_DDFIELDS type /CADAXO/SQLCDFIES_T
+    changing
+      !CT_FCAT type LVC_T_FCAT .
+  class-methods REPLACE_APOSTROPHES_WITH_SPACE
+    changing
+      !C_STRING type STRING .
+  class-methods REPLACE_ALL_SYMBOLS_WITH_VALUE
+    changing
+      !C_STRING type STRING
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  class-methods FORMAT_ABAP_CODE
+    importing
+      !I_LINE_SIZE type I default /CADAXO/CL_SQLC_COCKPIT_ASSIST=>C_SOURCE_LENGTH
+    changing
+      !CT_CODE type /CADAXO/SQLCSTRING_T .
+  class-methods FOREWARD_NAVIGATION_ADT_STOB
+    importing
+      !I_DDOBJNAME type DDOBJNAME .
+  class-methods FOREWARD_NAVIGATION_ADT_OTHERS
+    importing
+      !I_DDOBJNAME type DDOBJNAME .
+  class-methods HAS_CODE_OPEN_LITERAL
+    importing
+      !IV_ABAP_CODE type /CADAXO/SQLCSTRING
+      value(IV_OFFSET) type I default 0
+      !IV_LITERAL_MARK type C default `'`
+    returning
+      value(EV_IS_OPEN) type /CADAXO/SQLC_GENERAL_FLAG .
+  class-methods CREATE_DATA_REFERENCE
+    importing
+      !IV_INTTYPE type INTTYPE
+      !IV_LENG type DDLENG
+      !IV_DECIMALS type DECIMALS
+      !IV_INTLEN type INTLEN
+      !IV_STRU_NAME type STRING
+      !IV_TABIX type SYST_TABIX
+      !IV_DOMAINTEXT type /CADAXO/SQLCADDDOMAINTEXT
+      !IT_COMPONENTS_DOMVAL type /CADAXO/SQLCPARSECOMPONENT_T
+      !IT_COMP type /CADAXO/SQLC_COMPDESC_T
+      !IT_DOMVAL type /CADAXO/SQLC_DOMVAL_T
+    returning
+      value(RR_DATA) type ref to DATA .
+  class-methods CONVERT_VALUE_INT_TO_EDITOR
+    importing
+      !IV_TYP type C
+      !IV_FIELDVALUE_INTERNAL type ANY
+    returning
+      value(RV_FIELDVALUE_EDITOR) type STRING .
+  class-methods CALL_CONVERTION_EXIT_INPUT
+    importing
+      !IV_DATATYPE type ROLLNAME
+    changing
+      !EV_SYMBOL_VALUE type STRING .
+  class-methods ENCLODING_APOSTROPHE_REMOVE
+    changing
+      !EV_SYMBOL_VALUE type STRING
+    returning
+      value(EV_APOSTROPHE_CHAR) type /CADAXO/SQLC_CHAR1 .
+  class-methods ENCLODING_APOSTROPHE_SET
+    importing
+      !IV_APOSTROPHE_CHAR type /CADAXO/SQLC_CHAR1
+    changing
+      !EV_SYMBOL_VALUE type STRING .
+  class-methods GET_SQL_COCKPIT_STANDARD_USERS
+    returning
+      value(RT_SQL_COCKPIT_STANDARD_USERS) type /CADAXO/SQLC_USER_NAME_T .
+  class-methods FORMAT_WITH_SPACE
+    importing
+      value(IV_STRING) type STRING
+    returning
+      value(RV_FORMATTED) type STRING .
+  class-methods INSERT_SELECT_HEADER
+    changing
+      !CO_ABAP_EDITOR type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT .
+  class-methods CODE_COMPLETION
+    importing
+      !I_ABAP_EDITOR type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT
+    exporting
+      !E_STRING type STRING .
   PROTECTED SECTION.
 
 *"* protected components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
 *"* do not include other source files here!!!
-    CLASS-DATA g_open TYPE /cadaxo/sqlc_char1 .
+    CLASS-DATA g_open TYPE c length 1. "/cadaxo/sqlc_char1 .
     CLASS-DATA g_space_string TYPE string .
     CLASS-DATA gs_admin_cust TYPE /cadaxo/sqlc_admin_cust .
   PRIVATE SECTION.
@@ -303,7 +306,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_assist IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
 
   METHOD call_convertion_exit_input.  "COCKPIT-216

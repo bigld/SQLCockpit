@@ -1002,6 +1002,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           LOOP AT <lt_cl_sql_parse> ASSIGNING <l_cl_sql_parse>.
             <l_cl_sql_parse>->parse_sql_ii( ).
             authcheck->blacklist_check_tables( <l_cl_sql_parse>->result_source_t  ).
+            authcheck->blacklist_check_tables( <l_cl_sql_parse>->subselect_source_t  ).
+            authcheck->blacklist_check_tables( <l_cl_sql_parse>->union_source_t  ).
             <l_cl_sql_parse>->parse_sql_where_columns( ).
           ENDLOOP.
 

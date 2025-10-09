@@ -241,6 +241,9 @@ protected section.
   data G_MAIN_REF_ID type I .
   data BACKGROUND_MODE type FLAG .
   data SUBSELECTS type /CADAXO/SQLC_CL_COCKPIT_PARSET .
+  data unions type /CADAXO/SQLC_CL_COCKPIT_PARSET .
+  data subselect_SOURCE_T type /CADAXO/SQLCSELECTSOURCE_T .
+  data union_SOURCE_T type /CADAXO/SQLCSELECTSOURCE_T .
 
   class-methods CHECK_FOR_HOST_EXPRESSIONS
     importing
@@ -4340,7 +4343,7 @@ ENDMETHOD.
                                                       i_role          = i_role
                                                       i_main_ref_id   = i_main_ref_id
                                                       i_main_ref      = i_main_ref ).
-          APPEND LINES OF paresedsunions TO parser->subselects.
+          APPEND LINES OF paresedsunions TO parser->unions.
 
         ENDLOOP.
       ENDIF.
@@ -4361,10 +4364,17 @@ METHOD parse_sql_ii.
 
   LOOP AT subselects ASSIGNING FIELD-SYMBOL(<subselect>).
     <subselect>->parse_sql_ii( ).
-    APPEND LINES OF <subselect>->result_source_t TO result_source_t.
+    APPEND LINES OF <subselect>->result_source_t TO subselect_source_t.
   ENDLOOP.
-  SORT result_source_t.
-  DELETE ADJACENT DUPLICATES FROM result_source_t.
+  SORT subselect_source_t.
+  DELETE ADJACENT DUPLICATES FROM subselect_source_t.
+
+  LOOP AT unions ASSIGNING FIELD-SYMBOL(<union>).
+    <union>->parse_sql_ii( ).
+    APPEND LINES OF <subselect>->result_source_t TO union_source_t.
+  ENDLOOP.
+  SORT union_source_t.
+  DELETE ADJACENT DUPLICATES FROM union_source_t.
 
 ENDMETHOD.
 
@@ -6218,12 +6228,10 @@ ENDMETHOD.
           WHEN ')'.                                         " CDX3301
             CLEAR l_is_subsel.
             CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
-          WHEN 'UNION' OR 'ALL'.
-
+*          l_from = l_from + 2.
           WHEN OTHERS. " Field
             " split field into field, table and alias
             DATA: tablename TYPE string.
-            clear tablename.
             split_field( EXPORTING i_field  = l_string
                          IMPORTING e_field  = where_col-fieldname
                                    e_table  = tablename

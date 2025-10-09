@@ -40,7 +40,7 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util DEFINITION
         !i_date_type             TYPE /cadaxo/sqlc_csvcus_dateformat
         !i_date                  TYPE datum
       RETURNING
-        VALUE(rv_converted_date) TYPE /CADAXO/SQLC_CHAR10 .
+        VALUE(rv_converted_date) TYPE /CADAXO/SQLC_CONVERTED_DATE. "/CADAXO/SQLC_CHAR10 .
     CLASS-METHODS convert_time
       IMPORTING
         !i_time_type             TYPE /cadaxo/sqlc_csvcus_timeformat
