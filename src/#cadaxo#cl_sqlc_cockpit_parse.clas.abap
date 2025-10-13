@@ -4370,7 +4370,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
 
     LOOP AT unions ASSIGNING FIELD-SYMBOL(<union>).
       <union>->parse_sql_ii( ).
-      APPEND LINES OF <subselect>->result_source_t TO union_source_t.
+      APPEND LINES OF <union>->result_source_t TO union_source_t.
     ENDLOOP.
     SORT union_source_t.
     DELETE ADJACENT DUPLICATES FROM union_source_t.
@@ -5396,50 +5396,44 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
     "             |                      | of the alias name                           |                -
     " ---------------------------------------------------------------------------------------------------
 
-    DATA l_lines TYPE i.
-
-    FIELD-SYMBOLS <l_sql_source_line> LIKE LINE OF me->result_source_t.
-
     IF i_field CA '~'.         " alias~field
       SPLIT i_field AT '~' INTO e_alias e_field.
-      ASSIGN me->result_source_t[ alias = e_alias ] TO <l_sql_source_line>.
+      ASSIGN me->result_source_t[ alias = e_alias ] TO FIELD-SYMBOL(<sql_source_line>).
       IF sy-subrc <> 0.
-        ASSIGN me->result_source_t[ table = e_alias ] TO <l_sql_source_line>.
+        ASSIGN me->result_source_t[ table = e_alias ] TO <sql_source_line>.
       ENDIF.
       IF sy-subrc = 0.
-        e_table = <l_sql_source_line>-table.
+        e_table = <sql_source_line>-table.
       ENDIF.
     ELSEIF i_field CA '-'.     " table-field
       SPLIT i_field AT '-' INTO e_table e_field.
     ELSE.
       e_field = i_field. " only field
 
-      l_lines = lines( me->result_source_t ).
-
-      " only one table, then take the first one
-      IF l_lines = 1.
-        ASSIGN me->result_source_t[ 1 ] TO <l_sql_source_line>.
+      IF  lines( me->result_source_t ) = 1
+      AND me->union_source_t IS INITIAL.
+        ASSIGN me->result_source_t[ 1 ] TO <sql_source_line>.
         IF sy-subrc = 0.
-          e_table = <l_sql_source_line>-table.
+          e_table = <sql_source_line>-table.
         ENDIF.
       ELSE.
-
         " in other cases, try to find the right table
-        LOOP AT me->result_source_t ASSIGNING <l_sql_source_line>.
+        DATA(result_sources) = me->result_source_t.
+        APPEND LINES OF me->union_source_t TO result_sources.
+        LOOP AT result_sources ASSIGNING <sql_source_line>.
           SELECT SINGLE COUNT( * ) FROM dd03l
-            WHERE tabname   = <l_sql_source_line>-table
+            WHERE tabname   = <sql_source_line>-table
               AND fieldname = e_field
               AND as4local  = 'A'. "#EC CI_SROFC_NESTED "#EC CI_SEL_NESTED
           IF sy-subrc = 0.
-            IF e_table = space.
-              e_table = <l_sql_source_line>-table.
-            ENDIF.
+            e_table = <sql_source_line>-table.
+            RETURN.
           ENDIF.
         ENDLOOP.
       ENDIF.
     ENDIF.
 
-    " concatenate table and field into output field, separated by '-'
+
     CONCATENATE e_table '-' e_field INTO e_tabfld.
   ENDMETHOD.
 
