@@ -16,7 +16,7 @@ ENDCLASS.
 
 
 
-CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
+CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
 
 
   METHOD add_record_next_job.
@@ -138,7 +138,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
              FROM /cadaxo/sqlcsres
              WHERE root_list_guid = @i_list_guid OR list_guid = @i_list_guid
              ORDER BY ress_guid
-             into table @DATA(all_sqlcsres).
+             INTO TABLE @DATA(all_sqlcsres).
       IF sy-subrc <> 0.
         IF sy-batch IS NOT INITIAL.
           MESSAGE e143(/cadaxo/sqlc) WITH i_list_guid.
@@ -171,10 +171,9 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
         CLEAR lcl_sqlc_cockpit->ms_user_settings_xml-maxsel. "#Cockpit-338
 
 * parse the sql string
-        /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( EXPORTING i_sql           = l_sql_string
-                                                              i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
-                                                              i_role          = lcl_sqlc_cockpit->authcheck->get_cockpitrole( )
-                                                    IMPORTING e_sql_parsed    = lt_cl_sql_parse ).
+        lt_cl_sql_parse = /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( i_sql           = l_sql_string
+                                                                      i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
+                                                                      i_role          = lcl_sqlc_cockpit->authcheck->get_cockpitrole( ) ).
 
 * check the sql syntax
         /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( lt_cl_sql_parse ).
