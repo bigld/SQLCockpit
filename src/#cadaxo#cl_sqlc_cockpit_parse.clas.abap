@@ -7,7 +7,8 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse DEFINITION
                  /cadaxo/cl_sqlc_cockpit_main
                  /cadaxo/cl_sqlc_sql_syntax
                  /cadaxo/cl_sqlc_temp_rrg
-                 /cadaxo/cl_sqlc_cockpit_lists.
+                 /cadaxo/cl_sqlc_cockpit_lists
+                 /cadaxo/cl_sqlc_odata_gen.
 
   PUBLIC SECTION.
 
@@ -4099,8 +4100,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
                   IF in_subsection = abap_true.
                     CASE sql_string+l_foff(length).
                       WHEN 'SELECT'.
-                        in_subselect = abap_true.
-                        section_range-subselect-start = matchoffset - strlen('SELECT').
+                        IF in_subselect = abap_false.
+                          in_subselect = abap_true.
+                          section_range-subselect-start = matchoffset - strlen('SELECT').
+                        ENDIF.
                     ENDCASE.
                   ENDIF.
                 ENDIF.
@@ -4114,7 +4117,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
                 section_range-where-end = strlen( sql_string ).
               ENDIF.
               IF in_subselect = abap_true AND section_range-subselect-end IS INITIAL AND section_range-subselect-start IS NOT INITIAL.
-                section_range-subselect-end = strlen( sql_string ) - 1. " )
+                section_range-subselect-end = strlen( sql_string ) - 2. " )
               ENDIF.
               IF section_range-order-end IS INITIAL AND section_range-order-start IS NOT INITIAL.
                 section_range-order-end = strlen( sql_string ).

@@ -796,12 +796,13 @@ CLASS lcl_application IMPLEMENTATION.
             READ TABLE gt_controls ASSIGNING <wa_controls> WITH KEY tab = g_initiator.
             IF sy-subrc = 0.
               IF g_cleanup_errors = c_true.
-                <wa_controls>-alv_prot->modify_cell( i_row_id    = <lwa_mod_cells>-row_id
-                                                     i_tabix     = <lwa_mod_cells>-tabix
-                                                     i_fieldname = <lwa_mod_cells>-fieldname
-                                                     i_value     = space
-                                                    ).
-
+                IF <wa_controls>-alv_prot IS BOUND.
+                  <wa_controls>-alv_prot->modify_cell( i_row_id    = <lwa_mod_cells>-row_id
+                                                       i_tabix     = <lwa_mod_cells>-tabix
+                                                       i_fieldname = <lwa_mod_cells>-fieldname
+                                                       i_value     = space
+                                                      ).
+                ENDIF.
               ELSE.
                 <lwa_mod_cells>-error = c_true.
                 ADD 1 TO l_error .

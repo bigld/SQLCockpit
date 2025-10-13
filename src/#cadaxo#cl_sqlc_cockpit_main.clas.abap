@@ -691,8 +691,6 @@ protected section.
     DATA gt_elementinfo TYPE /cadaxo/sqlc_elementinfo_t .
     DATA gt_headerlines TYPE /cadaxo/sqlcheaderlines_t .
     DATA gt_history_log TYPE /cadaxo/sqlclogalv_t .
-    " DATA gt_html_demoversion TYPE gtt_char255 .
-    " DATA gt_html_html_startup TYPE gtt_char255 .
     DATA gt_jobs TYPE /cadaxo/sqlcjobsalv_t .
     DATA gt_lvc_s_layo TYPE /cadaxo/sqlc_t_lvc_s_filt .
     DATA gt_lvc_t_filt TYPE /cadaxo/sqlc_t_lvc_t_filt .
@@ -722,9 +720,14 @@ protected section.
     METHODS call_admin .
     METHODS _split_error_text
       IMPORTING
-        !is_error  TYPE /cadaxo/sqlcsyntaxerror
+         is_error  TYPE /cadaxo/sqlcsyntaxerror
       CHANGING
-        !ct_errors TYPE /cadaxo/sqlcsyntaxerror_t .
+         ct_errors TYPE /cadaxo/sqlcsyntaxerror_t .
+    METHODS select_authority_check IMPORTING i_parsed_selects TYPE /cadaxo/sqlc_cl_cockpit_parset
+      RAISING
+        /cadaxo/cx_sqlc_invalid_value
+        /cadaxo/cx_sqlc_symb_not_found
+        /cadaxo/cx_sqlc_syntax_error.
 ENDCLASS.
 
 
@@ -999,13 +1002,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                                                                   i_select_version = start_sql_version
                                                         IMPORTING e_sci_results    = DATA(sci_results) ).
 
-          LOOP AT <lt_cl_sql_parse> ASSIGNING <l_cl_sql_parse>.
-            <l_cl_sql_parse>->parse_sql_ii( ).
-            authcheck->blacklist_check_tables( <l_cl_sql_parse>->result_source_t  ).
-            authcheck->blacklist_check_tables( <l_cl_sql_parse>->subselect_source_t  ).
-            authcheck->blacklist_check_tables( <l_cl_sql_parse>->union_source_t  ).
-            <l_cl_sql_parse>->parse_sql_where_columns( ).
-          ENDLOOP.
+          select_authority_check( <lt_cl_sql_parse> ).
 
         ELSE.
           MESSAGE e103(/cadaxo/sqlc) INTO l_message.
@@ -1136,6 +1133,21 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       ENDIF.
     ENDIF.
   ENDMETHOD.
+
+  METHOD select_authority_check.
+
+    LOOP AT i_parsed_selects ASSIGNING FIELD-SYMBOL(<parsed_select>).
+      <parsed_select>->parse_sql_ii( ).
+      authcheck->blacklist_check_tables( <parsed_select>->result_source_t  ).
+      authcheck->blacklist_check_tables( <parsed_select>->subselect_source_t  ).
+      select_authority_check( <parsed_select>->subselects ).
+      authcheck->blacklist_check_tables( <parsed_select>->union_source_t  ).
+      <parsed_select>->parse_sql_where_columns( ).
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
 
 
   METHOD class_constructor.
