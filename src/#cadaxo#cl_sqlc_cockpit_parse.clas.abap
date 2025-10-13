@@ -3805,96 +3805,6 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
                                        with = lv_spacer_string ). " COCKPIT-222
 
       ENDIF.
-***
-***ENHANCEMENT-SECTION /CADAXO/SQLC_EHN_S_CLS_SE_001 SPOTS /CADAXO/SQLC_EHNSP_CLS_SE_001 .
-****...
-***FIND REGEX 'CLIENT\s+SPECIFIED' IN lv_check_sql_string MATCH OFFSET matchoffset MATCH LENGTH l_length.
-***IF sy-subrc EQ 0.
-***  MESSAGE e013(/cadaxo/sqlc).
-***ENDIF.
-***
-***FIND REGEX 'USING\s+CLIENT' IN lv_check_sql_string MATCH OFFSET matchoffset MATCH LENGTH l_length.   "COCKPIT-225
-***IF sy-subrc EQ 0.                                                                               "COCKPIT-225
-***  MESSAGE e121(/cadaxo/sqlc).                                                                   "COCKPIT-225
-***ENDIF.                                                                                          "COCKPIT-225
-***
-***
-***END-ENHANCEMENT-SECTION.
-****$*$-Start: /CADAXO/SQLC_EHN_S_CLS_SE_001-------------------------------------------------------$*$*
-***ENHANCEMENT 1  /CADAXO/SQLC_EHNIMP_CLS_PE_3.    "active version
-****...
-**** client specified - main select
-***    FIND ALL OCCURRENCES OF 'SELECT' IN lv_check_sql_string RESULTS lt_results.
-***    READ TABLE lt_results INDEX 2 INTO ls_results.
-***    IF sy-subrc EQ 0.
-***      length2 = ls_results-offset.
-***    ELSE.
-***      length2 = strlen( sql_string ).
-***    ENDIF.
-***    FIND FIRST OCCURRENCE OF REGEX 'CLIENT\s+SPECIFIED' IN SECTION OFFSET 0 LENGTH length2 OF lv_check_sql_string MATCH OFFSET matchoffset MATCH LENGTH l_length.
-***    IF sy-subrc EQ 0.
-***      IF ls_adm_cust-allow_cls NE abap_true.
-***        MESSAGE e013(/cadaxo/sqlc) INTO l_message.
-***        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-***              EXPORTING message       = l_message
-***                        /cadaxo/msgid = '/CADAXO/SQLC'
-***                        /cadaxo/msgnr = '013'.
-***      ELSE.
-***
-***        l_cl_sql_parse->gs_client_handling-client_specified = abap_true.
-***        lv_spacer_string = repeat( val = ` ` occ = l_length ).                                                         "COCKPIT-222
-***        lv_check_sql_string = replace( val = lv_check_sql_string off = matchoffset len = l_length with = lv_spacer_string )."COCKPIT-222
-***        sql_string          = replace( val = sql_string          off = matchoffset len = l_length with = lv_spacer_string )."COCKPIT-222
-***
-***      ENDIF.
-***    ENDIF.
-***
-**** client specified - sub selects
-***    FIND FIRST OCCURRENCE OF REGEX '\ASELECT(.*)SELECT(.*)(CLIENT\s+SPECIFIED)' IN lv_check_sql_string.
-***    IF sy-subrc EQ 0.
-***      IF ls_adm_cust-allow_cls NE abap_true.
-***        MESSAGE e013(/cadaxo/sqlc) INTO l_message.
-***        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
-***              EXPORTING message       = l_message
-***                        /cadaxo/msgid = '/CADAXO/SQLC'
-***                        /cadaxo/msgnr = '013'.
-***      ENDIF.
-***    ENDIF.
-***
-***
-***    FIND FIRST OCCURRENCE OF REGEX 'USING\s+CLIENT'                                                      "COCKPIT-225
-***         IN SECTION OFFSET 0 LENGTH length2 OF lv_check_sql_string                                     "COCKPIT-225
-***         MATCH OFFSET matchoffset MATCH LENGTH length.                                                   "COCKPIT-225
-***    IF sy-subrc EQ 0.                                                                                    "COCKPIT-225
-***      IF ls_adm_cust-allow_cls NE abap_true.                                                             "COCKPIT-225
-***        MESSAGE e121(/cadaxo/sqlc) INTO l_message.                                                       "COCKPIT-225
-***        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                                                "COCKPIT-225
-***              EXPORTING message       = l_message                                                        "COCKPIT-225
-***                        /cadaxo/msgid = '/CADAXO/SQLC'                                                   "COCKPIT-225
-***                        /cadaxo/msgnr = '121'.                                                           "COCKPIT-225
-***      ELSE.                                                                                              "COCKPIT-225
-***                                                                                                         "COCKPIT-225
-***        l_cl_sql_parse->gs_client_handling-using_client = abap_true.                                     "COCKPIT-225
-***                                                                                                         "COCKPIT-225
-***      ENDIF.                                                                                             "COCKPIT-225
-***    ENDIF.                                                                                               "COCKPIT-225
-***                                                                                                         "COCKPIT-225
-**** client specified - sub selects                                                                         "COCKPIT-225
-***    FIND FIRST OCCURRENCE OF REGEX '\ASELECT(.*)SELECT(.*)(USING\s+CLIENT)' IN lv_check_sql_string.      "COCKPIT-225
-***    IF sy-subrc EQ 0.                                                                                    "COCKPIT-225
-***      IF ls_adm_cust-allow_cls NE abap_true.                                                             "COCKPIT-225
-***        MESSAGE e121(/cadaxo/sqlc) INTO l_message.                                                       "COCKPIT-225
-***        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error                                                "COCKPIT-225
-***              EXPORTING message       = l_message                                                        "COCKPIT-225
-***                        /cadaxo/msgid = '/CADAXO/SQLC'                                                   "COCKPIT-225
-***                        /cadaxo/msgnr = '121'.                                                           "COCKPIT-225
-***      ENDIF.                                                                                             "COCKPIT-225
-***    ENDIF.                                                                                               "COCKPIT-225
-***
-***ENDENHANCEMENT.
-****$*$-End:   /CADAXO/SQLC_EHN_S_CLS_SE_001-------------------------------------------------------$*$*
-      " prüfung ob subselect eine CLIENT SPECIFIED hat '\ASELECT(.*)SELECT(.*)(CLIENT\s+SPECIFIED)'
-
 
 * client specified - main select
       FIND ALL OCCURRENCES OF 'SELECT' IN lv_check_sql_string RESULTS lt_results.
@@ -3967,6 +3877,18 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
       ENDIF.
 
       REPLACE 'COUNT(*)' IN sql_string WITH 'COUNT( * )'.
+
+* WITH PRIVILEGED ACCESS
+      FIND FIRST OCCURRENCE OF REGEX 'WITH\sPRIVILEGED\sACCESS' IN lv_check_sql_string.
+      IF sy-subrc = 0.
+        MESSAGE e170(/cadaxo/sqlc) INTO l_message.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error
+          EXPORTING
+            message       = l_message
+            /cadaxo/msgid = '/CADAXO/SQLC'
+            /cadaxo/msgnr = '170'.
+      ENDIF.
+
 
       l_sql_string = sql_string.
 
@@ -5824,7 +5746,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
             ENDIF.
 
             " check value of "P" fields
-            IF where_col-type_kind = 'P' AND where_col-value CO '0123456789.,'''' '.
+            IF where_col-type_kind = 'P'." AND where_col-value CO '0123456789.,'''' '.
               CREATE DATA lr_field TYPE HANDLE lr_abap_type.
               ASSIGN lr_field->* TO <l_field>.
 

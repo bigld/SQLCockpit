@@ -1010,6 +1010,12 @@
      <MSGNR>166</MSGNR>
      <TEXT>Input is not a correct JSON</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>170</MSGNR>
+     <TEXT>“WITH PRIVILEGED ACCESS” not yet supported</TEXT>
+    </T100>
    </T100>
    <LONGTEXTS>
     <item>
@@ -3160,6 +3166,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>166</MSGNR>
      <TEXT>Eingabe ist kein korrektes JSON</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>170</MSGNR>
+     <TEXT>“WITH PRIVILEGED ACCESS” wird derzeit noch nicht unterstützt</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>
