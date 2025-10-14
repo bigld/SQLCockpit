@@ -2951,7 +2951,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
         ENDIF.
 
         REPLACE ALL OCCURRENCES OF '''' IN c_where_col-value WITH ''." RT139
-        DATA l_char TYPE c LENGTH 40.                         " RT139
+        DATA l_char TYPE c LENGTH 5000.                         " RT139
         l_char = c_where_col-value.                           " RT139
         SHIFT l_char LEFT DELETING LEADING space.             " RT139
 
@@ -5747,30 +5747,38 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse IMPLEMENTATION.
 
             " check value of "P" fields
             IF where_col-type_kind = 'P'." AND where_col-value CO '0123456789.,'''' '.
-              CREATE DATA lr_field TYPE HANDLE lr_abap_type.
-              ASSIGN lr_field->* TO <l_field>.
-
-              l_strlen = strlen( where_col-value ) - 1.
-
-              l_string2 = where_col-value.
-
-              IF l_string2+l_strlen(1) = `'`.
-                l_string2 = l_string2(l_strlen).
+              IF subquery = abap_true.
+                FIND REGEX '\( SELECT' IN where_col-value.
+                IF sy-subrc = 0.
+                  DATA(is_subselect) = abap_true.
+                ENDIF.
               ENDIF.
+              IF is_subselect = abap_false.
+                CREATE DATA lr_field TYPE HANDLE lr_abap_type.
+                ASSIGN lr_field->* TO <l_field>.
 
-              IF l_string2(1) = `'`.
-                l_strlen = l_strlen - 1.
-                l_string2 = l_string2+1.
+                l_strlen = strlen( where_col-value ) - 1.
+
+                l_string2 = where_col-value.
+
+                IF l_string2+l_strlen(1) = `'`.
+                  l_string2 = l_string2(l_strlen).
+                ENDIF.
+
+                IF l_string2(1) = `'`.
+                  l_strlen = l_strlen - 1.
+                  l_string2 = l_string2+1.
+                ENDIF.
+                TRY.
+                    <l_field> = l_string2.
+                  CATCH cx_sy_conversion_no_number.
+                    l_fieldname = where_col-fieldname.
+                    RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value
+                      EXPORTING
+                        value = where_col-value
+                        field = l_fieldname.
+                ENDTRY.
               ENDIF.
-              TRY.
-                  <l_field> = l_string2.
-                CATCH cx_sy_conversion_no_number.
-                  l_fieldname = where_col-fieldname.
-                  RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_invalid_value
-                    EXPORTING
-                      value = where_col-value
-                      field = l_fieldname.
-              ENDTRY.
             ENDIF.
 
             IF l_offset <> 0.

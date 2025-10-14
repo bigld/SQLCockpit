@@ -1697,8 +1697,9 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
 
     c_offset = i_from.
 
-*begin OF INSERT 444
-    IF c_where_syntax+c_offset(1) EQ '(' OR c_where_syntax+c_offset(2) = '@('.
+    DATA(length) = strlen( c_where_syntax ).
+    IF ( length >= c_offset + 1 AND c_where_syntax+c_offset(1) = '(' )
+    OR ( length >= c_offset + 2 AND c_where_syntax+c_offset(2) = '@(' ).
       DATA(lv_open_bracket) = 1.
       DATA(lv_close_bracket)  = 0.
       IF c_where_syntax+c_offset(1) = '@'.
@@ -1715,7 +1716,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
       c_offset = c_offset + 1.
       EXIT.
     ENDIF.
-*end OF INSERT 444
 
     l_do_times = i_total_length - c_offset.
 
