@@ -5,6 +5,8 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util DEFINITION
 
   PUBLIC SECTION.
     TYPES: ty_strings TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
+    TYPES: ty_char1 TYPE c length 1 .
+    TYPES: ty_char8 TYPE c length 8 .
 
     CONSTANTS: BEGIN OF cseperators,
                  tab       TYPE /cadaxo/sqlc_csv_cust_fldsep VALUE 'TAB',
@@ -34,19 +36,19 @@ CLASS /cadaxo/cl_sqlc_csv_cust_util DEFINITION
         !i_separator_setting TYPE /cadaxo/sqlc_csv_cust_fldsep
         !i_separator_others  TYPE /cadaxo/sqlc_csvcust_fldsepoth OPTIONAL
       RETURNING
-        VALUE(e_separator)   TYPE /CADAXO/SQLC_CHAR1 .
+        VALUE(e_separator)   TYPE ty_char1 .
     CLASS-METHODS convert_date
       IMPORTING
         !i_date_type             TYPE /cadaxo/sqlc_csvcus_dateformat
         !i_date                  TYPE datum
       RETURNING
-        VALUE(rv_converted_date) TYPE /CADAXO/SQLC_CONVERTED_DATE. "/CADAXO/SQLC_CHAR10 .
+        VALUE(rv_converted_date) TYPE /CADAXO/SQLC_CONVERTED_DATE.
     CLASS-METHODS convert_time
       IMPORTING
         !i_time_type             TYPE /cadaxo/sqlc_csvcus_timeformat
         !i_time_int              TYPE uzeit
       RETURNING
-        VALUE(rv_converted_time) TYPE /CADAXO/SQLC_CHAR8 .
+        VALUE(rv_converted_time) TYPE ty_char8 .
     CLASS-METHODS get_csv_from_itab
       IMPORTING
                 it_table             TYPE ANY TABLE
@@ -135,7 +137,7 @@ CLASS /CADAXO/CL_SQLC_CSV_CUST_UTIL IMPLEMENTATION.
   METHOD get_csv_from_itab.
 
     DATA lv_output_line  TYPE string.
-    DATA lv_tmp_dats     TYPE /CADAXO/SQLC_CHAR30.
+    DATA lv_tmp_dats     TYPE c length 30.
     DATA lv_tmp_out      TYPE string.
 
     CLEAR ev_output_csv.

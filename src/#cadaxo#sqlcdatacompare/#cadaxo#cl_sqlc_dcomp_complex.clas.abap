@@ -5,7 +5,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+    TYPES: ty_char1 TYPE c LENGTH 1 .
     TYPES:
       BEGIN OF tys_table_details,
         number          TYPE i,
@@ -14,7 +14,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
         cdxdfies        TYPE /cadaxo/sqlcdfies_t,
         sort_tab        TYPE abap_sortorder_tab,
         link_fieldname  TYPE string,
-        compare_prefix  TYPE /CADAXO/SQLC_CHAR2,
+        compare_prefix  TYPE c length 2,
         components_view TYPE abap_component_view_tab,
         select_type     TYPE i,
         netplan_tab     TYPE REF TO if_aqqgraphic_table,
@@ -149,9 +149,9 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
       END OF typ_link .
     TYPES:
       BEGIN OF tys_progress_indi,
-        lines_compare       TYPE /CADAXO/SQLC_CHAR10,
+        lines_compare       TYPE c length 10,
         percentage_previous TYPE i,
-        current_line        TYPE /CADAXO/SQLC_CHAR10,
+        current_line        TYPE c length 10,
       END OF tys_progress_indi .
     TYPES:
       typ_link_tab TYPE STANDARD TABLE OF typ_link WITH DEFAULT KEY .
@@ -366,7 +366,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
       IMPORTING
         !iv_row_status  TYPE i
       CHANGING
-        !ec_light_field TYPE /CADAXO/SQLC_CHAR1 .
+        !ec_light_field TYPE ty_char1 .
     "! prepare dfies
     "!
     "! @parameter it_dfies | SQL Cockpit - Table of /CADAXO/SQLCDFIES
@@ -453,7 +453,7 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
     METHODS fieldmapping_delete .
     METHODS fieldmapping_set
       IMPORTING
-        !iv_kind TYPE /CADAXO/SQLC_CHAR1 .
+        !iv_kind TYPE ty_char1 .
     METHODS legent_build_line
       IMPORTING
         !is_table_details TYPE tys_table_details
@@ -577,16 +577,16 @@ CLASS /cadaxo/cl_sqlc_dcomp_complex DEFINITION
       IMPORTING
         !iv_row_status    TYPE i
       CHANGING
-        !ec_light_field_s TYPE /CADAXO/SQLC_CHAR1
-        !ec_light_field_t TYPE /CADAXO/SQLC_CHAR1 .
+        !ec_light_field_s TYPE ty_char1
+        !ec_light_field_t TYPE ty_char1 .
     METHODS fill_gds_rows_comp_state . "Cockpit402
   PRIVATE SECTION.
 
-    CONSTANTS c_prefix_source TYPE /CADAXO/SQLC_CHAR2 VALUE 'S_' ##NO_TEXT.
-    CONSTANTS c_prefix_target TYPE /CADAXO/SQLC_CHAR2 VALUE 'T_' ##NO_TEXT.
+    CONSTANTS c_prefix_source TYPE c length 2 VALUE 'S_' ##NO_TEXT.
+    CONSTANTS c_prefix_target TYPE c length 2 VALUE 'T_' ##NO_TEXT.
     CONSTANTS c_fieldname_lights TYPE string VALUE 'LIGHTS' ##NO_TEXT.
-    CONSTANTS c_mapkind_fieldname TYPE /CADAXO/SQLC_CHAR1 VALUE 'F' ##NO_TEXT.
-    CONSTANTS c_mapkind_index TYPE /CADAXO/SQLC_CHAR1 VALUE 'I' ##NO_TEXT.
+    CONSTANTS c_mapkind_fieldname TYPE ty_char1 VALUE 'F' ##NO_TEXT.
+    CONSTANTS c_mapkind_index TYPE ty_char1 VALUE 'I' ##NO_TEXT.
     CONSTANTS c_action_show_red TYPE stb_button-function VALUE 'SHOW_RED' ##NO_TEXT.
     CONSTANTS c_action_show_yellow TYPE stb_button-function VALUE 'SHOW_YELLOW' ##NO_TEXT.
     CONSTANTS c_action_show_green TYPE stb_button-function VALUE 'SHOW_GREEN' ##NO_TEXT.

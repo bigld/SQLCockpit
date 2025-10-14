@@ -60,11 +60,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse DEFINITION
     DATA gt_sql_where_col_tab_t TYPE /cadaxo/sqlcwherecol_str_t .
     DATA gt_sub_components TYPE abap_component_tab .
     DATA g_bypassing_buffer TYPE abap_bool.
-    DATA g_hold_result TYPE /cadaxo/sqlc_char1 .
+    DATA g_hold_result TYPE c length 1 .
     DATA g_no_upto TYPE flag .
     DATA g_saved_list TYPE abap_bool .
-    DATA g_select_distinct TYPE /cadaxo/sqlc_char1 .
-    DATA g_select_single TYPE /cadaxo/sqlc_char1 .
+    DATA g_select_distinct TYPE c length 1 .
+    DATA g_select_single TYPE c length 1 .
     DATA g_select_version TYPE /cadaxo/sqlc_select_version READ-ONLY .
     DATA g_up_to_x_rows TYPE int4 .
     DATA having_syntax TYPE /cadaxo/sqlcselecthavingsyntax .
@@ -78,7 +78,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse DEFINITION
     DATA source_syntax TYPE /cadaxo/sqlcselectsourcesyntax .
     DATA sql_syntax TYPE string .
     DATA sql_syntax_without_where TYPE string .
-    DATA subquery TYPE /cadaxo/sqlc_char1 .
+    DATA subquery TYPE c length 1 .
     DATA where_syntax TYPE /cadaxo/sqlcselectwheresyntax .
     DATA where_syntax_wildcard TYPE /cadaxo/sqlcselectwheresyntax .
 
@@ -223,7 +223,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse DEFINITION
       gtt_subpool_result TYPE TABLE OF gts_subpool_result .
 
     DATA order_syntax TYPE /cadaxo/sqlcselectordersyntax .
-    CONSTANTS c_apostrophe TYPE /cadaxo/sqlc_char1 VALUE '''' ##NO_TEXT.
+    CONSTANTS c_apostrophe TYPE c length 1 VALUE '''' ##NO_TEXT.
     CLASS-DATA gt_abap_typedescr TYPE /cadaxo/sqlctabtypedescr_t .
     CLASS-DATA g_role TYPE /cadaxo/sqlcrole_auth_xml .
     CLASS-DATA g_user_settings TYPE /cadaxo/sqlcusrp_xml .
