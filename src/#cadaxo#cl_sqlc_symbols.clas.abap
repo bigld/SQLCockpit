@@ -2529,6 +2529,7 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
         text              = TEXT-q55
         no_interval_check = abap_true
         excluded_options  = ls_exl_opt
+        lower_case        = abap_true "
       TABLES
         range             = <ls_table>
       EXCEPTIONS

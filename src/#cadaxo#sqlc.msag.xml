@@ -1016,6 +1016,18 @@
      <MSGNR>170</MSGNR>
      <TEXT>“WITH PRIVILEGED ACCESS” not yet supported</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>171</MSGNR>
+     <TEXT>&quot;FOR ALL ENTRIES&quot; not yet supported</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>172</MSGNR>
+     <TEXT>INTO or APPENDING is not allowed (set by the Cockpit)</TEXT>
+    </T100>
    </T100>
    <LONGTEXTS>
     <item>
@@ -3171,6 +3183,16 @@
      <SPRSL>D</SPRSL>
      <MSGNR>170</MSGNR>
      <TEXT>“WITH PRIVILEGED ACCESS” wird derzeit noch nicht unterstützt</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>171</MSGNR>
+     <TEXT>“FOR ALL ENTRIES” wird derzeit noch nicht unterstützt</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>172</MSGNR>
+     <TEXT>INTO oder APPENDING sind nicht erlaubt (wird durch das Cockpit gesetzt)</TEXT>
     </item>
    </T100_TEXTS>
   </asx:values>
