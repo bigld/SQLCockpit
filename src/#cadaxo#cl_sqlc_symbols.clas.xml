@@ -148,7 +148,7 @@
     <item>
      <ID>I</ID>
      <KEY>Q54</KEY>
-     <ENTRY>Paste Symbol Values</ENTRY>
+     <ENTRY>Set Values for Symbol:</ENTRY>
      <LENGTH>30</LENGTH>
     </item>
     <item>
@@ -309,13 +309,13 @@
       <item>
        <ID>I</ID>
        <KEY>Q54</KEY>
-       <ENTRY>Symbolwerte einfügen</ENTRY>
+       <ENTRY>Werte einfügen -</ENTRY>
        <LENGTH>30</LENGTH>
       </item>
       <item>
        <ID>I</ID>
        <KEY>Q55</KEY>
-       <ENTRY>Symolwert</ENTRY>
+       <ENTRY>Symbolwert</ENTRY>
        <LENGTH>25</LENGTH>
       </item>
       <item>

@@ -120,6 +120,7 @@ CLASS /cadaxo/cl_sqlc_symbols DEFINITION
       IMPORTING
         !i_symbol_multivalue  TYPE /cadaxo/sqlcsymbol_multivalue
         !i_symbol_datatype    TYPE /cadaxo/sqlcsymbol_datatype
+        !i_symbol_name        TYPE /cadaxo/sqlcsymbol_name
       RETURNING
         VALUE(r_symbol_value) TYPE rseloption
       RAISING
@@ -1979,7 +1980,6 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
     FIELD-SYMBOLS <l_symbol> LIKE LINE OF gt_symbol.
 
     READ TABLE gt_symbol INDEX es_row_no-row_id ASSIGNING <l_symbol>.
-
     TRY.
         me->check_symbol_datatype( i_value = CONV #( <l_symbol>-symbol_datatype ) ).
 
@@ -1993,7 +1993,8 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
 
     TRY.
         r_symbol_value = me->show_symbolmulti_dialog( EXPORTING i_symbol_multivalue = <l_symbol>-symbol_multivalue
-                                                                i_symbol_datatype   = <l_symbol>-symbol_datatype ).
+                                                                i_symbol_datatype   = <l_symbol>-symbol_datatype
+                                                                i_symbol_name       = <l_symbol>-symbol_name ).
 
         " Compress symbol multivalue
         /cadaxo/cl_sqlc_cockpit_assist=>compress_symbol_multivalue( EXPORTING i_symbol_multivalue = r_symbol_value
@@ -2024,12 +2025,14 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
         IF es_col_id = 'SYMBOL_TYPE_ICON_VAR' AND ls_symbol_ow-symbol_multivalue_var IS NOT INITIAL.
 
           symbol_value = me->show_symbolmulti_dialog( i_symbol_multivalue = ls_symbol_ow-symbol_multivalue_var
-                                                      i_symbol_datatype   = ls_symbol_ow-symbol_datatype_var ).
+                                                      i_symbol_datatype   = ls_symbol_ow-symbol_datatype_var
+                                                      i_symbol_name       = ls_symbol_ow-symbol_name ).
 
         ELSEIF es_col_id = 'SYMBOL_TYPE_ICON_USER' AND ls_symbol_ow-symbol_multivalue_user IS NOT INITIAL.
 
           symbol_value = me->show_symbolmulti_dialog( i_symbol_multivalue = ls_symbol_ow-symbol_multivalue_user
-                                                      i_symbol_datatype   = ls_symbol_ow-symbol_datatype_user ).
+                                                      i_symbol_datatype   = ls_symbol_ow-symbol_datatype_user
+                                                      i_symbol_name       = ls_symbol_ow-symbol_name ).
 
         ENDIF.
       CATCH /cadaxo/cx_sqlc_symb_not_found.
@@ -2469,7 +2472,9 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
 *------------+----------------------+---------------------------------------------+----------------*
 ****************************************************************************************************
 
-    DATA: ls_exl_opt TYPE rsoptions.
+    DATA ls_exl_opt TYPE rsoptions.
+    DATA popup_title TYPE syst_title.
+
 
     " Load Multivalue Data
     IF i_symbol_multivalue IS NOT INITIAL.
@@ -2522,10 +2527,14 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
       APPEND <ls_struct> TO <ls_table>.
     ENDLOOP.
 
+
+      popup_title = |{ TEXT-q54 } { i_symbol_name }|.
+
+
     " Show Multivalue Dialog
     CALL FUNCTION 'COMPLEX_SELECTIONS_DIALOG'
       EXPORTING
-        title             = TEXT-q54
+        title             = popup_title
         text              = TEXT-q55
         no_interval_check = abap_true
         excluded_options  = ls_exl_opt
