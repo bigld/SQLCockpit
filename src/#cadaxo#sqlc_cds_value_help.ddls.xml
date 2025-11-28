@@ -5,8 +5,8 @@
    <DDLS>
     <DDLNAME>/CADAXO/SQLC_CDS_VALUE_HELP</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
-    <DDTEXT>SQL Cockpit - Value help for all objects</DDTEXT>
-    <SOURCE_TYPE>W</SOURCE_TYPE>
+    <DDTEXT>SQL Cockpit - Datasource VH</DDTEXT>
+    <SOURCE_TYPE>V</SOURCE_TYPE>
    </DDLS>
   </asx:values>
  </asx:abap>

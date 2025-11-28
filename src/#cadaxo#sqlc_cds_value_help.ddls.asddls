@@ -1,8 +1,11 @@
-@Metadata.ignorePropagatedAnnotations: true
+@AbapCatalog.sqlViewName: '/CADAXO/SQLCTVH'
+@AbapCatalog.compiler.compareFilter: true
+@AbapCatalog.preserveKey: true
 @AccessControl.authorizationCheck: #NOT_REQUIRED
-@EndUserText.label: 'SQL Cockpit–Tables, CDS View, DB Views'
-define view entity /CADAXO/SQLC_CDS_VALUE_HELP
-  as select from dd02l
+@EndUserText.label: 'SQLC_CDS_VALUE_HELP'
+@Metadata.ignorePropagatedAnnotations: true
+define view /CADAXO/SQLC_CDS_VALUE_HELP
+ as select from dd02l
     inner join   dd02t on  dd02l.tabname    = dd02t.tabname
                        and dd02t.as4local   = dd02l.as4local
                        and dd02t.as4vers    = dd02l.as4vers
