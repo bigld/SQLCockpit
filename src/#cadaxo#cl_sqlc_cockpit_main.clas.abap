@@ -1134,21 +1134,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-  METHOD select_authority_check.
-
-    LOOP AT i_parsed_selects ASSIGNING FIELD-SYMBOL(<parsed_select>).
-      <parsed_select>->parse_sql_ii( ).
-      authcheck->blacklist_check_tables( <parsed_select>->result_source_t  ).
-      authcheck->blacklist_check_tables( <parsed_select>->subselect_source_t  ).
-      select_authority_check( <parsed_select>->subselects ).
-      authcheck->blacklist_check_tables( <parsed_select>->union_source_t  ).
-      <parsed_select>->parse_sql_where_columns( ).
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-
 
   METHOD class_constructor.
     DATA(resolution) = /cadaxo/cl_sqlc_resolution=>get_instance( ).
@@ -1449,7 +1434,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     " 740 Workaround for /CADAXO/SQLC_DataSourceVH
     DATA(sylangu) = VALUE /cadaxo/sqlcdemo( key_fld  = 76657871
-                                             text_fld = sy-langu ).
+                                            text_fld = sy-langu ).
     MODIFY /cadaxo/sqlcdemo FROM sylangu.
   ENDMETHOD.
 
@@ -4204,6 +4189,70 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     ENDIF.
 
+  ENDMETHOD.
+
+
+  METHOD handle_command_show_json_brow.
+    DATA gui_control  TYPE REF TO cl_gui_control.
+    DATA gui_alv_grid TYPE REF TO cl_gui_alv_grid.
+    DATA selected_row TYPE lvc_s_row.
+    DATA selected_col TYPE lvc_s_col.
+
+    FIELD-SYMBOLS <result_tab>   TYPE STANDARD TABLE.
+    FIELD-SYMBOLS <result_line>  TYPE any.
+    FIELD-SYMBOLS <result_field> TYPE any.
+    FIELD-SYMBOLS <dref_line>    TYPE REF TO data.
+
+    cl_gui_alv_grid=>get_focus( IMPORTING control = gui_control ).
+
+    TRY.
+        gui_alv_grid ?= gui_control.
+        gui_alv_grid->get_current_cell( IMPORTING es_row_id = selected_row
+                                                  es_col_id = selected_col ).
+      CATCH cx_sy_move_cast_error ##NO_HANDLER.
+        RETURN.
+    ENDTRY.
+
+    IF i_log = abap_true.
+      ASSIGN gt_history_log[ selected_row-index ] TO <result_line>.
+    ELSE.
+      ASSIGN dref_result_tab_t[ i_grid_i ] TO <dref_line>.
+      ASSIGN <dref_line>->* TO <result_tab>.
+      ASSIGN <result_tab>[ selected_row-index ] TO <result_line>.
+    ENDIF.
+
+    IF sy-subrc = 0.
+      ASSIGN COMPONENT selected_col-fieldname OF STRUCTURE <result_line> TO <result_field>.
+      IF <result_field> IS ASSIGNED.
+
+        DATA(data_to_string) = CONV string( <result_field> ).
+        IF data_to_string CP '{*' OR data_to_string CP '[*'.
+
+          " Perform transformation from JSON → HTML
+          TRY.
+              CALL TRANSFORMATION sjson2html
+                   SOURCE XML <result_field>
+                   RESULT XML DATA(result_html).
+
+              cl_abap_browser=>show_html( html_string  = cl_abap_codepage=>convert_from( result_html )
+                                          title        = TEXT-t18
+                                          size         = cl_abap_browser=>large
+                                          modal        = abap_true
+                                          printing     = abap_true
+                                          buttons      = abap_true
+                                          context_menu = abap_true ).
+            CATCH cx_transformation_error INTO DATA(lx_transform).
+              MESSAGE lx_transform->get_text( )
+                TYPE 'S'
+                DISPLAY LIKE 'E'.
+          ENDTRY.
+
+        ELSE.
+          MESSAGE i166(/cadaxo/sqlc) DISPLAY LIKE 'E'.
+        ENDIF.
+
+      ENDIF.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -10357,6 +10406,98 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD replace_icon_names_in_sql.
+
+    DATA: matches       TYPE match_result_tab,
+          match         TYPE match_result,
+          icon_name     TYPE string,
+          icon_id       TYPE icon_d,
+          left_part     TYPE string,
+          right_part    TYPE string,
+          sql_len       TYPE i,
+          remaining_len TYPE i,
+          idx           TYPE i,
+          pos           TYPE i.
+
+    FIND ALL OCCURRENCES OF REGEX 'ICON_[A-Za-z0-9_]+' IN c_sql_string IGNORING CASE RESULTS matches.
+
+    IF lines( matches ) = 0.
+      RETURN.
+    ENDIF.
+
+    sql_len = strlen( c_sql_string ).
+
+    idx = lines( matches ).
+    WHILE idx > 0.
+      READ TABLE matches INDEX idx INTO match.
+      IF sy-subrc <> 0.
+        idx = idx - 1.
+        CONTINUE.
+      ENDIF.
+
+      icon_name = to_upper( c_sql_string+match-offset(match-length) ).
+
+      SELECT SINGLE id INTO @icon_id FROM icon WHERE name = @icon_name.
+      IF sy-subrc = 0.
+
+        IF match-offset > 0.
+          left_part = c_sql_string+0(match-offset).
+        ELSE.
+          left_part = ''.
+        ENDIF.
+
+        pos = match-offset + match-length.
+        remaining_len = sql_len - pos.
+
+        IF remaining_len > 0.
+          right_part = c_sql_string+pos(remaining_len).
+        ELSE.
+          right_part = ''.
+        ENDIF.
+
+        CONCATENATE left_part icon_id right_part INTO c_sql_string.
+
+        sql_len = strlen( c_sql_string ).
+      ENDIF.
+
+      idx = idx - 1.
+    ENDWHILE.
+
+  ENDMETHOD.
+
+
+  METHOD replace_old_runtime_structure.
+
+    DATA runtime_regex     TYPE string VALUE '<RUNTIME>(\d+)</RUNTIME>'.
+    DATA target_string     TYPE string.
+    DATA runtime_regex_tab TYPE match_result_tab.
+    DATA l_xml_output      TYPE string.
+
+    l_xml_output = xml.
+
+    FIND ALL OCCURRENCES OF REGEX runtime_regex IN xml RESULTS runtime_regex_tab.
+
+    LOOP AT runtime_regex_tab INTO DATA(runtime_element).
+
+      DATA(runtime_element_submatch) = runtime_element-submatches[ 1 ].
+
+      DATA(runtime_value) = xml+runtime_element_submatch-offset(runtime_element_submatch-length).
+
+      target_string = |<RUNTIME><RUNTIME>{ runtime_value }</RUNTIME><UNIT>µs</UNIT></RUNTIME>|.
+      runtime_regex = |<RUNTIME>{ runtime_value }</RUNTIME>|.
+
+      IF NOT l_xml_output CS target_string.
+        l_xml_output = replace( val   = l_xml_output
+                         regex = runtime_regex
+                         with  = target_string ).
+      ENDIF.
+    ENDLOOP.
+
+    xml = l_xml_output.
+
+  ENDMETHOD.
+
+
   METHOD save_clipboard.
 ****************************************************************************************************
 * Description ....... Save the content of the clipboard                                            *
@@ -10472,6 +10613,20 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           APPEND <ls_result_details> TO gt_result_details_hold.
         ENDIF.
       ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD select_authority_check.
+
+    LOOP AT i_parsed_selects ASSIGNING FIELD-SYMBOL(<parsed_select>).
+      <parsed_select>->parse_sql_ii( ).
+      authcheck->blacklist_check_tables( <parsed_select>->result_source_t  ).
+      authcheck->blacklist_check_tables( <parsed_select>->subselect_source_t  ).
+      select_authority_check( <parsed_select>->subselects ).
+      authcheck->blacklist_check_tables( <parsed_select>->union_source_t  ).
+      <parsed_select>->parse_sql_where_columns( ).
     ENDLOOP.
 
   ENDMETHOD.
@@ -12895,162 +13050,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     ls_error_add-text = is_error-text+lv_pos.
     APPEND ls_error_add TO ct_errors.
-
-  ENDMETHOD.
-
-
-  METHOD replace_old_runtime_structure.
-
-    DATA runtime_regex     TYPE string VALUE '<RUNTIME>(\d+)</RUNTIME>'.
-    DATA target_string     TYPE string.
-    DATA runtime_regex_tab TYPE match_result_tab.
-    DATA l_xml_output      TYPE string.
-
-    l_xml_output = xml.
-
-    FIND ALL OCCURRENCES OF REGEX runtime_regex IN xml RESULTS runtime_regex_tab.
-
-    LOOP AT runtime_regex_tab INTO DATA(runtime_element).
-
-      DATA(runtime_element_submatch) = runtime_element-submatches[ 1 ].
-
-      DATA(runtime_value) = xml+runtime_element_submatch-offset(runtime_element_submatch-length).
-
-      target_string = |<RUNTIME><RUNTIME>{ runtime_value }</RUNTIME><UNIT>µs</UNIT></RUNTIME>|.
-      runtime_regex = |<RUNTIME>{ runtime_value }</RUNTIME>|.
-
-      IF NOT l_xml_output CS target_string.
-        l_xml_output = replace( val   = l_xml_output
-                         regex = runtime_regex
-                         with  = target_string ).
-      ENDIF.
-    ENDLOOP.
-
-    xml = l_xml_output.
-
-  ENDMETHOD.
-
-
-  METHOD handle_command_show_json_brow.
-    DATA gui_control  TYPE REF TO cl_gui_control.
-    DATA gui_alv_grid TYPE REF TO cl_gui_alv_grid.
-    DATA selected_row TYPE lvc_s_row.
-    DATA selected_col TYPE lvc_s_col.
-
-    FIELD-SYMBOLS <result_tab>   TYPE STANDARD TABLE.
-    FIELD-SYMBOLS <result_line>  TYPE any.
-    FIELD-SYMBOLS <result_field> TYPE any.
-    FIELD-SYMBOLS <dref_line>    TYPE REF TO data.
-
-    cl_gui_alv_grid=>get_focus( IMPORTING control = gui_control ).
-
-    TRY.
-        gui_alv_grid ?= gui_control.
-        gui_alv_grid->get_current_cell( IMPORTING es_row_id = selected_row
-                                                  es_col_id = selected_col ).
-      CATCH cx_sy_move_cast_error ##NO_HANDLER.
-        RETURN.
-    ENDTRY.
-
-    IF i_log = abap_true.
-      ASSIGN gt_history_log[ selected_row-index ] TO <result_line>.
-    ELSE.
-      ASSIGN dref_result_tab_t[ i_grid_i ] TO <dref_line>.
-      ASSIGN <dref_line>->* TO <result_tab>.
-      ASSIGN <result_tab>[ selected_row-index ] TO <result_line>.
-    ENDIF.
-
-    IF sy-subrc = 0.
-      ASSIGN COMPONENT selected_col-fieldname OF STRUCTURE <result_line> TO <result_field>.
-      IF <result_field> IS ASSIGNED.
-
-        DATA(data_to_string) = CONV string( <result_field> ).
-        IF data_to_string CP '{*' OR data_to_string CP '[*'.
-
-          " Perform transformation from JSON → HTML
-          TRY.
-              CALL TRANSFORMATION sjson2html
-                   SOURCE XML <result_field>
-                   RESULT XML DATA(result_html).
-
-              cl_abap_browser=>show_html( html_string  = cl_abap_codepage=>convert_from( result_html )
-                                          title        = TEXT-t18
-                                          size         = cl_abap_browser=>large
-                                          modal        = abap_true
-                                          printing     = abap_true
-                                          buttons      = abap_true
-                                          context_menu = abap_true ).
-            CATCH cx_transformation_error INTO DATA(lx_transform).
-              MESSAGE lx_transform->get_text( )
-                TYPE 'S'
-                DISPLAY LIKE 'E'.
-          ENDTRY.
-
-        ELSE.
-          MESSAGE i166(/cadaxo/sqlc) DISPLAY LIKE cl_abap_docu_constants=>msg-e.
-        ENDIF.
-
-      ENDIF.
-    ENDIF.
-  ENDMETHOD.
-
-
-  METHOD replace_icon_names_in_sql.
-
-    DATA: matches       TYPE match_result_tab,
-          match         TYPE match_result,
-          icon_name     TYPE string,
-          icon_id       TYPE icon_d,
-          left_part     TYPE string,
-          right_part    TYPE string,
-          sql_len       TYPE i,
-          remaining_len TYPE i,
-          idx           TYPE i,
-          pos           TYPE i.
-
-    FIND ALL OCCURRENCES OF REGEX 'ICON_[A-Za-z0-9_]+' IN c_sql_string IGNORING CASE RESULTS matches.
-
-    IF lines( matches ) = 0.
-      RETURN.
-    ENDIF.
-
-    sql_len = strlen( c_sql_string ).
-
-    idx = lines( matches ).
-    WHILE idx > 0.
-      READ TABLE matches INDEX idx INTO match.
-      IF sy-subrc <> 0.
-        idx = idx - 1.
-        CONTINUE.
-      ENDIF.
-
-      icon_name = to_upper( c_sql_string+match-offset(match-length) ).
-
-      SELECT SINGLE id INTO @icon_id FROM icon WHERE name = @icon_name.
-      IF sy-subrc = 0.
-
-        IF match-offset > 0.
-          left_part = c_sql_string+0(match-offset).
-        ELSE.
-          left_part = ''.
-        ENDIF.
-
-        pos = match-offset + match-length.
-        remaining_len = sql_len - pos.
-
-        IF remaining_len > 0.
-          right_part = c_sql_string+pos(remaining_len).
-        ELSE.
-          right_part = ''.
-        ENDIF.
-
-        CONCATENATE left_part icon_id right_part INTO c_sql_string.
-
-        sql_len = strlen( c_sql_string ).
-      ENDIF.
-
-      idx = idx - 1.
-    ENDWHILE.
 
   ENDMETHOD.
 ENDCLASS.
