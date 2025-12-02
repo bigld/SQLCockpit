@@ -73,4 +73,4 @@ union all
 }
 
 where src.as4local    = 'A'
-  and src.source_type = 'V';
+//  and src.source_type = 'V';
