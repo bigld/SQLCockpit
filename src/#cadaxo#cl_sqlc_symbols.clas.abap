@@ -245,11 +245,12 @@ CLASS /cadaxo/cl_sqlc_symbols DEFINITION
                  symbol_delete TYPE string VALUE 'SYMBOL_DELETE',
                END OF functions.
     DATA: symbol_alv_error TYPE bapiret2.
+private section.
 ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_SYMBOLS IMPLEMENTATION.
 
 
   METHOD check_changed_data.
@@ -1403,6 +1404,73 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD mark_cell_when_error.
+
+    symbol_alv_error = VALUE #(
+    type = i_msgty
+    id   = I_msgid
+    number   = i_msgno
+*message
+*log_no
+*log_msg_no
+    message_v1 = i_msgv1
+    message_v2 = i_msgv2
+    message_v3 = i_msgv3
+    message_v4 = i_msgv4
+
+    row  = i_row_id
+    field   = i_fieldname ).
+*    FIELD-SYMBOLS: <ls_cell_style> LIKE LINE OF ct_cell_style.
+*
+*    READ TABLE ct_cell_style ASSIGNING <ls_cell_style> WITH KEY fieldname = i_fieldname.
+*    IF sy-subrc <> 0.
+*      DATA(ls_cell_style) = VALUE lvc_s_styl(
+*        fieldname = i_fieldname
+*        style     = alv_style_color_negative
+*      ).
+*      INSERT ls_cell_style INTO TABLE ct_cell_style.
+*    ELSE.
+*      <ls_cell_style>-style = alv_style_color_negative.
+*    ENDIF.
+*
+*
+*    me->refresh_symbol_alv( ).
+
+    MESSAGE ID i_msgid TYPE 'S' NUMBER i_msgno
+            WITH i_msgv1 i_msgv2 i_msgv3 i_msgv4 DISPLAY LIKE i_msgty.
+
+  ENDMETHOD.
+
+
+  METHOD mark_symbol_alv_cell_error.
+
+    DATA ls_cell_msg TYPE lvc_s_msg.
+    DATA ls_cell_style TYPE lvc_s_styl.
+
+    ls_cell_msg-row_id    = i_row_id.
+    ls_cell_msg-fieldname = i_field_name.
+    ls_cell_msg-messageid     = i_msgid.
+    ls_cell_msg-messagenr    = i_msgno.
+    ls_cell_msg-msgty     = i_msgty.
+    ls_cell_msg-msgv1     = i_msgv1.
+
+    APPEND ls_cell_msg TO ct_cell_msg.
+
+    ls_cell_style-fieldname = i_field_name.
+    ls_cell_style-style     = '1'.
+
+    ASSIGN gt_symbol[ sy-tabix + i_row_id - 1 ] TO FIELD-SYMBOL(<fs_symbol_row>).
+    IF sy-subrc = 0.
+      IF <fs_symbol_row>-cell_style IS INITIAL.
+        CLEAR <fs_symbol_row>-cell_style.
+      ENDIF.
+      APPEND ls_cell_style TO <fs_symbol_row>-cell_style.
+    ENDIF.
+
+
+  ENDMETHOD.
+
+
   METHOD merge_symbols.
     DATA: sqlcusyms     TYPE TABLE OF /cadaxo/sqlcusym.
     DATA sqlcusyms_upd TYPE TABLE OF /cadaxo/sqlcusym.
@@ -1602,7 +1670,7 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
-      lv_count += 1.
+      lv_count = lv_count + 1.
 
       IF lv_count > 1.
         me->mark_cell_when_error( EXPORTING i_row_id      = <mod_cell>-row_id
@@ -2576,70 +2644,4 @@ CLASS /cadaxo/cl_sqlc_symbols IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
-  METHOD mark_cell_when_error.
-
-    symbol_alv_error = VALUE #(
-    type = i_msgty
-    id   = I_msgid
-    number   = i_msgno
-*message
-*log_no
-*log_msg_no
-    message_v1 = i_msgv1
-    message_v2 = i_msgv2
-    message_v3 = i_msgv3
-    message_v4 = i_msgv4
-
-    row  = i_row_id
-    field   = i_fieldname ).
-*    FIELD-SYMBOLS: <ls_cell_style> LIKE LINE OF ct_cell_style.
-*
-*    READ TABLE ct_cell_style ASSIGNING <ls_cell_style> WITH KEY fieldname = i_fieldname.
-*    IF sy-subrc <> 0.
-*      DATA(ls_cell_style) = VALUE lvc_s_styl(
-*        fieldname = i_fieldname
-*        style     = alv_style_color_negative
-*      ).
-*      INSERT ls_cell_style INTO TABLE ct_cell_style.
-*    ELSE.
-*      <ls_cell_style>-style = alv_style_color_negative.
-*    ENDIF.
-*
-*
-*    me->refresh_symbol_alv( ).
-
-    MESSAGE ID i_msgid TYPE 'S' NUMBER i_msgno
-            WITH i_msgv1 i_msgv2 i_msgv3 i_msgv4 DISPLAY LIKE i_msgty.
-
-  ENDMETHOD.
-
-  METHOD mark_symbol_alv_cell_error.
-
-    DATA ls_cell_msg TYPE lvc_s_msg.
-    DATA ls_cell_style TYPE lvc_s_styl.
-
-    ls_cell_msg-row_id    = i_row_id.
-    ls_cell_msg-fieldname = i_field_name.
-    ls_cell_msg-messageid     = i_msgid.
-    ls_cell_msg-messagenr    = i_msgno.
-    ls_cell_msg-msgty     = i_msgty.
-    ls_cell_msg-msgv1     = i_msgv1.
-
-    APPEND ls_cell_msg TO ct_cell_msg.
-
-    ls_cell_style-fieldname = i_field_name.
-    ls_cell_style-style     = '1'.
-
-    ASSIGN gt_symbol[ sy-tabix + i_row_id - 1 ] TO FIELD-SYMBOL(<fs_symbol_row>).
-    IF sy-subrc = 0.
-      IF <fs_symbol_row>-cell_style IS INITIAL.
-        CLEAR <fs_symbol_row>-cell_style.
-      ENDIF.
-      APPEND ls_cell_style TO <fs_symbol_row>-cell_style.
-    ENDIF.
-
-
-  ENDMETHOD.
-
 ENDCLASS.

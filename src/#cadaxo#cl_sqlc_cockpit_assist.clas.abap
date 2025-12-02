@@ -69,7 +69,7 @@ public section.
     exporting
       !E_DATE_FROM type DATS
       !E_TIME_FROM type TIMS
-      !E_SUCCESS type ABAP_BOOLEAN .
+      !E_SUCCESS type ABAP_BOOL .
   class-methods SQL_TRACE_OFF
     importing
       !I_SQL_TRACE type /CADAXO/SQLCSQLTRACE default 'X'

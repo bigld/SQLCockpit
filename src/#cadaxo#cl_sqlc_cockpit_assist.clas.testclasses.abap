@@ -107,7 +107,7 @@ CLASS /cadaxo/tc_sqlc_cockpit_assist IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals(
       act   = actual_sql
       exp   = expected_sql
-      quit  = if_abap_unit_constant=>quit-no
+      quit  = 0
     ).
   ENDMETHOD.
 
@@ -208,7 +208,7 @@ CLASS /cadaxo/tc_sqlc_cockpit_assist IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals(
       act  = actual_sql
       exp  = expected_sql
-      quit = if_abap_unit_constant=>quit-no ).
+      quit = 0 ).
 
   ENDMETHOD.
 

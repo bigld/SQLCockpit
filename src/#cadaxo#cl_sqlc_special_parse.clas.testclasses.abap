@@ -37,27 +37,27 @@ CLASS ltcl_ IMPLEMENTATION.
 
       cl_abap_unit_assert=>assert_true( act  = select_pattern-is_select
                                         msg  = |Expected SELECT detected for: { case-sql }|
-                                        quit = if_abap_unit_constant=>quit-no ).
+                                        quit = 0 ).
 
       cl_abap_unit_assert=>assert_equals( exp  = case-exp_len
                                           act  = select_pattern-match_length
                                           msg  = |Match length mismatch for: { case-sql }|
-                                          quit = if_abap_unit_constant=>quit-no ).
+                                          quit = 0 ).
 
       cl_abap_unit_assert=>assert_equals( exp  = case-exp_distinct
                                           act  = select_pattern-is_distinct
                                           msg  = |DISTINCT flag mismatch for: { case-sql }|
-                                          quit = if_abap_unit_constant=>quit-no ).
+                                          quit = 0 ).
 
       cl_abap_unit_assert=>assert_equals( exp  = case-exp_single
                                           act  = select_pattern-is_single
                                           msg  = |SINGLE flag mismatch for: { case-sql }|
-                                          quit = if_abap_unit_constant=>quit-no ).
+                                          quit = 0 ).
 
       cl_abap_unit_assert=>assert_equals( exp  = 0
                                           act  = select_pattern-match_offset
                                           msg  = |Wrong match offset for: { case-sql }|
-                                          quit = if_abap_unit_constant=>quit-no ).
+                                          quit = 0 ).
 
     ENDLOOP.
   ENDMETHOD.
