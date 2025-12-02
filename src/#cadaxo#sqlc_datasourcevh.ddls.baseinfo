@@ -3,6 +3,7 @@
 {
 "FROM":
 [
+"/CADAXO/SQLCDEMO",
 "DD02L",
 "DD02T",
 "DDDDLSRC",

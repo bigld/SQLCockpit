@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/CADAXO/SQLC_CDS_VALUE_HELP</DDLNAME>
+    <DDLNAME>/CADAXO/SQLC_DATASOURCEVH</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>SQL Cockpit - Datasource VH</DDTEXT>
     <SOURCE_TYPE>V</SOURCE_TYPE>

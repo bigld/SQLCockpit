@@ -1446,6 +1446,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
     symbols_controller = NEW /cadaxo/cl_sqlc_symbols( i_user_settings = REF #( me->g_user_settings )
                                                       i_main          = me ).
+
+    " 740 Workaround for /CADAXO/SQLC_DataSourceVH
+    FINAL(sylangu) = VALUE /cadaxo/sqlcdemo( key_fld  = 76657871
+                                             text_fld = sy-langu ).
+    MODIFY /cadaxo/sqlcdemo FROM sylangu.
   ENDMETHOD.
 
 
