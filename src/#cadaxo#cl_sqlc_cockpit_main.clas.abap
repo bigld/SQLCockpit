@@ -1448,7 +1448,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                                                       i_main          = me ).
 
     " 740 Workaround for /CADAXO/SQLC_DataSourceVH
-    FINAL(sylangu) = VALUE /cadaxo/sqlcdemo( key_fld  = 76657871
+    DATA(sylangu) = VALUE /cadaxo/sqlcdemo( key_fld  = 76657871
                                              text_fld = sy-langu ).
     MODIFY /cadaxo/sqlcdemo FROM sylangu.
   ENDMETHOD.
