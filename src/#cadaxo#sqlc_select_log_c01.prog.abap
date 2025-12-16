@@ -199,7 +199,7 @@ CLASS lcl_local_runner IMPLEMENTATION.
           temp_line-option = 'BT'.
 
         WHEN OTHERS.
-          RAISE EXCEPTION NEW cx_abap_invalid_value( ).
+          RAISE EXCEPTION TYPE cx_abap_invalid_value.
       ENDCASE.
 
       APPEND temp_line TO r_timestamps.
@@ -208,11 +208,10 @@ CLASS lcl_local_runner IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD db_query.
-    SELECT FROM /cadaxo/sqlclog
-      FIELDS *
+    SELECT * FROM /cadaxo/sqlclog
+      INTO TABLE @r_selects
       WHERE uname     IN @i_username
-        AND timestamp IN @i_timestamps
-      INTO TABLE @r_selects.
+        AND timestamp IN @i_timestamps.
   ENDMETHOD.
 
   METHOD get_start_of_day_timestamp.
