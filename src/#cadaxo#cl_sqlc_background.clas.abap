@@ -16,7 +16,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
 
 
   METHOD add_record_next_job.
@@ -138,7 +138,7 @@ CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
              FROM /cadaxo/sqlcsres
              WHERE root_list_guid = @i_list_guid OR list_guid = @i_list_guid
              ORDER BY ress_guid
-             INTO TABLE @DATA(all_sqlcsres).
+             into table @DATA(all_sqlcsres).
       IF sy-subrc <> 0.
         IF sy-batch IS NOT INITIAL.
           MESSAGE e143(/cadaxo/sqlc) WITH i_list_guid.
@@ -174,9 +174,14 @@ CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
         lt_cl_sql_parse = /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( i_sql           = l_sql_string
                                                                       i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
                                                                       i_role          = lcl_sqlc_cockpit->authcheck->get_cockpitrole( ) ).
+        IF lcl_sqlc_cockpit->ms_user_settings_xml-strict_mode = abap_true.
+          DATA(start_sql_version) = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
+        ELSE.
+          start_sql_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
+        ENDIF.
 
 * check the sql syntax
-        /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( lt_cl_sql_parse ).
+        /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( i_sql_parsed = lt_cl_sql_parse i_select_version = start_sql_version ).
 
         LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
           <lr_cl_sql_parse>->parse_sql_ii( ).
@@ -199,6 +204,22 @@ CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
 
           <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings  = lcl_sqlc_cockpit->ms_user_settings_xml
                                              IMPORTING e_result_details = result_details ).
+
+          "COCKPIT-458 BEGIN
+          IF <lr_cl_sql_parse>->g_select_version EQ /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_2.
+            IF <lr_cl_sql_parse>->g_main_ref->g_user_settings-domaintext EQ abap_true.
+              <lr_cl_sql_parse>->add_domain_value( ).
+              CLEAR <lr_cl_sql_parse>->gt_result_ddfields.
+              LOOP AT <lr_cl_sql_parse>->gt_lvc_t_fcat INTO DATA(fcat).
+                APPEND CORRESPONDING #( fcat ) TO <lr_cl_sql_parse>->gt_result_ddfields REFERENCE INTO DATA(field).
+                field->colhd_fieldname = field->fieldname.
+                IF field->leng = 0 AND field->intlen > 0.
+                  field->leng = field->intlen.
+                ENDIF.
+              ENDLOOP.
+            ENDIF.
+          ENDIF.
+          "COCKPIT-458 END
 
           APPEND result_details TO lt_result_details.
 

@@ -630,6 +630,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
             ENDIF.
             l_fcat_line-col_pos = tab.
             l_fcat_line-outputlen = 60.
+            l_fcat_line-intlen = 60.
+            l_fcat_line-inttype = 'c'.
             INSERT l_fcat_line INTO me->gt_lvc_t_fcat INDEX tab.
           ENDIF.
 

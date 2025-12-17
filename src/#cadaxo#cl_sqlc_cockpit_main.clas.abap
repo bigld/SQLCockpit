@@ -3705,10 +3705,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       SELECT SINGLE * FROM /cadaxo/sqlcsres INTO ls_sqlcsres WHERE ress_guid = ls_ress_guid.
 
       IF sy-subrc = 0.
-        CALL METHOD me->prepare_result_table
-          EXPORTING
-            is_sqlcsres = ls_sqlcsres
-            is_sqlcress = ls_sqlcress.
+        me->prepare_result_table( is_sqlcsres = ls_sqlcsres is_sqlcress = ls_sqlcress ).
       ELSE.
         MESSAGE e100(/cadaxo/sqlc) WITH 'GET_SAVED_RESULT' 'RESS_GUID_NOT_FOUND' ls_ress_guid.
       ENDIF.
@@ -10098,14 +10095,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ENDIF.
 
     " SQL-79
-    me->replace_old_runtime_structure(
-        CHANGING xml = l_xml
-    ).
-
-
-
-
-
+    me->replace_old_runtime_structure( CHANGING xml = l_xml ).
 
     CALL TRANSFORMATION id
       SOURCE XML l_xml
@@ -10120,7 +10110,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       READ TABLE lt_result_list_raw INDEX sy-tabix INTO ls_result_list_raw.
 
       CREATE OBJECT lr_sqlc_cl_cockpit_parse.
-
 
       MOVE: ls_sqlcresultsave-parse-result_ddfields             TO lr_sqlc_cl_cockpit_parse->gt_result_ddfields,
             ls_sqlcresultsave-parse-column_syntax               TO lr_sqlc_cl_cockpit_parse->column_syntax,
