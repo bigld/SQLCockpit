@@ -177,7 +177,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
 
   METHOD add_entity_attributes.
@@ -825,18 +825,20 @@ CLASS /cadaxo/cl_sqlc_odata_gen IMPLEMENTATION.
     APPEND `  ls_line = CORRESPONDING #( <fs_line> ).`                                                  TO ct_code.
     APPEND `  LOOP AT lt_components ASSIGNING FIELD-SYMBOL(<fs_comp>).`                                 TO ct_code.
     APPEND `    lo_elem ?= <fs_comp>-type.`                                                             TO ct_code.
-    APPEND `    DATA(ls_ddfies) = lo_elem->get_ddic_field( ).`                                          TO ct_code.
-    APPEND `    IF ls_ddfies-inttype EQ 'D'.`                                                           TO ct_code.
+    APPEND `    if lo_elem->type_kind = 'D'.`                                                           TO ct_code.
     APPEND `      ASSIGN COMPONENT <fs_comp>-name OF STRUCTURE <fs_line> TO FIELD-SYMBOL(<fs_source>).` TO ct_code.
     APPEND `      ASSIGN COMPONENT <fs_comp>-name OF STRUCTURE ls_line   TO FIELD-SYMBOL(<fs_target>).` TO ct_code.
-    APPEND `      CONVERT DATE <fs_source> INTO TIME STAMP <fs_target> TIME ZONE 'UTC'.`                TO ct_code.
-    APPEND `      IF <fs_target> EQ '0'.`                                                               TO ct_code.
-    APPEND `        <fs_target> = '00010101000000'.`                                                    TO ct_code.
-    APPEND `      ENDIF.`                                                                         TO ct_code.
-    APPEND `    ENDIF.`                                                                           TO ct_code.
-    APPEND `  ENDLOOP.`                                                                           TO ct_code.
-    APPEND `  APPEND ls_line TO et_entityset.`                                                    TO ct_code.
-    APPEND `ENDLOOP.`                                                                             TO ct_code.
+    APPEND `      if <fs_source> is assigned and <fs_target> is assigned.`                              TO ct_code.
+    APPEND `        CONVERT DATE <fs_source> INTO TIME STAMP <fs_target> TIME ZONE 'UTC'.`              TO ct_code.
+    APPEND `        IF <fs_target> EQ '0'.`                                                             TO ct_code.
+    APPEND `          <fs_target> = '00010101000000'.`                                                  TO ct_code.
+    APPEND `        ENDIF.`                                                                             TO ct_code.
+    APPEND `      ENDIF.`                                                                               TO ct_code.
+    APPEND `    unassign: <fs_source>, <fs_target>.`                                                    TO ct_code.
+    APPEND `    ENDIF.`                                                                                 TO ct_code.
+    APPEND `  ENDLOOP.`                                                                                 TO ct_code.
+    APPEND `  APPEND ls_line TO et_entityset.`                                                          TO ct_code.
+    APPEND `ENDLOOP.`                                                                                   TO ct_code.
     get_new_line( CHANGING ct_code = ct_code ).
 
   ENDMETHOD.
