@@ -1403,6 +1403,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
             <ls_lvc_s_fcat>-datatype   = <ls_ddfields>-datatype.
             <ls_lvc_s_fcat>-no_sign    = abap_false.                             "COCKPIT-181
 
+            if <ls_lvc_s_fcat>-intlen is initial.
+               <ls_lvc_s_fcat>-intlen = <ls_ddfields>-intlen.
+            endif.
+
             CASE <ls_lvc_s_fcat>-datatype.
               WHEN 'CURR'.
                 <ls_lvc_s_fcat>-cfieldname = <ls_ddfields>-reffield.
