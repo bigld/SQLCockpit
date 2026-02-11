@@ -1,15 +1,20 @@
-CLASS /cadaxo/cl_sqlc_background DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+class /CADAXO/CL_SQLC_BACKGROUND definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
-    CLASS-METHODS execute_sql_background IMPORTING i_list_guid TYPE /cadaxo/sqlc_listguid
-                                         RAISING   cx_static_check .
-    CLASS-METHODS add_record_next_job IMPORTING is_sqlcsres TYPE /cadaxo/sqlcsres
-                                                i_btcjob    TYPE btcjob
-                                                i_btcjobcnt TYPE btcjobcnt.
+public section.
 
+  class-methods EXECUTE_SQL_BACKGROUND
+    importing
+      !I_LIST_GUID type /CADAXO/SQLC_LISTGUID
+    raising
+      CX_STATIC_CHECK .
+  class-methods ADD_RECORD_NEXT_JOB
+    importing
+      !IS_SQLCSRES type /CADAXO/SQLCSRES
+      !I_BTCJOB type BTCJOB
+      !I_BTCJOBCNT type BTCJOBCNT .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -62,35 +67,6 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
 
 
   METHOD execute_sql_background.
-****************************************************************************************************
-* Description             : SQL Cockpit - Backgroundjob for SQL Cockpit                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Domi Bigl                Company    : CADAXO GesmbH                    *
-* Date                    : 16.04.2011                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 19.09.2014 | Wiesinger            | show released line for periodic job         |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.04.2016 | Ana Lekic            | save system/client with job                 | $002 COCKPIT-4 *
-*------------+----------------------+---------------------------------------------+----------------*
-* 13.05.2019 | Domi Bigl            | Dump at open list when V1 and V2 SQL is used| COCKPIT-375    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 01.06.2019 | Domi Bigl            | Manuell planned Jobs                        | COCKPIT-348    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 05.04.2022 | Domi Bigl            | Wrong list in job notification mail + CC    | COCKPIT-488    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 01.05.2024 | Domi Bigl            | Redesign + CC                               | SQL-26         *
-****************************************************************************************************
 
     DATA: lcl_sqlc_cockpit   TYPE REF TO /cadaxo/cl_sqlc_cockpit_main,
           result_details     TYPE /cadaxo/sqlcresult_details,
@@ -106,16 +82,15 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
           l_xml              TYPE string,
           lt_result_list_raw TYPE TABLE OF xstring,
           ls_result_list_raw TYPE xstring,
-          l_timestamp        TYPE timestampl,
-          lv_variant         TYPE btcvariant.
+          l_timestamp        TYPE timestampl.
 
     DATA ls_tbtco            TYPE tbtco.
     DATA lt_lvc_t_fcat       TYPE lvc_t_fcat.
     DATA l_btcjob            TYPE btcjob.
     DATA l_btcjobcnt         TYPE btcjobcnt.
 
-    FIELD-SYMBOLS: <lr_cl_sql_parse> TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
-    FIELD-SYMBOLS: <ls_t>            TYPE ANY TABLE.
+    FIELD-SYMBOLS <lr_cl_sql_parse> TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
+    FIELD-SYMBOLS <ls_t>            TYPE ANY TABLE.
 
     CALL FUNCTION 'GET_JOB_RUNTIME_INFO'
       IMPORTING
@@ -124,7 +99,6 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
       EXCEPTIONS
         OTHERS   = 1.
 
-*# 4660 - 20140919
     IF l_btcjob IS NOT INITIAL.
       SELECT SINGLE *
              FROM /cadaxo/sqlcsres
@@ -156,7 +130,6 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
                          i_btcjob    = l_btcjob
                          i_btcjobcnt = l_btcjobcnt ).
     COMMIT WORK.
-*# 4660 - 20140919
 
     cl_abap_gzip=>decompress_text( EXPORTING gzip_in  = ls_sqlcsres-sql_string
                                    IMPORTING text_out = l_sql_string ).
@@ -168,7 +141,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
 * replace all symbols
         /cadaxo/cl_sqlc_cockpit_assist=>replace_all_symbols_with_value( CHANGING c_string = l_sql_string ).
 
-        CLEAR lcl_sqlc_cockpit->ms_user_settings_xml-maxsel. "#Cockpit-338
+        CLEAR lcl_sqlc_cockpit->ms_user_settings_xml-maxsel.
 
 * parse the sql string
         lt_cl_sql_parse = /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( i_sql           = l_sql_string
@@ -205,21 +178,28 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
           <lr_cl_sql_parse>->execute_select( EXPORTING i_user_settings  = lcl_sqlc_cockpit->ms_user_settings_xml
                                              IMPORTING e_result_details = result_details ).
 
-          "COCKPIT-458 BEGIN
           IF <lr_cl_sql_parse>->g_select_version EQ /cadaxo/cl_sqlc_cockpit_parse=>c_select_version_2.
             IF <lr_cl_sql_parse>->g_main_ref->g_user_settings-domaintext EQ abap_true.
               <lr_cl_sql_parse>->add_domain_value( ).
               CLEAR <lr_cl_sql_parse>->gt_result_ddfields.
-              LOOP AT <lr_cl_sql_parse>->gt_lvc_t_fcat INTO DATA(fcat).
-                APPEND CORRESPONDING #( fcat ) TO <lr_cl_sql_parse>->gt_result_ddfields REFERENCE INTO DATA(field).
+              LOOP AT <lr_cl_sql_parse>->gt_lvc_t_fcat REFERENCE INTO DATA(fcat).
+
+                read table <lr_cl_sql_parse>->gt_result_ddfields_all with key fieldname = fcat->fieldname ASSIGNING field-symbol(<ddfield_all>).
+                if sy-subrc = 0 and <ddfield_all>-intlen <> fcat->intlen.
+                   fcat->intlen = <ddfield_all>-intlen.
+                endif.
+
+                APPEND CORRESPONDING #( fcat->* ) TO <lr_cl_sql_parse>->gt_result_ddfields REFERENCE INTO DATA(field).
+                field->leng = fcat->intlen.
+
                 field->colhd_fieldname = field->fieldname.
                 IF field->leng = 0 AND field->intlen > 0.
                   field->leng = field->intlen.
                 ENDIF.
+
               ENDLOOP.
             ENDIF.
           ENDIF.
-          "COCKPIT-458 END
 
           APPEND result_details TO lt_result_details.
 

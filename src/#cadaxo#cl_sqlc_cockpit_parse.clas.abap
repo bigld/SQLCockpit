@@ -517,6 +517,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
     LOOP AT gt_lvc_t_fcat ASSIGNING FIELD-SYMBOL(<lvc_s_fcat>).
       <lvc_s_fcat>-col_pos = sy-tabix.
+*
+*      READ TABLE components_new WITH KEY name = <lvc_s_fcat>-fieldname ASSIGNING FIELD-SYMBOL(<component>).
+*      IF sy-subrc = 0.
+*        DATA(l_elem_desc) = CAST cl_abap_elemdescr( <component>-type ).
+*        IF <lvc_s_fcat>-inttype = 'P' AND <lvc_s_fcat>-intlen <> l_elem_desc->length.
+*          <lvc_s_fcat>-intlen = l_elem_desc->length.
+*        ENDIF.
+*      ENDIF.
+
     ENDLOOP.
 
     me->result_table = result_new.
@@ -630,8 +639,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
             ENDIF.
             l_fcat_line-col_pos = tab.
             l_fcat_line-outputlen = 60.
-            l_fcat_line-intlen = 60.
-            l_fcat_line-inttype = 'c'.
+            l_fcat_line-intlen = 60. " * cl_abap_char_utilities=>charsize.
+            l_fcat_line-inttype = 'C'.
+            l_fcat_line-datatype = 'CHAR'.
+            l_fcat_line-key_sel = 'X'.
             INSERT l_fcat_line INTO me->gt_lvc_t_fcat INDEX tab.
           ENDIF.
 
@@ -1364,6 +1375,14 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
     lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( me->result_table ).
 
     CREATE DATA lr_tab TYPE HANDLE lr_tabledescr.
+
+*    data l_test type c.
+*    do.
+*      if l_test is not initial.
+*        exit.
+*      endif.
+*    enddo.
+
 
     ASSIGN lr_tab->* TO FIELD-SYMBOL(<lt_result_tmp>).
     TRY.
@@ -2836,7 +2855,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
     DATA lr_exception2      TYPE REF TO cx_sy_conversion_error.
     DATA lr_root_exception  TYPE REF TO /cadaxo/cx_sqlc_syntax_error.
 
-    "MACRO m_execute_select_v_2
+    m_execute_select_v_2.
 
     CLEAR l_maxsel.
 

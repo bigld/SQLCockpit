@@ -11,6 +11,18 @@
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
    </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>ADD_RECORD_NEXT_JOB</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>add record next job</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>EXECUTE_SQL_BACKGROUND</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>execute sql background</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>
