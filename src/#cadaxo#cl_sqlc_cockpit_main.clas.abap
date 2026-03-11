@@ -1252,7 +1252,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           g_user_settings-release_number       = ms_user_settings_xml-release_number.       " COCKPIT-98
 
           IF l_xml NS 'STRICT_MODE'.
-            ms_user_settings_xml-strict_mode = abap_true.
+            ms_user_settings_xml-strict_mode = abap_false.
           ENDIF.
           g_user_settings-strict_mode = ms_user_settings_xml-strict_mode.
 
@@ -3004,11 +3004,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         l_sql_string = me->get_sql_area( ).
 
 * get source code from sql editor
-        IF me->gc_abap_editor IS BOUND.                                                    "COCKPIT-7
-          me->gc_abap_editor->get_text( IMPORTING table = lt_code ).
-        ELSE.                                                                              "COCKPIT-7
-          me->gc_abap_editor_text->get_text_as_r3table( IMPORTING table = lt_code ).       "COCKPIT-7
-        ENDIF.                                                                             "COCKPIT-7
+        IF me->gc_abap_editor IS BOUND.
+          me->gc_abap_editor->get_text( IMPORTING table   = lt_code
+                                        EXCEPTIONS OTHERS = 1 ).
+        ELSE.
+          me->gc_abap_editor_text->get_text_as_r3table( IMPORTING table   = lt_code
+                                                        EXCEPTIONS OTHERS = 1 ).
+        ENDIF.
 
 * export the code into databuffer
         EXPORT code FROM lt_code[] TO DATA BUFFER ls_sqlcsres-editor_sqlstring.
@@ -3824,52 +3826,37 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     IF NOT gc_abap_editor IS INITIAL.
 
 * get the current selection
-      gc_abap_editor->get_selection_pos(
-        IMPORTING
-          from_line              = l_lf
-          from_pos               = l_pf
-          to_line                = l_lt
-          to_pos                 = l_pt
-        EXCEPTIONS
-          error_cntl_call_method = 1
-          OTHERS                 = 2 ).
+      gc_abap_editor->get_selection_pos( IMPORTING from_line = l_lf
+                                                   from_pos  = l_pf
+                                                   to_line   = l_lt
+                                                   to_pos    = l_pt
+                                         EXCEPTIONS OTHERS   = 1 ).
 
 * if there is a special selection, get the actual selection
       IF l_lf <> l_lt OR l_pf <> l_pt.
-        gc_abap_editor->get_selected_text_as_table(
-          IMPORTING
-            table    = lt_code
-          EXCEPTIONS
-            error_dp = 1
-            OTHERS   = 2 ).
+        gc_abap_editor->get_selected_text_as_table( IMPORTING  table  = lt_code
+                                                    EXCEPTIONS OTHERS = 1 ).
       ELSE.
 * no selection, get the whole text
-        gc_abap_editor->get_text( IMPORTING table = lt_code ).
+
+        gc_abap_editor->get_text( IMPORTING table   = lt_code
+                                  EXCEPTIONS OTHERS = 1 ).
       ENDIF.
     ELSEIF NOT gc_abap_editor_text IS INITIAL.
 
 * get the current selection
-      gc_abap_editor_text->get_selection_pos(
-        IMPORTING
-          from_line              = l_lf
-          from_pos               = l_pf
-          to_line                = l_lt
-          to_pos                 = l_pt
-        EXCEPTIONS
-          error_cntl_call_method = 1
-          OTHERS                 = 2 ).
+      gc_abap_editor_text->get_selection_pos( IMPORTING from_line = l_lf
+                                                        from_pos  = l_pf
+                                                        to_line   = l_lt
+                                                        to_pos    = l_pt
+                                              EXCEPTIONS OTHERS   = 1 ).
 
       IF l_lf <> l_lt OR l_pf <> l_pt.
-        gc_abap_editor_text->get_selected_text_as_r3table(
-          IMPORTING
-            table    = lt_code
-          EXCEPTIONS
-            error_dp = 1
-            OTHERS   = 2 ).
+        gc_abap_editor_text->get_selected_text_as_r3table( IMPORTING table   = lt_code
+                                                           EXCEPTIONS OTHERS = 1 ).
       ELSE.
-        gc_abap_editor_text->get_text_as_r3table(
-           IMPORTING
-              table                  = lt_code ).
+        gc_abap_editor_text->get_text_as_r3table( IMPORTING table   = lt_code
+                                                  EXCEPTIONS OTHERS = 1 ).
       ENDIF.
     ENDIF.
 
@@ -3975,24 +3962,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * get source code from sql editor
     IF NOT gc_abap_editor IS INITIAL.
 
-      gc_abap_editor->get_text(
-        IMPORTING
-          table = r_lt_code
-        EXCEPTIONS
-          error_dp               = 1
-          error_cntl_call_method = 2 ).
+      gc_abap_editor->get_text( IMPORTING table   = r_lt_code
+                                EXCEPTIONS OTHERS = 1 ).
 
     ELSE.
 
-      gc_abap_editor_text->get_text_as_r3table(
-        IMPORTING
-          table                  = r_lt_code
-        EXCEPTIONS
-          error_dp               = 1
-          error_cntl_call_method = 2
-          error_dp_create        = 3
-          potential_data_loss    = 4
-          OTHERS                 = 5 ).
+      gc_abap_editor_text->get_text_as_r3table( IMPORTING table   = r_lt_code
+                                                EXCEPTIONS OTHERS = 1 ).
 
     ENDIF.
   ENDMETHOD.
@@ -6759,7 +6735,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         from_pos  = l_from_pos
         to_pos    = l_to_pos ).
 
-    gc_abap_editor->get_text( IMPORTING table = lt_code ).
+    gc_abap_editor->get_text( IMPORTING table   = lt_code
+                              EXCEPTIONS OTHERS = 1 ).
 
     l_from_pos = l_from_pos - 1.
     l_to_pos = l_to_pos - 1.
@@ -11005,22 +10982,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 * set sql editor
     IF me->g_abap_editor_type = editor_type-new.
       IF gc_abap_editor IS BOUND.
-        gc_abap_editor->set_text(
-          EXPORTING
-            table    = i_codelines_t
-          EXCEPTIONS
-            error_dp = 1
-            OTHERS   = 2 ).
+        gc_abap_editor->set_text( EXPORTING table   = i_codelines_t
+                                  EXCEPTIONS OTHERS = 1 ).
       ENDIF.
     ELSE.
       IF gc_abap_editor_text IS BOUND.
-        gc_abap_editor_text->set_text_as_r3table(
-          EXPORTING
-            table           = i_codelines_t
-          EXCEPTIONS
-            error_dp        = 1
-            error_dp_create = 2
-            OTHERS          = 3 ).
+        gc_abap_editor_text->set_text_as_r3table( EXPORTING table   = i_codelines_t
+                                                  EXCEPTIONS OTHERS = 1 ).
       ENDIF.
     ENDIF.
 

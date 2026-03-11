@@ -62,189 +62,190 @@ CLASS /cadaxo/cl_sqlc_symbols DEFINITION
         !it_symbol_create TYPE t_symbol_db
       RETURNING
         VALUE(rv_success) TYPE boolean .
-  PROTECTED SECTION.
+protected section.
 
-    DATA g_symbol_toolbar_excluding TYPE ui_functions .
-    DATA dragdrop_behaviour_symbol TYPE REF TO cl_dragdrop .
-    DATA gcont_grid_symbol_t TYPE /cadaxo/sqlcclguicontainer_t .
-    DATA dragdrop_handle_symbol TYPE i .
-    DATA g_curr_col TYPE lvc_fname .
-    DATA g_curr_row TYPE /cadaxo/sqlcsymbol_name .
-    DATA gt_symbol TYPE /cadaxo/sqlc_symbol_t .
-    DATA gt_symbol_delete TYPE /cadaxo/sqlc_symbol_t .
-    DATA gt_symbol_selected TYPE /cadaxo/sqlc_symbol_t .
-    DATA main_controller TYPE REF TO /cadaxo/cl_sqlc_cockpit_main .
-    DATA gcont_symbol TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar_btns TYPE REF TO cl_gui_container .
-    DATA gcont_symbol_toolbar_img TYPE REF TO cl_gui_container .
-    DATA gs_splitter_symbol TYPE REF TO cl_gui_splitter_container .
-    DATA gs_splitter_symbol_toolbar TYPE REF TO cl_gui_splitter_container .
-    DATA gc_symbol_alv TYPE REF TO cl_gui_alv_grid .
-    DATA gc_symbol_toolbar TYPE REF TO cl_gui_toolbar .
-    DATA gc_symbol_toolbar_img TYPE REF TO cl_gui_picture .
-    DATA user_settings TYPE REF TO /cadaxo/sqlcusrp_dyn .
-    DATA gt_symbol_ow TYPE /cadaxo/sqlc_symbol_ow_t .
-    DATA gr_alv_symb_ow TYPE REF TO cl_gui_alv_grid .
-    DATA gr_cc_alv_symb_ow TYPE REF TO cl_gui_custom_container .
-    CLASS-DATA gt_used_symbols TYPE /cadaxo/sqlcusedsymbols_t .
-
-    METHODS set_symbol_alv .
-    METHODS save_symbols
-      EXPORTING
-        !e_success TYPE boolean .
-    METHODS get_symbols_selected
-      EXPORTING
-        VALUE(e_success) TYPE boolean .
-    METHODS focus_symbol_alv_cell
-      IMPORTING
-        !i_row_id     TYPE lvc_index
-        !i_field_name TYPE lvc_fname .
-    METHODS on_toolbar_function_selected
-      FOR EVENT function_selected OF cl_gui_toolbar
-      IMPORTING
-        !fcode .
-    METHODS confirm_symbol_overwrite .
-    METHODS on_symbol_button_variant
-      FOR EVENT button_click OF cl_gui_alv_grid
-      IMPORTING
-        !es_col_id
-        !es_row_no .
-    METHODS on_handle_varsym_click
-      FOR EVENT hotspot_click OF cl_gui_alv_grid
-      IMPORTING
-        !e_row_id
-        !e_column_id
-        !es_row_no .
-    METHODS show_symbolmulti_dialog
-      IMPORTING
-        !i_symbol_multivalue  TYPE /cadaxo/sqlcsymbol_multivalue
-        !i_symbol_datatype    TYPE /cadaxo/sqlcsymbol_datatype
-        !i_symbol_name        TYPE /cadaxo/sqlcsymbol_name
-      RETURNING
-        VALUE(r_symbol_value) TYPE rseloption
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    METHODS on_symbol_button_click
-      FOR EVENT button_click OF cl_gui_alv_grid
-      IMPORTING
-        !es_col_id
-        !es_row_no .
-    METHODS delete_symbols
-      EXPORTING
-        !e_success TYPE boolean .
-    METHODS delete_symbol_db
-      RETURNING
-        VALUE(rv_success) TYPE boolean .
-    METHODS update_symbol_db
-      IMPORTING
-        VALUE(it_symbol_update) TYPE t_symbol_db
-      RETURNING
-        VALUE(rv_success)       TYPE boolean .
-    METHODS check_symbol_value_valid
-      IMPORTING
-        !is_symbol_line TYPE /cadaxo/sqlc_symbol
-      RAISING
-        /cadaxo/cx_sqlc_invalid_value .
-    METHODS get_user_symbol_count
-      IMPORTING
-        !i_symbol_multivalue TYPE /cadaxo/sqlcsymbol_multivalue
-      RETURNING
-        VALUE(r_count)       TYPE i .
-    METHODS get_symbols .
-    METHODS on_symbol_menu_button
-      FOR EVENT menu_button OF cl_gui_alv_grid
-      IMPORTING
-        !e_object
-        !e_ucomm .
-    METHODS on_symbol_drag
-      FOR EVENT ondrag OF cl_gui_alv_grid
-      IMPORTING
-        !e_row
-        !e_column
-        !es_row_no
-        !e_dragdropobj .
-    METHODS on_symbol_double_click
-      FOR EVENT double_click OF cl_gui_alv_grid
-      IMPORTING
-        !e_row
-        !e_column
-        !es_row_no .
-    METHODS on_symbol_alv_toolbar
-      FOR EVENT toolbar OF cl_gui_alv_grid
-      IMPORTING
-        !e_object
-        !e_interactive .
-    METHODS on_symbol_alv_data_change
-      FOR EVENT data_changed OF cl_gui_alv_grid
-      IMPORTING
-        !er_data_changed
-        !e_onf4
-        !e_onf4_before
-        !e_onf4_after
-        !e_ucomm .
-    METHODS on_symbol_alv_data_changed_fin
-      FOR EVENT data_changed_finished OF cl_gui_alv_grid
-      IMPORTING
-        !e_modified
-        !et_good_cells .
-    METHODS fill_used_symbols
-      RETURNING
-        VALUE(rt_symbols) TYPE /cadaxo/sqlcusedsymbols_t .
-    METHODS get_symbol_datatype_desc
-      IMPORTING
-        !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
-      RETURNING
-        VALUE(r_desc) TYPE as4text .
-    METHODS get_symbol_datatype_info
-      IMPORTING
-        !i_datatype   TYPE /cadaxo/sqlcsymbol_datatype
-      RETURNING
-        VALUE(r_info) TYPE /cadaxo/sqlcsymbol_datainfo .
-    METHODS check_symbol_datatype
-      IMPORTING
-        !i_value TYPE lvc_value
-      RAISING
-        /cadaxo/cx_sqlc_symb_not_found .
-    METHODS on_symbol_alv_user_command
-      FOR EVENT user_command OF cl_gui_alv_grid
-      IMPORTING
-        !e_ucomm .
-    METHODS create_symbol_multival_tab_dyn
-      IMPORTING
-        !i_symbol_datatype TYPE /cadaxo/sqlcsymbol_datatype
-      EXPORTING
-        !e_data            TYPE data
-        !e_data_struct     TYPE data .
-    METHODS refresh_symbol_alv .
-    METHODS mark_cell_when_error
-      IMPORTING
-                i_row_id             TYPE int4
-                i_fieldname          TYPE lvc_fname
-                i_msgid              TYPE symsgid
-                i_msgno              TYPE symsgno
-                i_msgty              TYPE symsgty
-                i_msgv1              TYPE any OPTIONAL
-                i_msgv2              TYPE any OPTIONAL
-                i_msgv3              TYPE any OPTIONAL
-                i_msgv4              TYPE any OPTIONAL
-      CHANGING  VALUE(ct_cell_style) TYPE lvc_t_styl.
-    METHODS mark_symbol_alv_cell_error
-      IMPORTING
-        i_row_id     TYPE lvc_index
-        i_field_name TYPE lvc_fname
-        i_msgid      TYPE symsgid
-        i_msgno      TYPE symsgno
-        i_msgty      TYPE symsgty
-        i_msgv1      TYPE any OPTIONAL
-      CHANGING
-        ct_cell_msg  TYPE lvc_t_msg.
-
-
-    CONSTANTS: BEGIN OF functions,
+  data G_SYMBOL_TOOLBAR_EXCLUDING type UI_FUNCTIONS .
+  data DRAGDROP_BEHAVIOUR_SYMBOL type ref to CL_DRAGDROP .
+  data GCONT_GRID_SYMBOL_T type /CADAXO/SQLCCLGUICONTAINER_T .
+  data DRAGDROP_HANDLE_SYMBOL type I .
+  data G_CURR_COL type LVC_FNAME .
+  data G_CURR_ROW type /CADAXO/SQLCSYMBOL_NAME .
+  data GT_SYMBOL type /CADAXO/SQLC_SYMBOL_T .
+  data GT_SYMBOL_DELETE type /CADAXO/SQLC_SYMBOL_T .
+  data GT_SYMBOL_SELECTED type /CADAXO/SQLC_SYMBOL_T .
+  data MAIN_CONTROLLER type ref to /CADAXO/CL_SQLC_COCKPIT_MAIN .
+  data GCONT_SYMBOL type ref to CL_GUI_CONTAINER .
+  data GCONT_SYMBOL_TOOLBAR type ref to CL_GUI_CONTAINER .
+  data GCONT_SYMBOL_TOOLBAR_BTNS type ref to CL_GUI_CONTAINER .
+  data GCONT_SYMBOL_TOOLBAR_IMG type ref to CL_GUI_CONTAINER .
+  data GS_SPLITTER_SYMBOL type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GS_SPLITTER_SYMBOL_TOOLBAR type ref to CL_GUI_SPLITTER_CONTAINER .
+  data GC_SYMBOL_ALV type ref to CL_GUI_ALV_GRID .
+  data GC_SYMBOL_TOOLBAR type ref to CL_GUI_TOOLBAR .
+  data GC_SYMBOL_TOOLBAR_IMG type ref to CL_GUI_PICTURE .
+  data USER_SETTINGS type ref to /CADAXO/SQLCUSRP_DYN .
+  data GT_SYMBOL_OW type /CADAXO/SQLC_SYMBOL_OW_T .
+  data GR_ALV_SYMB_OW type ref to CL_GUI_ALV_GRID .
+  data GR_CC_ALV_SYMB_OW type ref to CL_GUI_CUSTOM_CONTAINER .
+  class-data GT_USED_SYMBOLS type /CADAXO/SQLCUSEDSYMBOLS_T .
+  constants:
+    BEGIN OF functions,
                  symbol_delete TYPE string VALUE 'SYMBOL_DELETE',
-               END OF functions.
-    DATA: symbol_alv_error TYPE bapiret2.
+               END OF functions .
+  data SYMBOL_ALV_ERROR type BAPIRET2 .
+  data INIT_DONE type FLAG .
+
+  methods SET_SYMBOL_ALV .
+  methods SAVE_SYMBOLS
+    exporting
+      !E_SUCCESS type BOOLEAN .
+  methods GET_SYMBOLS_SELECTED
+    exporting
+      value(E_SUCCESS) type BOOLEAN .
+  methods FOCUS_SYMBOL_ALV_CELL
+    importing
+      !I_ROW_ID type LVC_INDEX
+      !I_FIELD_NAME type LVC_FNAME .
+  methods ON_TOOLBAR_FUNCTION_SELECTED
+    for event FUNCTION_SELECTED of CL_GUI_TOOLBAR
+    importing
+      !FCODE .
+  methods CONFIRM_SYMBOL_OVERWRITE .
+  methods ON_SYMBOL_BUTTON_VARIANT
+    for event BUTTON_CLICK of CL_GUI_ALV_GRID
+    importing
+      !ES_COL_ID
+      !ES_ROW_NO .
+  methods ON_HANDLE_VARSYM_CLICK
+    for event HOTSPOT_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW_ID
+      !E_COLUMN_ID
+      !ES_ROW_NO .
+  methods SHOW_SYMBOLMULTI_DIALOG
+    importing
+      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
+      !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
+      !I_SYMBOL_NAME type /CADAXO/SQLCSYMBOL_NAME
+    returning
+      value(R_SYMBOL_VALUE) type RSELOPTION
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  methods ON_SYMBOL_BUTTON_CLICK
+    for event BUTTON_CLICK of CL_GUI_ALV_GRID
+    importing
+      !ES_COL_ID
+      !ES_ROW_NO .
+  methods DELETE_SYMBOLS
+    exporting
+      !E_SUCCESS type BOOLEAN .
+  methods DELETE_SYMBOL_DB
+    returning
+      value(RV_SUCCESS) type BOOLEAN .
+  methods UPDATE_SYMBOL_DB
+    importing
+      value(IT_SYMBOL_UPDATE) type T_SYMBOL_DB
+    returning
+      value(RV_SUCCESS) type BOOLEAN .
+  methods CHECK_SYMBOL_VALUE_VALID
+    importing
+      !IS_SYMBOL_LINE type /CADAXO/SQLC_SYMBOL
+    raising
+      /CADAXO/CX_SQLC_INVALID_VALUE .
+  methods GET_USER_SYMBOL_COUNT
+    importing
+      !I_SYMBOL_MULTIVALUE type /CADAXO/SQLCSYMBOL_MULTIVALUE
+    returning
+      value(R_COUNT) type I .
+  methods GET_SYMBOLS .
+  methods ON_SYMBOL_MENU_BUTTON
+    for event MENU_BUTTON of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT
+      !E_UCOMM .
+  methods ON_SYMBOL_DRAG
+    for event ONDRAG of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO
+      !E_DRAGDROPOBJ .
+  methods ON_SYMBOL_DOUBLE_CLICK
+    for event DOUBLE_CLICK of CL_GUI_ALV_GRID
+    importing
+      !E_ROW
+      !E_COLUMN
+      !ES_ROW_NO .
+  methods ON_SYMBOL_ALV_TOOLBAR
+    for event TOOLBAR of CL_GUI_ALV_GRID
+    importing
+      !E_OBJECT
+      !E_INTERACTIVE .
+  methods ON_SYMBOL_ALV_DATA_CHANGE
+    for event DATA_CHANGED of CL_GUI_ALV_GRID
+    importing
+      !ER_DATA_CHANGED
+      !E_ONF4
+      !E_ONF4_BEFORE
+      !E_ONF4_AFTER
+      !E_UCOMM .
+  methods ON_SYMBOL_ALV_DATA_CHANGED_FIN
+    for event DATA_CHANGED_FINISHED of CL_GUI_ALV_GRID
+    importing
+      !E_MODIFIED
+      !ET_GOOD_CELLS .
+  methods FILL_USED_SYMBOLS
+    returning
+      value(RT_SYMBOLS) type /CADAXO/SQLCUSEDSYMBOLS_T .
+  methods GET_SYMBOL_DATATYPE_DESC
+    importing
+      !I_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
+    returning
+      value(R_DESC) type AS4TEXT .
+  methods GET_SYMBOL_DATATYPE_INFO
+    importing
+      !I_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
+    returning
+      value(R_INFO) type /CADAXO/SQLCSYMBOL_DATAINFO .
+  methods CHECK_SYMBOL_DATATYPE
+    importing
+      !I_VALUE type LVC_VALUE
+    raising
+      /CADAXO/CX_SQLC_SYMB_NOT_FOUND .
+  methods ON_SYMBOL_ALV_USER_COMMAND
+    for event USER_COMMAND of CL_GUI_ALV_GRID
+    importing
+      !E_UCOMM .
+  methods CREATE_SYMBOL_MULTIVAL_TAB_DYN
+    importing
+      !I_SYMBOL_DATATYPE type /CADAXO/SQLCSYMBOL_DATATYPE
+    exporting
+      !E_DATA type DATA
+      !E_DATA_STRUCT type DATA .
+  methods REFRESH_SYMBOL_ALV .
+  methods MARK_CELL_WHEN_ERROR
+    importing
+      !I_ROW_ID type INT4
+      !I_FIELDNAME type LVC_FNAME
+      !I_MSGID type SYMSGID
+      !I_MSGNO type SYMSGNO
+      !I_MSGTY type SYMSGTY
+      !I_MSGV1 type ANY optional
+      !I_MSGV2 type ANY optional
+      !I_MSGV3 type ANY optional
+      !I_MSGV4 type ANY optional
+    changing
+      value(CT_CELL_STYLE) type LVC_T_STYL .
+  methods MARK_SYMBOL_ALV_CELL_ERROR
+    importing
+      !I_ROW_ID type LVC_INDEX
+      !I_FIELD_NAME type LVC_FNAME
+      !I_MSGID type SYMSGID
+      !I_MSGNO type SYMSGNO
+      !I_MSGTY type SYMSGTY
+      !I_MSGV1 type ANY optional
+    changing
+      !CT_CELL_MSG type LVC_T_MSG .
 private section.
 ENDCLASS.
 
@@ -773,7 +774,7 @@ CLASS /CADAXO/CL_SQLC_SYMBOLS IMPLEMENTATION.
       MESSAGE e100(/cadaxo/sqlc).
     ENDIF.
 
-    "    gc_symbol_alv->set_ready_for_input( i_ready_for_input = 1 ). "CDX PERFORMANCE
+    init_done = abap_true.
 
   ENDMETHOD.
 
@@ -901,21 +902,22 @@ CLASS /CADAXO/CL_SQLC_SYMBOLS IMPLEMENTATION.
     DATA: lt_results    TYPE match_result_tab.
     FIELD-SYMBOLS: <ls_result> LIKE LINE OF lt_results.
 
-    DATA(lv_sql_string) = main_controller->get_sql_area(  ).
+    IF init_done = abap_true.
+      DATA(lv_sql_string) = main_controller->get_sql_area(  ).
 
-    /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex( EXPORTING i_where_syntax = lv_sql_string
-                                                       IMPORTING e_result_tab   = lt_results ).
+      /cadaxo/cl_sqlc_cockpit_assist=>find_symbol_regex( EXPORTING i_where_syntax = lv_sql_string
+                                                         IMPORTING e_result_tab   = lt_results ).
 
-    LOOP AT lt_results ASSIGNING <ls_result>.
+      LOOP AT lt_results ASSIGNING <ls_result>.
 
-      DATA(l_from) = <ls_result>-offset + 1.
-      DATA(l_length) = <ls_result>-length - 2.
+        DATA(l_from) = <ls_result>-offset + 1.
+        DATA(l_length) = <ls_result>-length - 2.
 
-      DATA(l_symbol_name) = lv_sql_string+l_from(l_length).
-      APPEND to_upper( l_symbol_name ) TO rt_symbols.
+        DATA(l_symbol_name) = lv_sql_string+l_from(l_length).
+        APPEND to_upper( l_symbol_name ) TO rt_symbols.
 
-    ENDLOOP.
-
+      ENDLOOP.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -1105,10 +1107,10 @@ CLASS /CADAXO/CL_SQLC_SYMBOLS IMPLEMENTATION.
     ENDIF.                                                             "CDX001-0020
 
     IF me->user_settings->only_used_symbols = abap_true.               "CR22-002
-      IF   gt_used_symbols IS NOT INITIAL.
+      IF gt_used_symbols IS NOT INITIAL.
         DATA(lt_used_symbols) = gt_used_symbols.
       ELSE.
-        lt_used_symbols = me->fill_used_symbols( ).
+        lt_used_symbols = fill_used_symbols( ).
       ENDIF.
       SORT lt_used_symbols.
 * end of insert Cockpit-431

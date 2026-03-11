@@ -333,6 +333,13 @@
      </TEXTPOOL>
     </item>
    </I18N_TPOOL>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>INIT_DONE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>init done</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>
