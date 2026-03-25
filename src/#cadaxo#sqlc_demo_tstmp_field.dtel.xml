@@ -3,20 +3,22 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD04V>
-    <ROLLNAME>/CADAXO/SQLC_DEMO_KEY_FIELD</ROLLNAME>
+    <ROLLNAME>/CADAXO/SQLC_DEMO_TSTMP_FIELD</ROLLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
-    <DOMNAME>INT4</DOMNAME>
     <HEADLEN>10</HEADLEN>
     <SCRLEN1>10</SCRLEN1>
     <SCRLEN2>15</SCRLEN2>
     <SCRLEN3>20</SCRLEN3>
-    <DDTEXT>SQL Cockpit - DEMO Key field</DDTEXT>
-    <REPTEXT>Key</REPTEXT>
-    <SCRTEXT_S>Key</SCRTEXT_S>
-    <SCRTEXT_M>Key</SCRTEXT_M>
-    <SCRTEXT_L>Key</SCRTEXT_L>
+    <DDTEXT>SQL Cockpit - DEMO Timestamp field</DDTEXT>
+    <REPTEXT>TStmp</REPTEXT>
+    <SCRTEXT_S>TStmp</SCRTEXT_S>
+    <SCRTEXT_M>TStmp</SCRTEXT_M>
+    <SCRTEXT_L>TStmp</SCRTEXT_L>
     <DTELMASTER>E</DTELMASTER>
-    <REFKIND>D</REFKIND>
+    <DATATYPE>DEC</DATATYPE>
+    <LENG>000021</LENG>
+    <DECIMALS>000007</DECIMALS>
+    <OUTPUTLEN>000026</OUTPUTLEN>
    </DD04V>
    <I18N_LANGS>
     <LANGU>D</LANGU>
@@ -24,11 +26,11 @@
    <DD04_TEXTS>
     <item>
      <DDLANGUAGE>D</DDLANGUAGE>
-     <DDTEXT>SQL Cockpit - DEMO Key Feld</DDTEXT>
-     <REPTEXT>Key</REPTEXT>
-     <SCRTEXT_S>Key</SCRTEXT_S>
-     <SCRTEXT_M>Key</SCRTEXT_M>
-     <SCRTEXT_L>Key</SCRTEXT_L>
+     <DDTEXT>SQL Cockpit - DEMO Timestamp Feld</DDTEXT>
+     <REPTEXT>TStmp</REPTEXT>
+     <SCRTEXT_S>TStmp</SCRTEXT_S>
+     <SCRTEXT_M>TStmp</SCRTEXT_M>
+     <SCRTEXT_L>TStmp</SCRTEXT_L>
     </item>
    </DD04_TEXTS>
   </asx:values>

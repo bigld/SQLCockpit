@@ -3,18 +3,18 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD04V>
-    <ROLLNAME>/CADAXO/SQLC_DEMO_KEY_FIELD</ROLLNAME>
+    <ROLLNAME>/CADAXO/SQLC_DEMO_DOMVAL_FIELD</ROLLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
-    <DOMNAME>INT4</DOMNAME>
+    <DOMNAME>/CADAXO/SQLC_DEMO_DOMVAL_FIELD</DOMNAME>
     <HEADLEN>10</HEADLEN>
     <SCRLEN1>10</SCRLEN1>
     <SCRLEN2>15</SCRLEN2>
     <SCRLEN3>20</SCRLEN3>
-    <DDTEXT>SQL Cockpit - DEMO Key field</DDTEXT>
-    <REPTEXT>Key</REPTEXT>
-    <SCRTEXT_S>Key</SCRTEXT_S>
-    <SCRTEXT_M>Key</SCRTEXT_M>
-    <SCRTEXT_L>Key</SCRTEXT_L>
+    <DDTEXT>SQL Cockpit - DEMO Domain Value field</DDTEXT>
+    <REPTEXT>DomVal</REPTEXT>
+    <SCRTEXT_S>DomVal</SCRTEXT_S>
+    <SCRTEXT_M>DomVal</SCRTEXT_M>
+    <SCRTEXT_L>DomVal</SCRTEXT_L>
     <DTELMASTER>E</DTELMASTER>
     <REFKIND>D</REFKIND>
    </DD04V>
@@ -24,11 +24,11 @@
    <DD04_TEXTS>
     <item>
      <DDLANGUAGE>D</DDLANGUAGE>
-     <DDTEXT>SQL Cockpit - DEMO Key Feld</DDTEXT>
-     <REPTEXT>Key</REPTEXT>
-     <SCRTEXT_S>Key</SCRTEXT_S>
-     <SCRTEXT_M>Key</SCRTEXT_M>
-     <SCRTEXT_L>Key</SCRTEXT_L>
+     <DDTEXT>SQL Cockpit - DEMO Domain Value Feld</DDTEXT>
+     <REPTEXT>DomVal</REPTEXT>
+     <SCRTEXT_S>DomVal</SCRTEXT_S>
+     <SCRTEXT_M>DomVal</SCRTEXT_M>
+     <SCRTEXT_L>DomVal</SCRTEXT_L>
     </item>
    </DD04_TEXTS>
   </asx:values>
