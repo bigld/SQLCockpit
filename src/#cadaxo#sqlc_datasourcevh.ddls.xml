@@ -6,6 +6,7 @@
     <DDLNAME>/CADAXO/SQLC_DATASOURCEVH</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>SQL Cockpit - Datasource VH</DDTEXT>
+    <SOURCE_TYPE>V</SOURCE_TYPE>
    </DDLS>
   </asx:values>
  </asx:abap>
