@@ -1404,7 +1404,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
           l_pos = l_pos + 1.
           <ls_lvc_s_fcat>-col_pos = l_pos.
 
-          READ TABLE me->gt_result_ddfields WITH KEY fieldname = <ls_lvc_s_fcat>-fieldname ASSIGNING <ls_ddfields>.
+          READ TABLE me->gt_result_ddfields_all  WITH KEY fieldname = <ls_lvc_s_fcat>-fieldname ASSIGNING <ls_ddfields>.
           IF sy-subrc = 0.
             <ls_lvc_s_fcat>-rollname   = <ls_ddfields>-rollname.
             <ls_lvc_s_fcat>-domname    = <ls_ddfields>-domname.
