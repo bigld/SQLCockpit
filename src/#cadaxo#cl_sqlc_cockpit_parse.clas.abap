@@ -1054,49 +1054,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD create_alv_field_catalog_v_1.
-****************************************************************************************************
-* Description             : Create ALV Field Catalog                                               *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Dieter Schadler          Company    : CADAXO GesmbH                    *
-* Date                    : 17.11.2014                                                             *
-*--------------------------------------------------------------------------------------------------
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 12.09.2010 | Fößleitner Johann    | There are problems with the dynamic type    | CDX001-0016    *
-*            |                      | definition, when the table+fieldname longer |                *
-*            |                      | than 30 characters                          |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 13.02.2012 | Fößleitner Johann    | Use TABLE - to export list                  | CDX001-0034    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 12.09.2014 | Fößleitner Johann/   | Bug Fix - Dump when summing up Curr field   | CR22-031       *
-*            | René Rammer          |                                             | RT245          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 18.02.2017 | Domi Bigl            | Leading Spaces                              | COCKPIT-125    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 18.02.2017 | Domi Bigl            | timestamp handling                          | COCKPIT-105    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 05.07.2017 | Harald Wiesinger     | fix missing alv headers                     | COCKPIT-198   *
-****************************************************************************************************
+    DATA l_sql_abap_componentdescr TYPE abap_componentdescr.
+    DATA l_guid22                  TYPE c LENGTH 22.
+    DATA l_tabix                   LIKE sy-tabix.
+    DATA l_decimals                TYPE i.
+    DATA l_intlen                  TYPE i.
 
-    DATA l_sql_abap_componentdescr  TYPE abap_componentdescr.
-    DATA l_guid22(22)               TYPE c.
-    DATA l_tabix                    LIKE sy-tabix.
-    DATA l_decimals                 TYPE i.
-    DATA l_intlen                   TYPE i.
-
-    FIELD-SYMBOLS: <l_fields>     LIKE LINE OF me->gt_result_ddfields,
-                   <l_lvc_s_fcat> TYPE lvc_s_fcat.
+    FIELD-SYMBOLS <l_fields>     LIKE LINE OF me->gt_result_ddfields.
+    FIELD-SYMBOLS <l_lvc_s_fcat> TYPE lvc_s_fcat.
 
     CLEAR: me->result_component_t[].
     CLEAR: me->gt_lvc_t_fcat.
@@ -1114,7 +1080,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
                        <l_fields>-fieldname
                       INTO l_sql_abap_componentdescr-name.
         ELSE.
-          MOVE <l_fields>-tabname TO l_sql_abap_componentdescr-name.
+          l_sql_abap_componentdescr-name = <l_fields>-tabname.
         ENDIF.
 
         IF <l_fields>-aggr EQ 'SUM('.
@@ -1122,70 +1088,51 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
             WHEN 'P'.
               l_decimals = <l_fields>-decimals.
               l_intlen   = <l_fields>-intlen.
-              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_p( p_length = l_intlen p_decimals = l_decimals ).
+              l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_p( p_length   = l_intlen
+                                                                          p_decimals = l_decimals ).
             WHEN 'I'.
               l_sql_abap_componentdescr-type ?= cl_abap_elemdescr=>get_i( ).
-            WHEN OTHERS. "fallback
-*            TRY.
-*                l_sql_abap_componentdescr-type ?= cl_abap_typedescr=>describe_by_name( l_sql_abap_componentdescr-name ).
-*              CATCH cx_root INTO DATA(lv_not_found).
-              cl_abap_typedescr=>describe_by_name(
-                EXPORTING
-                  p_name         = l_sql_abap_componentdescr-name
-                RECEIVING
-                  p_descr_ref    = DATA(lv_descr_ref)
-                EXCEPTIONS
-                  type_not_found = 1
-                  OTHERS         = 2 ).
+            WHEN OTHERS.
+
+              cl_abap_typedescr=>describe_by_name( EXPORTING  p_name         = l_sql_abap_componentdescr-name
+                                                   RECEIVING  p_descr_ref    = DATA(lv_descr_ref)
+                                                   EXCEPTIONS type_not_found = 1
+                                                              OTHERS         = 2 ).
               l_sql_abap_componentdescr-type ?= lv_descr_ref.
-*            ENDTRY.
+
           ENDCASE.
         ELSE.
           IF <l_fields>-rollname NE '/CADAXO/SQLCAGGRCOUNT'.
-*          l_sql_abap_componentdescr-type ?= cl_abap_typedescr=>describe_by_name( l_sql_abap_componentdescr-name ).
-            cl_abap_typedescr=>describe_by_name(
-              EXPORTING
-                p_name         = l_sql_abap_componentdescr-name
-              RECEIVING
-                p_descr_ref    = lv_descr_ref
-              EXCEPTIONS
-                type_not_found = 1
-                OTHERS         = 2 ).
+
+            cl_abap_typedescr=>describe_by_name( EXPORTING  p_name         = l_sql_abap_componentdescr-name
+                                                 RECEIVING  p_descr_ref    = lv_descr_ref
+                                                 EXCEPTIONS OTHERS         = 2 ).
             l_sql_abap_componentdescr-type ?= lv_descr_ref.
           ELSE.
-*          l_sql_abap_componentdescr-type ?= cl_abap_typedescr=>describe_by_name( '/CADAXO/SQLCAGGRCOUNT' ).
-            cl_abap_typedescr=>describe_by_name(
-              EXPORTING
-                p_name         = '/CADAXO/SQLCAGGRCOUNT'
-              RECEIVING
-                p_descr_ref    = lv_descr_ref
-              EXCEPTIONS
-                type_not_found = 1
-                OTHERS         = 2 ).
+
+            cl_abap_typedescr=>describe_by_name( EXPORTING  p_name         = '/CADAXO/SQLCAGGRCOUNT'
+                                                 RECEIVING  p_descr_ref    = lv_descr_ref
+                                                 EXCEPTIONS OTHERS         = 2 ).
             l_sql_abap_componentdescr-type ?= lv_descr_ref.
           ENDIF.
         ENDIF.
 
-        READ TABLE me->result_component_t
-             WITH KEY name = l_sql_abap_componentdescr-name TRANSPORTING NO FIELDS.
-        IF sy-subrc EQ 0 OR strlen( l_sql_abap_componentdescr-name ) GT 30.
+        IF line_exists( me->result_component_t[ name = l_sql_abap_componentdescr-name ] ) OR strlen(
+            l_sql_abap_componentdescr-name ) GT 30.
           IF <l_fields>-map_fieldname IS INITIAL.
             DO.
               TRY.
                   CALL METHOD ('CL_SYSTEM_UUID')=>('CREATE_UUID_C22_STATIC')
-                    RECEIVING
-                      uuid = l_guid22.
+                    RECEIVING uuid = l_guid22.
                 CATCH cx_root.
                   CALL FUNCTION 'GUID_CREATE'
-                    IMPORTING
-                      ev_guid_22 = l_guid22.
+                    IMPORTING ev_guid_22 = l_guid22.
               ENDTRY.
-              TRANSLATE l_guid22 TO UPPER CASE.
+              l_guid22 = to_upper( l_guid22 ).
               REPLACE ALL OCCURRENCES OF '}' IN l_guid22 WITH 'A'.
               REPLACE ALL OCCURRENCES OF '{' IN l_guid22 WITH 'B'.
-* check for existing "GUID" caused by case-sensetivity of CHAR22 GUIDs
-              READ TABLE me->result_component_t WITH KEY name = l_guid22 TRANSPORTING NO FIELDS.
-              IF sy-subrc <> 0.
+              " check for existing "GUID" caused by case-sensetivity of CHAR22 GUIDs
+              IF NOT line_exists( me->result_component_t[ name = l_guid22 ] ).
                 EXIT.
               ENDIF.
             ENDDO.
@@ -1210,87 +1157,81 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
       MOVE-CORRESPONDING <l_fields> TO <l_lvc_s_fcat>.
 
-      MOVE 'TABLE' TO <l_lvc_s_fcat>-tabname. "CDX001-0034
+      <l_lvc_s_fcat>-tabname   = 'TABLE'. "CDX001-0034
 
-      MOVE: <l_fields>-fieldname TO <l_lvc_s_fcat>-ref_field,
-            <l_fields>-tabname   TO <l_lvc_s_fcat>-ref_table.
+      <l_lvc_s_fcat>-ref_field = <l_fields>-fieldname.
+      <l_lvc_s_fcat>-ref_table = <l_fields>-tabname.
 
       IF me->column_syntax EQ '*'.
         CASE <l_fields>-datatype.
           WHEN 'CURR'.
             READ TABLE me->gt_result_ddfields WITH KEY fieldname = <l_fields>-reffield TRANSPORTING NO FIELDS.  "CR22-031
             IF sy-subrc EQ 0.                                                                                   "CR22-031
-              MOVE <l_fields>-reffield TO <l_lvc_s_fcat>-cfieldname.                                            "CR22-031
+              <l_lvc_s_fcat>-cfieldname = <l_fields>-reffield.                                            "CR22-031
             ENDIF.                                                                                              "CR22-031
           WHEN 'QUAN'.
-            READ TABLE me->gt_result_ddfields TRANSPORTING NO FIELDS
-                       WITH KEY tabname = <l_fields>-tabname
-                                fieldname = <l_fields>-reffield.
-            IF sy-subrc EQ 0.
-              MOVE <l_fields>-reffield TO <l_lvc_s_fcat>-qfieldname.
+            IF line_exists( me->gt_result_ddfields[ tabname   = <l_fields>-tabname
+                                                    fieldname = <l_fields>-reffield ] ).
+              <l_lvc_s_fcat>-qfieldname = <l_fields>-reffield.
             ENDIF.
         ENDCASE.
       ELSE.
         CASE <l_fields>-datatype.
           WHEN 'CURR'.
-            READ TABLE me->gt_result_ddfields WITH KEY fieldname = <l_fields>-reffield
-                                                       tabname   = <l_fields>-reftable
-                                                       TRANSPORTING NO FIELDS.
-            IF sy-subrc EQ 0.
+            IF line_exists( me->gt_result_ddfields[ fieldname = <l_fields>-reffield
+                                                    tabname   = <l_fields>-reftable ] ).
               CONCATENATE <l_fields>-reftable '-' <l_fields>-reffield INTO <l_lvc_s_fcat>-cfieldname.
             ENDIF.
 
           WHEN 'QUAN'.
-            READ TABLE me->gt_result_ddfields TRANSPORTING NO FIELDS
-                       WITH KEY tabname = <l_fields>-reftable
-                                fieldname = <l_fields>-reffield.
-            IF sy-subrc EQ 0.
+            IF line_exists( me->gt_result_ddfields[ tabname   = <l_fields>-reftable
+                                                    fieldname = <l_fields>-reffield ] ).
               CONCATENATE <l_fields>-reftable '-' <l_fields>-reffield INTO <l_lvc_s_fcat>-qfieldname.
             ENDIF.
         ENDCASE.
       ENDIF.
 
       IF me->column_syntax NE '*'.
-        MOVE l_sql_abap_componentdescr-name TO <l_lvc_s_fcat>-fieldname.
+        <l_lvc_s_fcat>-fieldname = l_sql_abap_componentdescr-name.
       ENDIF.
 
-      MOVE <l_fields>-keyflag   TO <l_lvc_s_fcat>-key.
+      <l_lvc_s_fcat>-key = <l_fields>-keyflag.
 
-* set the column header (fieldname or fieldid)
+      " set the column header (fieldname or fieldid)
       IF i_user_settings-hd_fieldname EQ 'X'.
-        <l_lvc_s_fcat>-coltext     =  <l_fields>-colhd_fieldname.
-        IF NOT <l_fields>-/cadaxo/alias IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
-          CONCATENATE <l_fields>-/cadaxo/alias '~' <l_lvc_s_fcat>-coltext   INTO <l_lvc_s_fcat>-coltext.
-        ELSEIF   NOT <l_fields>-/cadaxo/alias_field IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL. "cockpit-339
-          MOVE <l_fields>-/cadaxo/alias_field TO <l_lvc_s_fcat>-coltext. "cockpit-339
+        <l_lvc_s_fcat>-coltext = <l_fields>-colhd_fieldname.
+        IF <l_fields>-/cadaxo/alias IS NOT INITIAL AND i_user_settings-hd_show_alias IS NOT INITIAL.
+          CONCATENATE <l_fields>-/cadaxo/alias '~' <l_lvc_s_fcat>-coltext INTO <l_lvc_s_fcat>-coltext.
+        ELSEIF <l_fields>-/cadaxo/alias_field IS NOT INITIAL AND i_user_settings-hd_show_alias IS NOT INITIAL. "cockpit-339
+          <l_lvc_s_fcat>-coltext = <l_fields>-/cadaxo/alias_field. "cockpit-339
         ENDIF.
       ELSE.
 
-        IF NOT <l_fields>-/cadaxo/alias_field IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
-          MOVE <l_fields>-/cadaxo/alias_field TO <l_lvc_s_fcat>-coltext.
+        IF <l_fields>-/cadaxo/alias_field IS NOT INITIAL AND i_user_settings-hd_show_alias IS NOT INITIAL.
+          <l_lvc_s_fcat>-coltext = <l_fields>-/cadaxo/alias_field.
         ELSE.
-          IF NOT <l_fields>-/cadaxo/alias IS INITIAL AND NOT i_user_settings-hd_show_alias IS INITIAL.
-            IF NOT <l_lvc_s_fcat>-scrtext_l IS INITIAL.
+          IF <l_fields>-/cadaxo/alias IS NOT INITIAL AND i_user_settings-hd_show_alias IS NOT INITIAL.
+            IF <l_lvc_s_fcat>-scrtext_l IS NOT INITIAL.
               CONCATENATE <l_fields>-/cadaxo/alias '~' <l_lvc_s_fcat>-scrtext_l INTO <l_lvc_s_fcat>-scrtext_l.
             ENDIF.
-            IF NOT <l_lvc_s_fcat>-scrtext_m IS INITIAL.
+            IF <l_lvc_s_fcat>-scrtext_m IS NOT INITIAL.
               CONCATENATE <l_fields>-/cadaxo/alias '~' <l_lvc_s_fcat>-scrtext_m INTO <l_lvc_s_fcat>-scrtext_m.
             ENDIF.
-            IF NOT <l_lvc_s_fcat>-scrtext_s IS INITIAL.
+            IF <l_lvc_s_fcat>-scrtext_s IS NOT INITIAL.
               CONCATENATE <l_fields>-/cadaxo/alias '~' <l_lvc_s_fcat>-scrtext_s INTO <l_lvc_s_fcat>-scrtext_s.
             ENDIF.
-            IF NOT <l_lvc_s_fcat>-reptext IS INITIAL.
+            IF <l_lvc_s_fcat>-reptext IS NOT INITIAL.
               CONCATENATE <l_fields>-/cadaxo/alias '~' <l_lvc_s_fcat>-reptext INTO <l_lvc_s_fcat>-reptext.
             ENDIF.
           ENDIF.
 
           CASE 'X'.
             WHEN i_user_settings-hd_fieldtext_s.
-              MOVE <l_lvc_s_fcat>-scrtext_s TO <l_lvc_s_fcat>-coltext.
+              <l_lvc_s_fcat>-coltext = <l_lvc_s_fcat>-scrtext_s.
             WHEN i_user_settings-hd_fieldtext_m.
-              MOVE <l_lvc_s_fcat>-scrtext_m TO <l_lvc_s_fcat>-coltext.
+              <l_lvc_s_fcat>-coltext = <l_lvc_s_fcat>-scrtext_m.
             WHEN i_user_settings-hd_fieldtext_l.
-              MOVE <l_lvc_s_fcat>-scrtext_l TO <l_lvc_s_fcat>-coltext.
+              <l_lvc_s_fcat>-coltext = <l_lvc_s_fcat>-scrtext_l.
           ENDCASE.
         ENDIF.
 
@@ -1303,7 +1244,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
         AND <l_lvc_s_fcat>-scrtext_m IS INITIAL                     "COCKPIT-198
         AND <l_lvc_s_fcat>-scrtext_l IS INITIAL                     "COCKPIT-198
         AND <l_lvc_s_fcat>-coltext   IS INITIAL.                    "COCKPIT-198
-          <l_lvc_s_fcat>-coltext = <l_fields>-fieldname.            "COCKPIT-198
+          <l_lvc_s_fcat>-coltext   = <l_fields>-fieldname.            "COCKPIT-198
           <l_lvc_s_fcat>-scrtext_s = <l_fields>-fieldname.          "COCKPIT-198
           <l_lvc_s_fcat>-scrtext_m = <l_fields>-fieldname.          "COCKPIT-198
           <l_lvc_s_fcat>-scrtext_l = <l_fields>-fieldname.          "COCKPIT-198
@@ -1314,7 +1255,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
       <l_lvc_s_fcat>-col_pos    = ( l_tabix * 2 ).
       <l_lvc_s_fcat>-dragdropid = i_dragdrop_handle.
 
-* set the use of the convertion exit
+      " set the use of the conversion exit
       IF i_user_settings-use_convexit IS INITIAL.
         <l_lvc_s_fcat>-no_convext = abap_true.
         CLEAR <l_lvc_s_fcat>-convexit.                                           "COCKPIT-105
@@ -1328,47 +1269,19 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
       ENDIF.                                                                     "COCKPIT-125
     ENDLOOP.
 
-    r_lvc_t_fcat = me->gt_lvc_t_fcat.
-
+    r_lvc_t_fcat = gt_lvc_t_fcat.
   ENDMETHOD.
 
-
   METHOD create_alv_field_catalog_v_2.
-****************************************************************************************************
-* Description             : Create ALV Field Catalog                                               *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2015               Release    : WAS 7.40 SP8                     *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 18.02.2017 | Domi Bigl            | Leading Spaces                              | COCKPIT-125    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 18.02.2017 | Domi Bigl            | timestamp handling                          | COCKPIT-105    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 04.04.2017 | Domi Bigl            | Sign                                        | COCKPIT-181    *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
-
     DATA lr_tabledescr TYPE REF TO cl_abap_tabledescr.
-    DATA lr_tab TYPE REF TO data.
-    DATA lr_table TYPE REF TO cl_salv_table.
-    DATA lr_cols TYPE REF TO cl_salv_columns_table.
-    DATA lr_aggr TYPE REF TO cl_salv_aggregations.
-    DATA l_pos TYPE i.
+    DATA lr_tab        TYPE REF TO data.
+    DATA lr_table      TYPE REF TO cl_salv_table.
+    DATA lr_cols       TYPE REF TO cl_salv_columns_table.
+    DATA lr_aggr       TYPE REF TO cl_salv_aggregations.
+    DATA l_pos         TYPE i.
 
-    FIELD-SYMBOLS: <ls_lvc_s_fcat> LIKE LINE OF me->gt_lvc_t_fcat,
-                   <ls_ddfields>   LIKE LINE OF me->gt_result_ddfields.
+    FIELD-SYMBOLS <ls_lvc_s_fcat> LIKE LINE OF me->gt_lvc_t_fcat.
+    FIELD-SYMBOLS <ls_ddfields>   LIKE LINE OF me->gt_result_ddfields.
 
     CLEAR me->gt_lvc_t_fcat.
 
@@ -1376,25 +1289,17 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
     CREATE DATA lr_tab TYPE HANDLE lr_tabledescr.
 
-*    data l_test type c.
-*    do.
-*      if l_test is not initial.
-*        exit.
-*      endif.
-*    enddo.
-
-
     ASSIGN lr_tab->* TO FIELD-SYMBOL(<lt_result_tmp>).
     TRY.
 
         cl_salv_table=>factory( IMPORTING r_salv_table = lr_table
-                                CHANGING t_table = <lt_result_tmp> ).
+                                CHANGING  t_table      = <lt_result_tmp> ).
 
         lr_cols = lr_table->get_columns( ).
         lr_aggr = lr_table->get_aggregations( ).
 
-        me->gt_lvc_t_fcat = cl_salv_controller_metadata=>get_lvc_fieldcatalog( r_columns      = lr_cols
-                                                                               r_aggregations = lr_aggr ).
+        gt_lvc_t_fcat = cl_salv_controller_metadata=>get_lvc_fieldcatalog( r_columns      = lr_cols
+                                                                           r_aggregations = lr_aggr ).
 
         DELETE me->gt_lvc_t_fcat WHERE datatype = 'NODE'.
 
@@ -1404,7 +1309,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
           l_pos = l_pos + 1.
           <ls_lvc_s_fcat>-col_pos = l_pos.
 
-          READ TABLE me->gt_result_ddfields_all  WITH KEY fieldname = <ls_lvc_s_fcat>-fieldname ASSIGNING <ls_ddfields>.
+          ASSIGN me->gt_result_ddfields_all[ fieldname = <ls_lvc_s_fcat>-fieldname ] TO <ls_ddfields>.
           IF sy-subrc = 0.
             <ls_lvc_s_fcat>-rollname   = <ls_ddfields>-rollname.
             <ls_lvc_s_fcat>-domname    = <ls_ddfields>-domname.
@@ -1416,15 +1321,15 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
             <ls_lvc_s_fcat>-reptext    = <ls_ddfields>-reptext.
             <ls_lvc_s_fcat>-f4availabl = <ls_ddfields>-f4availabl.
             <ls_lvc_s_fcat>-outputlen  = <ls_ddfields>-outputlen.
-            <ls_lvc_s_fcat>-ref_field  = <ls_ddfields>-reffield.
-            <ls_lvc_s_fcat>-ref_table  = <ls_ddfields>-reftable.
+            <ls_lvc_s_fcat>-ref_field  = <ls_ddfields>-fieldname. "<ls_ddfields>-reffield.
+            <ls_lvc_s_fcat>-ref_table  = <ls_ddfields>-tabname. " <ls_ddfields>-reftable.
             <ls_lvc_s_fcat>-key        = <ls_ddfields>-keyflag.
             <ls_lvc_s_fcat>-datatype   = <ls_ddfields>-datatype.
             <ls_lvc_s_fcat>-no_sign    = abap_false.                             "COCKPIT-181
 
-            if <ls_lvc_s_fcat>-intlen is initial.
-               <ls_lvc_s_fcat>-intlen = <ls_ddfields>-intlen.
-            endif.
+            IF <ls_lvc_s_fcat>-intlen IS INITIAL.
+              <ls_lvc_s_fcat>-intlen = <ls_ddfields>-intlen.
+            ENDIF.
 
             CASE <ls_lvc_s_fcat>-datatype.
               WHEN 'CURR'.
@@ -1459,13 +1364,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
           ENDIF.                                                                           "COCKPIT-125
         ENDLOOP.
 
-* set column header based on the user settings
-        /cadaxo/cl_sqlc_cockpit_assist=>set_fcat_header_texts(
-          EXPORTING
-            is_user_settings = me->g_user_settings
-            it_ddfields      = me->gt_result_ddfields
-          CHANGING
-            ct_fcat          = me->gt_lvc_t_fcat ).
+        " set column header based on the user settings
+        /cadaxo/cl_sqlc_cockpit_assist=>set_fcat_header_texts( EXPORTING is_user_settings = g_user_settings
+                                                                         it_ddfields      = gt_result_ddfields
+                                                               CHANGING  ct_fcat          = gt_lvc_t_fcat ).
 
       CATCH cx_salv_msg.
     ENDTRY.
@@ -1475,7 +1377,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
     FREE lr_aggr.
     FREE lr_tabledescr.
     FREE lr_tab.
-
   ENDMETHOD.
 
 
