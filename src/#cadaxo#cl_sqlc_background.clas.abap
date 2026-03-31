@@ -1,37 +1,31 @@
-class /CADAXO/CL_SQLC_BACKGROUND definition
-  public
-  final
-  create public .
+CLASS /cadaxo/cl_sqlc_background DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC.
 
-public section.
+  PUBLIC SECTION.
 
-  class-methods EXECUTE_SQL_BACKGROUND
-    importing
-      !I_LIST_GUID type /CADAXO/SQLC_LISTGUID
-    raising
-      CX_STATIC_CHECK .
-  class-methods ADD_RECORD_NEXT_JOB
-    importing
-      !IS_SQLCSRES type /CADAXO/SQLCSRES
-      !I_BTCJOB type BTCJOB
-      !I_BTCJOBCNT type BTCJOBCNT .
+    CLASS-METHODS execute_sql_background
+      IMPORTING !i_list_guid TYPE /cadaxo/sqlc_listguid
+      RAISING   cx_static_check.
+
+    CLASS-METHODS add_record_next_job
+      IMPORTING !is_sqlcsres TYPE /cadaxo/sqlcsres
+                !i_btcjob    TYPE btcjob
+                !i_btcjobcnt TYPE btcjobcnt.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
 
 
-
-CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
-
-
+CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
   METHOD add_record_next_job.
-
     DATA variant TYPE btcvariant.
     DATA tbtco   TYPE tbtco.
 
     SELECT SINGLE variant FROM tbtcp INTO variant WHERE jobname = i_btcjob AND jobcount = i_btcjobcnt.
     IF sy-subrc = 0.
-*   check for open periodic job -> create new initial line in sqlcsres
+      " check for open periodic job -> create new initial line in sqlcsres
       SELECT SINGLE a~jobcount
         FROM tbtco AS a
         INNER JOIN tbtcp AS b
@@ -42,7 +36,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
             AND b~variant = variant
             AND ( strtdate = '' OR strttime = '' ).
       IF sy-subrc = 0.
-        DATA(initial_guid) =  VALUE guid_16( ).
+        DATA(initial_guid) = VALUE guid_16( ).
         SELECT SINGLE @abap_true
                FROM /cadaxo/sqlcsres
                WHERE jobname        = @i_btcjob
@@ -62,42 +56,37 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
         ENDIF.
       ENDIF.
     ENDIF.
-
   ENDMETHOD.
 
-
   METHOD execute_sql_background.
+    DATA lcl_sqlc_cockpit   TYPE REF TO /cadaxo/cl_sqlc_cockpit_main.
+    DATA result_details     TYPE /cadaxo/sqlcresult_details.
+    DATA lt_result_details  TYPE TABLE OF /cadaxo/sqlcresult_details.
+    DATA ls_sqlcresult_ref  TYPE /cadaxo/sqlcresult_ref.
+    DATA lt_cl_sql_parse    TYPE /cadaxo/sqlc_cl_cockpit_parset.
+    DATA ls_sqlcsres        TYPE /cadaxo/sqlcsres.
+    DATA l_sql_string       TYPE string.
+    DATA ls_sqlcresultsave  TYPE /cadaxo/sqlcresultsave.
+    DATA lt_sqlcresultsave  TYPE TABLE OF /cadaxo/sqlcresultsave.
+    DATA ls_sqlcress        TYPE /cadaxo/sqlcress.
+    DATA lt_code            TYPE /cadaxo/sqlccodeline_t.
+    DATA l_xml              TYPE string.
+    DATA lt_result_list_raw TYPE TABLE OF xstring.
+    DATA ls_result_list_raw TYPE xstring.
+    DATA l_timestamp        TYPE timestampl.
 
-    DATA: lcl_sqlc_cockpit   TYPE REF TO /cadaxo/cl_sqlc_cockpit_main,
-          result_details     TYPE /cadaxo/sqlcresult_details,
-          lt_result_details  TYPE TABLE OF /cadaxo/sqlcresult_details,
-          ls_sqlcresult_ref  TYPE /cadaxo/sqlcresult_ref,
-          lt_cl_sql_parse    TYPE /cadaxo/sqlc_cl_cockpit_parset,
-          ls_sqlcsres        TYPE /cadaxo/sqlcsres,
-          l_sql_string       TYPE string,
-          ls_sqlcresultsave  TYPE /cadaxo/sqlcresultsave,
-          lt_sqlcresultsave  TYPE TABLE OF /cadaxo/sqlcresultsave,
-          ls_sqlcress        TYPE /cadaxo/sqlcress,
-          lt_code            TYPE /cadaxo/sqlccodeline_t,
-          l_xml              TYPE string,
-          lt_result_list_raw TYPE TABLE OF xstring,
-          ls_result_list_raw TYPE xstring,
-          l_timestamp        TYPE timestampl.
-
-    DATA ls_tbtco            TYPE tbtco.
-    DATA lt_lvc_t_fcat       TYPE lvc_t_fcat.
-    DATA l_btcjob            TYPE btcjob.
-    DATA l_btcjobcnt         TYPE btcjobcnt.
+    DATA ls_tbtco           TYPE tbtco.
+    DATA lt_lvc_t_fcat      TYPE lvc_t_fcat.
+    DATA l_btcjob           TYPE btcjob.
+    DATA l_btcjobcnt        TYPE btcjobcnt.
 
     FIELD-SYMBOLS <lr_cl_sql_parse> TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
     FIELD-SYMBOLS <ls_t>            TYPE ANY TABLE.
 
     CALL FUNCTION 'GET_JOB_RUNTIME_INFO'
-      IMPORTING
-        jobcount = l_btcjobcnt
-        jobname  = l_btcjob
-      EXCEPTIONS
-        OTHERS   = 1.
+      IMPORTING  jobcount = l_btcjobcnt
+                 jobname  = l_btcjob
+      EXCEPTIONS OTHERS   = 1.
 
     IF l_btcjob IS NOT INITIAL.
       SELECT SINGLE *
@@ -112,7 +101,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
              FROM /cadaxo/sqlcsres
              WHERE root_list_guid = @i_list_guid OR list_guid = @i_list_guid
              ORDER BY ress_guid
-             into table @DATA(all_sqlcsres).
+             INTO TABLE @DATA(all_sqlcsres).
       IF sy-subrc <> 0.
         IF sy-batch IS NOT INITIAL.
           MESSAGE e143(/cadaxo/sqlc) WITH i_list_guid.
@@ -138,23 +127,25 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
 
     TRY.
 
-* replace all symbols
+        " replace all symbols
         /cadaxo/cl_sqlc_cockpit_assist=>replace_all_symbols_with_value( CHANGING c_string = l_sql_string ).
 
         CLEAR lcl_sqlc_cockpit->ms_user_settings_xml-maxsel.
 
-* parse the sql string
-        lt_cl_sql_parse = /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i( i_sql           = l_sql_string
-                                                                      i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
-                                                                      i_role          = lcl_sqlc_cockpit->authcheck->get_cockpitrole( ) ).
+        " parse the sql string
+        lt_cl_sql_parse = /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i(
+                              i_sql           = l_sql_string
+                              i_user_settings = lcl_sqlc_cockpit->ms_user_settings_xml
+                              i_role          = lcl_sqlc_cockpit->authcheck->get_cockpitrole( ) ).
         IF lcl_sqlc_cockpit->ms_user_settings_xml-strict_mode = abap_true.
           DATA(start_sql_version) = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
         ELSE.
           start_sql_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
         ENDIF.
 
-* check the sql syntax
-        /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( i_sql_parsed = lt_cl_sql_parse i_select_version = start_sql_version ).
+        " check the sql syntax
+        /cadaxo/cl_sqlc_sql_syntax=>check_sql_syntax( i_sql_parsed     = lt_cl_sql_parse
+                                                      i_select_version = start_sql_version ).
 
         LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
           <lr_cl_sql_parse>->parse_sql_ii( ).
@@ -167,7 +158,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
         LOOP AT lt_cl_sql_parse ASSIGNING <lr_cl_sql_parse>.
 
           IF <lr_cl_sql_parse>->g_select_version = <lr_cl_sql_parse>->c_select_version_1.
-            <lr_cl_sql_parse>->create_alv_field_catalog( i_user_settings = lcl_sqlc_cockpit->g_user_settings
+            <lr_cl_sql_parse>->create_alv_field_catalog( i_user_settings   = lcl_sqlc_cockpit->g_user_settings
                                                          i_dragdrop_handle = 0 ).
             <lr_cl_sql_parse>->create_result_structures( ).
           ENDIF.
@@ -184,13 +175,13 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
               CLEAR <lr_cl_sql_parse>->gt_result_ddfields.
               LOOP AT <lr_cl_sql_parse>->gt_lvc_t_fcat REFERENCE INTO DATA(fcat).
 
-                read table <lr_cl_sql_parse>->gt_result_ddfields_all with key fieldname = fcat->fieldname ASSIGNING field-symbol(<ddfield_all>).
-                if sy-subrc = 0 and <ddfield_all>-intlen <> fcat->intlen.
-                   fcat->intlen = <ddfield_all>-intlen.
-                endif.
+                ASSIGN <lr_cl_sql_parse>->gt_result_ddfields_all[ fieldname = fcat->fieldname ] TO FIELD-SYMBOL(<ddfield_all>).
+                IF sy-subrc = 0 AND <ddfield_all>-intlen <> fcat->intlen.
+                  fcat->intlen = <ddfield_all>-intlen.
+                ENDIF.
 
                 APPEND CORRESPONDING #( fcat->* ) TO <lr_cl_sql_parse>->gt_result_ddfields REFERENCE INTO DATA(field).
-                field->leng = fcat->intlen.
+                field->leng            = fcat->intlen.
 
                 field->colhd_fieldname = field->fieldname.
                 IF field->leng = 0 AND field->intlen > 0.
@@ -223,20 +214,20 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
           ls_sqlcresultsave-main-result_details = lt_result_details[ sy-tabix ].
 
           IF <lr_cl_sql_parse>->g_select_version = <lr_cl_sql_parse>->c_select_version_1.
-            lt_lvc_t_fcat = <lr_cl_sql_parse>->create_alv_field_catalog( i_user_settings = lcl_sqlc_cockpit->g_user_settings
-                                                                         i_dragdrop_handle = 0 ).
+            lt_lvc_t_fcat = <lr_cl_sql_parse>->create_alv_field_catalog(
+                                i_user_settings   = lcl_sqlc_cockpit->g_user_settings
+                                i_dragdrop_handle = 0 ).
           ENDIF.
 
-          ls_sqlcresultsave-parse-column_syntax            = <lr_cl_sql_parse>->column_syntax.
-          ls_sqlcresultsave-parse-source_syntax            = <lr_cl_sql_parse>->source_syntax.
-          ls_sqlcresultsave-parse-where_syntax             = <lr_cl_sql_parse>->where_syntax.
-          ls_sqlcresultsave-parse-group_syntax             = <lr_cl_sql_parse>->group_syntax.
-          ls_sqlcresultsave-parse-having_syntax            = <lr_cl_sql_parse>->having_syntax.
-          ls_sqlcresultsave-parse-order_syntax             = <lr_cl_sql_parse>->order_syntax.
-          ls_sqlcresultsave-parse-dbhint_syntax            = <lr_cl_sql_parse>->dbhint_syntax.
-          ls_sqlcresultsave-parse-connection_syntax        = <lr_cl_sql_parse>->connection_syntax.
-          ls_sqlcresultsave-parse-sql_syntax               = <lr_cl_sql_parse>->sql_syntax.
-*          ls_sqlcresultsave-parse-result_ddfields          = <lr_cl_sql_parse>->gt_result_ddfields.
+          ls_sqlcresultsave-parse-column_syntax     = <lr_cl_sql_parse>->column_syntax.
+          ls_sqlcresultsave-parse-source_syntax     = <lr_cl_sql_parse>->source_syntax.
+          ls_sqlcresultsave-parse-where_syntax      = <lr_cl_sql_parse>->where_syntax.
+          ls_sqlcresultsave-parse-group_syntax      = <lr_cl_sql_parse>->group_syntax.
+          ls_sqlcresultsave-parse-having_syntax     = <lr_cl_sql_parse>->having_syntax.
+          ls_sqlcresultsave-parse-order_syntax      = <lr_cl_sql_parse>->order_syntax.
+          ls_sqlcresultsave-parse-dbhint_syntax     = <lr_cl_sql_parse>->dbhint_syntax.
+          ls_sqlcresultsave-parse-connection_syntax = <lr_cl_sql_parse>->connection_syntax.
+          ls_sqlcresultsave-parse-sql_syntax        = <lr_cl_sql_parse>->sql_syntax.
           IF lines( <lr_cl_sql_parse>->gt_result_ddfields_all ) > lines( <lr_cl_sql_parse>->gt_result_ddfields ).
             ls_sqlcresultsave-parse-result_ddfields = <lr_cl_sql_parse>->gt_result_ddfields_all.
           ELSE.
@@ -267,19 +258,17 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
           cl_abap_gzip=>compress_binary( EXPORTING raw_in   = ls_result_list_raw
                                          IMPORTING gzip_out = ls_result_list_raw ).
 
-
           APPEND ls_sqlcresultsave  TO lt_sqlcresultsave.
           APPEND ls_result_list_raw TO lt_result_list_raw.
 
         ENDLOOP.
-
 
         CALL TRANSFORMATION id SOURCE result_save = lt_sqlcresultsave
                                RESULT XML l_xml.
         cl_abap_gzip=>compress_text( EXPORTING text_in  = l_xml
                                      IMPORTING gzip_out = ls_sqlcress-rawdata ).
 
-        ls_sqlcress-uname = cl_abap_syst=>get_user_name( ).
+        ls_sqlcress-uname            = cl_abap_syst=>get_user_name( ).
 
         ls_sqlcress-editor_sqlstring = ls_sqlcsres-editor_sqlstring.
 
@@ -289,7 +278,7 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
         ls_sqlcsres-syst           = sy-sysid. "$002
         ls_sqlcsres-mandant        = sy-mandt. "$002
 
-        ls_sqlcsres-nr_of_selects = lines( lt_cl_sql_parse ).
+        ls_sqlcsres-nr_of_selects  = lines( lt_cl_sql_parse ).
 
         IF ls_sqlcsres-jobcount <> l_btcjobcnt.
           ls_sqlcsres-list_guid = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
@@ -300,23 +289,20 @@ CLASS /CADAXO/CL_SQLC_BACKGROUND IMPLEMENTATION.
         MODIFY /cadaxo/sqlcress FROM ls_sqlcress.
         MODIFY /cadaxo/sqlcsres FROM ls_sqlcsres.
 
-* catch exceptions
       CATCH /cadaxo/cx_sqlc_symb_not_found
             /cadaxo/cx_sqlc_no_sel_at_firs
             /cadaxo/cx_sqlc_syntax_error
             /cadaxo/cx_sqlc_no_source
             /cadaxo/cx_sqlc_to_much_resrow
-            cx_sy_open_sql_db  INTO DATA(exception).
+            cx_sy_open_sql_db INTO DATA(exception).
 
     ENDTRY.
 
     CALL FUNCTION 'BP_EVENT_RAISE'
-      EXPORTING
-        eventid         = '/CADAXO/MAIL_NOTIF'
-        eventparm       = i_list_guid
-        target_instance = ' '
-      EXCEPTIONS
-        OTHERS          = 1.
+      EXPORTING  eventid         = '/CADAXO/MAIL_NOTIF'
+                 eventparm       = i_list_guid
+                 target_instance = ' '
+      EXCEPTIONS OTHERS          = 1.
     IF sy-subrc <> 0.
     ENDIF.
 
