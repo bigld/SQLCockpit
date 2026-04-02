@@ -106,7 +106,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse DEFINITION
     METHODS check_sql_no_select_star
       RAISING
         /cadaxo/cx_sqlc_syntax_error.
-    METHODS check_sql_no_version1
+    METHODS check_sql_is_version2
       RAISING
         /cadaxo/cx_sqlc_syntax_error.
     METHODS constructor
@@ -864,7 +864,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
     ENDIF.
   ENDMETHOD.
-  METHOD check_sql_no_version1.
+  METHOD check_sql_is_version2.
     IF me->g_select_version <> 2.
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
     ENDIF.
