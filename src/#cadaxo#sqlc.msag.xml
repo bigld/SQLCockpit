@@ -1013,6 +1013,12 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>167</MSGNR>
+     <TEXT>SELECT * is not permitted for background execution with &apos;Add Domain Text&apos;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>170</MSGNR>
      <TEXT>“WITH PRIVILEGED ACCESS” not yet supported</TEXT>
     </T100>
@@ -2332,6 +2338,124 @@
       </TLINE>
      </LINES>
     </item>
+    <item>
+     <DOKIL>
+      <ID>NA</ID>
+      <OBJECT>/CADAXO/SQLC167</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0002</VERSION>
+      <TXTLINES>00009</TXTLINES>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>/CADAXO/SQLC167</TDNAME>
+      <TDID>NA</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00002</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>&amp;CAUSE&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Sie möchten SELECT statements with * oder data_source~* im Hintergrund</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>ausführen</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>und haben in den persönlichen Einstellungen die &apos;Domain Text hinzufügen&apos;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Option</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>aktiviert</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Das ist derzeit nicht erlaubt</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>&amp;WHAT_TO_DO&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Bitte geben Sie eine Selekt-Liste an oder</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>deaktivieren Sie die &apos;Domain Text hinzufügen&apos; Option in den persönlichen</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Einstellungen</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+    <item>
+     <DOKIL>
+      <ID>NA</ID>
+      <OBJECT>/CADAXO/SQLC167</OBJECT>
+      <LANGU>E</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0002</VERSION>
+      <MASTERLANG>X</MASTERLANG>
+      <TXTLINES>00006</TXTLINES>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>/CADAXO/SQLC167</TDNAME>
+      <TDID>NA</TDID>
+      <TDSPRAS>E</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00002</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>&amp;CAUSE&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>You try to execute SELECT statements with * or data_source~*</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>in background mode and you have activated the &apos;Add Domain Text&apos; option</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>in the personel settings.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>This is not allowed</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>&amp;WHAT_TO_DO&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Please specifiy a select list or remove the &apos;Add Domain Text&apos; option</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>in your personel settings.</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
    </LONGTEXTS>
    <I18N_LANGS>
     <LANGU>D</LANGU>
@@ -3178,6 +3302,11 @@
      <SPRSL>D</SPRSL>
      <MSGNR>166</MSGNR>
      <TEXT>Eingabe ist kein korrektes JSON</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>167</MSGNR>
+     <TEXT>Im Hintergrund ist &apos;Domain Text ergänzen&apos; mit SELECT * nicht erlaubt</TEXT>
     </item>
     <item>
      <SPRSL>D</SPRSL>

@@ -120,6 +120,21 @@ CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
                          i_btcjobcnt = l_btcjobcnt ).
     COMMIT WORK.
 
+    TRY.
+        DATA jobstart_conditions TYPE /cadaxo/sqlc_jobwiz_fields.
+        DATA xml_string          TYPE string.
+        cl_abap_gzip=>decompress_text( EXPORTING gzip_in  = ls_sqlcsres-jobstartcond
+                                       IMPORTING text_out = xml_string ).
+
+        CALL TRANSFORMATION id
+               SOURCE XML xml_string
+               RESULT settings = jobstart_conditions.
+      CATCH cx_transformation_error.
+      CATCH cx_parameter_invalid_range
+            cx_sy_buffer_overflow
+            cx_sy_conversion_codepage
+            cx_sy_compression_error.
+    ENDTRY.
     cl_abap_gzip=>decompress_text( EXPORTING gzip_in  = ls_sqlcsres-sql_string
                                    IMPORTING text_out = l_sql_string ).
 
@@ -131,6 +146,9 @@ CLASS /cadaxo/cl_sqlc_background IMPLEMENTATION.
         /cadaxo/cl_sqlc_cockpit_assist=>replace_all_symbols_with_value( CHANGING c_string = l_sql_string ).
 
         CLEAR lcl_sqlc_cockpit->ms_user_settings_xml-maxsel.
+        IF jobstart_conditions-add_domain_value = abap_true.
+          lcl_sqlc_cockpit->ms_user_settings_xml-domaintext = abap_true.
+        ENDIF.
 
         " parse the sql string
         lt_cl_sql_parse = /cadaxo/cl_sqlc_cockpit_parse=>parse_sql_i(

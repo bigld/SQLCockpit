@@ -132,12 +132,10 @@ CLASS /cadaxo/cl_sqlc_cockpit_main DEFINITION
       IMPORTING
         !i_html_id     TYPE /cadaxo/sqlcparameter_id DEFAULT 'HTML_STARTUP'
         !i_main_ref_id TYPE i .
-    METHODS check_sql_syntax
-      IMPORTING
-        !i_use_local_parser TYPE char1 OPTIONAL
-      RAISING
-        /cadaxo/cx_sqlc_syntax_error
-        /cadaxo/cx_sqlc_invalid_value .
+    METHODS check_sql_syntax IMPORTING i_use_local_parser TYPE char1 OPTIONAL
+                             retURNING VALUE(et_parsers) type /cadaxo/sqlc_cl_cockpit_parset
+                             RAISING   /cadaxo/cx_sqlc_syntax_error
+                                       /cadaxo/cx_sqlc_invalid_value .
     METHODS constructor .
     METHODS get_content
       IMPORTING
@@ -1132,6 +1130,8 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                                             height = toolbar_row_height * 3 ).
       ENDIF.
     ENDIF.
+
+    et_parsers = <lt_cl_sql_parse>.
   ENDMETHOD.
 
 
@@ -2908,58 +2908,28 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     FREE: lt_lvc_t_fcat.
   ENDMETHOD.
 
-
   METHOD execute_sql_background_wiz.
-****************************************************************************************************
-* Description             : SQL Cockpit - Execute Job Wizard                                       *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Cadaxo                   Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Domi Bigl                Company    : CADAXO GesmbH                    *
-* Date                    : 16.04.2011                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 27.03.2012 | Fößleitner Johann    | Add nr. of selects to jobmonitor            | CDX130-004     *
-*------------+----------------------+---------------------------------------------+----------------*
-* 28.10.2016 | Domi Bigl            | Jobs with old Editor                        | COCKPIT-7      *
-*------------+----------------------+---------------------------------------------+----------------*
-* 16.05-2017 | Harald Wiesinger     | DATA LOSS Dump with periodic Jobs           | COCKPIT-205    *
-*------------+----------------------+---------------------------------------------+----------------*
-* 15.06.2022 | Domi Bigl            | Wrong list in job notification mail + CC    | COCKPIT-488    *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-****************************************************************************************************
+    DATA l_lines                TYPE i.
+    DATA lr_exception           TYPE REF TO cx_root.
+    DATA l_message              TYPE string.
+    DATA l_sql_string           TYPE string.
+    DATA ls_jobstart_conditions TYPE /cadaxo/sqlc_jobwiz_fields.
+    DATA l_xml                  TYPE string.
+    DATA ls_sqlcsres            TYPE /cadaxo/sqlcsres.
+    DATA l_btcjob_notif         TYPE btcjob.
+    DATA l_btcjobcnt_notif      TYPE btcjobcnt.
+    DATA lt_code                TYPE /cadaxo/sqlccodeline_t.
+    DATA l_jobgroup             TYPE c LENGTH 1.
+    DATA ls_sqlcsres_tmp        TYPE /cadaxo/sqlcsres.
 
-    DATA: l_lines                TYPE i,
-          lr_exception           TYPE REF TO cx_root,
-          l_message              TYPE string,
-          l_sql_string           TYPE string,
-          ls_jobstart_conditions TYPE /cadaxo/sqlc_jobwiz_fields,
-          l_xml                  TYPE string,
-          ls_sqlcsres            TYPE /cadaxo/sqlcsres,
-          l_btcjob_notif         TYPE btcjob,
-          l_btcjobcnt_notif      TYPE btcjobcnt,
-          lt_code                TYPE /cadaxo/sqlccodeline_t,
-          l_jobgroup(1),
-          ls_sqlcsres_tmp        TYPE /cadaxo/sqlcsres.
+    DATA lt_saved_lists         TYPE /cadaxo/sqlcsresalv_t.
+    DATA l_free_space_kb        TYPE int4.
+    DATA ls_adm_cust            TYPE /cadaxo/sqlc_admin_cust.
+    DATA ls_tbtcjob             TYPE tbtcjob.
+    DATA l_event_param          TYPE btcevtparm.
+    DATA l_event_periodic       TYPE c LENGTH 1.
 
-    DATA lt_saved_lists   TYPE /cadaxo/sqlcsresalv_t.
-    DATA l_free_space_kb  TYPE int4.
-    DATA ls_adm_cust      TYPE /cadaxo/sqlc_admin_cust.
-    DATA ls_tbtcjob       TYPE tbtcjob.
-    DATA l_event_param    TYPE btcevtparm.
-    DATA l_event_periodic TYPE c LENGTH 1.
-
-* check job release authorization
-
+    " check job release authorization
     AUTHORITY-CHECK
       OBJECT 'S_BTCH_JOB'
           ID 'JOBGROUP'  FIELD l_jobgroup
@@ -2981,50 +2951,54 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                l_event_param,
                l_event_periodic.
 
-* check sql syntax
-        me->check_sql_syntax( i_use_local_parser = abap_true ).
+        DATA(parsers) = check_sql_syntax( abap_true ).
 
-* check free space for the job
+        " check free space for the job
         /cadaxo/cl_sqlc_cockpit_assist=>get_adm_customizing( IMPORTING e_customizing = ls_adm_cust ).
 
         IF ls_adm_cust-maxspace GT 0.
-          /cadaxo/cl_sqlc_cockpit_lists=>get_saved_lists( EXPORTING i_uname = sy-uname
-                                                          IMPORTING e_saved_lists = lt_saved_lists
+          /cadaxo/cl_sqlc_cockpit_lists=>get_saved_lists( EXPORTING i_uname         = sy-uname
+                                                          IMPORTING e_saved_lists   = lt_saved_lists
                                                                     e_free_space_kb = l_free_space_kb ).
           IF l_free_space_kb LT 0.
             MESSAGE e085(/cadaxo/sqlc) WITH ls_adm_cust-maxspace.
           ENDIF.
         ENDIF.
-
-* how many sql selects does the user execute
-        l_lines = lines( gt_cl_sql_parse ).
+        LOOP AT parsers INTO DATA(parser).
+          TRY.
+              parser->check_sql_no_select_star( ).
+            CATCH /cadaxo/cx_sqlc_syntax_error.
+              MESSAGE s167(/cadaxo/sqlc) DISPLAY LIKE 'E'.
+              RETURN.
+          ENDTRY.
+        ENDLOOP.
+        l_lines = lines( parsers ).
         ls_sqlcsres-nr_of_selects = l_lines.            "CDX130-004
 
-* get sql string from editor control
-        l_sql_string = me->get_sql_area( ).
+        " get sql string from editor control
+        l_sql_string = get_sql_area( ).
 
-* get source code from sql editor
+        " get source code from sql editor
         IF me->gc_abap_editor IS BOUND.
-          me->gc_abap_editor->get_text( IMPORTING table   = lt_code
-                                        EXCEPTIONS OTHERS = 1 ).
+          gc_abap_editor->get_text( IMPORTING  table  = lt_code
+                                    EXCEPTIONS OTHERS = 1 ).
         ELSE.
-          me->gc_abap_editor_text->get_text_as_r3table( IMPORTING table   = lt_code
-                                                        EXCEPTIONS OTHERS = 1 ).
+          gc_abap_editor_text->get_text_as_r3table( IMPORTING  table  = lt_code
+                                                    EXCEPTIONS OTHERS = 1 ).
         ENDIF.
 
-* export the code into databuffer
+        " export the code into databuffer
         EXPORT code FROM lt_code[] TO DATA BUFFER ls_sqlcsres-editor_sqlstring.
 
-* check if i_sql_String is not initial
+        " check if i_sql_String is not initial
 
-* call wizard dialog
+        " call wizard dialog
         CALL FUNCTION '/CADAXO/SQLC_JOB_SCHEDULING'
-          IMPORTING
-            e_start_conditions = ls_jobstart_conditions
-          EXCEPTIONS
-            OTHERS             = 1.
+          IMPORTING  e_start_conditions = ls_jobstart_conditions
+          EXCEPTIONS OTHERS             = 1.
         IF sy-subrc = 0.
 
+          ls_jobstart_conditions-add_domain_value = ms_user_settings_xml-domaintext.
           CALL TRANSFORMATION id
              SOURCE settings = ls_jobstart_conditions
              RESULT XML l_xml.
@@ -3035,23 +3009,20 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
           cl_abap_gzip=>compress_text( EXPORTING text_in  = l_sql_string
                                        IMPORTING gzip_out = ls_sqlcsres-sql_string ).
 
-          ls_sqlcsres-list_guid = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
+          ls_sqlcsres-list_guid      = cl_uuid_factory=>create_system_uuid( )->create_uuid_x16( ).
           ls_sqlcsres-root_list_guid = ls_sqlcsres-list_guid.
 
           GET TIME STAMP FIELD ls_sqlcsres-create_timestamp.
 
-* Insert Jobdefinition to DB
+          " Insert Jobdefinition to DB
           CALL FUNCTION 'JOB_OPEN'
-            EXPORTING
-              jobname          = ls_jobstart_conditions-jobname
-              jobclass         = ls_jobstart_conditions-jobclass
-            IMPORTING
-              jobcount         = ls_sqlcsres-jobcount
-            EXCEPTIONS
-              cant_create_job  = 1
-              invalid_job_data = 2
-              jobname_missing  = 3
-              OTHERS           = 4.
+            EXPORTING  jobname          = ls_jobstart_conditions-jobname
+                       jobclass         = ls_jobstart_conditions-jobclass
+            IMPORTING  jobcount         = ls_sqlcsres-jobcount
+            EXCEPTIONS cant_create_job  = 1
+                       invalid_job_data = 2
+                       jobname_missing  = 3
+                       OTHERS           = 4.
 
           ls_sqlcsres-uname   = sy-uname.
           ls_sqlcsres-jobname = ls_jobstart_conditions-jobname.
@@ -3082,56 +3053,22 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
           CASE abap_true.
             WHEN ls_jobstart_conditions-periodic_minutely.
-              MOVE 1 TO ls_tbtcjob-prdmins.
+              ls_tbtcjob-prdmins = 1.
               l_event_periodic = abap_true.
             WHEN ls_jobstart_conditions-periodic_hourly.
-              MOVE 1 TO ls_tbtcjob-prdhours.
+              ls_tbtcjob-prdhours = 1.
               l_event_periodic = abap_true.
             WHEN ls_jobstart_conditions-periodic_daily.
-              MOVE 1 TO ls_tbtcjob-prddays.
+              ls_tbtcjob-prddays = 1.
               l_event_periodic = abap_true.
             WHEN ls_jobstart_conditions-periodic_weekly.
-              MOVE 1 TO ls_tbtcjob-prdweeks.
+              ls_tbtcjob-prdweeks = 1.
               l_event_periodic = abap_true.
             WHEN ls_jobstart_conditions-periodic_monthly.
-              MOVE 1 TO ls_tbtcjob-prdmonths.
+              ls_tbtcjob-prdmonths = 1.
               l_event_periodic = abap_true.
           ENDCASE.
 
-* COCKPIT-488 DEL
-*          IF ls_jobstart_conditions-notification_email1 IS NOT INITIAL
-*          OR ls_jobstart_conditions-notification_email2 IS NOT INITIAL
-*          OR ls_jobstart_conditions-notification_sap_mail IS NOT INITIAL.
-*
-*            l_btcjob_notif = '/CADAXO/MAIL_NOTIF'.
-*            l_event_param  = ls_sqlcsres-list_guid.
-*
-*            CALL FUNCTION 'JOB_OPEN'
-*              EXPORTING"
-*                jobname  = l_btcjob_notif
-*                jobclass = 'C'
-*              IMPORTING
-*                jobcount = l_btcjobcnt_notif
-*              EXCEPTIONS
-*                OTHERS   = 1.
-*
-*            SUBMIT /cadaxo/sqlc_batch_executemail
-*                   WITH pjobguid = ls_sqlcsres-list_guid
-*                   VIA JOB l_btcjob_notif
-*                   NUMBER l_btcjobcnt_notif
-*                   AND RETURN.
-*
-*            CALL FUNCTION 'JOB_CLOSE'
-*              EXPORTING
-*                jobcount       = l_btcjobcnt_notif
-*                jobname        = l_btcjob_notif
-*                event_id       = '/CADAXO/MAIL_NOTIF'
-*                event_param    = l_event_param
-*                event_periodic = l_event_periodic
-*              EXCEPTIONS
-*                OTHERS         = 9.
-*          ENDIF.
-* COCKPIT-488 DEL END
           CASE abap_true.
             WHEN ls_jobstart_conditions-immediately.
               IF l_event_periodic = abap_true.                     "COCKPIT-488
@@ -3143,69 +3080,53 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                 start_time = '      '.                             "COCKPIT-488
               ENDIF.                                               "COCKPIT-488
               CALL FUNCTION 'JOB_CLOSE'
-                EXPORTING
-                  jobcount  = ls_sqlcsres-jobcount
-                  jobname   = ls_jobstart_conditions-jobname
-                  strtimmed = ls_jobstart_conditions-immediately
-                  sdlstrtdt = start_date
-                  sdlstrttm = start_time
-                  prdmins   = ls_tbtcjob-prdmins
-                  prddays   = ls_tbtcjob-prddays
-                  prdhours  = ls_tbtcjob-prdhours
-                  prdmonths = ls_tbtcjob-prdmonths
-                  prdweeks  = ls_tbtcjob-prdweeks
-                EXCEPTIONS
-                  OTHERS    = 1.
+                EXPORTING  jobcount  = ls_sqlcsres-jobcount
+                           jobname   = ls_jobstart_conditions-jobname
+                           strtimmed = ls_jobstart_conditions-immediately
+                           sdlstrtdt = start_date
+                           sdlstrttm = start_time
+                           prdmins   = ls_tbtcjob-prdmins
+                           prddays   = ls_tbtcjob-prddays
+                           prdhours  = ls_tbtcjob-prdhours
+                           prdmonths = ls_tbtcjob-prdmonths
+                           prdweeks  = ls_tbtcjob-prdweeks
+                EXCEPTIONS OTHERS    = 1.
 
               COMMIT WORK AND WAIT.
 
-*  "COCKPIT-488 DEL
-*              IF l_event_periodic = abap_true.
-*                WAIT UP TO 2 SECONDS. "give Jobsystem some time to schedule next job COCKPIT-488
-*                add_record_next_job( is_sqlcsres = ls_sqlcsres
-*                                     i_btcjob    = ls_sqlcsres-jobname
-*                                     i_btcjobcnt = ls_sqlcsres-jobcount ).
-*              ENDIF.
-*  "COCKPIT-488 DEL END
-
             WHEN ls_jobstart_conditions-planned.
               CALL FUNCTION 'JOB_CLOSE'
-                EXPORTING
-                  jobcount   = ls_sqlcsres-jobcount
-                  jobname    = ls_jobstart_conditions-jobname
-                  laststrtdt = ls_jobstart_conditions-laststrtdt
-                  laststrttm = ls_jobstart_conditions-laststrttm
-                  sdlstrtdt  = ls_jobstart_conditions-sdlstrtdt
-                  sdlstrttm  = ls_jobstart_conditions-sdlstrttm
-                  prdmins    = ls_tbtcjob-prdmins
-                  prddays    = ls_tbtcjob-prddays
-                  prdhours   = ls_tbtcjob-prdhours
-                  prdmonths  = ls_tbtcjob-prdmonths
-                  prdweeks   = ls_tbtcjob-prdweeks
-                EXCEPTIONS
-                  OTHERS     = 1.
+                EXPORTING  jobcount   = ls_sqlcsres-jobcount
+                           jobname    = ls_jobstart_conditions-jobname
+                           laststrtdt = ls_jobstart_conditions-laststrtdt
+                           laststrttm = ls_jobstart_conditions-laststrttm
+                           sdlstrtdt  = ls_jobstart_conditions-sdlstrtdt
+                           sdlstrttm  = ls_jobstart_conditions-sdlstrttm
+                           prdmins    = ls_tbtcjob-prdmins
+                           prddays    = ls_tbtcjob-prddays
+                           prdhours   = ls_tbtcjob-prdhours
+                           prdmonths  = ls_tbtcjob-prdmonths
+                           prdweeks   = ls_tbtcjob-prdweeks
+                EXCEPTIONS OTHERS     = 1.
             WHEN ls_jobstart_conditions-scheduled.
               CALL FUNCTION 'JOB_CLOSE'
-                EXPORTING
-                  jobcount = ls_sqlcsres-jobcount
-                  jobname  = ls_jobstart_conditions-jobname
-                EXCEPTIONS
-                  OTHERS   = 9.
+                EXPORTING  jobcount = ls_sqlcsres-jobcount
+                           jobname  = ls_jobstart_conditions-jobname
+                EXCEPTIONS OTHERS   = 9.
           ENDCASE.
 
-          MESSAGE s155(/cadaxo/sqlc)  DISPLAY LIKE 'S'.
-          me->show_jobmonitor( ).
+          MESSAGE s155(/cadaxo/sqlc) DISPLAY LIKE 'S'.
+          show_jobmonitor( ).
 
         ELSEIF sy-subrc = 1.
-          MESSAGE s042(/cadaxo/sqlc)  DISPLAY LIKE 'E'.
+          MESSAGE s042(/cadaxo/sqlc) DISPLAY LIKE 'E'.
         ENDIF.
 
       CATCH cx_sy_generate_subpool_full.
-        MESSAGE i038(/cadaxo/sqlc)  DISPLAY LIKE 'E'.
+        MESSAGE i038(/cadaxo/sqlc) DISPLAY LIKE 'E'.
       CATCH cx_root INTO lr_exception.
         l_message = lr_exception->get_text( ).
     ENDTRY.
-
   ENDMETHOD.
 
 
@@ -6445,38 +6366,41 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-
   METHOD on_alv_templ_double_click_2000.
-
-* data definitions & field symbols
-    DATA: l_sqlctemp_class   TYPE /cadaxo/sqlctempl_class.
+    " data definitions & field symbols
+    DATA: l_sqlctemp_class TYPE /cadaxo/sqlctempl_class.
     DATA: lcl_template_class TYPE REF TO /cadaxo/cl_sqlc_template.
 
-    FIELD-SYMBOLS: <l_sql_template_alv> TYPE /cadaxo/sqlctemp_alv,
-                   <l_cl_sql_parse>     LIKE LINE OF gt_cl_sql_parse.
+    FIELD-SYMBOLS <l_sql_template_alv> TYPE /cadaxo/sqlctemp_alv.
+    FIELD-SYMBOLS <l_cl_sql_parse>     LIKE LINE OF gt_cl_sql_parse.
 
-* read selected template
-    READ TABLE gt_templates INDEX e_row-index ASSIGNING <l_sql_template_alv>.
+    " read selected template
+    ASSIGN gt_templates[ e_row-index ] TO <l_sql_template_alv>.
     IF sy-subrc = 0.
 
-* get template class from database
+      " get template class from database
       SELECT SINGLE template_class FROM /cadaxo/sqlctemp INTO l_sqlctemp_class WHERE template_name = <l_sql_template_alv>-template_name.
       IF sy-subrc = 0.
 
-        READ TABLE gt_cl_sql_parse INDEX 1 ASSIGNING <l_cl_sql_parse>.
+        ASSIGN gt_cl_sql_parse[ 1 ] TO <l_cl_sql_parse>.
         IF sy-subrc = 0.
 
-          IF <l_sql_template_alv>-template_name = me->c_template_name_odata.
+          IF <l_sql_template_alv>-template_name = c_template_name_odata.
 
             TRY.
-                <l_cl_sql_parse>->check_sql_odata_syntax( ).
+                <l_cl_sql_parse>->check_sql_no_select_star( ).
               CATCH /cadaxo/cx_sqlc_syntax_error.
                 MESSAGE s163(/cadaxo/sqlc) DISPLAY LIKE 'E'.
                 RETURN.
-              CATCH /cadaxo/cx_sqlc_odata_gen.
+            ENDTRY.
+
+            TRY.
+                <l_cl_sql_parse>->check_sql_no_version1( ).
+              CATCH /cadaxo/cx_sqlc_syntax_error.
                 MESSAGE s162(/cadaxo/sqlc) DISPLAY LIKE 'E'.
                 RETURN.
             ENDTRY.
+
           ENDIF.
 
           <l_cl_sql_parse>->parse_sql_ii( ).
@@ -6485,14 +6409,14 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
           CREATE OBJECT lcl_template_class
                  TYPE (l_sqlctemp_class)
-                 EXPORTING i_cl_sql_parse = <l_cl_sql_parse>
-                           i_templ_name   = <l_sql_template_alv>-template_name.
+            EXPORTING i_cl_sql_parse = <l_cl_sql_parse>
+                      i_templ_name   = <l_sql_template_alv>-template_name.
 
           lcl_template_class->execute_template_generation( ).
           CLEAR: lcl_template_class. "COCKPIT-409
           "COCKPIT-274 BEGIN
           IF lines( <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen ) > 1.
-            me->gt_cl_sql_parse = <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen. "me->gt_cl_sql_parse_beftempgen.
+            gt_cl_sql_parse = <l_cl_sql_parse>->g_main_ref->gt_cl_sql_parse_beftempgen. "me->gt_cl_sql_parse_beftempgen.
           ENDIF.
           "COCKPIT-274 END
 
@@ -6505,7 +6429,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         MESSAGE e100(/cadaxo/sqlc).
       ENDIF.
     ENDIF.
-
   ENDMETHOD.
 
 
@@ -9470,7 +9393,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         me->move_forw_to_sql( ).
       WHEN 'SYNTCHECK'.   "Syntaxcheck
         TRY.
-            me->check_sql_syntax( i_use_local_parser = abap_true ).
+            me->check_sql_syntax( abap_true ).
 
             MESSAGE s002(/cadaxo/sqlc).
 
@@ -12455,29 +12378,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD store_sql_to_hist.
-****************************************************************************************************
-* Description             : Store the SQL Command to history                                       *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.06.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
 
 * some data definitions
     DATA: l_cnt_lines    TYPE i,

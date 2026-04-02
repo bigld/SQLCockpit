@@ -103,10 +103,12 @@ CLASS /cadaxo/cl_sqlc_cockpit_parse DEFINITION
         !c_domain_value   TYPE gts_domval
       RAISING
         /cadaxo/cx_sqlc_syntax_error .
-    METHODS check_sql_odata_syntax
+    METHODS check_sql_no_select_star
       RAISING
-        /cadaxo/cx_sqlc_syntax_error
-        /cadaxo/cx_sqlc_odata_gen .
+        /cadaxo/cx_sqlc_syntax_error.
+    METHODS check_sql_no_version1
+      RAISING
+        /cadaxo/cx_sqlc_syntax_error.
     METHODS constructor
       IMPORTING
         !i_main_ref_id TYPE i OPTIONAL .
@@ -390,25 +392,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
 
   METHOD add_domain_value.
-****************************************************************************************************
-* Description             : Add Domainvalues to Result List                                        *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations : COCKPIT-458                                                            *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Attila Kajtar            Company    : CADAXO GesmbH                    *
-* Date                    : 21.10.2020               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    : CADAXO GesmbH                    *
-* Date                    : 21.10.2020                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 | Correction Nr. *
-*------------+----------------------+---------------------------------------------+----------------*
-* 07.12.2020 | A. Kajtar            | Saved List error                            | COCKPIT-468    *
-****************************************************************************************************
+
     DATA structure TYPE REF TO cl_abap_structdescr.
     DATA structure_new TYPE REF TO cl_abap_structdescr.
     DATA sub_structure TYPE REF TO cl_abap_structdescr.
@@ -875,41 +859,16 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
   ENDMETHOD.
 
-
-  METHOD check_sql_odata_syntax.
-****************************************************************************************************
-* Description ....... Checks the Syntax of a sql statement for OData Generating                                        *
-* Developer ......... Dusan Sacha      Date .... 24.06.2022                                 *
-* Status ............ xxxxxxxxx                                                                    *                                                                                                  *
-* Qual. Check(opt.)       :        Company    : CADAXO GesmbH                    *
-* Date                    :                                                             *
-****************************************************************************************************
-* Date       | User              | Description                                       |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-* <date>     | <developer name>  | <short description>                               |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-*------------+-------------------+---------------------------------------------------+-------------*
-*            |                   |                                                   |             *
-****************************************************************************************************
-
-    "No Select * allowed for OData Generation
+  METHOD check_sql_no_select_star.
     IF me->column_syntax EQ '*' OR me->column_syntax CS '~*'.
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
     ENDIF.
-
-    "Only new OpenSQL syntax is allowed for OData Generation
-    IF me->g_select_version <> 2.
-      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_gen.
-    ENDIF.
-
-
-
-
   ENDMETHOD.
-
+  METHOD check_sql_no_version1.
+    IF me->g_select_version <> 2.
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_syntax_error.
+    ENDIF.
+  ENDMETHOD.
 
   METHOD check_sql_string_includes_subq.
 ****************************************************************************************************
@@ -1337,6 +1296,27 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
               WHEN 'QUAN'.
                 <ls_lvc_s_fcat>-qfieldname = <ls_ddfields>-reffield.
             ENDCASE.
+          ENDIF.
+
+          "get_lvc_fieldcatalog sets intlen to a strange DDIC_LEN
+          "at least for P this may be wrong
+          "
+          "The permitted range for the length is:
+          "Type C, N, X: 1 .. 65535
+          "TYPE P:       1 .. 16
+          IF <ls_lvc_s_fcat>-inttype = 'P' AND <ls_lvc_s_fcat>-intlen > 16.
+            IF <ls_lvc_s_fcat>-rollname IS INITIAL.
+              <ls_lvc_s_fcat>-intlen = 16.
+            ELSE.
+              cl_abap_elemdescr=>describe_by_name( EXPORTING  p_name      = <ls_lvc_s_fcat>-rollname
+                                                   RECEIVING  p_descr_ref = DATA(elemdescr)
+                                                   EXCEPTIONS OTHERS      = 1 ).
+              IF sy-subrc = 0.
+                <ls_lvc_s_fcat>-intlen = elemdescr->length.
+                "<ls_lvc_s_fcat>-decimals = elemdescr->decimals.
+              ENDIF.
+            ENDIF.
+
           ENDIF.
 
           IF <ls_lvc_s_fcat>-scrtext_s IS INITIAL.
