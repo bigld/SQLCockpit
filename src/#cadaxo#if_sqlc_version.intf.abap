@@ -1,6 +1,6 @@
-INTERFACE /cadaxo/if_sqlc_version
-  PUBLIC.
+interface /CADAXO/IF_SQLC_VERSION
+  public .
 
 
-  CONSTANTS version TYPE string VALUE '2025.1.3'.
-ENDINTERFACE.
+  constants VERSION type STRING value '2025.1.4' ##NO_TEXT.
+endinterface.
