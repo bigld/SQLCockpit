@@ -730,7 +730,7 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD add_hold_lists.
@@ -2907,6 +2907,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
     FREE: lt_lvc_t_fcat.
   ENDMETHOD.
+
 
   METHOD execute_sql_background_wiz.
     DATA l_lines                TYPE i.
@@ -6369,6 +6370,7 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
       ENDIF.                                                  "CDX001-0006
     ENDIF.
   ENDMETHOD.
+
 
   METHOD on_alv_templ_double_click_2000.
     " data definitions & field symbols
@@ -10364,14 +10366,11 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
   METHOD replace_old_runtime_structure.
 
-    DATA runtime_regex     TYPE string VALUE '<RUNTIME>(\d+)</RUNTIME>'.
-    DATA target_string     TYPE string.
-    DATA runtime_regex_tab TYPE match_result_tab.
-    DATA l_xml_output      TYPE string.
+    DATA runtime_regex TYPE string VALUE '<RUNTIME>(\d+)</RUNTIME>'.
 
-    l_xml_output = xml.
+    DATA(l_xml_output) = xml.
 
-    FIND ALL OCCURRENCES OF REGEX runtime_regex IN xml RESULTS runtime_regex_tab.
+    FIND ALL OCCURRENCES OF REGEX runtime_regex IN xml RESULTS DATA(runtime_regex_tab).
 
     LOOP AT runtime_regex_tab INTO DATA(runtime_element).
 
@@ -10379,13 +10378,14 @@ CLASS /cadaxo/cl_sqlc_cockpit_main IMPLEMENTATION.
 
       DATA(runtime_value) = xml+runtime_element_submatch-offset(runtime_element_submatch-length).
 
-      target_string = |<RUNTIME><RUNTIME>{ runtime_value }</RUNTIME><UNIT>µs</UNIT></RUNTIME>|.
+      DATA(target_string1) = |<RUNTIME><RUNTIME>{ runtime_value }</RUNTIME><UNIT>|.
+      DATA(target_string2) = |µs</UNIT></RUNTIME>|.
       runtime_regex = |<RUNTIME>{ runtime_value }</RUNTIME>|.
 
-      IF NOT l_xml_output CS target_string.
+      IF NOT l_xml_output CS target_string1.
         l_xml_output = replace( val   = l_xml_output
-                         regex = runtime_regex
-                         with  = target_string ).
+                                regex = runtime_regex
+                                with  = target_string1 && target_string2 ).
       ENDIF.
     ENDLOOP.
 
