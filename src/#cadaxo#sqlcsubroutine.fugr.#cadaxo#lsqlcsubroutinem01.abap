@@ -1,7 +1,286 @@
 DEFINE m_process_version_2.
 
+  DATA: BEGIN OF ls_syn_msg,
+          l1(72),
+          l2(72),
+          l3(72),
+        END OF ls_syn_msg.
+
+  DATA lr_parser          TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
+  DATA lt_code            TYPE /cadaxo/sqlcstring_t.
+  DATA lt_result_source   TYPE /cadaxo/sqlcselectsource_fla_t.
+  DATA lt_result          TYPE TABLE OF c.
+  DATA l_pool_name        LIKE sy-repid.
+  DATA l_syn_lin          TYPE i.
+  DATA l_syn_wrd          TYPE c LENGTH 30.
+  DATA lr_result          TYPE REF TO data.
+  DATA lr_tab_result_exp  TYPE REF TO cl_abap_tabledescr.
+  DATA lrx_root           TYPE REF TO cx_root.
+  DATA lr_ddictypedescr   TYPE REF TO cl_abap_typedescr.
+  DATA ddfields           TYPE ddfields.
+  DATA lr_typedescr       TYPE REF TO cl_abap_typedescr.
+  DATA lr_tabledescr      TYPE REF TO cl_abap_tabledescr.
+  DATA lr_strucdescr      TYPE REF TO cl_abap_structdescr.
+  DATA lr_strucdescr_main TYPE REF TO cl_abap_structdescr.
+  DATA lt_components      TYPE cl_abap_structdescr=>component_table.
+  DATA lr_element         TYPE REF TO cl_abap_elemdescr.
+  DATA lsqlc_dfies        TYPE /cadaxo/sqlcdfies.
+  DATA l_dfies            TYPE dfies.
+  DATA lt_incl_view       TYPE cl_abap_structdescr=>included_view.
+  DATA l_user_settings    TYPE /cadaxo/sqlcusrp_dyn.
+  DATA lt_symbol_ranges   TYPE /cadaxo/cl_sqlc_cockpit_parse=>gtt_symbol_variable.
+  FIELD-SYMBOLS: <lt_result_table> TYPE STANDARD TABLE.
+  FIELD-SYMBOLS: <et_dfies>        LIKE et_dfies.
+
+  CREATE OBJECT lr_parser.
+
+  IMPORT dfies         = lr_parser->gt_result_ddfields
+         result_source = lt_result_source
+         source_syntax = lr_parser->source_syntax
+         column_syntax = lr_parser->column_syntax
+         fields_syntax = lr_parser->fields_syntax
+         code          = lt_code
+         user_settings = l_user_settings "$002
+         range_tables  = lt_symbol_ranges
+         FROM DATA BUFFER ic_data.
+
+  ASSIGN lt_result TO <lt_result_table>.
+
+* generate the subroutine pool
+  GENERATE SUBROUTINE POOL lt_code NAME l_pool_name
+                                MESSAGE ls_syn_msg
+                                   LINE l_syn_lin
+                                   WORD l_syn_wrd.
+
+  IF ls_syn_msg IS INITIAL.
+
+    DATA(runtime) = /cadaxo/cl_sqlc_rt_measurement=>start( ).
+
+    CREATE DATA lr_result TYPE c.
+
+    PERFORM form  IN PROGRAM (l_pool_name) TABLES   <lt_result_table>
+                                           USING    lr_tab_result_exp
+                                                    lr_result
+                                                    l_user_settings-sql_trace "$001
+                                                    l_user_settings-tablebuffer_trace "$001
+                                                    lt_symbol_ranges
+                                           CHANGING lrx_root.
+    IF lrx_root IS NOT INITIAL. "begin of +431
+      e_error_message = lrx_root->get_text( ).
+      RETURN.
+    ENDIF.  "end of +431
+
+    e_result_lines = sy-dbcnt.
+    e_runtime = runtime->end( ).
+
+  ELSE.
+    e_error_message = ls_syn_msg.
+  ENDIF.
+
+  IF e_error_message IS INITIAL.
+
+    lr_parser->result_table = lr_result.
+
+    IF lt_result_source IS NOT INITIAL.
+      TRY.
+          LOOP AT lt_result_source REFERENCE INTO DATA(tablename).
+            cl_abap_structdescr=>describe_by_name( EXPORTING p_name         = tablename->table
+                                                   RECEIVING p_descr_ref    = lr_ddictypedescr
+                                                   EXCEPTIONS OTHERS         = 1 ).
+            IF sy-subrc = 0.
+
+              append lines of CAST cl_abap_structdescr( lr_ddictypedescr )->get_ddic_field_list( ) to ddfields.
+            ENDIF.
+          ENDLOOP.
+        CATCH cx_root.
+      ENDTRY.
+    ENDIF.
+
+    lr_tabledescr ?= cl_abap_tabledescr=>describe_by_data_ref( lr_result ).
+    lr_typedescr ?= lr_tabledescr->get_table_line_type( ).
+
+
+    IF ddfields IS INITIAL AND  lr_typedescr->is_ddic_type( ).
+      ddfields = CAST cl_abap_structdescr( lr_typedescr )->get_ddic_field_list( ).
+    ENDIF.
+
+    CASE lr_typedescr->kind.
+      WHEN cl_abap_typedescr=>kind_struct.
+        lr_strucdescr_main ?= lr_typedescr.
+        lt_components = lr_strucdescr_main->get_components( ).
+
+      WHEN cl_abap_typedescr=>kind_elem.
+        lr_element ?= lr_typedescr.
+        APPEND INITIAL LINE TO lt_components ASSIGNING FIELD-SYMBOL(<ls_component2>).
+        <ls_component2>-name = 'LINE'.
+        <ls_component2>-type = lr_element.
+    ENDCASE.
+
+    CLEAR lr_parser->gt_result_ddfields.
+
+    ASSIGN et_dfies TO <et_dfies>.
+    DO 2 TIMES.
+      LOOP AT lt_components ASSIGNING FIELD-SYMBOL(<ls_component>).
+        CLEAR lsqlc_dfies.
+
+        GET REFERENCE OF <ls_component>-type INTO DATA(ltest).
+
+        CASE <ls_component>-type->kind.
+          WHEN cl_abap_typedescr=>kind_struct.
+
+            lr_strucdescr          ?= <ls_component>-type.
+            lsqlc_dfies-stru_name  = lr_strucdescr->get_relative_name( ).
+            lsqlc_dfies-fieldname  = <ls_component>-name.
+            lsqlc_dfies-as_include = <ls_component>-as_include.
+
+          WHEN cl_abap_typedescr=>kind_elem.
+
+            lr_element                  ?= <ls_component>-type.
+            lsqlc_dfies-fieldname       = <ls_component>-name.
+            lsqlc_dfies-colhd_fieldname = <ls_component>-name.
+            lsqlc_dfies-inttype         = lr_element->type_kind.
+            lsqlc_dfies-decimals        = lr_element->decimals.
+            lsqlc_dfies-outputlen       = lr_element->output_length.
+
+            IF cl_abap_char_utilities=>charsize = 1.                                               "$002
+              lsqlc_dfies-intlen    = lr_element->length.                                          "$002
+            ELSE.                                                                                  "$002
+              CASE lsqlc_dfies-inttype.
+                WHEN 'P' OR 'I' OR 'X' OR 'F'.
+                  lsqlc_dfies-intlen    = lr_element->length.
+                WHEN OTHERS.
+                  lsqlc_dfies-intlen    = lr_element->length / cl_abap_char_utilities=>charsize.   "$002
+              ENDCASE.
+            ENDIF.                                                                                 "$002
+            lsqlc_dfies-leng            = lsqlc_dfies-intlen.
+
+            CLEAR l_dfies.
+            IF line_exists( ddfields[ fieldname = lsqlc_dfies-fieldname ] ).
+              l_dfies = ddfields[ fieldname = lsqlc_dfies-fieldname ].
+            ELSE.
+              IF lr_element->is_ddic_type( ) = abap_true.
+                l_dfies = lr_element->get_ddic_field( ).
+              ENDIF.
+            ENDIF.
+            IF l_dfies IS NOT INITIAL.
+              lsqlc_dfies-scrtext_s   = l_dfies-scrtext_s.
+              lsqlc_dfies-scrtext_m   = l_dfies-scrtext_m.
+              lsqlc_dfies-scrtext_l   = l_dfies-scrtext_l.
+              lsqlc_dfies-domname     = l_dfies-domname.
+              lsqlc_dfies-keyflag     = l_dfies-keyflag.
+              lsqlc_dfies-rollname    = l_dfies-rollname.
+              lsqlc_dfies-checktable  = l_dfies-checktable.
+              lsqlc_dfies-precfield   = l_dfies-precfield.
+              lsqlc_dfies-convexit    = l_dfies-convexit.
+              lsqlc_dfies-fieldtext   = l_dfies-fieldtext.
+              lsqlc_dfies-reptext     = l_dfies-reptext.
+              lsqlc_dfies-f4availabl  = l_dfies-f4availabl.
+              lsqlc_dfies-reffield    = l_dfies-reffield.
+              lsqlc_dfies-reftable    = l_dfies-reftable.
+              lsqlc_dfies-datatype    = l_dfies-datatype.
+            ENDIF.
+
+        ENDCASE.
+
+        APPEND lsqlc_dfies TO <et_dfies>.
+
+      ENDLOOP.
+      IF lr_strucdescr_main IS NOT BOUND.
+        EXIT. "DO.
+      ELSE.
+
+        lt_incl_view = lr_strucdescr_main->get_included_view( ).
+        MOVE-CORRESPONDING lt_incl_view TO lt_components.
+
+        ASSIGN et_dfies_all TO <et_dfies>.
+      ENDIF.
+    ENDDO.
+
+    ASSIGN lr_parser->result_table->* TO <lt_result_table>.
+    CLEAR ic_data.
+
+    EXPORT data = <lt_result_table> TO DATA BUFFER ic_data.
+
+  ENDIF.
+
+ENDFORM.
 END-OF-DEFINITION.
 
 DEFINE m_process_version_1.
+DATA: BEGIN OF ls_syn_msg,
+          l1(72),
+          l2(72),
+          l3(72),
+        END OF ls_syn_msg.
 
+  DATA lr_parser          TYPE REF TO /cadaxo/cl_sqlc_cockpit_parse.
+  DATA lt_result_source   TYPE /cadaxo/sqlcselectsource_fla_t.
+  DATA lt_code            TYPE /cadaxo/sqlcstring_t.
+  DATA l_pool_name        LIKE sy-repid.
+  DATA l_syn_lin          TYPE i.
+  DATA l_syn_wrd          TYPE c LENGTH 30.
+  DATA l_from             TYPE i.
+  DATA l_to               TYPE i.
+  DATA lr_result          TYPE REF TO data.
+  DATA lr_tab_result_exp  TYPE REF TO cl_abap_tabledescr.
+  DATA lrx_root           TYPE REF TO cx_root.
+  DATA l_user_settings    TYPE /cadaxo/sqlcusrp_dyn. "$002
+  FIELD-SYMBOLS: <lt_result_table> TYPE STANDARD TABLE.
+
+  CREATE OBJECT lr_parser.
+
+  IMPORT dfies = lr_parser->gt_result_ddfields
+         result_source = lt_result_source
+         source_syntax = lr_parser->source_syntax
+         column_syntax = lr_parser->column_syntax
+         code          = lt_code
+         user_settings = l_user_settings "$002
+         FROM DATA BUFFER ic_data.
+
+  MOVE-CORRESPONDING lt_result_source TO lr_parser->result_source_t.
+
+  IF lines( lr_parser->gt_result_ddfields ) = 1 AND lr_parser->gt_result_ddfields[ 1 ]-fieldname IS INITIAL.
+    IF lr_parser->column_syntax NP 'COUNT( *'.         "bigld COCKPIT-246
+      lr_parser->column_syntax = '*'.
+    ENDIF.                                            "bigld COCKPIT-43
+  ENDIF.
+
+  lr_parser->create_alv_field_catalog_v_1( ).
+  lr_parser->create_result_structures( ).
+
+  ASSIGN lr_parser->result_table->* TO <lt_result_table>.
+
+* generate the subroutine pool
+  GENERATE SUBROUTINE POOL lt_code NAME l_pool_name
+                                MESSAGE ls_syn_msg
+                                   LINE l_syn_lin
+                                   WORD l_syn_wrd.
+
+  IF ls_syn_msg IS INITIAL.
+
+    DATA(runtime) = /cadaxo/cl_sqlc_rt_measurement=>start( ).
+
+    CREATE DATA lr_result TYPE c.
+
+    PERFORM form  IN PROGRAM (l_pool_name) TABLES   <lt_result_table>
+                                           USING    lr_tab_result_exp
+                                                    lr_result
+                                                    l_user_settings-sql_trace "$002
+                                                    l_user_settings-tablebuffer_trace "$002
+                                           CHANGING lrx_root.
+
+    e_result_lines = sy-dbcnt.
+    e_runtime = runtime->end( ).
+
+  ELSE.
+    e_error_message = ls_syn_msg.
+  ENDIF.
+
+  CLEAR ic_data.
+
+  EXPORT data = <lt_result_table> TO DATA BUFFER ic_data.
+
+  et_dfies = lr_parser->gt_result_ddfields.
+
+ENDFORM.
 END-OF-DEFINITION.

@@ -39,7 +39,112 @@ ENDCLASS.
 
 
 
-CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
+CLASS /CADAXO/CL_SQLC_SQL_SYNTAX IMPLEMENTATION.
+
+
+  METHOD build_abap_code.
+    DATA l_line  LIKE LINE OF e_abap_code.
+    DATA l_dummy TYPE string.
+
+    CLEAR e_abap_code[].
+
+    IF i_cl_cockpit_parse->g_select_single IS NOT INITIAL.
+      APPEND 'FIELD-SYMBOLS: <FS_STR_RESULT> TYPE ANY.' TO e_abap_code_data.
+      APPEND 'APPEND INITIAL LINE TO TAB_RESULT ASSIGNING <fs_str_result>.' TO e_abap_code.
+      CONCATENATE ' SELECT SINGLE' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
+    ELSE.
+      IF i_cl_cockpit_parse->g_select_distinct IS NOT INITIAL.
+        CONCATENATE ' SELECT DISTINCT' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
+      ELSE.
+        CONCATENATE ' SELECT' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
+      ENDIF.
+    ENDIF.
+
+    APPEND l_line TO e_abap_code.
+
+    l_dummy = i_cl_cockpit_parse->source_syntax && i_cl_cockpit_parse->cds_parameter_syntax.
+    CONCATENATE ' FROM' l_dummy INTO l_line SEPARATED BY space.
+
+    IF i_cl_cockpit_parse->gs_client_handling-client_specified = abap_true.
+      CONCATENATE l_line 'CLIENT SPECIFIED' INTO l_line SEPARATED BY space.
+    ELSEIF i_cl_cockpit_parse->gs_client_handling-using_client = abap_true.
+      CONCATENATE l_line 'USING CLIENT' INTO l_line SEPARATED BY space.
+    ENDIF.
+
+    APPEND l_line TO e_abap_code.
+
+    IF    i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1
+       OR i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v0.
+
+      IF i_cl_cockpit_parse->fields_syntax IS INITIAL.
+        i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
+
+        i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
+
+        i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
+
+      ELSE.
+        i_cl_cockpit_parse->get_code_fields( CHANGING ct_code = e_abap_code ).
+      ENDIF.
+
+      IF i_cl_cockpit_parse->g_select_single IS NOT INITIAL.
+        APPEND ' INTO <fs_str_result>' TO e_abap_code.
+      ELSE.
+        APPEND ' INTO TABLE TAB_RESULT' TO e_abap_code.
+      ENDIF.
+    ELSEIF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
+      i_cl_cockpit_parse->get_code_fields( CHANGING ct_code = e_abap_code ).
+    ENDIF.
+
+    i_cl_cockpit_parse->get_code_where( EXPORTING i_only_initval = abap_true
+                                        CHANGING  ct_code        = e_abap_code ).
+    IF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
+      i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
+    ENDIF.
+
+    i_cl_cockpit_parse->get_code_group_by( CHANGING ct_code = e_abap_code ).
+
+    i_cl_cockpit_parse->get_code_having( CHANGING ct_code = e_abap_code ).
+
+    i_cl_cockpit_parse->get_code_order_by( CHANGING ct_code = e_abap_code ).
+
+    IF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
+      IF i_cl_cockpit_parse->g_select_single IS NOT INITIAL.
+        APPEND ' INTO @DATA(LS_RESULTDATA)' TO e_abap_code.
+      ELSE.
+        APPEND ' INTO TABLE @DATA(TAB_RESULTDATA)' TO e_abap_code.
+      ENDIF.
+
+      i_cl_cockpit_parse->get_code_offset( CHANGING ct_code = e_abap_code ).
+
+      i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
+
+      i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
+
+      i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
+
+    ELSEIF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
+
+      i_cl_cockpit_parse->get_code_offset( CHANGING ct_code = e_abap_code ).
+
+      IF i_cl_cockpit_parse->fields_syntax IS NOT INITIAL.
+
+        i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
+
+        i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
+
+        i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
+
+      ENDIF.
+
+    ENDIF.
+
+    IF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
+      i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
+    ENDIF.
+
+    APPEND '.' TO e_abap_code.
+  ENDMETHOD.
 
 
   METHOD check_sql_syntax.
@@ -72,7 +177,7 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
                                                            IMPORTING e_result_tab   = lt_results ).
 
         IF lt_results IS NOT INITIAL.
-          lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
+          lv_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
         ENDIF.
 
         IF <l_cl_sql_parse>->fields_syntax IS NOT INITIAL.
@@ -248,111 +353,6 @@ CLASS /cadaxo/cl_sqlc_sql_syntax IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
 
-  ENDMETHOD.
-
-
-  METHOD build_abap_code.
-    DATA l_line  LIKE LINE OF e_abap_code.
-    DATA l_dummy TYPE string.
-
-    CLEAR e_abap_code[].
-
-    IF i_cl_cockpit_parse->g_select_single IS NOT INITIAL.
-      APPEND 'FIELD-SYMBOLS: <FS_STR_RESULT> TYPE ANY.' TO e_abap_code_data.
-      APPEND 'APPEND INITIAL LINE TO TAB_RESULT ASSIGNING <fs_str_result>.' TO e_abap_code.
-      CONCATENATE ' SELECT SINGLE' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
-    ELSE.
-      IF i_cl_cockpit_parse->g_select_distinct IS NOT INITIAL.
-        CONCATENATE ' SELECT DISTINCT' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
-      ELSE.
-        CONCATENATE ' SELECT' i_cl_cockpit_parse->column_syntax INTO l_line SEPARATED BY space.
-      ENDIF.
-    ENDIF.
-
-    APPEND l_line TO e_abap_code.
-
-    l_dummy = i_cl_cockpit_parse->source_syntax && i_cl_cockpit_parse->cds_parameter_syntax.
-    CONCATENATE ' FROM' l_dummy INTO l_line SEPARATED BY space.
-
-    IF i_cl_cockpit_parse->gs_client_handling-client_specified = abap_true.
-      CONCATENATE l_line 'CLIENT SPECIFIED' INTO l_line SEPARATED BY space.
-    ELSEIF i_cl_cockpit_parse->gs_client_handling-using_client = abap_true.
-      CONCATENATE l_line 'USING CLIENT' INTO l_line SEPARATED BY space.
-    ENDIF.
-
-    APPEND l_line TO e_abap_code.
-
-    IF    i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1
-       OR i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v0.
-
-      IF i_cl_cockpit_parse->fields_syntax IS INITIAL.
-        i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
-
-        i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
-
-        i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
-
-      ELSE.
-        i_cl_cockpit_parse->get_code_fields( CHANGING ct_code = e_abap_code ).
-      ENDIF.
-
-      IF i_cl_cockpit_parse->g_select_single IS NOT INITIAL.
-        APPEND ' INTO <fs_str_result>' TO e_abap_code.
-      ELSE.
-        APPEND ' INTO TABLE TAB_RESULT' TO e_abap_code.
-      ENDIF.
-    ELSEIF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
-      i_cl_cockpit_parse->get_code_fields( CHANGING ct_code = e_abap_code ).
-    ENDIF.
-
-    i_cl_cockpit_parse->get_code_where( EXPORTING i_only_initval = abap_true
-                                        CHANGING  ct_code        = e_abap_code ).
-    IF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
-      i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
-    ENDIF.
-
-    i_cl_cockpit_parse->get_code_group_by( CHANGING ct_code = e_abap_code ).
-
-    i_cl_cockpit_parse->get_code_having( CHANGING ct_code = e_abap_code ).
-
-    i_cl_cockpit_parse->get_code_order_by( CHANGING ct_code = e_abap_code ).
-
-    IF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v2.
-      IF i_cl_cockpit_parse->g_select_single IS NOT INITIAL.
-        APPEND ' INTO @DATA(LS_RESULTDATA)' TO e_abap_code.
-      ELSE.
-        APPEND ' INTO TABLE @DATA(TAB_RESULTDATA)' TO e_abap_code.
-      ENDIF.
-
-      i_cl_cockpit_parse->get_code_offset( CHANGING ct_code = e_abap_code ).
-
-      i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
-
-      i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
-
-      i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
-
-    ELSEIF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
-
-      i_cl_cockpit_parse->get_code_offset( CHANGING ct_code = e_abap_code ).
-
-      IF i_cl_cockpit_parse->fields_syntax IS NOT INITIAL.
-
-        i_cl_cockpit_parse->get_code_up_to_rows( CHANGING ct_code = e_abap_code ).
-
-        i_cl_cockpit_parse->get_code_bypassing_buffer( CHANGING ct_code = e_abap_code ).
-
-        i_cl_cockpit_parse->get_code_connection( CHANGING ct_code = e_abap_code ).
-
-      ENDIF.
-
-    ENDIF.
-
-    IF i_select_version = /cadaxo/cl_sqlc_sql_syntax=>cc_select_version-v1.
-      i_cl_cockpit_parse->get_code_dbhints( CHANGING ct_code = e_abap_code ).
-    ENDIF.
-
-    APPEND '.' TO e_abap_code.
   ENDMETHOD.
 
 
