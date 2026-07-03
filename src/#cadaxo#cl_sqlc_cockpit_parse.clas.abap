@@ -1671,60 +1671,21 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
 
   METHOD get_abap_typedescr.
-****************************************************************************************************
-* Description             : Buffer CL_ABAP_TYPEDESCR                                               *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations : To improve the performance, we use a local buffer to get the           *
-*                           abap types                                                             *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    *
-* Date                    : 01.03.2010                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-*            |                      |                                             |                *
-*            |                      |                                             |                *
-****************************************************************************************************
 
-    DATA lcl_typedescr  TYPE REF TO cl_abap_typedescr.
+    DATA lcl_typedescr TYPE REF TO cl_abap_typedescr.
 
-    FIELD-SYMBOLS <l_tabtypedescr> LIKE LINE OF gt_abap_typedescr.
-
-* can we get the type from the local buffer?
-    READ TABLE gt_abap_typedescr WITH KEY typename = i_name ASSIGNING <l_tabtypedescr>.
-    IF sy-subrc EQ 0.
-      MOVE <l_tabtypedescr>-abap_typedescr TO r_abap_typedescr.
+    ASSIGN gt_abap_typedescr[ typename = i_name ] TO FIELD-SYMBOL(<typedescr>).
+    IF sy-subrc = 0.
+      r_abap_typedescr = <typedescr>-abap_typedescr.
     ELSE.
-* the given type isn't in the local buffer, so we get it from the database
-      cl_abap_typedescr=>describe_by_name(
-        EXPORTING
-          p_name         = i_name
-        RECEIVING
-          p_descr_ref    = lcl_typedescr
-        EXCEPTIONS
-          type_not_found = 1
-          OTHERS         = 2 ).
-      IF sy-subrc EQ 0. "add the type description to buffer
-        APPEND INITIAL LINE TO gt_abap_typedescr ASSIGNING <l_tabtypedescr>.
-
-        MOVE: i_name        TO <l_tabtypedescr>-typename,
-              lcl_typedescr TO <l_tabtypedescr>-abap_typedescr.
-
-        MOVE <l_tabtypedescr>-abap_typedescr TO r_abap_typedescr.
-
-      ELSE. "in this case, we have realy a problem. Should not happen ...
-        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_type_not_found
-          EXPORTING
-            type = i_name.
+      cl_abap_typedescr=>describe_by_name( EXPORTING p_name      = i_name
+                                           RECEIVING p_descr_ref = lcl_typedescr
+                                           EXCEPTIONS OTHERS     = 1 ).
+      IF sy-subrc = 0.
+        INSERT VALUE #( typename = i_name abap_typedescr = lcl_typedescr ) INTO TABLE gt_abap_typedescr ASSIGNING <typedescr>.
+        r_abap_typedescr = <typedescr>-abap_typedescr.
+      ELSE.
+        RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_type_not_found EXPORTING type = i_name.
       ENDIF.
     ENDIF.
 
@@ -3767,6 +3728,12 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
     DATA l_open_symbol        TYPE c LENGTH 1.
     DATA l_from_symbol        TYPE i.
     DATA l_to_symbol          TYPE i.
+    DATA tablename            TYPE string.
+    DATA: BEGIN OF group_by_match,
+            offset TYPE i,
+            length TYPE i,
+          END OF group_by_match.
+
     FIELD-SYMBOLS <l_field>             TYPE any.
     FIELD-SYMBOLS <ls_string>           TYPE string.
     FIELD-SYMBOLS <l_source_split>      TYPE string.
@@ -4265,27 +4232,35 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
             CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
 *          l_from = l_from + 2.
           WHEN OTHERS. " Field
-            " split field into field, table and alias
-            DATA: tablename TYPE string.
-            split_field( EXPORTING i_field  = l_string
-                         IMPORTING e_field  = where_col-fieldname
-                                   e_table  = tablename
-                                   e_alias  = where_col-aliasname
-                                   e_tabfld = where_col-tablefield ).
-            where_col-tablename = tablename.
-            CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
 
-            " get type of the tablefield
-            TRY.
-                lr_abap_type ?= get_abap_typedescr( i_name = where_col-tablefield ).
-                where_col-type_kind   = lr_abap_type->type_kind.
-                where_col-fieldlength = lr_abap_type->output_length.
-                IF where_col-type_kind = 'g' AND where_col-fieldlength = 0. "SSTRING
-                  where_col-fieldlength = 1333.
-                ENDIF.
-              CATCH /cadaxo/cx_sqlc_type_not_found.
-                CLEAR lr_abap_type.
-            ENDTRY.
+            IF l_string =  'GROUP'.
+              FIND REGEX '^ *BY +' IN SECTION OFFSET l_from OF me->where_syntax MATCH OFFSET group_by_match-offset MATCH LENGTH group_by_match-length.
+              IF sy-subrc = 0.
+                l_from = group_by_match-offset + group_by_match-length.
+              ENDIF.
+            ELSE.
+              CLEAR tablename.
+              split_field( EXPORTING i_field  = l_string
+                           IMPORTING e_field  = where_col-fieldname
+                                     e_table  = tablename
+                                     e_alias  = where_col-aliasname
+                                     e_tabfld = where_col-tablefield ).
+              where_col-tablename = tablename.
+              CONCATENATE me->where_syntax_wildcard l_string INTO me->where_syntax_wildcard SEPARATED BY space.
+
+              " get type of the tablefield
+              TRY.
+                  lr_abap_type ?= get_abap_typedescr( i_name = where_col-tablefield ).
+                  where_col-type_kind   = lr_abap_type->type_kind.
+                  where_col-fieldlength = lr_abap_type->output_length.
+                  IF where_col-type_kind = 'g' AND where_col-fieldlength = 0. "SSTRING
+                    where_col-fieldlength = 1333.
+                  ENDIF.
+                CATCH /cadaxo/cx_sqlc_type_not_found cx_sy_move_cast_error.
+                  CLEAR lr_abap_type.
+              ENDTRY.
+
+            ENDIF.
 
         ENDCASE.
       ELSE.
@@ -4497,30 +4472,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
 
   METHOD split_field.
-    " ---------------------------------------------------------------------------------------------------
-    "  Description             : Split Field into field, table and alias                                -
-    " ---------------------------------------------------------------------------------------------------
-    "  Additional informations : This Method splits a field into field, table and alias                 -
-    "                                                                                                   -
-    " ---------------------------------------------------------------------------------------------------
-    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
-    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
-    " ---------------------------------------------------------------------------------------------------
-    "  Qual. Check(opt.)       : Oliver Wahrstötter       Company    : CADAXO GesmbH                    -
-    "  Date                    : 01.03.2010                                                             -
-    " ---------------------------------------------------------------------------------------------------
-    "                                                                                                   -
-    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
-    "                                                                                                   -
-    "  Date       | Developer            | Description                                 | Correction Nr. -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  03.08.2010 | Fößleitner Johann    | Try to find the right table, in case of     | CDX001-0001    -
-    "             |                      | join select without alias                   |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  29.08.2010 | Bigl Dominik         | Check, if the table name is used instead    | CDX001-0009    -
-    "             |                      | of the alias name                           |                -
-    " ---------------------------------------------------------------------------------------------------
-
     IF i_field CA '~'.         " alias~field
       SPLIT i_field AT '~' INTO e_alias e_field.
       ASSIGN me->result_source_t[ alias = e_alias ] TO FIELD-SYMBOL(<sql_source_line>).
@@ -4552,12 +4503,11 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
               AND as4local  = 'A'. "#EC CI_SROFC_NESTED "#EC CI_SEL_NESTED
           IF sy-subrc = 0.
             e_table = <sql_source_line>-table.
-            RETURN.
+            EXIT. "LOOP.
           ENDIF.
         ENDLOOP.
       ENDIF.
     ENDIF.
-
 
     CONCATENATE e_table '-' e_field INTO e_tabfld.
   ENDMETHOD.
