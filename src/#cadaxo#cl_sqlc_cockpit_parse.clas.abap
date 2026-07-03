@@ -3727,37 +3727,6 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
 
   METHOD parse_sql_where_columns.
-    " ---------------------------------------------------------------------------------------------------
-    "  Description             : PARSE SQL WHERE COLUMNS                                                -
-    " ---------------------------------------------------------------------------------------------------
-    "  Additional informations :                                                                        -
-    "                                                                                                   -
-    " ---------------------------------------------------------------------------------------------------
-    "  Developer               : Johann Fößleitner        Company    : CADAXO GesmbH                    -
-    "  Date                    : 01.01.2010               Release    : WAS 7.00                         -
-    " ---------------------------------------------------------------------------------------------------
-    "  Qual. Check(opt.)       : xxxxxxxxxxxx             Company    : xxxxxxxxx                        -
-    "  Date                    : xx.xx.xxxx                                                             -
-    " ---------------------------------------------------------------------------------------------------
-    "                                                                                                   -
-    " -----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S ------------
-    "                                                                                                   -
-    "  Date       | Developer            | Description                                 |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  04.01.2012 | Fößleitner Johann    | add '=>, =<, ><'                            | CDX001-0031    -
-    "             |                      |                                             |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  24.05.2012 | Fößleitner Johann    | Bugfixing symbolname used in like           | "CDX130-008    -
-    "             |                      |                                             |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  01.06.2012 | Ana Lekic            |format value in where (for timestamps)       | CDX130-018     -
-    "             |                      |                                             |                -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  09.05.2014 | Domi Bigl            | no decimal . for P decimals 0               | RT229          -
-    " ------------+----------------------+---------------------------------------------+-----------------
-    "  10.06.2016 | Ana Lekic            | Fehler beim replace vom wert                | Cockpit-65     -
-    " ---------------------------------------------------------------------------------------------------
-
     DATA l_space_string       TYPE string.
     DATA l_offset             TYPE i.
     DATA l_from               TYPE i.
@@ -3895,7 +3864,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
             ENDIF.
 
             " check value of "P" fields
-            IF where_col-type_kind = 'P'." AND where_col-value CO '0123456789.,'''' '.
+            IF where_col-type_kind = 'P' AND where_col-value NS '~'." AND where_col-value CO '0123456789.,'''' '.
               IF subquery = abap_true.
                 FIND REGEX '\( SELECT' IN where_col-value.
                 IF sy-subrc = 0.
