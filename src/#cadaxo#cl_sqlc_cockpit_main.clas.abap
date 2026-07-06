@@ -1059,18 +1059,14 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         ls_error-longtext = icon_display_text.
       ENDIF.
 
-      TRY.
-          IF strlen( ls_error-text ) >= 127.
+      IF strlen( ls_error-text ) > 127.
 
-            _split_error_text( EXPORTING is_error  = ls_error
-                               CHANGING  ct_errors = gt_errors ).
-          ELSE.
-            INSERT ls_error INTO TABLE gt_errors.
-          ENDIF.
+        _split_error_text( EXPORTING is_error  = ls_error
+                           CHANGING  ct_errors = gt_errors ).
+      ELSE.
+        INSERT ls_error INTO TABLE gt_errors.
+      ENDIF.
 
-        CATCH cx_sy_range_out_of_bounds.
-          APPEND ls_error TO gt_errors.
-      ENDTRY.
 
       gc_abap_error->get_frontend_fieldcatalog( IMPORTING et_fieldcatalog = lt_fieldcat ).
       ASSIGN lt_fieldcat[ fieldname = 'LONGTEXT' ] TO <ls_fieldcat>.
@@ -4313,7 +4309,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ls_error-text    = l_message.
     ls_error-msgtype = icon_red_light.
 
-    IF strlen( ls_error-text ) >= 127.
+    IF strlen( ls_error-text ) > 127.
 
       _split_error_text( EXPORTING is_error  = ls_error
                          CHANGING  ct_errors = lt_errors ).
@@ -12886,34 +12882,38 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD _split_error_text.
+    TRY.
+        DATA lv_pos       TYPE i.
+        DATA ls_error_add TYPE /cadaxo/sqlcsyntaxerror.
+        DATA lv_space     TYPE string.
 
-    DATA lv_pos        TYPE i.
-    DATA ls_error_add  TYPE /cadaxo/sqlcsyntaxerror.
-    DATA lv_space      TYPE string.
+        CONCATENATE '' '' INTO lv_space SEPARATED BY space.
 
-    CONCATENATE '' ''  INTO lv_space SEPARATED BY space.
+        ls_error_add = is_error.
 
-    ls_error_add = is_error.
+        lv_pos = 127.
+        WHILE lv_pos <> 0.
+          IF is_error-text+lv_pos(1) = lv_space.
+            EXIT.
+          ENDIF.
+          lv_pos -= 1.
+        ENDWHILE.
 
-    lv_pos = 127.
-    WHILE lv_pos <> 0.
-      IF is_error-text+lv_pos(1) = lv_space.
-        EXIT.
-      ENDIF.
-      lv_pos = lv_pos - 1.
-    ENDWHILE.
+        ls_error_add-text = is_error-text(lv_pos).
+        APPEND ls_error_add TO ct_errors.
 
-    ls_error_add-text = is_error-text(lv_pos).
-    APPEND ls_error_add TO ct_errors.
+        IF lv_pos = 0.
+          lv_pos = 128.
+        ELSE.
+          lv_pos += 1.
+        ENDIF.
 
-    IF lv_pos = 0.
-      lv_pos = 128.
-    ELSE.
-      lv_pos = lv_pos + 1.
-    ENDIF.
+        ls_error_add-text = is_error-text+lv_pos.
+        APPEND ls_error_add TO ct_errors.
 
-    ls_error_add-text = is_error-text+lv_pos.
-    APPEND ls_error_add TO ct_errors.
+      CATCH cx_sy_range_out_of_bounds.
+        APPEND is_error TO ct_errors.
 
+    ENDTRY.
   ENDMETHOD.
 ENDCLASS.
