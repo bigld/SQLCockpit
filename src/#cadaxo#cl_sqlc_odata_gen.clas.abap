@@ -164,6 +164,7 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
     CLASS-DATA gv_package TYPE devclass .
     CLASS-DATA gv_entity TYPE /iwbep/med_external_name .
     CLASS-DATA gv_entity_set TYPE /iwbep/sbdm_node_name .
+    CLASS-DATA gv_odata_Type TYPE numc4 .
     DATA gwa_report TYPE /cadaxo/sqlc_temp_odata_attr .
     DATA gwa_evt TYPE /cadaxo/sqlc_temp_rep_salv_evt .
     DATA gv_filter TYPE flag .
@@ -278,7 +279,8 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   METHOD create_service.
 
-    DATA(lo_service) = gr_factory->create_service( ).
+    DATA(lo_service) = gr_factory->create_service(
+                                        EXPORTING iv_version = gv_odata_type ).
     gr_project->insert_child( io_child = lo_service ).
 
   ENDMETHOD.
@@ -1008,7 +1010,8 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
     DATA lv_version      TYPE /iwbep/med_grp_version.
 
     lv_service_name = |{ gv_project_name }_SRV|.
-    lv_version      = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+*    lv_version      = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+    lv_version      = gv_odata_type.
 
     CALL FUNCTION '/IWFND/FM_ACTIVATE_SERVICE'
       EXPORTING
@@ -1043,6 +1046,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
     gv_package      = is_odata_attr-package.
     gv_entity       = is_odata_attr-entity.
     gv_entity_set   = is_odata_attr-entity_set.
+    gv_odata_type   = is_odata_attr-odata_type.
     gv_regser       = is_odata_attr-regser.
     gv_filter       = is_odata_attr-filter.
     gv_order        = is_odata_attr-order.
