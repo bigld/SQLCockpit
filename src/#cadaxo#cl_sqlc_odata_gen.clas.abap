@@ -10,6 +10,7 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
     DATA gt_tab_fields TYPE ddfields .
     CONSTANTS c_plugin TYPE /iwbep/sbdm_plugin VALUE '/IWBEP/GEN' ##NO_TEXT.
     CONSTANTS c_strat_name TYPE /iwbep/sbdm_gen_strat_name VALUE '0001' ##NO_TEXT.
+    CONSTANTS c_strat_nameV4 TYPE /iwbep/sbdm_gen_strat_name VALUE '0002' ##NO_TEXT.
     CONSTANTS c_object TYPE trobjtype VALUE 'CLAS' ##NO_TEXT.
     CONSTANTS c_pgmid TYPE pgmid VALUE 'R3TR' ##NO_TEXT.
     CONSTANTS c_object_type TYPE trobjtype VALUE 'IWPR' ##NO_TEXT.
@@ -164,7 +165,7 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
     CLASS-DATA gv_package TYPE devclass .
     CLASS-DATA gv_entity TYPE /iwbep/med_external_name .
     CLASS-DATA gv_entity_set TYPE /iwbep/sbdm_node_name .
-    CLASS-DATA gv_odata_Type TYPE numc4 .
+    CLASS-DATA gv_odata_Type TYPE /iwbep/sbdm_project_type .
     DATA gwa_report TYPE /cadaxo/sqlc_temp_odata_attr .
     DATA gwa_evt TYPE /cadaxo/sqlc_temp_rep_salv_evt .
     DATA gv_filter TYPE flag .
@@ -264,6 +265,10 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
       iv_project_description = CONV #( gv_project_name )
        ).
 
+*   set variant of OData Generation (aka OData Type/ strategy /project type)
+    gr_project->set_project_type( gv_odata_type ).
+*    gr_project->set_gen_strategy( ).
+
 *   set additional values
     gr_project->set_package( gv_package ).
 
@@ -279,8 +284,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   METHOD create_service.
 
-    DATA(lo_service) = gr_factory->create_service(
-                                        EXPORTING iv_version = gv_odata_type ).
+    DATA(lo_service) = gr_factory->create_service( ).
     gr_project->insert_child( io_child = lo_service ).
 
   ENDMETHOD.
@@ -444,6 +448,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
     DATA lr_plugin            TYPE REF TO /iwbep/cl_sbgn_plugin.
     DATA lo_gen_strategy      TYPE REF TO /iwbep/if_sbdm_gen_strategy.
     DATA lr_test              TYPE REF TO /iwbep/cl_sb_gen_generator.
+    DATA ls_proj_type         TYPE /IWBEP/SBDM_PROJECT_TYPE.
     DATA ls_gen_strat_ver     TYPE /iwbep/s_sbdm_gen_stratversion.
     DATA ls_gen_strat_version TYPE /iwbep/s_sbdm_gen_stratversion.
     DATA ls_gen_strategy      TYPE /iwbep/s_sbdm_gen_strategy.
@@ -451,10 +456,28 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
     lr_plugin = NEW #( ).
 
+    ls_proj_type         = gr_project->get_project_type( ).
     ls_gen_strat_version = gr_project->get_gen_strategy( ).
 
     ls_gen_strat_version-plugin     = /cadaxo/cl_sqlc_odata_gen=>c_plugin.
-    ls_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+
+    CASE ls_proj_type.
+      when /iwbep/if_sbdm_project=>gc_type_mpc_dpc_v2.       "Service with SAP Annotations
+        ls_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+
+      when /iwbep/if_sbdm_project=>GC_TYPE_MPC_DPC_V2_PLUS.  "Service with Vocabulary-Based Annotations
+        ls_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+
+      when /iwbep/if_sbdm_project=>GC_TYPE_APC_REF_V2_PLUS.  "Annotation Model for Referenced Service
+        ls_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+
+      when /iwbep/if_sbdm_project=>GC_TYPE_MPC_DPC_V4.       "OData 4.0 Service
+        ls_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_nameV4.
+
+      When OTHERS.
+        ls_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+    ENDCASE.
+*    ls_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
 
     ls_gen_strategy-plugin = ls_gen_strat_version-plugin.
     ls_gen_strategy-name = ls_gen_strat_version-strat_name.
@@ -467,7 +490,10 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
         iv_gen_strat_version = ls_gen_strat_version-strat_version ).
     ENDIF.
 
-    lr_test ?= lo_gen_strategy.
+*   Debug helper?
+    IF lo_gen_strategy IS INSTANCE OF /iwbep/cl_sb_gen_generator. "only strategy 0001 NOT OData V4
+      lr_test ?= lo_gen_strategy.
+    ENDIF.
 
     lo_gen_strategy->generate( EXPORTING io_project   = gr_project
                                IMPORTING et_message   = lt_messages
@@ -1010,8 +1036,8 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
     DATA lv_version      TYPE /iwbep/med_grp_version.
 
     lv_service_name = |{ gv_project_name }_SRV|.
-*    lv_version      = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
-    lv_version      = gv_odata_type.
+    lv_version      = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+*    lv_version      = gv_odata_type.
 
     CALL FUNCTION '/IWFND/FM_ACTIVATE_SERVICE'
       EXPORTING

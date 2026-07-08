@@ -94,6 +94,7 @@ MODULE pai_0100 INPUT.
   build_symbols package      gs_report_attr-package.
   build_symbols entity       gs_report_attr-entity.
   build_symbols entity_set   gs_report_attr-entity_set.
+  build_symbols odata_type   gs_report_attr-odata_type.
   build_symbols regser       gs_report_attr-regser.
   build_symbols filter       gs_report_attr-filter.
   build_symbols order        gs_report_attr-order.
