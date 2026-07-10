@@ -378,7 +378,7 @@
       <TYPE>I</TYPE>
       <NEXTSCREEN>0120</NEXTSCREEN>
       <LINES>027</LINES>
-      <COLUMNS>143</COLUMNS>
+      <COLUMNS>146</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -522,7 +522,7 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
-       <NAME>ODATA_TYPE</NAME>
+       <NAME>GS_REPORT_ATTR-ODATA_TYPE</NAME>
        <TEXT>Project_Type___</TEXT>
        <LINE>005</LINE>
        <COLUMN>001</COLUMN>
@@ -556,6 +556,7 @@
        <TYPE>CHECK</TYPE>
        <NAME>GS_REPORT_ATTR-REGSER</NAME>
        <TEXT>Register_Service_________</TEXT>
+       <DROPDOWN>L</DROPDOWN>
        <LINE>006</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>027</LENGTH>
