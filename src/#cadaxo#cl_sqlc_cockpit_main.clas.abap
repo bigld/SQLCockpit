@@ -1746,45 +1746,23 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD create_dyn_document.
-****************************************************************************************************
-* Description             : create_dyn_document                                                    *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : CADAXO GesmbH            Company    : CADAXO GesmbH                    *
-* Date                    : 01.01.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
-* Date                    : xx.xx.xxxx                                                             *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Set headerline in Result ALV                | CR22-034       *
-*            |                      |                                             | Clocking4721   *
-*------------+----------------------+---------------------------------------------+----------------*
-* 11.09.2014 | RenÃƒÂ© Rammer          | Bug Fix Text in ALV Header too long         | CR22-035       *
-*            |                      |                                             | RT259          *
-****************************************************************************************************
-
     CONSTANTS: lc_length TYPE i VALUE 255.
+
+    DATA: lt_text_lines TYPE  string_table.
+    DATA: lwa_line TYPE string.
     DATA: lt_text  TYPE sdydo_text_table.
     DATA: lwa_text TYPE sdydo_text_element.
-    DATA: l_length TYPE i.
     DATA: l_reuse  TYPE flag.
 
-    DO.
-      l_length = strlen( i_sql ).
-      lwa_text = i_sql+0(l_length).
-      APPEND lwa_text TO lt_text.
-      IF l_length <= lc_length.
-        EXIT. "DO
-      ENDIF.
-      i_sql = i_sql+lc_length.
-    ENDDO.
+
+    lt_text_lines =
+        /CADAXO/CL_SQLC_COCKPIT_ASSIST=>split_text_into_lines(
+                iv_text = i_sql
+                iv_line_length = lc_length ).
+    " conversion from string into sdydo_text_element
+    LOOP AT lt_text_lines into lwa_line.
+        APPEND CONV sdydo_text_element( lwa_line ) to lt_text.
+    ENDLOOP.
 
     IF ic_document IS INITIAL.
       CREATE OBJECT ic_document
