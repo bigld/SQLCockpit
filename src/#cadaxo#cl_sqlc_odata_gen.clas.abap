@@ -500,12 +500,8 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
   METHOD get_generation_strategy.
     DATA ls_proj_type TYPE /iwbep/sbdm_project_type.
 
-    TRY.
-        ls_proj_type         = gr_project->get_project_type( ).
-        es_gen_strat_version = gr_project->get_gen_strategy( ).
-      CATCH /iwbep/cx_sbcm_exception.
-        " TODO call suitable Exception
-    ENDTRY.
+    ls_proj_type         = gr_project->get_project_type( ).
+    es_gen_strat_version = gr_project->get_gen_strategy( ).
 
     es_gen_strat_version-plugin = /cadaxo/cl_sqlc_odata_gen=>c_plugin.
     es_gen_strategy-plugin      = es_gen_strat_version-plugin.
@@ -556,8 +552,8 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
                 iv_gen_strat_version = is_gen_strat_version-strat_version ).
 
         ENDIF.
-      CATCH /iwbep/cx_sbdm_exception.
-        " TODO call suitable exception
+      CATCH /iwbep/cx_sbdm_exception INTO DATA(lo_exception).
+        MESSAGE e174(/CADAXO/SQLC) with lo_exception->get_longtext(  ) is_gen_strategy.
     ENDTRY.
   ENDMETHOD.
 
@@ -569,14 +565,16 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
         io_gen_strategy->generate( EXPORTING io_project   = gr_project
                                    IMPORTING et_message   = lt_messages
                                              ev_completed = lv_completed ).
-      CATCH /iwbep/cx_sbcm_exception.
-        "TODO call suitable exception
+      CATCH /iwbep/cx_sbcm_exception INTO DATA(lo_exception).
+        MESSAGE e175(/CADAXO/SQLC) with lo_exception->get_longtext(  ) io_gen_strategy->ms_gen_strategy.
     ENDTRY.
 
     IF    sy-ucomm = 'CANCEL'
        OR sy-ucomm = 'ESC'.
 
-      RAISE EXCEPTION NEW /cadaxo/cx_sqlc_odata_gen( textid = /cadaxo/cx_sqlc_odata_gen=>process_canceled ).
+      RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_gen
+        EXPORTING
+          textid = /cadaxo/cx_sqlc_odata_gen=>process_canceled.
 
     ENDIF.
   ENDMETHOD.
@@ -590,11 +588,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
     io_gen_strategy->get_validator( ).
 
-    TRY.
-        gr_project->set_gen_strategy( ls_gen_strat_ver ).
-      CATCH /iwbep/cx_sbcm_exception.
-        " TODO call suitable exception
-    ENDTRY.
+    gr_project->set_gen_strategy( ls_gen_strat_ver ).
   ENDMETHOD.
 
   METHOD generate_odata.
