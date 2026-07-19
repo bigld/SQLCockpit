@@ -1298,7 +1298,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
             CASE <ls_lvc_s_fcat>-datatype.
               WHEN 'CURR'.
-                <ls_lvc_s_fcat>-cfieldname = <ls_ddfields>-reffield.
+                "SQL-156 - only set Reffield if in result list
+                IF line_exists( me->gt_lvc_t_fcat[ fieldname = <ls_ddfields>-reffield ] ).
+                  <ls_lvc_s_fcat>-cfieldname = <ls_ddfields>-reffield.
+                ENDIF.
               WHEN 'QUAN'.
                 <ls_lvc_s_fcat>-qfieldname = <ls_ddfields>-reffield.
             ENDCASE.
