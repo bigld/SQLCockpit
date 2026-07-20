@@ -2965,18 +2965,20 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
             MESSAGE e085(/cadaxo/sqlc) WITH ls_adm_cust-maxspace.
           ENDIF.
         ENDIF.
-        LOOP AT parsers INTO DATA(parser).
-          TRY.
-              parser->check_sql_is_version2( ).
-              TRY.
-                  parser->check_sql_no_select_star( ).
-                CATCH /cadaxo/cx_sqlc_syntax_error.
-                  MESSAGE s167(/cadaxo/sqlc) DISPLAY LIKE 'E'.
-                  RETURN.
-              ENDTRY.
-            CATCH /cadaxo/cx_sqlc_syntax_error.
-          ENDTRY.
-        ENDLOOP.
+        IF ms_user_settings_xml-domaintext = abap_true.
+          LOOP AT parsers INTO DATA(parser).
+            TRY.
+                parser->check_sql_is_version2( ).
+                TRY.
+                    parser->check_sql_no_select_star( ).
+                  CATCH /cadaxo/cx_sqlc_syntax_error.
+                    MESSAGE s167(/cadaxo/sqlc) DISPLAY LIKE 'E'.
+                    RETURN.
+                ENDTRY.
+              CATCH /cadaxo/cx_sqlc_syntax_error.
+            ENDTRY.
+          ENDLOOP.
+        ENDIF.
         l_lines = lines( parsers ).
         ls_sqlcsres-nr_of_selects = l_lines.            "CDX130-004
 
@@ -2999,8 +3001,10 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
         " call wizard dialog
         CALL FUNCTION '/CADAXO/SQLC_JOB_SCHEDULING'
-          IMPORTING  e_start_conditions = ls_jobstart_conditions
-          EXCEPTIONS OTHERS             = 1.
+          IMPORTING
+            e_start_conditions = ls_jobstart_conditions
+          EXCEPTIONS
+            OTHERS             = 1.
         IF sy-subrc = 0.
 
           ls_jobstart_conditions-add_domain_value = ms_user_settings_xml-domaintext.
@@ -3021,13 +3025,16 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
           " Insert Jobdefinition to DB
           CALL FUNCTION 'JOB_OPEN'
-            EXPORTING  jobname          = ls_jobstart_conditions-jobname
-                       jobclass         = ls_jobstart_conditions-jobclass
-            IMPORTING  jobcount         = ls_sqlcsres-jobcount
-            EXCEPTIONS cant_create_job  = 1
-                       invalid_job_data = 2
-                       jobname_missing  = 3
-                       OTHERS           = 4.
+            EXPORTING
+              jobname          = ls_jobstart_conditions-jobname
+              jobclass         = ls_jobstart_conditions-jobclass
+            IMPORTING
+              jobcount         = ls_sqlcsres-jobcount
+            EXCEPTIONS
+              cant_create_job  = 1
+              invalid_job_data = 2
+              jobname_missing  = 3
+              OTHERS           = 4.
 
           ls_sqlcsres-uname   = sy-uname.
           ls_sqlcsres-jobname = ls_jobstart_conditions-jobname.
@@ -3085,39 +3092,45 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
                 start_time = '      '.                             "COCKPIT-488
               ENDIF.                                               "COCKPIT-488
               CALL FUNCTION 'JOB_CLOSE'
-                EXPORTING  jobcount  = ls_sqlcsres-jobcount
-                           jobname   = ls_jobstart_conditions-jobname
-                           strtimmed = ls_jobstart_conditions-immediately
-                           sdlstrtdt = start_date
-                           sdlstrttm = start_time
-                           prdmins   = ls_tbtcjob-prdmins
-                           prddays   = ls_tbtcjob-prddays
-                           prdhours  = ls_tbtcjob-prdhours
-                           prdmonths = ls_tbtcjob-prdmonths
-                           prdweeks  = ls_tbtcjob-prdweeks
-                EXCEPTIONS OTHERS    = 1.
+                EXPORTING
+                  jobcount  = ls_sqlcsres-jobcount
+                  jobname   = ls_jobstart_conditions-jobname
+                  strtimmed = ls_jobstart_conditions-immediately
+                  sdlstrtdt = start_date
+                  sdlstrttm = start_time
+                  prdmins   = ls_tbtcjob-prdmins
+                  prddays   = ls_tbtcjob-prddays
+                  prdhours  = ls_tbtcjob-prdhours
+                  prdmonths = ls_tbtcjob-prdmonths
+                  prdweeks  = ls_tbtcjob-prdweeks
+                EXCEPTIONS
+                  OTHERS    = 1.
 
               COMMIT WORK AND WAIT.
 
             WHEN ls_jobstart_conditions-planned.
               CALL FUNCTION 'JOB_CLOSE'
-                EXPORTING  jobcount   = ls_sqlcsres-jobcount
-                           jobname    = ls_jobstart_conditions-jobname
-                           laststrtdt = ls_jobstart_conditions-laststrtdt
-                           laststrttm = ls_jobstart_conditions-laststrttm
-                           sdlstrtdt  = ls_jobstart_conditions-sdlstrtdt
-                           sdlstrttm  = ls_jobstart_conditions-sdlstrttm
-                           prdmins    = ls_tbtcjob-prdmins
-                           prddays    = ls_tbtcjob-prddays
-                           prdhours   = ls_tbtcjob-prdhours
-                           prdmonths  = ls_tbtcjob-prdmonths
-                           prdweeks   = ls_tbtcjob-prdweeks
-                EXCEPTIONS OTHERS     = 1.
+                EXPORTING
+                  jobcount   = ls_sqlcsres-jobcount
+                  jobname    = ls_jobstart_conditions-jobname
+                  laststrtdt = ls_jobstart_conditions-laststrtdt
+                  laststrttm = ls_jobstart_conditions-laststrttm
+                  sdlstrtdt  = ls_jobstart_conditions-sdlstrtdt
+                  sdlstrttm  = ls_jobstart_conditions-sdlstrttm
+                  prdmins    = ls_tbtcjob-prdmins
+                  prddays    = ls_tbtcjob-prddays
+                  prdhours   = ls_tbtcjob-prdhours
+                  prdmonths  = ls_tbtcjob-prdmonths
+                  prdweeks   = ls_tbtcjob-prdweeks
+                EXCEPTIONS
+                  OTHERS     = 1.
             WHEN ls_jobstart_conditions-scheduled.
               CALL FUNCTION 'JOB_CLOSE'
-                EXPORTING  jobcount = ls_sqlcsres-jobcount
-                           jobname  = ls_jobstart_conditions-jobname
-                EXCEPTIONS OTHERS   = 9.
+                EXPORTING
+                  jobcount = ls_sqlcsres-jobcount
+                  jobname  = ls_jobstart_conditions-jobname
+                EXCEPTIONS
+                  OTHERS   = 9.
           ENDCASE.
 
           MESSAGE s155(/cadaxo/sqlc) DISPLAY LIKE 'S'.
