@@ -12356,22 +12356,25 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         cv_search_string = search_string.
 
     IF search_string IS NOT INITIAL.
+      TRY.
+          CLEAR : gt_selected_rows, gv_selected_total, gv_selected_counter, gt_selected_disp.
 
-      CLEAR : gt_selected_rows, gv_selected_total, gv_selected_counter, gt_selected_disp.
+          LOOP AT gt_history_log INTO DATA(history_log) WHERE sql_string cp search_string.
 
-      LOOP AT gt_history_log INTO DATA(ls_history_log).
-        DATA(lv_match_index) = sy-tabix.
-        FIND ALL OCCURRENCES OF REGEX search_string IN ls_history_log-sql_string RESULTS DATA(lt_results) IGNORING CASE IN CHARACTER MODE.
-        IF lt_results IS NOT INITIAL.
-          selected_row-index = lv_match_index.
-          APPEND selected_row TO gt_selected_rows.
-          CLEAR lt_results.
-        ENDIF.
-      ENDLOOP.
+            APPEND VALUE #( index = sy-tabix ) TO gt_selected_rows.
 
-      gv_selected_total = lines( gt_selected_rows ).
-      me->log_alv_line_selection( ).
+          ENDLOOP.
 
+          gv_selected_total = lines( gt_selected_rows ).
+          me->log_alv_line_selection( ).
+        CATCH cx_root INTO DATA(exception).
+          MESSAGE e173(/cadaxo/sqlc) with exception->get_text(  ) .
+          RETURN.
+      ENDTRY.
+
+      IF lines( gt_selected_rows ) = 0.
+          MESSAGE s177(/cadaxo/sqlc) .
+      ENDIF.
     ENDIF.
 
   ENDMETHOD.
