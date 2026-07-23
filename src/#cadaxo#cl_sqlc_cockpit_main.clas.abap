@@ -1757,22 +1757,20 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
   METHOD create_dyn_document.
     CONSTANTS: lc_length TYPE i VALUE 255.
-
-    DATA: lt_text_lines TYPE  string_table.
-    DATA: lwa_line TYPE string.
     DATA: lt_text  TYPE sdydo_text_table.
     DATA: lwa_text TYPE sdydo_text_element.
+    DATA: l_length TYPE i.
     DATA: l_reuse  TYPE flag.
 
-
-    lt_text_lines =
-        /CADAXO/CL_SQLC_COCKPIT_ASSIST=>split_text_into_lines(
-                iv_text = i_sql
-                iv_line_length = lc_length ).
-    " conversion from string into sdydo_text_element
-    LOOP AT lt_text_lines into lwa_line.
-        APPEND CONV sdydo_text_element( lwa_line ) to lt_text.
-    ENDLOOP.
+    DO.
+      l_length = strlen( i_sql ).
+      lwa_text = i_sql+0(l_length).
+      APPEND lwa_text TO lt_text.
+      IF l_length <= lc_length.
+        EXIT. "DO
+      ENDIF.
+      i_sql = i_sql+lc_length.
+    ENDDO.
 
     IF ic_document IS INITIAL.
       CREATE OBJECT ic_document
@@ -1788,18 +1786,16 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ENDIF.
 
 * For Header Line
-    IF i_header_text IS NOT INITIAL.                          "CR22-034
-      CLEAR lt_text.                                          "CR22-034
-      APPEND i_header_text TO lt_text.                        "CR22-034
-    ENDIF.                                                    "CR22-034
+    IF i_header_text IS NOT INITIAL.
+      CLEAR lt_text.
+      APPEND i_header_text TO lt_text.
+    ENDIF.
 
-    LOOP AT lt_text INTO lwa_text.                            "CR22-035
-      ic_document->add_text(                                  "CR22-035
-       EXPORTING                                              "CR22-035
-         text          = lwa_text                             "CR22-035
-       CHANGING                                               "CR22-035
-         document      =  ic_document ).                      "CR22-035
-    ENDLOOP.                                                  "CR22-035
+    ic_document->add_text(
+     EXPORTING
+       text_table    = lt_text
+     CHANGING
+       document      = ic_document ).
 
     IF l_reuse = abap_true.
       ic_document->display_document( EXPORTING reuse_control = l_reuse ).
