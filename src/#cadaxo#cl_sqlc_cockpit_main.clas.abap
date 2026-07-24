@@ -1059,8 +1059,18 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
         ls_error-longtext = icon_display_text.
       ENDIF.
 
-      _split_error_text( EXPORTING is_error  = ls_error
-                         CHANGING  ct_errors = gt_errors ).
+      TRY.
+          IF strlen( ls_error-text ) >= 127.
+
+            _split_error_text( EXPORTING is_error  = ls_error
+                               CHANGING  ct_errors = gt_errors ).
+          ELSE.
+            INSERT ls_error INTO TABLE gt_errors.
+          ENDIF.
+
+        CATCH cx_sy_range_out_of_bounds.
+          APPEND ls_error TO gt_errors.
+      ENDTRY.
 
       gc_abap_error->get_frontend_fieldcatalog( IMPORTING et_fieldcatalog = lt_fieldcat ).
       ASSIGN lt_fieldcat[ fieldname = 'LONGTEXT' ] TO <ls_fieldcat>.
@@ -1746,23 +1756,45 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
 
   METHOD create_dyn_document.
-    CONSTANTS: lc_length TYPE i VALUE 255.
+****************************************************************************************************
+* Description             : create_dyn_document                                                    *
+*--------------------------------------------------------------------------------------------------*
+* Additional informations :                                                                        *
+*                                                                                                  *
+*--------------------------------------------------------------------------------------------------*
+* Developer               : CADAXO GesmbH            Company    : CADAXO GesmbH                    *
+* Date                    : 01.01.2010               Release    : WAS 7.00                         *
+*--------------------------------------------------------------------------------------------------*
+* Qual. Check(opt.)       : xxxxxxxxxxxxxxxxxx       Company    : CADAXO GesmbH                    *
+* Date                    : xx.xx.xxxx                                                             *
+*--------------------------------------------------------------------------------------------------*
+*                                                                                                  *
+*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
+*                                                                                                  *
+* Date       | Developer            | Description                                 |                *
+*------------+----------------------+---------------------------------------------+----------------*
+* 25.08.2014 | RenÃƒÂ© Rammer          | Set headerline in Result ALV                | CR22-034       *
+*            |                      |                                             | Clocking4721   *
+*------------+----------------------+---------------------------------------------+----------------*
+* 11.09.2014 | RenÃƒÂ© Rammer          | Bug Fix Text in ALV Header too long         | CR22-035       *
+*            |                      |                                             | RT259          *
+****************************************************************************************************
 
-    DATA: lt_text_lines TYPE  string_table.
-    DATA: lwa_line TYPE string.
+    CONSTANTS: lc_length TYPE i VALUE 255.
     DATA: lt_text  TYPE sdydo_text_table.
     DATA: lwa_text TYPE sdydo_text_element.
+    DATA: l_length TYPE i.
     DATA: l_reuse  TYPE flag.
 
-
-    lt_text_lines =
-        /CADAXO/CL_SQLC_COCKPIT_ASSIST=>split_text_into_lines(
-                iv_text = i_sql
-                iv_line_length = lc_length ).
-    " conversion from string into sdydo_text_element
-    LOOP AT lt_text_lines into lwa_line.
-        APPEND CONV sdydo_text_element( lwa_line ) to lt_text.
-    ENDLOOP.
+    DO.
+      l_length = strlen( i_sql ).
+      lwa_text = i_sql+0(l_length).
+      APPEND lwa_text TO lt_text.
+      IF l_length <= lc_length.
+        EXIT. "DO
+      ENDIF.
+      i_sql = i_sql+lc_length.
+    ENDDO.
 
     IF ic_document IS INITIAL.
       CREATE OBJECT ic_document
@@ -4281,8 +4313,13 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ls_error-text    = l_message.
     ls_error-msgtype = icon_red_light.
 
-    _split_error_text( EXPORTING is_error  = ls_error
-                       CHANGING  ct_errors = lt_errors ).
+    IF strlen( ls_error-text ) >= 127.
+
+      _split_error_text( EXPORTING is_error  = ls_error
+                         CHANGING  ct_errors = lt_errors ).
+    ELSE.
+      INSERT ls_error INTO TABLE lt_errors.
+    ENDIF.
 
     IF lines( gt_errors ) > 0.                                                   "COCKPIT-103
       IF gt_errors[ lines( gt_errors ) ]-text <> lt_errors[ lines( lt_errors ) ]-text.                  "COCKPIT-103
@@ -12847,38 +12884,36 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD _split_error_text.
-    IF strlen( is_error-text ) > 127.
-      DATA lv_pos       TYPE i.
-      DATA ls_error_add TYPE /cadaxo/sqlcsyntaxerror.
-      DATA lv_space     TYPE string.
 
-      CONCATENATE '' '' INTO lv_space SEPARATED BY space.
+    DATA lv_pos        TYPE i.
+    DATA ls_error_add  TYPE /cadaxo/sqlcsyntaxerror.
+    DATA lv_space      TYPE string.
 
-      ls_error_add = is_error.
+    CONCATENATE '' ''  INTO lv_space SEPARATED BY space.
 
-      lv_pos = 127.
-      WHILE lv_pos <> 0.
-        IF is_error-text+lv_pos(1) = lv_space.
-          EXIT.
-        ENDIF.
-        lv_pos -= 1.
-      ENDWHILE.
+    ls_error_add = is_error.
 
-      ls_error_add-text = is_error-text(lv_pos).
-      APPEND ls_error_add TO ct_errors.
-
-      IF lv_pos = 0.
-        lv_pos = 128.
-      ELSE.
-        lv_pos += 1.
+    lv_pos = 127.
+    WHILE lv_pos <> 0.
+      IF is_error-text+lv_pos(1) = lv_space.
+        EXIT.
       ENDIF.
+      lv_pos = lv_pos - 1.
+    ENDWHILE.
 
-      ls_error_add-text = is_error-text+lv_pos.
-      APPEND ls_error_add TO ct_errors.
+    ls_error_add-text = is_error-text(lv_pos).
+    APPEND ls_error_add TO ct_errors.
+
+    IF lv_pos = 0.
+      lv_pos = 128.
     ELSE.
-      APPEND is_error TO ct_errors.
-
+      lv_pos = lv_pos + 1.
     ENDIF.
+
+    ls_error_add-text = is_error-text+lv_pos.
+    APPEND ls_error_add TO ct_errors.
+
   ENDMETHOD.
 ENDCLASS.

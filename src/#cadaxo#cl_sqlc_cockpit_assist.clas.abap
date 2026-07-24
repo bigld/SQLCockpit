@@ -293,13 +293,6 @@ public section.
       !I_ABAP_EDITOR type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT
     exporting
       !E_STRING type STRING .
-  CLASS-METHODS split_text_into_lines
-    importing
-      iv_text TYPE string
-      iv_line_length TYPE i default 127
-    returning
-      value(rt_lines) TYPE string_table.
-
   PROTECTED SECTION.
 
 *"* protected components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
@@ -312,11 +305,6 @@ public section.
 *"* private components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
 *"* do not include other source files here!!!
     CLASS-DATA gt_used_symbols_table TYPE /cadaxo/sqlcusedsymbols_t .
-    CLASS-METHODS get_split_position
-      IMPORTING
-        iv_line_length TYPE i
-        iv_text        TYPE string
-      RETURNING VALUE(rv_pos) TYPE i.
 ENDCLASS.
 
 
@@ -2930,68 +2918,5 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
-  ENDMETHOD.
-
-  METHOD split_text_into_lines.
-    CONSTANTS lc_space TYPE string VALUE ` `.
-
-    DATA lv_pos         TYPE i.
-    DATA lv_text_length TYPE i.
-    DATA lv_rest_text   TYPE string.
-    DATA lt_lines_rest  TYPE string_table.
-    DATA lv_space_found TYPE abap_bool VALUE abap_false.
-
-    lv_text_length = strlen( iv_text ).
-
-    IF iv_line_length >= lv_text_length.
-      APPEND iv_text TO rt_lines.
-      RETURN.
-    ENDIF.
-
-    lv_pos = get_split_position( iv_line_length = iv_line_length
-                                 iv_text        = iv_text ).
-
-    IF lc_space = substring( val = iv_text
-                             off = lv_pos
-                             len = 1 ).
-      lv_space_found = abap_true.
-    ENDIF.
-
-    APPEND substring( val = iv_text
-                      len = lv_pos ) TO rt_lines.
-
-    lv_rest_text = substring( val = iv_text
-                              off = COND i( WHEN lv_space_found = abap_true
-                                            THEN lv_pos + 1 " -> remove the leading space
-                                            ELSE lv_pos ) ).
-
-    IF iv_line_length < strlen( lv_rest_text ).
-      lt_lines_rest =
-          split_text_into_lines( iv_line_length = iv_line_length
-                                 iv_text        = lv_rest_text ).
-      APPEND LINES OF lt_lines_rest TO rt_lines.
-    ELSE.
-      APPEND lv_rest_text TO rt_lines.
-    ENDIF.
-  ENDMETHOD.
-
-  METHOD get_split_position.
-    DATA lv_current_char TYPE string.
-    CONSTANTS lc_space TYPE string VALUE ` `.
-
-    " find position of last space to split text at
-    rv_pos = iv_line_length.
-    WHILE rv_pos <> 0.
-      lv_current_char = substring( val = iv_text
-                                   off = rv_pos
-                                   len = 1 ).
-      IF lc_space = lv_current_char.
-        RETURN.
-      ENDIF.
-      rv_pos -= 1.
-    ENDWHILE.
-
-    " to avoid infinite recursion
-    rv_pos = iv_line_length.
   ENDMETHOD.
 ENDCLASS.
