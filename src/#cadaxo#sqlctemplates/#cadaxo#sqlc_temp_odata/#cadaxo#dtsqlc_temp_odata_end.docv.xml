@@ -43,6 +43,10 @@
      </TLINE>
      <TLINE>
       <TDFORMAT>/</TDFORMAT>
+      <TDLINE>&lt;ZH&gt;Project Type&lt;/&gt;,,,,&amp;CDXODATA_TYPE&amp;</TDLINE>
+     </TLINE>
+     <TLINE>
+      <TDFORMAT>/</TDFORMAT>
       <TDLINE>&lt;ZH&gt;Register Service&lt;/&gt;,,,,&amp;CDXREGSER&amp;</TDLINE>
      </TLINE>
      <TLINE>
