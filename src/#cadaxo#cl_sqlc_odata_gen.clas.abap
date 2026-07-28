@@ -45,9 +45,13 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
     METHODS restrict_proj_types
       RETURNING VALUE(r_proj_types) TYPE vrm_values.
 
+    METHODS get_supported_proj_types
+      RETURNING VALUE(r_supported_proj_types) TYPE vrm_values.
+
     CLASS-METHODS class_constructor.
 
   PROTECTED SECTION.
+    CLASS-DATA gt_supported_proj_types TYPE STANDARD TABLE OF /iwbep/sbdm_project_type.
 
     METHODS create_project
       RAISING
@@ -167,9 +171,6 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
     METHODS get_existing_proj_types
       RETURNING VALUE(r_existing_proj_types) TYPE dd07v_types.
 
-    METHODS get_supported_proj_types
-      RETURNING VALUE(r_supported_proj_types) TYPE vrm_values.
-
     METHODS set_dropdown_values
       IMPORTING iv_dropdown_id TYPE vrm_id
                 it_values      TYPE vrm_values.
@@ -214,7 +215,6 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
     DATA gv_count TYPE flag .
     DATA gv_regser TYPE flag .
     CONSTANTS c_filter_cnt TYPE i VALUE 10 ##NO_TEXT.
-    CLASS-DATA gt_supported_proj_types TYPE STANDARD TABLE OF /iwbep/sbdm_project_type.
 ENDCLASS.
 
 

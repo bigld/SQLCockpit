@@ -90,11 +90,18 @@ ENDMODULE.
 MODULE pai_0100 INPUT.
   FIELD-SYMBOLS: <fs_swcont> TYPE swcont.
 
+  LOOP AT go_odata_wiz->get_supported_proj_types(  ) INTO DATA(proj_type).
+    IF gs_report_attr-odata_type EQ proj_type-key.
+        DATA(proj_type_string) = proj_type-key && | | && proj_type-text.
+        EXIT. "LOOP
+    ENDIF.
+  ENDLOOP.
+
   build_symbols project_name gs_report_attr-project_name.
   build_symbols package      gs_report_attr-package.
   build_symbols entity       gs_report_attr-entity.
   build_symbols entity_set   gs_report_attr-entity_set.
-  build_symbols odata_type   gs_report_attr-odata_type.
+  build_symbols odata_type   proj_type_string.
   build_symbols regser       gs_report_attr-regser.
   build_symbols filter       gs_report_attr-filter.
   build_symbols order        gs_report_attr-order.
