@@ -1034,6 +1034,18 @@
      <MSGNR>172</MSGNR>
      <TEXT>INTO or APPENDING is not allowed (set by the Cockpit)</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>173</MSGNR>
+     <TEXT>Search failed: &amp;1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>177</MSGNR>
+     <TEXT>no search results.</TEXT>
+    </T100>
    </T100>
    <LONGTEXTS>
     <item>
