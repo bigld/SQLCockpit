@@ -3509,7 +3509,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_PARSE IMPLEMENTATION.
 
     SHIFT sql_string LEFT DELETING LEADING space.
 
-    sql_string = condense( sql_string ).
+*    sql_string = condense( sql_string ).
 
     length = strlen( sql_string ).
     l_from = 0.
