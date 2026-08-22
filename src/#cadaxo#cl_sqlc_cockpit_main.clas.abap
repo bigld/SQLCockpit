@@ -1060,7 +1060,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       ENDIF.
 
       TRY.
-          IF strlen( ls_error-text ) >= 127.
+          IF strlen( ls_error-text ) > 127.
 
             _split_error_text( EXPORTING is_error  = ls_error
                                CHANGING  ct_errors = gt_errors ).
@@ -4326,7 +4326,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     ls_error-text    = l_message.
     ls_error-msgtype = icon_red_light.
 
-    IF strlen( ls_error-text ) >= 127.
+    IF strlen( ls_error-text ) > 127.
 
       _split_error_text( EXPORTING is_error  = ls_error
                          CHANGING  ct_errors = lt_errors ).
@@ -12906,6 +12906,7 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
     DATA lv_pos        TYPE i.
     DATA ls_error_add  TYPE /cadaxo/sqlcsyntaxerror.
     DATA lv_space      TYPE string.
+    DATA lv_space_found TYPE abap_bool VALUE abap_false.
 
     CONCATENATE '' ''  INTO lv_space SEPARATED BY space.
 
@@ -12919,17 +12920,27 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_MAIN IMPLEMENTATION.
       lv_pos = lv_pos - 1.
     ENDWHILE.
 
+    IF lv_pos = 0.
+      lv_pos = 127.
+    ELSE.
+      lv_space_found = abap_true.
+    ENDIF.
+
     ls_error_add-text = is_error-text(lv_pos).
     APPEND ls_error_add TO ct_errors.
 
-    IF lv_pos = 0.
-      lv_pos = 128.
-    ELSE.
-      lv_pos = lv_pos + 1.
+    IF lv_space_found = abap_true.
+        lv_pos = lv_pos + 1.
     ENDIF.
 
     ls_error_add-text = is_error-text+lv_pos.
-    APPEND ls_error_add TO ct_errors.
+
+    IF strlen( ls_error_add-text ) > 127.
+        _split_error_text( EXPORTING is_error  = ls_error_add
+                           CHANGING  ct_errors = ct_errors ).
+    ELSE.
+      APPEND ls_error_add TO ct_errors.
+    ENDIF.
 
   ENDMETHOD.
 ENDCLASS.

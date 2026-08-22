@@ -3923,6 +3923,11 @@
      <LANGU>E</LANGU>
      <DESCRIPT>User Action - SQL Trace ON/OFF</DESCRIPT>
     </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>_SPLIT_ERROR_TEXT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>split error text when length &gt;127</DESCRIPT>
+    </SEOCOMPOTX>
    </DESCRIPTIONS>
    <DESCRIPTIONS_SUB>
     <SEOSUBCOTX>
@@ -3930,6 +3935,18 @@
      <SCONAME>R_ANSWER</SCONAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Single-Character Flag</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>_SPLIT_ERROR_TEXT</CMPNAME>
+     <SCONAME>CT_ERRORS</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>table of errors to add the split up error (can be gt_errors)</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>_SPLIT_ERROR_TEXT</CMPNAME>
+     <SCONAME>IS_ERROR</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Error with messagelength &gt;127 to be split in multiple err</DESCRIPT>
     </SEOSUBCOTX>
    </DESCRIPTIONS_SUB>
   </asx:values>
