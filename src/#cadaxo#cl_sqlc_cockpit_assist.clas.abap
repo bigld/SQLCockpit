@@ -293,6 +293,7 @@ public section.
       !I_ABAP_EDITOR type ref to /CADAXO/CL_SQLC_GUI_ABAPEDIT
     exporting
       !E_STRING type STRING .
+
   PROTECTED SECTION.
 
 *"* protected components of class /CADAXO/CL_SQLC_COCKPIT_ASSIST
@@ -2919,4 +2920,5 @@ CLASS /CADAXO/CL_SQLC_COCKPIT_ASSIST IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
 ENDCLASS.
