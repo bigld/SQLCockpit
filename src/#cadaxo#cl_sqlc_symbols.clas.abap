@@ -965,81 +965,54 @@ CLASS /CADAXO/CL_SQLC_SYMBOLS IMPLEMENTATION.
 
 
   METHOD get_symbols.
-****************************************************************************************************
-* Description             : Get symbols                                                            *
-*--------------------------------------------------------------------------------------------------*
-* Additional informations :                                                                        *
-*                                                                                                  *
-*--------------------------------------------------------------------------------------------------*
-* Developer               : David Ren                Company    : MDL                              *
-* Date                    : 11.10.2010               Release    : WAS 7.00                         *
-*--------------------------------------------------------------------------------------------------*
-* Qual. Check(opt.)       :                          Company    :                                  *
-* Date                    :                                                                        *
-*--------------------------------------------------------------------------------------------------*
-*                                                                                                  *
-*-----------E N H A N C E M E N T S / C O R R E C T I O N S / M O D I F I C A T I O N S -----------*
-*                                                                                                  *
-* Date       | Developer            | Description                                 |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 06.11.2010 | Domi Bigl            | Sort global/user                            | CDX001-0020    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-* 25.08.2014 | RenÃƒÂ© Rammer          | Symbol reduction                            | CR22-002       *
-*            |                      |                                             | RT235          *
-*------------+----------------------+---------------------------------------------+----------------*
-* 31.07.2017 | Dusan Sacha          | Symbol Multi Value                          | COCKPIT-240    *
-*            |                      |                                             |                *
-*------------+----------------------+---------------------------------------------+----------------*
-****************************************************************************************************
 
     DATA ls_symbol LIKE LINE OF gt_symbol.
     DATA lt_program_symbol TYPE TABLE OF /cadaxo/sqlcsymb.
     DATA ls_celltab TYPE lvc_s_styl.
     DATA lt_user_symbol LIKE gt_symbol[].
     DATA lv_tabix TYPE i.
-    DATA: i_values_count TYPE i.           "COCKPIT-240
-    DATA: lv_symbol_enabled TYPE raw4.     "COCKPIT-240
-    DATA: lv_datatype_enabled TYPE raw4.   "COCKPIT-240
+    DATA: i_values_count TYPE i.
+    DATA: lv_symbol_enabled TYPE raw4.
+    DATA: lv_datatype_enabled TYPE raw4.
 
     FIELD-SYMBOLS <ls_user_symbol> LIKE LINE OF lt_user_symbol.
 
-* For Used Symbols
-    " DATA lt_symbol       LIKE gt_symbol.                      "CR22-002
-
     REFRESH gt_symbol.
 
-* Get user symbols(user dependent)
+*   Get user symbols(user dependent)
     SELECT symbol_name
            symbol_value
            symbol_desc
-           symbol_multivalue                                              "COCKPIT-240
-           symbol_datatype                                                "COCKPIT-240
+           symbol_multivalue
+           symbol_datatype
            FROM /cadaxo/sqlcusym
              INTO CORRESPONDING FIELDS OF TABLE lt_user_symbol
              WHERE username = sy-uname.
-*             ORDER BY symbol_name.                                          "COCKPIT-240 "COCKPIT-403
     IF sy-subrc = 0.
-      SORT lt_user_symbol BY symbol_name."COCKPIT-403
+      SORT lt_user_symbol BY symbol_name.
       LOOP AT lt_user_symbol ASSIGNING <ls_user_symbol>.
 
-        "     Get Multi Values Count
-        i_values_count = get_user_symbol_count( i_symbol_multivalue = <ls_user_symbol>-symbol_multivalue ). "COCKPIT-240
-        lv_datatype_enabled = cl_gui_alv_grid=>mc_style_enabled.                                            "COCKPIT-240
+*     Get Multi Values Count
+        i_values_count = get_user_symbol_count( i_symbol_multivalue = <ls_user_symbol>-symbol_multivalue ).
+        lv_datatype_enabled = cl_gui_alv_grid=>mc_style_enabled.
         "     Get Icon
-        IF ( <ls_user_symbol>-symbol_multivalue IS NOT INITIAL ).                    "COCKPIT-240
-          <ls_user_symbol>-symbol_icon = '@3W@'.                                     "COCKPIT-240
-          lv_symbol_enabled = cl_gui_alv_grid=>mc_style_disabled.                    "COCKPIT-240
-          <ls_user_symbol>-symbol_value = '<' && i_values_count &&' VALUES' && '>'.  "COCKPIT-240
-          IF i_values_count > 0.                                                     "COCKPIT-240
-            lv_datatype_enabled = cl_gui_alv_grid=>mc_style_disabled.                "COCKPIT-240
-          ENDIF.                                                                     "COCKPIT-240
-        ELSE.                                                                        "COCKPIT-240
-          <ls_user_symbol>-symbol_icon = '@7L@'.                                     "COCKPIT-240
-          lv_symbol_enabled = cl_gui_alv_grid=>mc_style_enabled.                     "COCKPIT-240
-        ENDIF.                                                                       "COCKPIT-240
+        IF ( <ls_user_symbol>-symbol_multivalue IS NOT INITIAL ).
+          IF i_values_count > 0.
+            <ls_user_symbol>-symbol_icon = ICON_DISPLAY_MORE.
+          ELSE.
+            <ls_user_symbol>-symbol_icon = ICON_ENTER_MORE.
+          ENDIF.
+          lv_symbol_enabled = cl_gui_alv_grid=>mc_style_disabled.
+          <ls_user_symbol>-symbol_value = '<' && i_values_count &&' VALUES' && '>'.
+          IF i_values_count > 0.
+            lv_datatype_enabled = cl_gui_alv_grid=>mc_style_disabled.
+          ENDIF.
+        ELSE.
+          <ls_user_symbol>-symbol_icon = ICON_OO_CONSTANT.
+          lv_symbol_enabled = cl_gui_alv_grid=>mc_style_enabled.
+        ENDIF.
 
-        "     Get Data Element Info
+*     Get Data Element Info
         IF ( <ls_user_symbol>-symbol_datatype IS NOT INITIAL ).
           <ls_user_symbol>-symbol_datadesc = me->get_symbol_datatype_desc( i_datatype = <ls_user_symbol>-symbol_datatype ).
           <ls_user_symbol>-symbol_datainfo = me->get_symbol_datatype_info( i_datatype = <ls_user_symbol>-symbol_datatype ).
@@ -1050,18 +1023,18 @@ CLASS /CADAXO/CL_SQLC_SYMBOLS IMPLEMENTATION.
         ls_celltab-fieldname = 'SYMBOL_NAME'.
         ls_celltab-style = cl_gui_alv_grid=>mc_style_disabled.
         INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.
-        ls_celltab-fieldname = 'SYMBOL_ICON'.                         "COCKPIT-240
-        ls_celltab-style = cl_gui_alv_grid=>mc_style_button.          "COCKPIT-240
-        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.     "COCKPIT-240
-        ls_celltab-fieldname = 'SYMBOL_VALUE'.                        "COCKPIT-240
-        ls_celltab-style = lv_symbol_enabled.                         "COCKPIT-240
+        ls_celltab-fieldname = 'SYMBOL_ICON'.
+        ls_celltab-style = cl_gui_alv_grid=>mc_style_button.
+        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.
+        ls_celltab-fieldname = 'SYMBOL_VALUE'.
+        ls_celltab-style = lv_symbol_enabled.
         INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.
         ls_celltab-fieldname = 'SYMBOL_DESC'.
         ls_celltab-style = cl_gui_alv_grid=>mc_style_enabled.
         INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.
-        ls_celltab-fieldname = 'SYMBOL_DATATYPE'.                     "COCKPIT-240
-        ls_celltab-style = lv_datatype_enabled.                       "COCKPIT-240
-        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.     "COCKPIT-240
+        ls_celltab-fieldname = 'SYMBOL_DATATYPE'.
+        ls_celltab-style = lv_datatype_enabled.
+        INSERT ls_celltab INTO TABLE <ls_user_symbol>-cell_style.
 
       ENDLOOP.
 
@@ -1104,24 +1077,23 @@ CLASS /CADAXO/CL_SQLC_SYMBOLS IMPLEMENTATION.
         CATCH /cadaxo/cx_sqlc_symb_not_found .
 
       ENDTRY.
-    ENDIF.                                                             "CDX001-0020
+    ENDIF.
 
-    IF me->user_settings->only_used_symbols = abap_true.               "CR22-002
+    IF me->user_settings->only_used_symbols = abap_true.
       IF gt_used_symbols IS NOT INITIAL.
         DATA(lt_used_symbols) = gt_used_symbols.
       ELSE.
         lt_used_symbols = fill_used_symbols( ).
       ENDIF.
       SORT lt_used_symbols.
-* end of insert Cockpit-431
-      LOOP AT gt_symbol INTO ls_symbol.                       "CR22-002
-        lv_tabix = sy-tabix.                                  "CR22-002
-        READ TABLE lt_used_symbols FROM ls_symbol-symbol_name TRANSPORTING NO FIELDS. "CR22-002"+Cockpit-431
-        IF sy-subrc <> 0.                                     "CR22-002
-          DELETE gt_symbol INDEX lv_tabix.                    "CR22-002
-        ENDIF.                                                "CR22-002
-      ENDLOOP.                                                "CR22-002
-    ENDIF.                                                    "CR22-002
+      LOOP AT gt_symbol INTO ls_symbol.
+        lv_tabix = sy-tabix.
+        READ TABLE lt_used_symbols FROM ls_symbol-symbol_name TRANSPORTING NO FIELDS.
+        IF sy-subrc <> 0.
+          DELETE gt_symbol INDEX lv_tabix.
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
 
   ENDMETHOD.
 
