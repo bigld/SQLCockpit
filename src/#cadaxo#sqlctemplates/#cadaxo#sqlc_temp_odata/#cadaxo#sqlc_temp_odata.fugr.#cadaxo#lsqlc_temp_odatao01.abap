@@ -63,3 +63,13 @@ MODULE container_130 OUTPUT.
   PERFORM container_130.
 
 ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  restrict_odata_type  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE restrict_odata_type OUTPUT.
+
+  go_odata_wiz->restrict_proj_types( ).
+
+ENDMODULE.

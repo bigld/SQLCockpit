@@ -1039,13 +1039,25 @@
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>173</MSGNR>
      <TEXT>Search failed: &amp;1</TEXT>
+         </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>     
+     <MSGNR>174</MSGNR>
+     <TEXT>OData Service: generation-strategy Generation with strat &amp;2 failed: &amp;1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/CADAXO/SQLC</ARBGB>
+     <MSGNR>175</MSGNR>
+     <TEXT>OData Service Generation with strat &amp;2 failed: &amp;1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/CADAXO/SQLC</ARBGB>
      <MSGNR>177</MSGNR>
      <TEXT>no search results.</TEXT>
-    </T100>
+    </T100>    
    </T100>
    <LONGTEXTS>
     <item>

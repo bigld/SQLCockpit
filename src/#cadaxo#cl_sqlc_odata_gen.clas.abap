@@ -6,10 +6,13 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
 
   PUBLIC SECTION.
 
+    TYPE-POOLS vrm.
+
     DATA gt_selopt TYPE /cadaxo/sqlc_temp_odata_selstt .
     DATA gt_tab_fields TYPE ddfields .
     CONSTANTS c_plugin TYPE /iwbep/sbdm_plugin VALUE '/IWBEP/GEN' ##NO_TEXT.
     CONSTANTS c_strat_name TYPE /iwbep/sbdm_gen_strat_name VALUE '0001' ##NO_TEXT.
+    CONSTANTS c_strat_nameV4 TYPE /iwbep/sbdm_gen_strat_name VALUE '0002' ##NO_TEXT.
     CONSTANTS c_object TYPE trobjtype VALUE 'CLAS' ##NO_TEXT.
     CONSTANTS c_pgmid TYPE pgmid VALUE 'R3TR' ##NO_TEXT.
     CONSTANTS c_object_type TYPE trobjtype VALUE 'IWPR' ##NO_TEXT.
@@ -38,7 +41,17 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
 
     METHODS execute_template_generation
         REDEFINITION .
+
+    METHODS restrict_proj_types
+      RETURNING VALUE(r_proj_types) TYPE vrm_values.
+
+    METHODS get_supported_proj_types
+      RETURNING VALUE(r_supported_proj_types) TYPE vrm_values.
+
+    CLASS-METHODS class_constructor.
+
   PROTECTED SECTION.
+    CLASS-DATA gt_supported_proj_types TYPE STANDARD TABLE OF /iwbep/sbdm_project_type.
 
     METHODS create_project
       RAISING
@@ -152,6 +165,34 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
     METHODS get_header
       CHANGING
         !ct_code TYPE rswsourcet .
+
+    TYPES dd07v_types TYPE TABLE OF dd07v WITH DEFAULT KEY.
+
+    METHODS get_existing_proj_types
+      RETURNING VALUE(r_existing_proj_types) TYPE dd07v_types.
+
+    METHODS set_dropdown_values
+      IMPORTING iv_dropdown_id TYPE vrm_id
+                it_values      TYPE vrm_values.
+
+    METHODS get_generation_strategy
+      EXPORTING es_gen_strat_version TYPE /iwbep/s_sbdm_gen_stratversion
+                es_gen_strategy      TYPE /iwbep/s_sbdm_gen_strategy.
+
+    METHODS create_generation_strategy
+      IMPORTING is_gen_strat_version   TYPE /iwbep/s_sbdm_gen_stratversion
+                is_gen_strategy        TYPE /iwbep/s_sbdm_gen_strategy
+      RETURNING VALUE(ro_gen_strategy) TYPE REF TO /iwbep/if_sbdm_gen_strategy.
+
+    METHODS execute_generation_strategy
+      IMPORTING io_gen_strategy TYPE REF TO /iwbep/if_sbdm_gen_strategy
+      RAISING /CADAXO/CX_SQLC_ODATA_GEN.
+
+    METHODS set_generation_strategy
+      IMPORTING io_gen_strategy TYPE REF TO /iwbep/if_sbdm_gen_strategy.
+
+
+
   PRIVATE SECTION.
 
     DATA gr_transaction TYPE REF TO /iwbep/cl_sbdm_transact_handlr .
@@ -164,6 +205,7 @@ CLASS /cadaxo/cl_sqlc_odata_gen DEFINITION
     CLASS-DATA gv_package TYPE devclass .
     CLASS-DATA gv_entity TYPE /iwbep/med_external_name .
     CLASS-DATA gv_entity_set TYPE /iwbep/sbdm_node_name .
+    CLASS-DATA gv_proj_type TYPE /iwbep/sbdm_project_type .
     DATA gwa_report TYPE /cadaxo/sqlc_temp_odata_attr .
     DATA gwa_evt TYPE /cadaxo/sqlc_temp_rep_salv_evt .
     DATA gv_filter TYPE flag .
@@ -262,6 +304,9 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
       iv_project_name        = CONV #( gv_project_name )
       iv_project_description = CONV #( gv_project_name )
        ).
+
+*   set variant of Project Generation (aka OData Type/ strategy /project type)
+    gr_project->set_project_type( gv_proj_type ).
 
 *   set additional values
     gr_project->set_package( gv_package ).
@@ -435,58 +480,116 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD generate_objects.
-
-    DATA lt_messages          TYPE /iwbep/if_sbcm_msg_object=>ty_t_object.
-    DATA lr_plugin            TYPE REF TO /iwbep/cl_sbgn_plugin.
     DATA lo_gen_strategy      TYPE REF TO /iwbep/if_sbdm_gen_strategy.
-    DATA lr_test              TYPE REF TO /iwbep/cl_sb_gen_generator.
-    DATA ls_gen_strat_ver     TYPE /iwbep/s_sbdm_gen_stratversion.
+
     DATA ls_gen_strat_version TYPE /iwbep/s_sbdm_gen_stratversion.
     DATA ls_gen_strategy      TYPE /iwbep/s_sbdm_gen_strategy.
-    DATA lv_completed         TYPE abap_bool.
+
+    get_generation_strategy( IMPORTING es_gen_strat_version = ls_gen_strat_version
+                                       es_gen_strategy      = ls_gen_strategy ).
+
+    lo_gen_strategy = create_generation_strategy( is_gen_strat_version = ls_gen_strat_version
+                                                  is_gen_strategy      = ls_gen_strategy ).
+
+    execute_generation_strategy( io_gen_strategy = lo_gen_strategy ).
+
+    set_generation_strategy( io_gen_strategy = lo_gen_strategy ).
+  ENDMETHOD.
+
+  METHOD get_generation_strategy.
+    DATA ls_proj_type TYPE /iwbep/sbdm_project_type.
+
+    ls_proj_type         = gr_project->get_project_type( ).
+    es_gen_strat_version = gr_project->get_gen_strategy( ).
+
+    es_gen_strat_version-plugin = /cadaxo/cl_sqlc_odata_gen=>c_plugin.
+    es_gen_strategy-plugin      = es_gen_strat_version-plugin.
+
+    CASE ls_proj_type.
+
+      WHEN /iwbep/if_sbdm_project=>gc_type_mpc_dpc_v2       " Service with SAP Annotations
+        OR /iwbep/if_sbdm_project=>gc_type_mpc_dpc_v2_plus  " Service with Vocabulary-Based Annotations
+        OR /iwbep/if_sbdm_project=>gc_type_apc_ref_v2_plus. " Annotation Model for Referenced Service
+        " TODO Annotation Model for Referenced Service needs work during service generation
+        " -> "access to node 00000000... is read only"
+
+        es_gen_strat_version-strat_name    = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+        es_gen_strat_version-strat_version = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+
+      WHEN /iwbep/if_sbdm_project=>gc_type_mpc_dpc_v4.      " OData 4.0 Service
+        " TODO OData 4.0 Service needs work during service generation
+        " -> "unknown error"
+        es_gen_strat_version-strat_name    = /cadaxo/cl_sqlc_odata_gen=>c_strat_namev4.
+        es_gen_strat_version-strat_version = /cadaxo/cl_sqlc_odata_gen=>c_strat_namev4.
+
+      WHEN OTHERS.
+
+        es_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+
+    ENDCASE.
+
+    es_gen_strategy-name = es_gen_strat_version-strat_name.
+  ENDMETHOD.
+
+  METHOD create_generation_strategy.
+    DATA lr_plugin TYPE REF TO /iwbep/cl_sbgn_plugin.
 
     lr_plugin = NEW #( ).
 
-    ls_gen_strat_version = gr_project->get_gen_strategy( ).
+    TRY.
+        IF is_gen_strat_version-strat_version IS INITIAL.
 
-    ls_gen_strat_version-plugin     = /cadaxo/cl_sqlc_odata_gen=>c_plugin.
-    ls_gen_strat_version-strat_name = /cadaxo/cl_sqlc_odata_gen=>c_strat_name.
+          ro_gen_strategy =
+            lr_plugin->/iwbep/if_sbdm_plugin~create_generation_strategy(
+                is_gen_strategy = is_gen_strategy ).
 
-    ls_gen_strategy-plugin = ls_gen_strat_version-plugin.
-    ls_gen_strategy-name = ls_gen_strat_version-strat_name.
+        ELSE.
 
-    IF ls_gen_strat_version-strat_version IS INITIAL.
-      lo_gen_strategy = lr_plugin->/iwbep/if_sbdm_plugin~create_generation_strategy( is_gen_strategy = ls_gen_strategy ).
-    ELSE.
-      lo_gen_strategy = lr_plugin->/iwbep/if_sbdm_plugin~create_generation_strategy(
-        is_gen_strategy = ls_gen_strategy
-        iv_gen_strat_version = ls_gen_strat_version-strat_version ).
-    ENDIF.
+          ro_gen_strategy =
+            lr_plugin->/iwbep/if_sbdm_plugin~create_generation_strategy(
+                is_gen_strategy      = is_gen_strategy
+                iv_gen_strat_version = is_gen_strat_version-strat_version ).
 
-    lr_test ?= lo_gen_strategy.
+        ENDIF.
+      CATCH /iwbep/cx_sbdm_exception INTO DATA(lo_exception).
+        MESSAGE e174(/CADAXO/SQLC) with lo_exception->get_longtext(  ) is_gen_strategy.
+    ENDTRY.
+  ENDMETHOD.
 
-    lo_gen_strategy->generate( EXPORTING io_project   = gr_project
-                               IMPORTING et_message   = lt_messages
-                                         ev_completed = lv_completed  ).
-    IF sy-ucomm EQ 'CANCEL'
-    OR sy-ucomm EQ 'ESC'.
+  METHOD execute_generation_strategy.
+    DATA lt_messages  TYPE /iwbep/if_sbcm_msg_object=>ty_t_object.
+    DATA lv_completed TYPE abap_bool.
+
+    TRY.
+        io_gen_strategy->generate( EXPORTING io_project   = gr_project
+                                   IMPORTING et_message   = lt_messages
+                                             ev_completed = lv_completed ).
+      CATCH /iwbep/cx_sbcm_exception INTO DATA(lo_exception).
+        MESSAGE e175(/CADAXO/SQLC) with lo_exception->get_longtext(  ) io_gen_strategy->ms_gen_strategy.
+    ENDTRY.
+
+    IF    sy-ucomm = 'CANCEL'
+       OR sy-ucomm = 'ESC'.
+
       RAISE EXCEPTION TYPE /cadaxo/cx_sqlc_odata_gen
         EXPORTING
           textid = /cadaxo/cx_sqlc_odata_gen=>process_canceled.
+
     ENDIF.
-
-    ls_gen_strat_ver-plugin        = lo_gen_strategy->ms_gen_strategy-plugin.
-    ls_gen_strat_ver-strat_name    = lo_gen_strategy->ms_gen_strategy-name.
-    ls_gen_strat_ver-strat_version = lo_gen_strategy->mv_gen_strat_version.
-
-    lo_gen_strategy->get_validator( ).
-
-    gr_project->set_gen_strategy( ls_gen_strat_ver ).
-
   ENDMETHOD.
 
+  METHOD set_generation_strategy.
+    DATA ls_gen_strat_ver TYPE /iwbep/s_sbdm_gen_stratversion.
+
+    ls_gen_strat_ver-plugin        = io_gen_strategy->ms_gen_strategy-plugin.
+    ls_gen_strat_ver-strat_name    = io_gen_strategy->ms_gen_strategy-name.
+    ls_gen_strat_ver-strat_version = io_gen_strategy->mv_gen_strat_version.
+
+    io_gen_strategy->get_validator( ).
+
+    gr_project->set_gen_strategy( ls_gen_strat_ver ).
+  ENDMETHOD.
 
   METHOD generate_odata.
 
@@ -1043,6 +1146,7 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
     gv_package      = is_odata_attr-package.
     gv_entity       = is_odata_attr-entity.
     gv_entity_set   = is_odata_attr-entity_set.
+    gv_proj_type    = is_odata_attr-odata_type.
     gv_regser       = is_odata_attr-regser.
     gv_filter       = is_odata_attr-filter.
     gv_order        = is_odata_attr-order.
@@ -1128,6 +1232,77 @@ CLASS /CADAXO/CL_SQLC_ODATA_GEN IMPLEMENTATION.
       MESSAGE ID '/IWBEP/SBDM' TYPE 'E'
       NUMBER '012' WITH iv_project_name.
     ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD restrict_proj_types.
+    DATA lt_supported_proj_types TYPE vrm_values.
+
+    lt_supported_proj_types = get_supported_proj_types(  ).
+
+    set_dropdown_values( iv_dropdown_id = 'GS_REPORT_ATTR-ODATA_TYPE'
+                         it_values      = lt_supported_proj_types ).
+  ENDMETHOD.
+
+
+  METHOD get_supported_proj_types.
+    DATA lt_supported_types TYPE vrm_values.
+    DATA ls_supported_type  TYPE vrm_value.
+
+    LOOP AT get_existing_proj_types(  ) INTO DATA(ls_proj_type).
+
+**     maybe unsupported on older SAP systems:
+*      IF line_exists( gt_supported_odata_types[ table_line = ls_proj_type-domvalue_l ] ).
+*        APPEND ls_supported_type TO lt_supported_types.
+*      ENDIF.
+      READ TABLE gt_supported_proj_types
+        WITH KEY table_line = ls_proj_type-domvalue_l
+        TRANSPORTING NO FIELDS.
+
+      IF sy-subrc = 0.
+        ls_supported_type-key  = ls_proj_type-domvalue_l.
+        ls_supported_type-text = ls_proj_type-ddtext.
+
+        APPEND ls_supported_type TO lt_supported_types.
+      ENDIF.
+
+    ENDLOOP.
+
+    r_supported_proj_types = lt_supported_types.
+  ENDMETHOD.
+
+
+  METHOD get_existing_proj_types.
+    DATA lt_proj_types TYPE TABLE OF dd07v.
+
+    CALL FUNCTION 'DD_DOMVALUES_GET'
+      EXPORTING domname   = '/IWBEP/SBDM_PROJECT_TYPE'
+                text      = 'X'
+      TABLES    dd07v_tab = lt_proj_types.
+
+    r_existing_proj_types = lt_proj_types.
+  ENDMETHOD.
+
+
+  METHOD set_dropdown_values.
+    CALL FUNCTION 'VRM_SET_VALUES'
+      EXPORTING id     = iv_dropdown_id
+                values = it_values.
+  ENDMETHOD.
+
+
+  METHOD CLASS_CONSTRUCTOR.
+    gt_supported_proj_types = VALUE #(
+        ( /iwbep/if_sbdm_project=>gc_type_mpc_dpc_v2 )          " Service with SAP Annotations
+        ( /iwbep/if_sbdm_project=>gc_type_mpc_dpc_v2_plus )     " Service with Vocabulary-Based Annotations
+**       TODO annotation model for referenced service needs work during service generation
+**          -> "access to node 00000000... is read only"
+*        ( /iwbep/if_sbdm_project=>GC_TYPE_APC_REF_V2_PLUS )     "Annotation Model for Referenced Service
+**       TODO odata v4 needs work during service generation
+**          -> "unknown error"
+*        ( /iwbep/if_sbdm_project=>GC_TYPE_MPC_DPC_V4 )          "OData 4.0 Service
+      ).
 
   ENDMETHOD.
 ENDCLASS.
