@@ -37,11 +37,9 @@ ENDCLASS.
 
 
 CLASS /CADAXO/CL_SQLC_SPECIAL_PARSE IMPLEMENTATION.
-
-
   METHOD detect_select_pattern.
     DATA(sql_input) = to_upper( i_sql_string ).
-    CONDENSE sql_input.
+*    CONDENSE sql_input.
 
     CLEAR r_select_pattern.
 
@@ -52,7 +50,7 @@ CLASS /CADAXO/CL_SQLC_SPECIAL_PARSE IMPLEMENTATION.
          SUBMATCHES DATA(lv_dist) DATA(lv_single).
 
     IF sy-subrc = 0.
-      r_select_pattern-is_select = abap_true.
+      r_select_pattern-is_select   = abap_true.
       r_select_pattern-is_distinct = xsdbool( lv_dist IS NOT INITIAL ).
       r_select_pattern-is_single   = xsdbool( lv_single IS NOT INITIAL ).
     ENDIF.
