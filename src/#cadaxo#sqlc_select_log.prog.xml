@@ -13,10 +13,7 @@
    <VARIS>
     <item>
      <VARIANT>CUS&amp;_LAST7DAYS</VARIANT>
-     <TRANSPORT>F</TRANSPORT>
      <ENVIRONMNT>A</ENVIRONMNT>
-     <PROTECTED>S</PROTECTED>
-     <XFLAG1>EA==</XFLAG1>
      <VARISCREENS>
       <RSDYNNR>
        <DYNNR>*</DYNNR>
@@ -29,6 +26,8 @@
        <OLEN>10</OLEN>
        <FROM>1</FROM>
        <TO>1</TO>
+       <VNAME>IEQRS_VARI_V_TODAY_X</VNAME>
+       <VTYPE>F</VTYPE>
       </VANZ>
       <VANZ>
        <NAME>SEL_ROWS</NAME>
@@ -68,9 +67,6 @@
       <RSPARAMSL_255>
        <SELNAME>SEL_USER</SELNAME>
        <KIND>S</KIND>
-       <SIGN>I</SIGN>
-       <OPTION>EQ</OPTION>
-       <LOW>GCOSIC</LOW>
       </RSPARAMSL_255>
      </VALUES>
      <TEXTS>
@@ -82,10 +78,7 @@
     </item>
     <item>
      <VARIANT>CUS&amp;_TODAY</VARIANT>
-     <TRANSPORT>F</TRANSPORT>
      <ENVIRONMNT>A</ENVIRONMNT>
-     <PROTECTED>S</PROTECTED>
-     <XFLAG1>EA==</XFLAG1>
      <VARISCREENS>
       <RSDYNNR>
        <DYNNR>*</DYNNR>
@@ -98,6 +91,8 @@
        <OLEN>10</OLEN>
        <FROM>1</FROM>
        <TO>1</TO>
+       <VNAME>IEQRS_VARI_V_TODAY</VNAME>
+       <VTYPE>F</VTYPE>
       </VANZ>
       <VANZ>
        <NAME>SEL_ROWS</NAME>
@@ -137,9 +132,6 @@
       <RSPARAMSL_255>
        <SELNAME>SEL_USER</SELNAME>
        <KIND>S</KIND>
-       <SIGN>I</SIGN>
-       <OPTION>EQ</OPTION>
-       <LOW>GCOSIC</LOW>
       </RSPARAMSL_255>
      </VALUES>
      <TEXTS>
