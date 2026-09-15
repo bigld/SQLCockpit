@@ -1,4 +1,4 @@
-name: Generate install version
+name: Generate code version
 
 on:
   issues:
@@ -7,12 +7,12 @@ on:
     types: [labeled]
 
 concurrency:
-  group: generate-install-version
+  group: generate-code-version
   cancel-in-progress: false
 
 jobs:
   generate:
-    if: github.event.label.name == 'generate-install-version'
+    if: github.event.label.name == 'generate-code-version'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -193,5 +193,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `❌ Generating the install version failed. See ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+              body: `❌ Generating the code version failed. See ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });

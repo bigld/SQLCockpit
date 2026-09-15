@@ -1,7 +1,7 @@
-name: Generate install version
+name: Generate code version
 description: Create a DEV (abapGIT) or MACRO version branch for a specific commit
-title: "[Install] Version for commit "
-labels: [generate-install-version]
+title: "[Code] Version for commit "
+labels: [generate-code-version]
 body:
   - type: markdown
     attributes:
