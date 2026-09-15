@@ -1,0 +1,155 @@
+name: Generate install version
+
+on:
+  issues:
+    # Creating an issue via the form applies the label and fires "labeled";
+    # re-adding the label manually re-triggers the run.
+    types: [labeled]
+
+concurrency:
+  group: generate-install-version
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: github.event.label.name == 'generate-install-version'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Read and validate commit from issue
+        id: commit
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { execFileSync } = require("child_process");
+
+            // Issue-form body: "### Label\n\nvalue\n\n### Label\n\nvalue ..."
+            const fields = {};
+            for (const section of (context.payload.issue.body || "").split(/^### /m).slice(1)) {
+              const [heading, ...rest] = section.split("\n");
+              const value = rest.join("\n").trim();
+              fields[heading.trim()] = value === "_No response_" ? "" : value;
+            }
+
+            const fail = async (message) => {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `❌ ${message}`
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                state: "closed",
+                state_reason: "not_planned"
+              });
+              core.setFailed(message);
+            };
+
+            const raw = (fields["Commit"] ?? "").trim();
+            if (raw === "") return fail("Commit is mandatory but was not provided.");
+            if (!/^[0-9a-fA-F]{7,40}$/.test(raw)) return fail(`Commit "${raw}" is not a valid SHA (7–40 hex characters).`);
+
+            let sha;
+            try {
+              sha = execFileSync("git", ["rev-parse", "--verify", "--quiet", `${raw}^{commit}`], { encoding: "utf8" }).trim();
+            } catch {
+              return fail(`Commit "${raw}" does not exist in this repository.`);
+            }
+
+            const subject = execFileSync("git", ["log", "-1", "--format=%s", sha], { encoding: "utf8" }).trim();
+
+            // Git refs must not contain spaces or ~^:?*[\ and no "..", so sanitize the subject
+            const safeSubject = subject
+              .replace(/[\s~^:?*\[\]\\@{}]+/g, "-")
+              .replace(/\.\.+/g, ".")
+              .replace(/^[-.]+|[-.]+$/g, "")
+              .replace(/\.lock$/, "");
+            const branch = `abapGIT---${safeSubject}`;
+
+            try {
+              execFileSync("git", ["ls-remote", "--exit-code", "--heads", "origin", branch], { stdio: "ignore" });
+              return fail(`Branch \`${branch}\` already exists.`);
+            } catch {}
+
+            core.setOutput("sha", sha);
+            core.setOutput("short", sha.slice(0, 7));
+            core.setOutput("subject", subject);
+            core.setOutput("branch", branch);
+            core.info(`Resolved commit ${sha} ("${subject}") -> branch ${branch}`);
+
+      - name: Create branch at commit
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
+        run: git checkout -b "$BRANCH" "$SHA"
+
+      - name: Move macros to methods
+        shell: pwsh
+        run: |
+          ./tools/Move-MacroToMethod.ps1 `
+            -ClassAbapPath "src/#cadaxo#cl_sqlc_cockpit_parse.clas.abap" `
+            -Mapping "execute_select_via_subpool=create_dynamic_select_subpool", `
+                     "execute_select_via_subpool_v_2=create_dynamic_select_subpool2", `
+                     "execute_select_v_1=m_execute_select", `
+                     "execute_select_v_2=m_execute_select_v_2"
+
+      - name: Commit and push branch
+        env:
+          BRANCH: ${{ steps.commit.outputs.branch }}
+          SHORT: ${{ steps.commit.outputs.short }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          if git diff --quiet; then
+            echo "::error::Move-MacroToMethod.ps1 produced no changes at commit ${SHORT}"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src
+          git commit -m "Move macros to methods for install version ${SHORT} (Issue #${ISSUE_NUMBER})"
+          git push origin "$BRANCH"
+          echo "BRANCH_URL=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/$(printf '%s' "$BRANCH" | jq -sRr @uri)" >> "$GITHUB_ENV"
+
+      - name: Close issue
+        uses: actions/github-script@v8
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+          SUBJECT: ${{ steps.commit.outputs.subject }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
+        with:
+          script: |
+            const { SHA, SUBJECT, BRANCH, BRANCH_URL } = process.env;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `✅ Install version created from commit \`${SHA}\` ("${SUBJECT}") on branch \`${BRANCH}\`: ${BRANCH_URL}`
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: "closed",
+              state_reason: "completed"
+            });
+
+      - name: Report failure
+        if: failure() && steps.commit.outcome == 'success'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `❌ Generating the install version failed. See ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });

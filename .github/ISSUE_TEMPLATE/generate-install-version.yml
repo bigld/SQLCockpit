@@ -1,0 +1,19 @@
+name: Generate install version
+description: Create an abapGit install branch (macros moved into methods) for a specific commit
+title: "[Install] Version for commit "
+labels: [generate-install-version]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Submitting this issue starts a workflow that runs `tools/Move-MacroToMethod.ps1`
+        on the given commit and pushes the result to a new branch
+        `abapGIT---<commit message>`.
+  - type: input
+    id: commit
+    attributes:
+      label: Commit
+      description: Full or abbreviated commit SHA that exists in this repository
+      placeholder: 3f2a9c1
+    validations:
+      required: true
