@@ -22,8 +22,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Read and validate commit from issue
-        id: commit
+      - name: Read and validate issue input
+        id: input
         uses: actions/github-script@v8
         with:
           script: |
@@ -54,6 +54,14 @@ jobs:
               core.setFailed(message);
             };
 
+            const variants = {
+              "DEV Version":   { script: "Move-MacroToMethod.ps1", suffix: "abapGIT" },
+              "MACRO Version": { script: "Move-MethodToMacro.ps1", suffix: "MACRO" }
+            };
+            const version = (fields["Version"] ?? "").trim();
+            const variant = variants[version];
+            if (!variant) return fail(`Version "${version}" is invalid, expected one of: ${Object.keys(variants).join(", ")}.`);
+
             const raw = (fields["Commit"] ?? "").trim();
             if (raw === "") return fail("Commit is mandatory but was not provided.");
             // SHA, branch or tag; reject anything git would treat as an option or path trick
@@ -71,36 +79,46 @@ jobs:
             if (!sha) return fail(`Commit "${raw}" does not exist in this repository (no matching SHA, branch or tag).`);
 
             const subject = execFileSync("git", ["log", "-1", "--format=%s", sha], { encoding: "utf8" }).trim();
+            const message = `${subject} - ${variant.suffix}`;
 
-            // Git refs must not contain spaces or ~^:?*[\ and no "..", so sanitize the subject
-            const safeSubject = subject
+            // Git refs must not contain spaces or ~^:?*[\ and no "..", so sanitize the message
+            const branch = message
               .replace(/[\s~^:?*\[\]\\@{}]+/g, "-")
               .replace(/\.\.+/g, ".")
               .replace(/^[-.]+|[-.]+$/g, "")
               .replace(/\.lock$/, "");
-            const branch = `abapGIT---${safeSubject}`;
 
+            let exists = false;
             try {
               execFileSync("git", ["ls-remote", "--exit-code", "--heads", "origin", branch], { stdio: "ignore" });
-              return fail(`Branch \`${branch}\` already exists.`);
+              exists = true;
             } catch {}
 
             core.setOutput("sha", sha);
             core.setOutput("short", sha.slice(0, 7));
             core.setOutput("subject", subject);
+            core.setOutput("version", version);
+            core.setOutput("script", variant.script);
+            core.setOutput("message", message);
             core.setOutput("branch", branch);
-            core.info(`Resolved commit ${sha} ("${subject}") -> branch ${branch}`);
+            core.setOutput("exists", String(exists));
+            core.setOutput("branch_url", `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/${encodeURIComponent(branch)}`);
+            core.info(`Resolved commit ${sha} ("${subject}") -> ${version} on branch ${branch}${exists ? " (already exists)" : ""}`);
 
       - name: Create branch at commit
+        if: steps.input.outputs.exists != 'true'
         env:
-          SHA: ${{ steps.commit.outputs.sha }}
-          BRANCH: ${{ steps.commit.outputs.branch }}
+          SHA: ${{ steps.input.outputs.sha }}
+          BRANCH: ${{ steps.input.outputs.branch }}
         run: git checkout -b "$BRANCH" "$SHA"
 
-      - name: Move macros to methods
+      - name: Run ${{ steps.input.outputs.script }}
+        if: steps.input.outputs.exists != 'true'
         shell: pwsh
+        env:
+          SCRIPT: ${{ steps.input.outputs.script }}
         run: |
-          ./tools/Move-MacroToMethod.ps1 `
+          & "./tools/$env:SCRIPT" `
             -ClassAbapPath "src/#cadaxo#cl_sqlc_cockpit_parse.clas.abap" `
             -Mapping "execute_select_via_subpool=create_dynamic_select_subpool", `
                      "execute_select_via_subpool_v_2=create_dynamic_select_subpool2", `
@@ -109,42 +127,54 @@ jobs:
 
       - name: Commit and push branch
         id: push
+        if: steps.input.outputs.exists != 'true'
         env:
-          BRANCH: ${{ steps.commit.outputs.branch }}
-          SHORT: ${{ steps.commit.outputs.short }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          BRANCH: ${{ steps.input.outputs.branch }}
+          MESSAGE: ${{ steps.input.outputs.message }}
+          SHORT: ${{ steps.input.outputs.short }}
+          SCRIPT: ${{ steps.input.outputs.script }}
         run: |
           if git diff --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "Move-MacroToMethod.ps1 produced no changes at commit ${SHORT}; pushing branch as-is"
+            echo "${SCRIPT} produced no changes at commit ${SHORT}; pushing branch as-is"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add src
-            git commit -m "Move macros to methods for install version ${SHORT} (Issue #${ISSUE_NUMBER})"
+            git commit -m "$MESSAGE"
           fi
           git push origin "$BRANCH"
-          echo "BRANCH_URL=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/$(printf '%s' "$BRANCH" | jq -sRr @uri)" >> "$GITHUB_ENV"
 
       - name: Close issue
         uses: actions/github-script@v8
         env:
-          SHA: ${{ steps.commit.outputs.sha }}
-          SUBJECT: ${{ steps.commit.outputs.subject }}
-          BRANCH: ${{ steps.commit.outputs.branch }}
+          SHA: ${{ steps.input.outputs.sha }}
+          SUBJECT: ${{ steps.input.outputs.subject }}
+          VERSION: ${{ steps.input.outputs.version }}
+          SCRIPT: ${{ steps.input.outputs.script }}
+          BRANCH: ${{ steps.input.outputs.branch }}
+          BRANCH_URL: ${{ steps.input.outputs.branch_url }}
+          EXISTS: ${{ steps.input.outputs.exists }}
           CHANGED: ${{ steps.push.outputs.changed }}
         with:
           script: |
-            const { SHA, SUBJECT, BRANCH, BRANCH_URL, CHANGED } = process.env;
-            const detail = CHANGED === "true"
-              ? "Macros were moved into their methods."
-              : "No changes needed – `Move-MacroToMethod.ps1` found nothing to move, the branch points to the original commit.";
+            const { SHA, SUBJECT, VERSION, SCRIPT, BRANCH, BRANCH_URL, EXISTS, CHANGED } = process.env;
+            const source = `commit \`${SHA}\` ("${SUBJECT}")`;
+            let body;
+            if (EXISTS === "true") {
+              body = `ℹ️ ${VERSION} for ${source} already exists on branch \`${BRANCH}\`: ${BRANCH_URL}\n\nNothing was generated.`;
+            } else {
+              const detail = CHANGED === "true"
+                ? `\`${SCRIPT}\` changes were committed.`
+                : `No changes needed – \`${SCRIPT}\` found nothing to move, the branch points to the original commit.`;
+              body = `✅ ${VERSION} created from ${source} on branch \`${BRANCH}\`: ${BRANCH_URL}\n\n${detail}`;
+            }
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `✅ Install version created from commit \`${SHA}\` ("${SUBJECT}") on branch \`${BRANCH}\`: ${BRANCH_URL}\n\n${detail}`
+              body
             });
             await github.rest.issues.update({
               owner: context.repo.owner,
@@ -155,7 +185,7 @@ jobs:
             });
 
       - name: Report failure
-        if: failure() && steps.commit.outcome == 'success'
+        if: failure() && steps.input.outcome == 'success'
         uses: actions/github-script@v8
         with:
           script: |

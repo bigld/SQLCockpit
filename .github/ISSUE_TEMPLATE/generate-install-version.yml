@@ -1,14 +1,19 @@
 name: Generate install version
-description: Create an abapGit install branch (macros moved into methods) for a specific commit
+description: Create a DEV (abapGIT) or MACRO version branch for a specific commit
 title: "[Install] Version for commit "
 labels: [generate-install-version]
 body:
   - type: markdown
     attributes:
       value: |
-        Submitting this issue starts a workflow that runs `tools/Move-MacroToMethod.ps1`
-        on the given commit and pushes the result to a new branch
-        `abapGIT---<commit message>`.
+        Submitting this issue starts a workflow that checks out the given commit, runs the
+        conversion script for the selected version and pushes the result to a new branch
+        `<commit message> - <suffix>`. If that branch already exists, its link is posted here.
+
+        | Version | Script | Suffix |
+        | --- | --- | --- |
+        | DEV Version | `tools/Move-MacroToMethod.ps1` | `abapGIT` |
+        | MACRO Version | `tools/Move-MethodToMacro.ps1` | `MACRO` |
 
         **Finding the commit:**
         - Browse the [commit history](https://github.com/cadaxo/SQLCockpit/commits) and use the
@@ -16,6 +21,16 @@ body:
         - Or list the [branches](https://github.com/cadaxo/SQLCockpit/branches) /
           [tags](https://github.com/cadaxo/SQLCockpit/tags) and enter the name instead
         - Locally: `git log --oneline -20`
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: Which version should be generated?
+      options:
+        - DEV Version
+        - MACRO Version
+    validations:
+      required: true
   - type: input
     id: commit
     attributes:
