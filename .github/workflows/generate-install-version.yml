@@ -56,14 +56,19 @@ jobs:
 
             const raw = (fields["Commit"] ?? "").trim();
             if (raw === "") return fail("Commit is mandatory but was not provided.");
-            if (!/^[0-9a-fA-F]{7,40}$/.test(raw)) return fail(`Commit "${raw}" is not a valid SHA (7–40 hex characters).`);
+            // SHA, branch or tag; reject anything git would treat as an option or path trick
+            if (raw.startsWith("-") || /[\s~^:?*\[\\]|\.\./.test(raw)) return fail(`Commit "${raw}" is not a valid SHA, branch or tag name.`);
 
+            // Branches are only available as remote-tracking refs in the checkout
+            const candidates = [raw, `origin/${raw}`];
             let sha;
-            try {
-              sha = execFileSync("git", ["rev-parse", "--verify", "--quiet", `${raw}^{commit}`], { encoding: "utf8" }).trim();
-            } catch {
-              return fail(`Commit "${raw}" does not exist in this repository.`);
+            for (const ref of candidates) {
+              try {
+                sha = execFileSync("git", ["rev-parse", "--verify", "--quiet", `${ref}^{commit}`], { encoding: "utf8" }).trim();
+                break;
+              } catch {}
             }
+            if (!sha) return fail(`Commit "${raw}" does not exist in this repository (no matching SHA, branch or tag).`);
 
             const subject = execFileSync("git", ["log", "-1", "--format=%s", sha], { encoding: "utf8" }).trim();
 
@@ -103,19 +108,22 @@ jobs:
                      "execute_select_v_2=m_execute_select_v_2"
 
       - name: Commit and push branch
+        id: push
         env:
           BRANCH: ${{ steps.commit.outputs.branch }}
           SHORT: ${{ steps.commit.outputs.short }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           if git diff --quiet; then
-            echo "::error::Move-MacroToMethod.ps1 produced no changes at commit ${SHORT}"
-            exit 1
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Move-MacroToMethod.ps1 produced no changes at commit ${SHORT}; pushing branch as-is"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add src
+            git commit -m "Move macros to methods for install version ${SHORT} (Issue #${ISSUE_NUMBER})"
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src
-          git commit -m "Move macros to methods for install version ${SHORT} (Issue #${ISSUE_NUMBER})"
           git push origin "$BRANCH"
           echo "BRANCH_URL=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/$(printf '%s' "$BRANCH" | jq -sRr @uri)" >> "$GITHUB_ENV"
 
@@ -125,14 +133,18 @@ jobs:
           SHA: ${{ steps.commit.outputs.sha }}
           SUBJECT: ${{ steps.commit.outputs.subject }}
           BRANCH: ${{ steps.commit.outputs.branch }}
+          CHANGED: ${{ steps.push.outputs.changed }}
         with:
           script: |
-            const { SHA, SUBJECT, BRANCH, BRANCH_URL } = process.env;
+            const { SHA, SUBJECT, BRANCH, BRANCH_URL, CHANGED } = process.env;
+            const detail = CHANGED === "true"
+              ? "Macros were moved into their methods."
+              : "No changes needed – `Move-MacroToMethod.ps1` found nothing to move, the branch points to the original commit.";
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `✅ Install version created from commit \`${SHA}\` ("${SUBJECT}") on branch \`${BRANCH}\`: ${BRANCH_URL}`
+              body: `✅ Install version created from commit \`${SHA}\` ("${SUBJECT}") on branch \`${BRANCH}\`: ${BRANCH_URL}\n\n${detail}`
             });
             await github.rest.issues.update({
               owner: context.repo.owner,

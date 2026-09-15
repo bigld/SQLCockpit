@@ -9,11 +9,18 @@ body:
         Submitting this issue starts a workflow that runs `tools/Move-MacroToMethod.ps1`
         on the given commit and pushes the result to a new branch
         `abapGIT---<commit message>`.
+
+        **Finding the commit:**
+        - Browse the [commit history](https://github.com/cadaxo/SQLCockpit/commits) and use the
+          copy button next to a commit to copy its SHA
+        - Or list the [branches](https://github.com/cadaxo/SQLCockpit/branches) /
+          [tags](https://github.com/cadaxo/SQLCockpit/tags) and enter the name instead
+        - Locally: `git log --oneline -20`
   - type: input
     id: commit
     attributes:
       label: Commit
-      description: Full or abbreviated commit SHA that exists in this repository
-      placeholder: 3f2a9c1
+      description: Commit SHA (full or abbreviated), branch name or tag that exists in this repository
+      placeholder: 3f2a9c1 / main / 2025.1.4
     validations:
       required: true
